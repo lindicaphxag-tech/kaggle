@@ -120,6 +120,94 @@
       "source": "inbox/FIRST_SEEN_20261006T155324Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "9a61945e1ec620d0254a16045e4c9ec6b7fa475ffc31397d4611a89780e8e24e"
+    },
+    {
+      "created_at": "2026-10-06T20:18:07Z",
+      "first_frozen_at": "2026-10-06T20:56:28Z",
+      "id": "StanfordVL/BEHAVIOR-1K#2363",
+      "issue_number": 2363,
+      "prediction_deadline_at": "2026-10-07T02:56:28Z",
+      "repository": "StanfordVL/BEHAVIOR-1K",
+      "source": "inbox/FIRST_SEEN_20261006T205628Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "e963517d4557b9a3a1132fa204cce59cc890a33cb59b2dfeb6ce4e21504df075"
+    },
+    {
+      "created_at": "2026-10-06T16:01:53Z",
+      "first_frozen_at": "2026-10-06T20:56:28Z",
+      "id": "huggingface/lerobot#4857",
+      "issue_number": 4857,
+      "prediction_deadline_at": "2026-10-07T02:56:28Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261006T205628Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "da0d02ed549ea4f27b9f77a358eae1f50f6a2032519063aff60e2f806ed6efaf"
+    },
+    {
+      "created_at": "2026-10-06T18:58:27Z",
+      "first_frozen_at": "2026-10-06T20:56:28Z",
+      "id": "huggingface/lerobot#4858",
+      "issue_number": 4858,
+      "prediction_deadline_at": "2026-10-07T02:56:28Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261006T205628Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "15edfe59c3de681ed3183f2ed5ab6189f2ffc22d25721187dc03cbdeea7a2aab"
+    },
+    {
+      "created_at": "2026-10-06T18:58:46Z",
+      "first_frozen_at": "2026-10-06T20:56:28Z",
+      "id": "huggingface/lerobot#4859",
+      "issue_number": 4859,
+      "prediction_deadline_at": "2026-10-07T02:56:28Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261006T205628Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "be66f6ad9a693ff369179734d87cea37c5cfead24bf391bd0aee6819b4de18d4"
+    },
+    {
+      "created_at": "2026-10-06T16:36:30Z",
+      "first_frozen_at": "2026-10-06T20:56:28Z",
+      "id": "isaac-sim/IsaacLab#8334",
+      "issue_number": 8334,
+      "prediction_deadline_at": "2026-10-07T02:56:28Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261006T205628Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "2111ee2ba1fa081ec0a9b5efdaa0ada16fcf1e30e08f2f389c405df94c924ecb"
+    },
+    {
+      "created_at": "2026-10-06T19:17:44Z",
+      "first_frozen_at": "2026-10-06T20:56:28Z",
+      "id": "isaac-sim/IsaacLab#8342",
+      "issue_number": 8342,
+      "prediction_deadline_at": "2026-10-07T02:56:28Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261006T205628Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "9f4bf87d23042ebf049d275f76de161715a40e65949f918ffc9d4268270cfeb5"
+    },
+    {
+      "created_at": "2026-10-06T16:01:39Z",
+      "first_frozen_at": "2026-10-06T20:56:28Z",
+      "id": "ros-navigation/navigation2#6612",
+      "issue_number": 6612,
+      "prediction_deadline_at": "2026-10-07T02:56:28Z",
+      "repository": "ros-navigation/navigation2",
+      "source": "inbox/FIRST_SEEN_20261006T205628Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "e5eb071df331c0cee2132d598da22cc00deae1d2f820b33f7f5c569ffe6e2b5c"
+    },
+    {
+      "created_at": "2026-10-06T18:20:51Z",
+      "first_frozen_at": "2026-10-06T20:56:28Z",
+      "id": "ros-navigation/navigation2#6621",
+      "issue_number": 6621,
+      "prediction_deadline_at": "2026-10-07T02:56:28Z",
+      "repository": "ros-navigation/navigation2",
+      "source": "inbox/FIRST_SEEN_20261006T205628Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "7783a773bf11aaa6c2d285f4e6bdc857f6a96c4367350280c751b22dc98d39fe"
     }
   ]
 }
