@@ -1,6 +1,73 @@
 {
-  "schema_version": 1,
+  "note": "Public transport starts fresh at its activation cutoff. No historical case is retroactively imported as a prospective candidate.",
   "public_activation_cutoff": "2026-10-06T01:58:55Z",
-  "seen": [],
-  "note": "Public transport starts fresh at its activation cutoff. No historical case is retroactively imported as a prospective candidate."
+  "schema_version": 1,
+  "seen": [
+    {
+      "created_at": "2026-10-06T07:13:54Z",
+      "first_frozen_at": "2026-10-06T08:55:48Z",
+      "id": "ARISE-Initiative/robomimic#322",
+      "issue_number": 322,
+      "prediction_deadline_at": "2026-10-06T14:55:48Z",
+      "repository": "ARISE-Initiative/robomimic",
+      "source": "inbox/FIRST_SEEN_20261006T085548Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "db06f956af48a1d11a85d03cca534e7c7102fb48cdc1d15e935a1c3e360a0b56"
+    },
+    {
+      "created_at": "2026-10-06T03:03:16Z",
+      "first_frozen_at": "2026-10-06T08:55:48Z",
+      "id": "ARISE-Initiative/robosuite#831",
+      "issue_number": 831,
+      "prediction_deadline_at": "2026-10-06T14:55:48Z",
+      "repository": "ARISE-Initiative/robosuite",
+      "source": "inbox/FIRST_SEEN_20261006T085548Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "8b292923307b4e4d72ac434c2a71a1852a3d73eb36352a4de0266f8a7cf0a322"
+    },
+    {
+      "created_at": "2026-10-06T04:23:59Z",
+      "first_frozen_at": "2026-10-06T08:55:48Z",
+      "id": "ros-controls/ros2_control#3665",
+      "issue_number": 3665,
+      "prediction_deadline_at": "2026-10-06T14:55:48Z",
+      "repository": "ros-controls/ros2_control",
+      "source": "inbox/FIRST_SEEN_20261006T085548Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "50212d8b50c624dd24ae12d03632bbec26831ab1194cc4547613ce2032e8308c"
+    },
+    {
+      "created_at": "2026-10-06T04:41:31Z",
+      "first_frozen_at": "2026-10-06T08:55:48Z",
+      "id": "ros-controls/ros2_control#3666",
+      "issue_number": 3666,
+      "prediction_deadline_at": "2026-10-06T14:55:48Z",
+      "repository": "ros-controls/ros2_control",
+      "source": "inbox/FIRST_SEEN_20261006T085548Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "fb68a07800e2da2663756ae082c7c60d1fa4f750d5902e0385a0102eb8ec7197"
+    },
+    {
+      "created_at": "2026-10-06T04:25:32Z",
+      "first_frozen_at": "2026-10-06T08:55:48Z",
+      "id": "ros-controls/ros2_controllers#2691",
+      "issue_number": 2691,
+      "prediction_deadline_at": "2026-10-06T14:55:48Z",
+      "repository": "ros-controls/ros2_controllers",
+      "source": "inbox/FIRST_SEEN_20261006T085548Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "f8fbdc9716f6aa16171364cccc44ac3a346be33eaffb3fd09c7e94a1f2579292"
+    },
+    {
+      "created_at": "2026-10-06T08:08:08Z",
+      "first_frozen_at": "2026-10-06T08:55:48Z",
+      "id": "ros2/rclcpp#3314",
+      "issue_number": 3314,
+      "prediction_deadline_at": "2026-10-06T14:55:48Z",
+      "repository": "ros2/rclcpp",
+      "source": "inbox/FIRST_SEEN_20261006T085548Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "5f2a7c91c169eb9ca8387619e4d7d3d87083c0c8675a67222fe471b2369e626f"
+    }
+  ]
 }
