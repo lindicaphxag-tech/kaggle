@@ -11,12 +11,13 @@
       "prediction_deadline_at": "2026-10-06T14:55:48Z",
       "repository": "ARISE-Initiative/robomimic",
       "source": "inbox/FIRST_SEEN_20261006T085548Z.json",
-      "status": "excluded_i0_mechanism_exposed",
+      "status": "excluded_i0_exact_mechanism_and_repair_exposed",
       "surface_sha256": "db06f956af48a1d11a85d03cca534e7c7102fb48cdc1d15e935a1c3e360a0b56",
       "independence_class": "I0",
       "disposition_frozen_at": "2026-10-06T11:33:10Z",
       "disposition_sha256": "5987204267b935b941957d2c629ce2bda842a46a62ef16893d437069690c3145",
-      "disposition_source": "dispositions/ARISE-Initiative__robomimic__322.json"
+      "disposition_source": "dispositions/ARISE-Initiative__robomimic__322.json",
+      "triage_source": "triage/TRIAGE_FIRST_SEEN_20261006T085548Z.json"
     },
     {
       "created_at": "2026-10-06T03:03:16Z",
@@ -26,12 +27,13 @@
       "prediction_deadline_at": "2026-10-06T14:55:48Z",
       "repository": "ARISE-Initiative/robosuite",
       "source": "inbox/FIRST_SEEN_20261006T085548Z.json",
-      "status": "excluded_i0_mechanism_exposed",
+      "status": "excluded_i0_exact_mechanism_and_repair_exposed_and_crash",
       "surface_sha256": "8b292923307b4e4d72ac434c2a71a1852a3d73eb36352a4de0266f8a7cf0a322",
       "independence_class": "I0",
       "disposition_frozen_at": "2026-10-06T11:33:10Z",
       "disposition_sha256": "f1a5929c03dcb7cb76af0a0c14caf5920d3c7f7ec2bd45ef2c9cbc26932241bb",
-      "disposition_source": "dispositions/ARISE-Initiative__robosuite__831.json"
+      "disposition_source": "dispositions/ARISE-Initiative__robosuite__831.json",
+      "triage_source": "triage/TRIAGE_FIRST_SEEN_20261006T085548Z.json"
     },
     {
       "created_at": "2026-10-06T04:23:59Z",
@@ -41,12 +43,13 @@
       "prediction_deadline_at": "2026-10-06T14:55:48Z",
       "repository": "ros-controls/ros2_control",
       "source": "inbox/FIRST_SEEN_20261006T085548Z.json",
-      "status": "excluded_insufficient_original_surface",
+      "status": "excluded_protocol_2_4_ci_failure_only",
       "surface_sha256": "50212d8b50c624dd24ae12d03632bbec26831ab1194cc4547613ce2032e8308c",
       "independence_class": "EXCLUDED",
       "disposition_frozen_at": "2026-10-06T11:33:10Z",
       "disposition_sha256": "b08db7d8479cac75dcf651a9fc391b29c22dec62c8ba4992fa8bcd6730fed9db",
-      "disposition_source": "dispositions/ros-controls__ros2_control__3665.json"
+      "disposition_source": "dispositions/ros-controls__ros2_control__3665.json",
+      "triage_source": "triage/TRIAGE_FIRST_SEEN_20261006T085548Z.json"
     },
     {
       "created_at": "2026-10-06T04:41:31Z",
@@ -56,12 +59,13 @@
       "prediction_deadline_at": "2026-10-06T14:55:48Z",
       "repository": "ros-controls/ros2_control",
       "source": "inbox/FIRST_SEEN_20261006T085548Z.json",
-      "status": "excluded_insufficient_original_surface",
+      "status": "excluded_protocol_2_4_ci_failure_only",
       "surface_sha256": "fb68a07800e2da2663756ae082c7c60d1fa4f750d5902e0385a0102eb8ec7197",
       "independence_class": "EXCLUDED",
       "disposition_frozen_at": "2026-10-06T11:33:10Z",
       "disposition_sha256": "6a3d573f9231381e98b7a6cf0002a5f3557cccc6c5579342d2edb553ea855a6b",
-      "disposition_source": "dispositions/ros-controls__ros2_control__3666.json"
+      "disposition_source": "dispositions/ros-controls__ros2_control__3666.json",
+      "triage_source": "triage/TRIAGE_FIRST_SEEN_20261006T085548Z.json"
     },
     {
       "created_at": "2026-10-06T04:25:32Z",
@@ -71,12 +75,13 @@
       "prediction_deadline_at": "2026-10-06T14:55:48Z",
       "repository": "ros-controls/ros2_controllers",
       "source": "inbox/FIRST_SEEN_20261006T085548Z.json",
-      "status": "excluded_insufficient_original_surface",
+      "status": "excluded_protocol_2_4_ci_failure_only",
       "surface_sha256": "f8fbdc9716f6aa16171364cccc44ac3a346be33eaffb3fd09c7e94a1f2579292",
       "independence_class": "EXCLUDED",
       "disposition_frozen_at": "2026-10-06T11:33:10Z",
       "disposition_sha256": "91e9cff85f4e3c166e3134febe460025bebeb84fea8a05106fb0eaa4f400d048",
-      "disposition_source": "dispositions/ros-controls__ros2_controllers__2691.json"
+      "disposition_source": "dispositions/ros-controls__ros2_controllers__2691.json",
+      "triage_source": "triage/TRIAGE_FIRST_SEEN_20261006T085548Z.json"
     },
     {
       "created_at": "2026-10-06T08:08:08Z",
@@ -86,12 +91,13 @@
       "prediction_deadline_at": "2026-10-06T14:55:48Z",
       "repository": "ros2/rclcpp",
       "source": "inbox/FIRST_SEEN_20261006T085548Z.json",
-      "status": "excluded_i0_mechanism_exposed",
+      "status": "excluded_i0_exact_mechanism_and_fix_exposed_and_crash",
       "surface_sha256": "5f2a7c91c169eb9ca8387619e4d7d3d87083c0c8675a67222fe471b2369e626f",
       "independence_class": "I0",
       "disposition_frozen_at": "2026-10-06T11:33:10Z",
       "disposition_sha256": "137713a798da7908c3f1af037dd19d286c2bcc71ec9edddb38e44b177854b19f",
-      "disposition_source": "dispositions/ros2__rclcpp__3314.json"
+      "disposition_source": "dispositions/ros2__rclcpp__3314.json",
+      "triage_source": "triage/TRIAGE_FIRST_SEEN_20261006T085548Z.json"
     }
   ]
 }
