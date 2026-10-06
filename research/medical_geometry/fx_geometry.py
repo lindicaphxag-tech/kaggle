@@ -221,7 +221,7 @@ def compile_fx_geometry(
                     )
                     current_node = other_node
                     continue
-\                if not require_channel_aligned_cat:
+                if not require_channel_aligned_cat:
                     raise UnsupportedGeometryOp(
                         f"cat at {node.name!r} contains distinct channel sampling lattices; "
                         "generic channel concatenation should preserve them as a LatticeBundle. "
@@ -229,7 +229,7 @@ def compile_fx_geometry(
                         "require_channel_aligned_cat=True only for an aligned-fusion contract."
                     )
 
-n                bundle = synthesize_merge_repair(current, other, role=role)
+                bundle = synthesize_merge_repair(current, other, role=role)
                 obligations.append(
                     MergeRepairObligation(
                         node_name=node.name,
