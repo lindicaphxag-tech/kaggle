@@ -1,1 +1,297 @@
-"""torch.fx patient-space type checking for branched medical networks.\n\nThe compiler traces a PyTorch model, propagates ClinGeom feature lattices through\nsupported spatial operators, and checks add/cat merge points. Tensor-shape\ncompatibility is not sufficient: merge inputs must denote the same patient-space\nsampling lattice, or the compiler emits an atomic repair obligation.\n"""\n\nfrom __future__ import annotations\n\nfrom dataclasses import dataclass\nimport operator\nfrom typing import Any\n\nimport numpy as np\nimport torch\nimport torch.fx as fx\nimport torch.nn as nn\n\nfrom .clingeom import FeatureLattice, feature_affine\nfrom .repair_synthesis import MergeRepairBundle, synthesize_merge_repair\nfrom .torch_geometry import UnsupportedGeometryOp, _apply_supported_geometry\n\n\n@dataclass(frozen=True)\nclass FXNodeGeometry:\n    node_name: str\n    op: str\n    target: str\n    lattice: FeatureLattice\n    patient_affine: np.ndarray\n\n\n@dataclass(frozen=True)\nclass MergeRepairObligation:\n    node_name: str\n    merge_kind: str\n    left_node: str\n    right_node: str\n    bundle: MergeRepairBundle\n    reason: str\n\n\n@dataclass(frozen=True)\nclass FXGeometryReport:\n    graph_module: fx.GraphModule\n    nodes: tuple[FXNodeGeometry, ...]\n    repair_obligations: tuple[MergeRepairObligation, ...]\n    output_lattice: FeatureLattice\n\n\nclass PatientSpaceMergeError(RuntimeError):\n    """Raised when strict type checking encounters a merge requiring repair."""\n\n\ndef _same_merge_lattice(\n    a: FeatureLattice,\n    b: FeatureLattice,\n    *,\n    atol: float = 1e-9,\n) -> bool:\n    return (\n        tuple(a.shape) == tuple(b.shape)\n        and np.allclose(a.jump, b.jump, atol=atol, rtol=0)\n        and np.allclose(a.start, b.start, atol=atol, rtol=0)\n    )\n\n\ndef _node_lattice(env: dict[fx.Node, FeatureLattice], value: Any) -> FeatureLattice:\n    if not isinstance(value, fx.Node) or value not in env:\n        raise UnsupportedGeometryOp("geometry input is not a previously typed tensor node")\n    return env[value]\n\n\ndef _merge_pair(\n    *,\n    node: fx.Node,\n    kind: str,\n    left_node: fx.Node,\n    right_node: fx.Node,\n    env: dict[fx.Node, FeatureLattice],\n    obligations: list[MergeRepairObligation],\n    strict: bool,\n    role: str,\n) -> FeatureLattice:\n    left = _node_lattice(env, left_node)\n    right = _node_lattice(env, right_node)\n\n    if tuple(left.shape) != tuple(right.shape):\n        raise UnsupportedGeometryOp(\n            f"{kind} at {node.name!r} has ordinary spatial shape mismatch: "\n            f"{left.shape} vs {right.shape}"\n        )\n\n    if _same_merge_lattice(left, right):\n        return FeatureLattice(\n            left.shape,\n            np.asarray(left.jump, dtype=np.float64).copy(),\n            np.asarray(left.start, dtype=np.float64).copy(),\n            np.maximum(\n                np.asarray(left.receptive_field, dtype=np.float64),\n                np.asarray(right.receptive_field, dtype=np.float64),\n            ),\n        )\n\n    bundle = synthesize_merge_repair(left, right, role=role)\n    obligations.append(\n        MergeRepairObligation(\n            node_name=node.name,\n            merge_kind=kind,\n            left_node=left_node.name,\n            right_node=right_node.name,\n            bundle=bundle,\n            reason=(\n                "tensor shapes agree but patient-space feature-center lattices differ; "\n                "fusion requires the certified atomic repair bundle"\n            ),\n        )\n    )\n\n    if strict:\n        raise PatientSpaceMergeError(\n            f"{kind} at {node.name!r} is tensor-valid but patient-space invalid; "\n            f"repair bundle {bundle.bundle_digest}"\n        )\n\n    if "refuse" in {bundle.left.kind, bundle.right.kind}:\n        raise UnsupportedGeometryOp(\n            f"{kind} at {node.name!r} has no certified repair in ClinGeom v1"\n        )\n\n    return bundle.target\n\n\ndef compile_fx_geometry(\n    module: nn.Module,\n    *,\n    input_shape: tuple[int, int, int],\n    input_affine: np.ndarray,\n    role: str = "feature",\n    strict: bool = False,\n    require_channel_aligned_cat: bool = False,\n) -> FXGeometryReport:\n    """Trace a PyTorch DAG under an optional single-lattice fusion contract.\n\n    Pointwise addition always requires matching patient-space sampling lattices.\n    Channel concatenation may intentionally preserve different sampling phases.\n    By default, mismatched channel cat belongs in the LatticeBundle compiler.\n    Set require_channel_aligned_cat=True only when the application contract\n    explicitly requires aligned channel centers before concatenation.\n    """\n\n    affine = np.asarray(input_affine, dtype=np.float64)\n    if affine.shape != (4, 4) or not np.all(np.isfinite(affine)):\n        raise ValueError("input_affine must be a finite 4x4 matrix")\n\n    gm = fx.symbolic_trace(module)\n    env: dict[fx.Node, FeatureLattice] = {}\n    typed_nodes: list[FXNodeGeometry] = []\n    obligations: list[MergeRepairObligation] = []\n    output_lattice: FeatureLattice | None = None\n    placeholder_count = 0\n\n    for node in gm.graph.nodes:\n        if node.op == "placeholder":\n            placeholder_count += 1\n            if placeholder_count > 1:\n                raise UnsupportedGeometryOp("ClinGeom fx v1 supports one tensor input")\n            lattice = FeatureLattice.input_grid(input_shape)\n            env[node] = lattice\n\n        elif node.op == "call_module":\n            layer = gm.get_submodule(str(node.target))\n            if not node.args:\n                raise UnsupportedGeometryOp(f"module {node.target!r} has no tensor input")\n            source = _node_lattice(env, node.args[0])\n            lattice = _apply_supported_geometry(layer, source)\n            env[node] = lattice\n\n        elif node.op == "call_function" and node.target in {operator.add, torch.add}:\n            if len(node.args) < 2:\n                raise UnsupportedGeometryOp("add node must have two tensor inputs")\n            lattice = _merge_pair(\n                node=node,\n                kind="add",\n                left_node=node.args[0],\n                right_node=node.args[1],\n                env=env,\n                obligations=obligations,\n                strict=strict,\n                role=role,\n            )\n            env[node] = lattice\n\n        elif node.op == "call_function" and node.target is torch.cat:\n            tensors = node.args[0]\n            if not isinstance(tensors, (tuple, list)) or len(tensors) < 2:\n                raise UnsupportedGeometryOp("torch.cat must receive at least two typed tensors")\n            dim = node.kwargs.get("dim", node.args[1] if len(node.args) > 1 else 0)\n            if dim not in {1, -4}:\n                raise UnsupportedGeometryOp(\n                    "ClinGeom fx v1 only certifies channel-wise cat for NCDHW tensors"\n                )\n            current_node = tensors[0]\n            current = _node_lattice(env, current_node)\n            for other_node in tensors[1:]:\n                other = _node_lattice(env, other_node)\n                if tuple(current.shape) != tuple(other.shape):\n                    raise UnsupportedGeometryOp(\n                        f"cat at {node.name!r} has ordinary spatial shape mismatch"\n                    )\n                if _same_merge_lattice(current, other):\n                    current = FeatureLattice(\n                        current.shape,\n                        np.asarray(current.jump).copy(),\n                        np.asarray(current.start).copy(),\n                        np.maximum(\n                            np.asarray(current.receptive_field),\n                            np.asarray(other.receptive_field),\n                        ),\n                    )\n                    current_node = other_node\n                    continue\n\                if not require_channel_aligned_cat:\n                    raise UnsupportedGeometryOp(\n                        f"cat at {node.name!r} contains distinct channel sampling lattices; "\n                        "generic channel concatenation should preserve them as a LatticeBundle. "\n                        "Use compile_fx_bundle_geometry, or set "\n                        "require_channel_aligned_cat=True only for an aligned-fusion contract."\n                    )\n\nn                bundle = synthesize_merge_repair(current, other, role=role)\n                obligations.append(\n                    MergeRepairObligation(\n                        node_name=node.name,\n                        merge_kind="cat",\n                        left_node=getattr(current_node, "name", "<merged>"),\n                        right_node=other_node.name,\n                        bundle=bundle,\n                        reason=("application declared channel-aligned fusion, but tensor-valid ""channel groups have different feature-center lattices"),\n                    )\n                )\n                if strict:\n                    raise PatientSpaceMergeError(\n                        f"cat at {node.name!r} requires repair bundle {bundle.bundle_digest}"\n                    )\n                if "refuse" in {bundle.left.kind, bundle.right.kind}:\n                    raise UnsupportedGeometryOp(\n                        f"cat at {node.name!r} has no certified repair in ClinGeom v1"\n                    )\n                current = bundle.target\n                current_node = node\n            lattice = current\n            env[node] = lattice\n\n        elif node.op == "call_function" and node.target is torch.relu:\n            lattice = _node_lattice(env, node.args[0])\n            env[node] = lattice\n\n        elif node.op == "output":\n            raw = node.args[0]\n            if isinstance(raw, fx.Node):\n                output_lattice = _node_lattice(env, raw)\n            elif isinstance(raw, (tuple, list)) and len(raw) == 1 and isinstance(raw[0], fx.Node):\n                output_lattice = _node_lattice(env, raw[0])\n            else:\n                raise UnsupportedGeometryOp("ClinGeom fx v1 requires one tensor output")\n            continue\n\n        elif node.op == "get_attr":\n            continue\n\n        else:\n            raise UnsupportedGeometryOp(\n                f"FX node {node.name!r}: op={node.op!r}, target={node.target!r} "\n                "has no certified patient-space rule"\n            )\n\n        typed_nodes.append(\n            FXNodeGeometry(\n                node_name=node.name,\n                op=node.op,\n                target=str(node.target),\n                lattice=lattice,\n                patient_affine=feature_affine(affine, lattice),\n            )\n        )\n\n    if placeholder_count != 1 or output_lattice is None:\n        raise UnsupportedGeometryOp("failed to establish one input and one output lattice")\n\n    return FXGeometryReport(\n        graph_module=gm,\n        nodes=tuple(typed_nodes),\n        repair_obligations=tuple(obligations),\n        output_lattice=output_lattice,\n    )\n
+"""torch.fx patient-space type checking for branched medical networks.
+
+The compiler traces a PyTorch model, propagates ClinGeom feature lattices through
+supported spatial operators, and checks add/cat merge points. Tensor-shape
+compatibility is not sufficient: merge inputs must denote the same patient-space
+sampling lattice, or the compiler emits an atomic repair obligation.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+import operator
+from typing import Any
+
+import numpy as np
+import torch
+import torch.fx as fx
+import torch.nn as nn
+
+from .clingeom import FeatureLattice, feature_affine
+from .repair_synthesis import MergeRepairBundle, synthesize_merge_repair
+from .torch_geometry import UnsupportedGeometryOp, _apply_supported_geometry
+
+
+@dataclass(frozen=True)
+class FXNodeGeometry:
+    node_name: str
+    op: str
+    target: str
+    lattice: FeatureLattice
+    patient_affine: np.ndarray
+
+
+@dataclass(frozen=True)
+class MergeRepairObligation:
+    node_name: str
+    merge_kind: str
+    left_node: str
+    right_node: str
+    bundle: MergeRepairBundle
+    reason: str
+
+
+@dataclass(frozen=True)
+class FXGeometryReport:
+    graph_module: fx.GraphModule
+    nodes: tuple[FXNodeGeometry, ...]
+    repair_obligations: tuple[MergeRepairObligation, ...]
+    output_lattice: FeatureLattice
+
+
+class PatientSpaceMergeError(RuntimeError):
+    """Raised when strict type checking encounters a merge requiring repair."""
+
+
+def _same_merge_lattice(
+    a: FeatureLattice,
+    b: FeatureLattice,
+    *,
+    atol: float = 1e-9,
+) -> bool:
+    return (
+        tuple(a.shape) == tuple(b.shape)
+        and np.allclose(a.jump, b.jump, atol=atol, rtol=0)
+        and np.allclose(a.start, b.start, atol=atol, rtol=0)
+    )
+
+
+def _node_lattice(env: dict[fx.Node, FeatureLattice], value: Any) -> FeatureLattice:
+    if not isinstance(value, fx.Node) or value not in env:
+        raise UnsupportedGeometryOp("geometry input is not a previously typed tensor node")
+    return env[value]
+
+
+def _merge_pair(
+    *,
+    node: fx.Node,
+    kind: str,
+    left_node: fx.Node,
+    right_node: fx.Node,
+    env: dict[fx.Node, FeatureLattice],
+    obligations: list[MergeRepairObligation],
+    strict: bool,
+    role: str,
+) -> FeatureLattice:
+    left = _node_lattice(env, left_node)
+    right = _node_lattice(env, right_node)
+
+    if tuple(left.shape) != tuple(right.shape):
+        raise UnsupportedGeometryOp(
+            f"{kind} at {node.name!r} has ordinary spatial shape mismatch: "
+            f"{left.shape} vs {right.shape}"
+        )
+
+    if _same_merge_lattice(left, right):
+        return FeatureLattice(
+            left.shape,
+            np.asarray(left.jump, dtype=np.float64).copy(),
+            np.asarray(left.start, dtype=np.float64).copy(),
+            np.maximum(
+                np.asarray(left.receptive_field, dtype=np.float64),
+                np.asarray(right.receptive_field, dtype=np.float64),
+            ),
+        )
+
+    bundle = synthesize_merge_repair(left, right, role=role)
+    obligations.append(
+        MergeRepairObligation(
+            node_name=node.name,
+            merge_kind=kind,
+            left_node=left_node.name,
+            right_node=right_node.name,
+            bundle=bundle,
+            reason=(
+                "tensor shapes agree but patient-space feature-center lattices differ; "
+                "fusion requires the certified atomic repair bundle"
+            ),
+        )
+    )
+
+    if strict:
+        raise PatientSpaceMergeError(
+            f"{kind} at {node.name!r} is tensor-valid but patient-space invalid; "
+            f"repair bundle {bundle.bundle_digest}"
+        )
+
+    if "refuse" in {bundle.left.kind, bundle.right.kind}:
+        raise UnsupportedGeometryOp(
+            f"{kind} at {node.name!r} has no certified repair in ClinGeom v1"
+        )
+
+    return bundle.target
+
+
+def compile_fx_geometry(
+    module: nn.Module,
+    *,
+    input_shape: tuple[int, int, int],
+    input_affine: np.ndarray,
+    role: str = "feature",
+    strict: bool = False,
+    require_channel_aligned_cat: bool = False,
+) -> FXGeometryReport:
+    """Trace a PyTorch DAG under an optional single-lattice fusion contract.
+
+    Pointwise addition always requires matching patient-space sampling lattices.
+    Channel concatenation may intentionally preserve different sampling phases.
+    By default, mismatched channel cat belongs in the LatticeBundle compiler.
+    Set require_channel_aligned_cat=True only when the application contract
+    explicitly requires aligned channel centers before concatenation.
+    """
+
+    affine = np.asarray(input_affine, dtype=np.float64)
+    if affine.shape != (4, 4) or not np.all(np.isfinite(affine)):
+        raise ValueError("input_affine must be a finite 4x4 matrix")
+
+    gm = fx.symbolic_trace(module)
+    env: dict[fx.Node, FeatureLattice] = {}
+    typed_nodes: list[FXNodeGeometry] = []
+    obligations: list[MergeRepairObligation] = []
+    output_lattice: FeatureLattice | None = None
+    placeholder_count = 0
+
+    for node in gm.graph.nodes:
+        if node.op == "placeholder":
+            placeholder_count += 1
+            if placeholder_count > 1:
+                raise UnsupportedGeometryOp("ClinGeom fx v1 supports one tensor input")
+            lattice = FeatureLattice.input_grid(input_shape)
+            env[node] = lattice
+
+        elif node.op == "call_module":
+            layer = gm.get_submodule(str(node.target))
+            if not node.args:
+                raise UnsupportedGeometryOp(f"module {node.target!r} has no tensor input")
+            source = _node_lattice(env, node.args[0])
+            lattice = _apply_supported_geometry(layer, source)
+            env[node] = lattice
+
+        elif node.op == "call_function" and node.target in {operator.add, torch.add}:
+            if len(node.args) < 2:
+                raise UnsupportedGeometryOp("add node must have two tensor inputs")
+            lattice = _merge_pair(
+                node=node,
+                kind="add",
+                left_node=node.args[0],
+                right_node=node.args[1],
+                env=env,
+                obligations=obligations,
+                strict=strict,
+                role=role,
+            )
+            env[node] = lattice
+
+        elif node.op == "call_function" and node.target is torch.cat:
+            tensors = node.args[0]
+            if not isinstance(tensors, (tuple, list)) or len(tensors) < 2:
+                raise UnsupportedGeometryOp("torch.cat must receive at least two typed tensors")
+            dim = node.kwargs.get("dim", node.args[1] if len(node.args) > 1 else 0)
+            if dim not in {1, -4}:
+                raise UnsupportedGeometryOp(
+                    "ClinGeom fx v1 only certifies channel-wise cat for NCDHW tensors"
+                )
+            current_node = tensors[0]
+            current = _node_lattice(env, current_node)
+            for other_node in tensors[1:]:
+                other = _node_lattice(env, other_node)
+                if tuple(current.shape) != tuple(other.shape):
+                    raise UnsupportedGeometryOp(
+                        f"cat at {node.name!r} has ordinary spatial shape mismatch"
+                    )
+                if _same_merge_lattice(current, other):
+                    current = FeatureLattice(
+                        current.shape,
+                        np.asarray(current.jump).copy(),
+                        np.asarray(current.start).copy(),
+                        np.maximum(
+                            np.asarray(current.receptive_field),
+                            np.asarray(other.receptive_field),
+                        ),
+                    )
+                    current_node = other_node
+                    continue
+\                if not require_channel_aligned_cat:
+                    raise UnsupportedGeometryOp(
+                        f"cat at {node.name!r} contains distinct channel sampling lattices; "
+                        "generic channel concatenation should preserve them as a LatticeBundle. "
+                        "Use compile_fx_bundle_geometry, or set "
+                        "require_channel_aligned_cat=True only for an aligned-fusion contract."
+                    )
+
+n                bundle = synthesize_merge_repair(current, other, role=role)
+                obligations.append(
+                    MergeRepairObligation(
+                        node_name=node.name,
+                        merge_kind="cat",
+                        left_node=getattr(current_node, "name", "<merged>"),
+                        right_node=other_node.name,
+                        bundle=bundle,
+                        reason=("application declared channel-aligned fusion, but tensor-valid ""channel groups have different feature-center lattices"),
+                    )
+                )
+                if strict:
+                    raise PatientSpaceMergeError(
+                        f"cat at {node.name!r} requires repair bundle {bundle.bundle_digest}"
+                    )
+                if "refuse" in {bundle.left.kind, bundle.right.kind}:
+                    raise UnsupportedGeometryOp(
+                        f"cat at {node.name!r} has no certified repair in ClinGeom v1"
+                    )
+                current = bundle.target
+                current_node = node
+            lattice = current
+            env[node] = lattice
+
+        elif node.op == "call_function" and node.target is torch.relu:
+            lattice = _node_lattice(env, node.args[0])
+            env[node] = lattice
+
+        elif node.op == "output":
+            raw = node.args[0]
+            if isinstance(raw, fx.Node):
+                output_lattice = _node_lattice(env, raw)
+            elif isinstance(raw, (tuple, list)) and len(raw) == 1 and isinstance(raw[0], fx.Node):
+                output_lattice = _node_lattice(env, raw[0])
+            else:
+                raise UnsupportedGeometryOp("ClinGeom fx v1 requires one tensor output")
+            continue
+
+        elif node.op == "get_attr":
+            continue
+
+        else:
+            raise UnsupportedGeometryOp(
+                f"FX node {node.name!r}: op={node.op!r}, target={node.target!r} "
+                "has no certified patient-space rule"
+            )
+
+        typed_nodes.append(
+            FXNodeGeometry(
+                node_name=node.name,
+                op=node.op,
+                target=str(node.target),
+                lattice=lattice,
+                patient_affine=feature_affine(affine, lattice),
+            )
+        )
+
+    if placeholder_count != 1 or output_lattice is None:
+        raise UnsupportedGeometryOp("failed to establish one input and one output lattice")
+
+    return FXGeometryReport(
+        graph_module=gm,
+        nodes=tuple(typed_nodes),
+        repair_obligations=tuple(obligations),
+        output_lattice=output_lattice,
+    )
