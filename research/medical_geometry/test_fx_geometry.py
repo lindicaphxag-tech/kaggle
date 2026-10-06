@@ -55,14 +55,24 @@ def test_aligned_same_shape_cat_is_legal_even_with_different_receptive_fields():
     assert np.allclose(report.output_lattice.receptive_field, [3, 3, 3])
 
 
-def test_tensor_valid_cat_with_half_voxel_phase_mismatch_emits_atomic_repair():
+def test_generic_misaligned_channel_cat_preserves_fibers_instead_of_auto_repair():
     model = MisalignedCat()
     x = torch.zeros(1, 1, 64, 64, 64)
-    # PyTorch accepts the merge because spatial shapes match exactly.
     assert tuple(model(x).shape[-3:]) == (32, 32, 32)
+    with pytest.raises(UnsupportedGeometryOp, match="LatticeBundle"):
+        compile_fx_geometry(
+            model, input_shape=(64, 64, 64), input_affine=np.eye(4), strict=False
+        )
 
+
+def test_explicit_aligned_cat_contract_emits_atomic_repair():
+    model = MisalignedCat()
     report = compile_fx_geometry(
-        model, input_shape=(64, 64, 64), input_affine=np.eye(4), strict=False
+        model,
+        input_shape=(64, 64, 64),
+        input_affine=np.eye(4),
+        strict=False,
+        require_channel_aligned_cat=True,
     )
     assert len(report.repair_obligations) == 1
     obligation = report.repair_obligations[0]
@@ -81,6 +91,7 @@ def test_strict_mode_rejects_tensor_valid_patient_space_invalid_cat():
             input_shape=(64, 64, 64),
             input_affine=np.eye(4),
             strict=True,
+            require_channel_aligned_cat=True,
         )
 
 
