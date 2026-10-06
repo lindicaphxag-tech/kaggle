@@ -87,6 +87,8 @@ def test_inverse_rotation_round_trip_has_quarter_eager_prompt_iou():
     np.testing.assert_allclose(cert.direct_prompt_iou, 1.0, atol=1e-12)
     np.testing.assert_allclose(cert.eager_prompt_iou, 0.25, atol=1e-12)
     np.testing.assert_allclose(cert.path_overcoverage_ratio, 3.0, atol=1e-12)
+    np.testing.assert_allclose(cert.log_volume_debt, np.log(4.0), atol=1e-12)
+    np.testing.assert_allclose(cert.fidelity_retention, 0.25, atol=1e-12)
     np.testing.assert_allclose(cert.avoidable_prompt_iou_loss, 0.75, atol=1e-12)
     assert cert.should_defer_projection
 
@@ -109,3 +111,36 @@ def test_eager_chain_never_beats_deferred_projection():
     assert np.all(cert.eager_target_widths + 1e-12 >= cert.direct_target_widths)
     assert cert.eager_stagewise_aabb_volume + 1e-12 >= cert.direct_tight_aabb_volume
     assert cert.eager_prompt_iou <= cert.direct_prompt_iou + 1e-12
+
+
+def test_refining_projection_boundaries_never_reduces_debt():
+    rng = np.random.default_rng(20261006)
+    extents = np.array([2.0, 3.0, 4.0])
+    for _ in range(50):
+        a = np.eye(3) + rng.normal(scale=0.12, size=(3, 3))
+        b = _rotation(float(rng.uniform(-35.0, 35.0))) @ np.diag(
+            rng.uniform(0.7, 1.4, size=3)
+        )
+        c = np.eye(3) + rng.normal(scale=0.10, size=(3, 3))
+        if min(abs(np.linalg.det(x)) for x in (a, b, c)) < 0.2:
+            continue
+
+        fine = certify_aabb_approximation_debt([a, b, c], extents)
+        coarse = certify_aabb_approximation_debt([b @ a, c], extents)
+
+        np.testing.assert_allclose(
+            fine.total_linear_map, coarse.total_linear_map, atol=1e-12, rtol=1e-12
+        )
+        assert fine.log_volume_debt + 1e-12 >= coarse.log_volume_debt
+        assert fine.fidelity_retention <= coarse.fidelity_retention + 1e-12
+
+
+def test_log_debt_exactly_explains_fidelity_retention():
+    maps = [_rotation(13.0), _rotation(-29.0), _rotation(16.0)]
+    cert = certify_aabb_approximation_debt(maps, np.array([1.0, 2.0, 3.0]))
+    np.testing.assert_allclose(
+        cert.fidelity_retention,
+        np.exp(-cert.log_volume_debt),
+        atol=1e-12,
+        rtol=1e-12,
+    )
