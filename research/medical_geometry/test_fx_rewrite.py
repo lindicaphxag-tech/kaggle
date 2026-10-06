@@ -44,6 +44,7 @@ def test_original_graph_is_tensor_valid_but_physical_samples_disagree():
         input_shape=(64, 64, 64),
         input_affine=np.eye(4),
         strict=False,
+        require_channel_aligned_cat=True,
     )
     assert len(report.repair_obligations) == 1
 
@@ -54,6 +55,7 @@ def test_auto_rewrite_aligns_branches_before_cat():
         model,
         input_shape=(64, 64, 64),
         input_affine=np.eye(4),
+        repair_channel_cat=True,
     )
     assert len(rewritten.rewrites) == 1
 
