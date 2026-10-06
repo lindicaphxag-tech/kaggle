@@ -1,0 +1,57 @@
+name: ClinGeom public post-prediction resolution transport
+
+on:
+  pull_request:
+    paths:
+      - "clingeom_transport/**"
+      - ".github/workflows/clingeom-prospective-resolution.yml"
+  push:
+    branches: [main]
+    paths:
+      - "clingeom_transport/predictions/**"
+      - "clingeom_transport/collect_resolution.py"
+      - ".github/workflows/clingeom-prospective-resolution.yml"
+  schedule:
+    - cron: "53 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: clingeom-public-resolution
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: python clingeom_transport/collect_resolution.py --self-test
+
+  collect:
+    if: github.event_name != 'pull_request'
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: Collect digest-authorized post-freeze evidence
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python clingeom_transport/collect_resolution.py
+      - name: Persist changed resolution evidence only
+        run: |
+          if git diff --quiet -- clingeom_transport/resolution; then
+            echo "No changed ClinGeom resolution evidence."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add clingeom_transport/resolution
+          git commit -m "Freeze ClinGeom public post-prediction resolution evidence"
+          git push origin HEAD:main
