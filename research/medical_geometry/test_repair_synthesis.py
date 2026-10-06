@@ -40,9 +40,9 @@ def test_integer_subset_uses_zero_interpolation_crop():
     assert verify_repair_plan(src, dst, plan)
 
 
-def test_half_voxel_offset_requires_resampling():
+def test_interior_half_voxel_offset_requires_resampling_without_extrapolation():
     src = lattice((16, 16, 16), (4, 4, 4), (0, 0, 0))
-    dst = lattice((16, 16, 16), (4, 4, 4), (1.5, 1.5, 1.5))
+    dst = lattice((15, 15, 15), (4, 4, 4), (1.5, 1.5, 1.5))
     plan = synthesize_lattice_repair(src, dst, role="feature")
     assert plan.kind == "resample"
     assert plan.interpolation == "trilinear"
@@ -51,9 +51,9 @@ def test_half_voxel_offset_requires_resampling():
     assert verify_repair_plan(src, dst, plan)
 
 
-def test_label_resampling_is_nearest_not_trilinear():
+def test_interior_label_resampling_is_nearest_not_trilinear():
     src = lattice((16, 16, 16), (4, 4, 4), (0, 0, 0))
-    dst = lattice((16, 16, 16), (4, 4, 4), (1.5, 0, 0))
+    dst = lattice((15, 16, 16), (4, 4, 4), (1.5, 0, 0))
     plan = synthesize_lattice_repair(src, dst, role="label")
     assert plan.kind == "resample"
     assert plan.interpolation == "nearest"
