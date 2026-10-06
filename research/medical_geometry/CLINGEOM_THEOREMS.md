@@ -179,3 +179,66 @@ contain exact zeros that remove some dependencies. ClinGeom v1 deliberately
 does not use floating-point weight sparsity to certify semantic geometry;
 doing so would require weight-bound certificates and robustness to numerical
 perturbation.
+
+
+## T9 — affine prompt representation ceiling for axis-aligned box prompts
+
+Let a source AABB have positive side-length vector `d` and let `A` be the
+invertible source-to-target affine linear chart map. The exact transported
+physical region is a parallelepiped with volume
+
+    V_exact = |det(A)| prod_j d_j.
+
+The tightest target-axis-aligned enclosing box has widths
+
+    w_i = sum_j |A_ij| d_j
+
+and volume
+
+    V_AABB = prod_i w_i.
+
+Therefore the best physical-region fidelity achievable by an enclosing target
+AABB is
+
+    IoU_prompt(A,d) = V_exact / V_AABB.
+
+This equals one exactly for monomial `A` (one non-zero per row and column),
+the affine maps under which the AABB family is closed. For a unit cube under
+a 45-degree in-plane rotation, `V_AABB=2`, so `IoU_prompt=0.5`.
+
+This is a prompt-representation statement before model inference. It is not an
+upper bound on final segmentation Dice/IoU; a model may use image evidence to
+refine beyond its prompt.
+
+## T10 — minimal exact representation lift hierarchy
+
+For one canonical source AABB, the transported edge matrix is
+
+    E = A diag(d).
+
+The least expressive exact target representation obeys:
+
+1. **AABB** iff `A` is monomial.
+2. **OBB** iff the transported edges are mutually orthogonal, equivalently
+   `A^T A` is diagonal for positive diagonal `d`.
+3. **Parallelepiped** for every invertible affine `A`.
+4. **Target-grid mask** when no supported continuum parametric primitive is
+   available and physical point-membership is explicitly rasterized.
+
+The instance-level OBB condition must not be confused with global OBB-family
+closure. Every arbitrarily oriented OBB remains an OBB only under similarity
+maps satisfying `A^T A = s^2 I`.
+
+A compiler should therefore choose the first *supported exact* primitive in
+
+    AABB -> OBB -> parallelepiped -> mask
+
+before considering any inexact enclosing-box approximation. If an API supports
+only AABB, approximation requires an explicit fidelity budget based on T9 or
+must fail closed.
+
+### Prompt-theorem falsification boundary
+
+T9/T10 concern physical prompt denotation under affine image-chart changes.
+They do not claim generic bounding-box robustness, prompt-selection optimality,
+or segmentation-performance bounds.
