@@ -45,12 +45,13 @@ def rewrite_patient_space_merges(
     input_shape: tuple[int, int, int],
     input_affine: np.ndarray,
     role: str = "feature",
+    repair_channel_cat: bool = False,
 ) -> RewrittenGeometryModel:
-    """Insert certified lattice-repair modules before binary add/cat merges.
+    """Insert certified repairs before binary pointwise/aligned merges.
 
-    v1 deliberately supports only binary merge obligations. Multi-input fusion
-    remains detectable by the compiler but is not automatically rewritten until
-    an atomic multi-way target-lattice optimizer is implemented.
+    Pointwise add is eligible by default. Heterogeneous channel concatenation
+    preserves channel-fiber identity and is only rewritten when
+    repair_channel_cat=True explicitly declares an aligned-fusion contract.
     """
 
     report = compile_fx_geometry(
@@ -59,6 +60,7 @@ def rewrite_patient_space_merges(
         input_affine=input_affine,
         role=role,
         strict=False,
+        require_channel_aligned_cat=repair_channel_cat,
     )
     gm = report.graph_module
     graph = gm.graph
