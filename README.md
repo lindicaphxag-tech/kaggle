@@ -1,5 +1,7 @@
 # Public Research Artifacts
 
+[![ClinGeom public core artifact](https://github.com/lindicaphxag-tech/kaggle/actions/workflows/clingeom-core-artifact.yml/badge.svg?branch=main)](https://github.com/lindicaphxag-tech/kaggle/actions/workflows/clingeom-core-artifact.yml)
+
 This repository is a public evidence and reproducibility surface for two research lines:
 
 1. **ClinGeom** — typed patient-space semantics for medical AI pipelines.
@@ -37,7 +39,7 @@ PYTHONPATH=. python research/medical_geometry/benchmark_clingeom.py
 PYTHONPATH=. python research/medical_geometry/benchmark_prompt_representation.py
 ```
 
-The first benchmark should expose a case where voxel Dice is exactly `1.0` while patient-space centroid error is non-zero, plus a negative control where shape-only geometry is valid. The prompt benchmark must keep analytic-vs-sampled representation error below its frozen threshold.
+The first benchmark should expose a case where voxel Dice is exactly `1.0` while patient-space centroid error is non-zero, plus a negative control where shape-only geometry is valid. The prompt benchmark must keep analytic-vs-sampled representation error below its frozen threshold. It also includes the exact 45° rotation → inverse-rotation witness: deferred projection returns prompt IoU `1.0`, while eager intermediate AABB projection returns `0.25`.
 
 ### PyTorch compiler reproduction
 
