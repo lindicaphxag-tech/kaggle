@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "surface": "clingeom-public-prospective-transport",
+  "public_activation_commit": "e2021356533586d09192eb9afa42a374f4856acb",
+  "public_activation_cutoff": "2026-10-06T03:10:20Z",
+  "prediction_sla_hours": 6,
+  "repository_count": 12,
+  "historical_sampling_provenance": {
+    "selection_commit": "c59d01ebf079c3fb4a36e515fbfc24ae00eafafe",
+    "original_cutoff": "2026-10-06T02:24:26Z",
+    "source_branch": "research/clingeom-patient-space-contracts",
+    "note": "The public transport will start fresh at its own activation cutoff and never retroactively upgrade earlier observations."
+  },
+  "repositories": [
+    "Project-MONAI/MONAI",
+    "MIC-DKFZ/nnUNet",
+    "TorchIO-project/torchio",
+    "SimpleITK/SimpleITK",
+    "InsightSoftwareConsortium/ITK",
+    "pydicom/pydicom",
+    "ImagingDataCommons/highdicom",
+    "nipy/nibabel",
+    "Project-MONAI/MONAILabel",
+    "wasserth/TotalSegmentator",
+    "bowang-lab/MedSAM",
+    "MIC-DKFZ/MedSAM3"
+  ],
+  "eligible_failure_axes": [
+    "voxel-to-patient affine",
+    "orientation / axis order",
+    "RAS-LPS or coordinate-frame conversion",
+    "spacing / origin / direction cosines",
+    "resampling and interpolation role semantics",
+    "image-label grid correspondence",
+    "laterality semantics under reflection",
+    "multiframe DICOM geometry",
+    "model feature/logit sampling lattice",
+    "inverse export to source patient space",
+    "geometry provenance / silent metadata substitution"
+  ],
+  "information_barrier": "Before prediction freeze, transport may read only original GitHub issue endpoint fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "claim_boundary": "Capture is not a mechanism match, prospective success, clinical validation, external adoption, or L8/L9 credit.",
+  "eligibility_rule": "Only issues created strictly after public_activation_cutoff can become prospective candidates on this public surface. Earlier private-branch observations are provenance only and are never upgraded retroactively."
+}
