@@ -1,0 +1,26 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "aditya-neuraco",
+      "body": "### Intro\n\nHi!\n\nI am a Aditya, a Research Engineer working on Robot Learning at Neuracore, we use MuJoCo for our examples in [neuracore](https://github.com/NeuracoreAI/neuracore). \n\nWe support aarch64 for our package. Yesterday, on 5 October 2026, mujoco 3.15 was released without python 3.11 wheels for aarch64, and users on 3.11 haven't been able to install our library. Could you please upload the aarch32 wheel for python 3.11?\n\nHere you can find that there's no wheel for aarch64 python 3.11 wheen mujoco 3.15 - https://pypi.org/project/mujoco/?filename=aarch64#files\n\n### My setup\n\nUbuntu 24.04 aarch64\n\n### What's happening? What did you expect?\n\nNot able to install mujoco 3.15 on aarch64 on python 3.11.\n\n\n### Steps for reproduction\n\nRun this snippet on a ARM64 Linux (Ubuntu 24.04) machine: \n\n```python\nuv tool install -p 3.11 neuracore[examples]\n```\n\n### Minimal model for reproduction\n\n_No response_\n\n### Code required for reproduction\n\n_No response_\n\n### Confirmations\n\n- [x] I searched the [latest documentation](https://mujoco.readthedocs.io/en/latest/overview.html) thoroughly before posting.\n- [x] I searched previous [Issues](https://github.com/google-deepmind/mujoco/issues) and [Discussions](https://github.com/google-deepmind/mujoco/discussions), I am certain this has not been raised before.",
+      "created_at": "2026-10-06T10:59:22Z",
+      "html_url": "https://github.com/google-deepmind/mujoco/issues/3659",
+      "id": "google-deepmind/mujoco#3659",
+      "issue_number": 3659,
+      "labels": [
+        "bug"
+      ],
+      "repository": "google-deepmind/mujoco",
+      "surface_sha256": "4e702e2c314832990d89f8113dda7ff9a3a647c00b47fd1666b57534138d94cb",
+      "title": "Missing aarch64 wheel for python 3.11 in mujoco version 3.15"
+    }
+  ],
+  "post_activation_issue_identities_observed": 7,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-06T11:38:42Z",
+  "schema_version": 1
+}
