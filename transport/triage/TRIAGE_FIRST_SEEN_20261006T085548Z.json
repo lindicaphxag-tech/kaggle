@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "source_first_seen_commit": "ca54df9991349c81b389ae5fd71938cadaf54bb3",
+  "first_seen_file": "transport/inbox/FIRST_SEEN_20261006T085548Z.json",
+  "first_seen_at": "2026-10-06T08:55:48Z",
+  "prediction_deadline_at": "2026-10-06T14:55:48Z",
+  "protocol": "Embodied Correctness Prospective Discovery Protocol v2",
+  "policy_basis": {
+    "eligibility_2_4": "Primary cases must concern silent or semantically misleading correctness, not merely a crash, feature request, performance complaint, or hyperparameter recipe.",
+    "independence": {
+      "I2": "symptom/reproducer only",
+      "I1": "subsystem/broad causal hint",
+      "I0": "exact mechanism/repair exposed"
+    }
+  },
+  "cases": [
+    {
+      "case_id": "ARISE-Initiative/robomimic#322",
+      "surface_sha256": "db06f956af48a1d11a85d03cca534e7c7102fb48cdc1d15e935a1c3e360a0b56",
+      "disposition": "excluded_i0_exact_mechanism_and_repair_exposed",
+      "independence_class": "I0",
+      "primary_eligible": false,
+      "reason": "Original issue body identifies eval(pool_class) as the attacker-controlled execution path, points to the existing encoder registry, and proposes replacing eval with allow-listed lookup. No independent mechanism prediction is possible."
+    },
+    {
+      "case_id": "ARISE-Initiative/robosuite#831",
+      "surface_sha256": "8b292923307b4e4d72ac434c2a71a1852a3d73eb36352a4de0266f8a7cf0a322",
+      "disposition": "excluded_i0_exact_mechanism_and_repair_exposed_and_crash",
+      "independence_class": "I0",
+      "primary_eligible": false,
+      "reason": "Original issue body identifies the unbounded MuJoCo dependency, pybind11 enum-comparison regression, exact int() repair, and release pin; the reported outcome is also an installation/runtime crash, excluded by protocol 2.4."
+    },
+    {
+      "case_id": "ros-controls/ros2_control#3665",
+      "surface_sha256": "50212d8b50c624dd24ae12d03632bbec26831ab1194cc4547613ce2032e8308c",
+      "disposition": "excluded_protocol_2_4_ci_failure_only",
+      "independence_class": "not_adjudicated",
+      "primary_eligible": false,
+      "reason": "Original surface contains only an automated CI build-failure notification and a run link. Protocol 2.4 excludes mere build/CI failures from primary semantic cases; no mechanism prediction is authorized from this surface."
+    },
+    {
+      "case_id": "ros-controls/ros2_control#3666",
+      "surface_sha256": "fb68a07800e2da2663756ae082c7c60d1fa4f750d5902e0385a0102eb8ec7197",
+      "disposition": "excluded_protocol_2_4_ci_failure_only",
+      "independence_class": "not_adjudicated",
+      "primary_eligible": false,
+      "reason": "Original surface contains only an automated CI build-failure notification and a run link. Protocol 2.4 excludes mere build/CI failures from primary semantic cases; no mechanism prediction is authorized from this surface."
+    },
+    {
+      "case_id": "ros-controls/ros2_controllers#2691",
+      "surface_sha256": "f8fbdc9716f6aa16171364cccc44ac3a346be33eaffb3fd09c7e94a1f2579292",
+      "disposition": "excluded_protocol_2_4_ci_failure_only",
+      "independence_class": "not_adjudicated",
+      "primary_eligible": false,
+      "reason": "Original surface contains only an automated CI build-failure notification and a run link. Protocol 2.4 excludes mere build/CI failures from primary semantic cases; no mechanism prediction is authorized from this surface."
+    },
+    {
+      "case_id": "ros2/rclcpp#3314",
+      "surface_sha256": "5f2a7c91c169eb9ca8387619e4d7d3d87083c0c8675a67222fe471b2369e626f",
+      "disposition": "excluded_i0_exact_mechanism_and_fix_exposed_and_crash",
+      "independence_class": "I0",
+      "primary_eligible": false,
+      "reason": "Original issue body identifies the TimerData use-after-free owner layer, relevant source lines, shutdown/remove-node path, and a ready fix; the observed outcome is SIGSEGV, also excluded by protocol 2.4."
+    }
+  ],
+  "counters": {
+    "first_seen_candidates": 6,
+    "primary_eligible": 0,
+    "excluded_i0": 3,
+    "excluded_protocol_ci_failure": 3,
+    "admitted_i2": 0,
+    "frozen_predictions": 0
+  },
+  "information_barrier": "Triage used only the frozen original issue surfaces in FIRST_SEEN_20261006T085548Z.json plus the already-frozen protocol. No comments, linked PR diffs, later commits, maintainer diagnoses, or fixes were consulted.",
+  "claim_boundary": "This negative triage is prospective surveillance evidence only. It contributes no I2 mechanism success, no adoption credit, and no L8/L9 level credit."
+}
