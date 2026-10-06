@@ -121,3 +121,13 @@ def test_unequal_sampling_rates_fail_closed_in_merge_v1():
     bundle = synthesize_merge_repair(fine, coarse)
     assert bundle.right.kind == "refuse"
     assert "unequal" in bundle.reason
+
+
+def test_full_extent_fractional_shift_refuses_extrapolation():
+    src = lattice((16, 16, 16), (4, 4, 4), (0, 0, 0))
+    dst = lattice((16, 16, 16), (4, 4, 4), (1.5, 0, 0))
+    plan = synthesize_lattice_repair(src, dst, role="feature")
+    assert plan.kind == "refuse"
+    assert plan.interpolation is None
+    assert "extrapolation" in plan.reason
+    assert verify_repair_plan(src, dst, plan)
