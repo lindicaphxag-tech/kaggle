@@ -109,6 +109,17 @@
       "source": "inbox/FIRST_SEEN_20261006T113842Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "4e702e2c314832990d89f8113dda7ff9a3a647c00b47fd1666b57534138d94cb"
+    },
+    {
+      "created_at": "2026-10-06T12:58:56Z",
+      "first_frozen_at": "2026-10-06T15:53:24Z",
+      "id": "Farama-Foundation/Gymnasium#1754",
+      "issue_number": 1754,
+      "prediction_deadline_at": "2026-10-06T21:53:24Z",
+      "repository": "Farama-Foundation/Gymnasium",
+      "source": "inbox/FIRST_SEEN_20261006T155324Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "9a61945e1ec620d0254a16045e4c9ec6b7fa475ffc31397d4611a89780e8e24e"
     }
   ]
 }

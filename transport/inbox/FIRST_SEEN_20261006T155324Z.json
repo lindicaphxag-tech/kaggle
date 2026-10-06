@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "JoeyTan21",
+      "body": "**Describe the bug**\n\n`gymnasium.spaces.Sequence` with `stack=True` raises from `contains` (and therefore from `x in space`) when `x` is not a stacked batch of feature-space samples. Depending on the input and the feature space it raises `TypeError`, `ValueError`, `KeyError` or `IndexError`. Every other space returns `False` for such inputs, as does the same `Sequence` with `stack=False`.\n\nCause: the `stack=True` branch of `Sequence.contains` ([sequence.py#L195-L199](https://github.com/Farama-Foundation/Gymnasium/blob/main/gymnasium/spaces/sequence.py#L195-L199)) passes `x` directly to `gymnasium.vector.utils.iterate(self.stacked_feature_space, x)`. `iterate` assumes a valid batch: `_iterate_base` calls `iter(x)` (fails for scalars / `None`), `_iterate_dict` / `_iterate_tuple` index `x[key]` / `x[i]` and `zip(..., strict=True)` the per-key iterators (fails for wrong keys, wrong container types, or per-key arrays of different lengths).\n\nThis is the same class of issue as #1648 / #1663 (`Discrete.contains` / `Box.contains` raising `OverflowError`) and #1753 (`MultiBinary` / `MultiDiscrete` raising on ragged input): `contains` is a membership test and should return a bool.\n\n**Code example**\n\n```\nimport numpy as np\nfrom gymnasium.spaces import Box, Dict, Discrete, Sequence\n\nbox_seq = Sequence(Box(0, 1, shape=(2,)), stack=True)\nbox_seq.contains(None)\n# TypeError: Unable to iterate over the following elements: None\nbox_seq.contains(0.5)\n# TypeError: Unable to iterate over the following elements: 0.5\n\nSequence(Discrete(3), stack=True).contains(np.int64(1))\n# TypeError: Unable to iterate over the following elements: 1\n\ndict_seq = Sequence(Dict(a=Box(0, 1, shape=(2,)), b=Discrete(3)), stack=True)\ndict_seq.contains(\"abc\")\n# TypeError: string indices must be integers, not 'str'\ndict_seq.contains({})\n# KeyError: 'a'\ndict_seq.contains({\"a\": np.zeros((2, 2), dtype=np.float32), \"b\": np.zeros(3, dtype=np.int64)})\n# ValueError: zip() argument 2 is longer than argument 1\n\n# For comparison, all of these return False:\nSequence(Box(0, 1, shape=(2,))).contains(None)   # stack=False\nDict(a=Box(0, 1, shape=(2,))).contains(None)\nBox(0, 1, shape=(2,)).contains(None)\n```\n\n**System info**\n\n- Gymnasium installed from source, `main` at `916c23b46`, `gymnasium.__version__ == \"1.4.0\"`\n- Python 3.12.13, numpy 2.5.3\n- macOS 15 (Darwin 24.3.0); also reproduces independent of OS as it is pure Python\n\n**Additional context**\n\nA minimal fix is to catch `(TypeError, ValueError, KeyError, IndexError)` around the `iterate` call in the `stack=True` branch and return `False`, mirroring how `Box.contains` catches the errors from `np.asarray`. I have the fix and regression tests ready and can open a PR.\n\nDisclosure: found, reproduced and the draft fix tested locally with the help of an AI coding agent (Claude Code); reviewed before filing.\n\n- [x] I have checked that there is no similar issue in the repo\n",
+      "created_at": "2026-10-06T12:58:56Z",
+      "html_url": "https://github.com/Farama-Foundation/Gymnasium/issues/1754",
+      "id": "Farama-Foundation/Gymnasium#1754",
+      "issue_number": 1754,
+      "labels": [],
+      "repository": "Farama-Foundation/Gymnasium",
+      "surface_sha256": "9a61945e1ec620d0254a16045e4c9ec6b7fa475ffc31397d4611a89780e8e24e",
+      "title": "[Bug Report] Sequence(stack=True).contains raises for non-batch inputs instead of returning False"
+    }
+  ],
+  "post_activation_issue_identities_observed": 8,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-06T15:53:24Z",
+  "schema_version": 1
+}
