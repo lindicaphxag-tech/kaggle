@@ -242,7 +242,8 @@ def compile_fx_geometry(
                 )
                 if strict:
                     raise PatientSpaceMergeError(
-                        f"cat at {node.name!r} requires repair bundle {bundle.bundle_digest}"
+                        f"patient-space aligned cat at {node.name!r} requires repair bundle "
+                        f"{bundle.bundle_digest}"
                     )
                 if "refuse" in {bundle.left.kind, bundle.right.kind}:
                     raise UnsupportedGeometryOp(
