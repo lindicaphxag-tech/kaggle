@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "case_id": "ros2/rclcpp#3314",
+  "source_surface_sha256": "5f2a7c91c169eb9ca8387619e4d7d3d87083c0c8675a67222fe471b2369e626f",
+  "first_frozen_at": "2026-10-06T08:55:48Z",
+  "prediction_deadline_at": "2026-10-06T14:55:48Z",
+  "disposition_frozen_at": "2026-10-06T11:33:10Z",
+  "disposition_within_sla": true,
+  "independence_class": "I0",
+  "disposition": "excluded_i0_mechanism_exposed",
+  "reason": "Original issue body already identifies the TimerData lifetime/use-after-free mechanism, exact source locations, shutdown/remove_node paths, and a ready fix branch; no independent mechanism prediction remains possible.",
+  "information_barrier": "Disposition uses only the already-frozen original issue title/body. Comments, linked workflow logs, linked PR diffs, later commits, maintainer diagnoses, and fixes were not read before this freeze.",
+  "claim_boundary": "An exclusion/disposition record is not a prospective mechanism success, external adoption, or L8/L9 credit.",
+  "disposition_sha256": "137713a798da7908c3f1af037dd19d286c2bcc71ec9edddb38e44b177854b19f"
+}

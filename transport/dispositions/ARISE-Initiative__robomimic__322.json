@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "case_id": "ARISE-Initiative/robomimic#322",
+  "source_surface_sha256": "db06f956af48a1d11a85d03cca534e7c7102fb48cdc1d15e935a1c3e360a0b56",
+  "first_frozen_at": "2026-10-06T08:55:48Z",
+  "prediction_deadline_at": "2026-10-06T14:55:48Z",
+  "disposition_frozen_at": "2026-10-06T11:33:10Z",
+  "disposition_within_sla": true,
+  "independence_class": "I0",
+  "disposition": "excluded_i0_mechanism_exposed",
+  "reason": "Original issue body already identifies the attacker-controlled pool_class -> eval() mechanism, affected code locations, registry-based repair, and a second independent torch.load path; no independent mechanism prediction remains possible.",
+  "information_barrier": "Disposition uses only the already-frozen original issue title/body. Comments, linked workflow logs, linked PR diffs, later commits, maintainer diagnoses, and fixes were not read before this freeze.",
+  "claim_boundary": "An exclusion/disposition record is not a prospective mechanism success, external adoption, or L8/L9 credit.",
+  "disposition_sha256": "5987204267b935b941957d2c629ce2bda842a46a62ef16893d437069690c3145"
+}

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "case_id": "ros-controls/ros2_controllers#2691",
+  "source_surface_sha256": "f8fbdc9716f6aa16171364cccc44ac3a346be33eaffb3fd09c7e94a1f2579292",
+  "first_frozen_at": "2026-10-06T08:55:48Z",
+  "prediction_deadline_at": "2026-10-06T14:55:48Z",
+  "disposition_frozen_at": "2026-10-06T11:33:10Z",
+  "disposition_within_sla": true,
+  "independence_class": "EXCLUDED",
+  "disposition": "excluded_insufficient_original_surface",
+  "reason": "Original issue surface contains only a scheduled-build failure link and no semantic relation, reproducer, owner boundary, or mechanism evidence. Opening the linked workflow before a prediction would violate the frozen information barrier, so no defensible I2 prediction is made.",
+  "information_barrier": "Disposition uses only the already-frozen original issue title/body. Comments, linked workflow logs, linked PR diffs, later commits, maintainer diagnoses, and fixes were not read before this freeze.",
+  "claim_boundary": "An exclusion/disposition record is not a prospective mechanism success, external adoption, or L8/L9 credit.",
+  "disposition_sha256": "91e9cff85f4e3c166e3134febe460025bebeb84fea8a05106fb0eaa4f400d048"
+}

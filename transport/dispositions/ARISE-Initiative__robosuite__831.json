@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "case_id": "ARISE-Initiative/robosuite#831",
+  "source_surface_sha256": "8b292923307b4e4d72ac434c2a71a1852a3d73eb36352a4de0266f8a7cf0a322",
+  "first_frozen_at": "2026-10-06T08:55:48Z",
+  "prediction_deadline_at": "2026-10-06T14:55:48Z",
+  "disposition_frozen_at": "2026-10-06T11:33:10Z",
+  "disposition_within_sla": true,
+  "independence_class": "I0",
+  "disposition": "excluded_i0_mechanism_exposed",
+  "reason": "Original issue body already identifies both dependency-range and numpy.int32/pybind11 enum-comparison mechanisms, version boundaries, related upstream fixes, and the int() repair; no independent mechanism prediction remains possible.",
+  "information_barrier": "Disposition uses only the already-frozen original issue title/body. Comments, linked workflow logs, linked PR diffs, later commits, maintainer diagnoses, and fixes were not read before this freeze.",
+  "claim_boundary": "An exclusion/disposition record is not a prospective mechanism success, external adoption, or L8/L9 credit.",
+  "disposition_sha256": "f1a5929c03dcb7cb76af0a0c14caf5920d3c7f7ec2bd45ef2c9cbc26932241bb"
+}
