@@ -242,3 +242,47 @@ must fail closed.
 T9/T10 concern physical prompt denotation under affine image-chart changes.
 They do not claim generic bounding-box robustness, prompt-selection optimality,
 or segmentation-performance bounds.
+
+
+## T11 — intermediate AABB projection creates path-dependent approximation debt
+
+Let invertible affine linear maps `A1,...,Ak` be applied in order to a source
+AABB with positive side lengths `d`.
+
+If exact geometry is retained until the final boundary, its tight AABB widths are
+
+    d_direct = |Ak ... A1| d.
+
+If the region is replaced by its tight AABB after every intermediate stage,
+
+    d_eager = |Ak| ... |A1| d.
+
+The elementwise triangle inequality
+
+    |AB| <= |A||B|
+
+implies `d_direct <= d_eager` componentwise. Hence eager intermediate AABB
+projection cannot improve final AABB representation fidelity relative to one
+deferred projection after exact transport.
+
+### Exact round-trip witness
+
+For a unit cube, a 45-degree in-plane rotation `R`, then `R^-1`,
+
+    R^-1 R = I.
+
+Deferred projection therefore returns the exact unit AABB with prompt-region
+IoU `1`. But eager projection gives widths
+
+    |R^-1| |R| (1,1,1)^T = (2,2,1)^T,
+
+volume `4`, and prompt-region IoU `1/4`.
+
+Thus an exactly cancelling physical transform pair can create 0.75 avoidable
+prompt-region IoU loss purely from intermediate restriction of the
+representation. The compiler consequence is to retain exact richer geometry
+through internal chart transforms and project to a restricted API primitive
+only at the final boundary.
+
+This is a representation statement, not a prediction that model Dice changes
+by the same amount.

@@ -39,6 +39,20 @@ class LiftDecision:
 
 
 @dataclass(frozen=True)
+class ApproximationDebtCertificate:
+    total_linear_map: np.ndarray
+    direct_target_widths: np.ndarray
+    eager_target_widths: np.ndarray
+    exact_final_volume: float
+    direct_tight_aabb_volume: float
+    eager_stagewise_aabb_volume: float
+    direct_prompt_iou: float
+    eager_prompt_iou: float
+    path_overcoverage_ratio: float
+    avoidable_prompt_iou_loss: float
+    should_defer_projection: bool
+
+@dataclass(frozen=True)
 class SampledFidelity:
     analytic_iou: float
     sampled_iou: float
@@ -218,4 +232,56 @@ def sample_tight_aabb_iou(
         sampled_iou=float(sampled),
         absolute_error=float(abs(sampled - cert.tight_aabb_iou)),
         samples_per_axis=samples_per_axis,
+    )
+
+
+def certify_aabb_approximation_debt(
+    linear_maps: tuple[np.ndarray, ...] | list[np.ndarray],
+    source_extents: np.ndarray,
+    *,
+    atol: float = 1e-8,
+) -> ApproximationDebtCertificate:
+    """Certify loss caused by projecting to AABB after every affine stage.
+
+    Deferred projection uses |Ak...A1| d. Eager stagewise projection
+    uses |Ak|...|A1| d. The elementwise inequality |AB| <= |A||B|
+    guarantees that eager projection cannot beat deferred projection.
+    """
+    if not linear_maps:
+        raise ValueError('at least one linear map is required')
+    extents = np.asarray(source_extents, dtype=np.float64)
+    if extents.shape != (3,) or not np.all(np.isfinite(extents)):
+        raise ValueError('source_extents must be one finite length-3 vector')
+    if np.any(extents <= 0):
+        raise ValueError('source_extents must be strictly positive')
+
+    total = np.eye(3, dtype=np.float64)
+    eager_widths = extents.copy()
+    for linear_map in linear_maps:
+        linear = _linear(linear_map)
+        if abs(float(np.linalg.det(linear))) <= atol:
+            raise ValueError('every linear map must be nonsingular')
+        total = linear @ total
+        eager_widths = np.abs(linear) @ eager_widths
+
+    direct_widths = np.abs(total) @ extents
+    exact_volume = float(abs(np.linalg.det(total)) * np.prod(extents))
+    direct_volume = float(np.prod(direct_widths))
+    eager_volume = float(np.prod(eager_widths))
+    if eager_volume + atol < direct_volume:
+        raise RuntimeError('eager AABB volume violated the absolute-matrix bound')
+    direct_iou = min(1.0, exact_volume / direct_volume)
+    eager_iou = min(1.0, exact_volume / eager_volume)
+    return ApproximationDebtCertificate(
+        total_linear_map=total,
+        direct_target_widths=direct_widths,
+        eager_target_widths=eager_widths,
+        exact_final_volume=exact_volume,
+        direct_tight_aabb_volume=direct_volume,
+        eager_stagewise_aabb_volume=eager_volume,
+        direct_prompt_iou=direct_iou,
+        eager_prompt_iou=eager_iou,
+        path_overcoverage_ratio=max(0.0, eager_volume / direct_volume - 1.0),
+        avoidable_prompt_iou_loss=max(0.0, direct_iou - eager_iou),
+        should_defer_projection=bool(eager_iou + atol < direct_iou),
     )
