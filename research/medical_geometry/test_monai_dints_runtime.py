@@ -13,6 +13,7 @@ from research.medical_geometry.lattice_bundle import (
     factorized_reduce_bundle,
 )
 
+from research.medical_geometry.torch_fx_bundle import compile_fx_bundle_geometry
 
 def test_monai_dints_factorized_reduce_has_two_channel_sampling_phases():
     block = FactorizedReduceBlock(
