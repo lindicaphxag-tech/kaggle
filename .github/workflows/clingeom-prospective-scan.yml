@@ -1,0 +1,70 @@
+name: ClinGeom public prospective first-seen transport
+
+on:
+  pull_request:
+    paths:
+      - "clingeom_transport/**"
+      - ".github/workflows/clingeom-prospective-scan.yml"
+  push:
+    branches: [main]
+    paths:
+      - "clingeom_transport/**"
+      - ".github/workflows/clingeom-prospective-scan.yml"
+  schedule:
+    - cron: "29 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: clingeom-public-first-seen
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: Validate adapter and frozen identity
+        run: |
+          python -m py_compile             clingeom_transport/scan.py             clingeom_transport/freeze_prediction.py             clingeom_transport/collect_resolution.py
+          python clingeom_transport/collect_resolution.py --self-test
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          w=json.loads(Path("clingeom_transport/watchset.json").read_text())
+          s=json.loads(Path("clingeom_transport/seen.json").read_text())
+          assert w["public_activation_commit"]=="e2021356533586d09192eb9afa42a374f4856acb"
+          assert w["public_activation_cutoff"]=="2026-10-06T03:10:20Z"
+          assert s["public_activation_cutoff"]==w["public_activation_cutoff"]
+          assert len(w["repositories"])==len(set(w["repositories"]))==12
+          PY
+
+  scan:
+    if: github.event_name != 'pull_request'
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: Scan frozen medical geometry frame
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python clingeom_transport/scan.py | tee /tmp/clingeom_scan.json
+      - name: Persist only new first-seen evidence
+        run: |
+          if git diff --quiet -- clingeom_transport/seen.json clingeom_transport/inbox; then
+            echo "No new ClinGeom first-seen cases."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add clingeom_transport/seen.json clingeom_transport/inbox
+          git commit -m "Freeze ClinGeom public prospective first-seen evidence"
+          git push origin HEAD:main
