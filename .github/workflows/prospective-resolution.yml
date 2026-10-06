@@ -1,0 +1,40 @@
+name: Public post-prediction resolution transport
+on:
+  push:
+    branches: [main]
+    paths:
+      - "transport/predictions/**"
+      - "transport/collect_resolution.py"
+      - ".github/workflows/prospective-resolution.yml"
+  schedule:
+    - cron: "47 */6 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: semrepair-public-resolution
+  cancel-in-progress: false
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: python transport/collect_resolution.py --self-test
+      - name: Collect digest-authorized post-freeze evidence
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python transport/collect_resolution.py
+      - name: Persist changed resolution evidence only
+        run: |
+          if git diff --quiet -- transport/resolution; then
+            echo "No changed resolution evidence."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add transport/resolution
+          git commit -m "Freeze public post-prediction resolution evidence"
+          git push origin HEAD:main

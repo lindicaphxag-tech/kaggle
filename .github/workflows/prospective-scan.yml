@@ -1,0 +1,51 @@
+name: Public prospective first-seen transport
+on:
+  push:
+    branches: [main]
+    paths:
+      - "transport/**"
+      - ".github/workflows/prospective-scan.yml"
+  schedule:
+    - cron: "11 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: semrepair-public-first-seen
+  cancel-in-progress: false
+jobs:
+  validate-and-scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: Validate transport source
+        run: |
+          python -m py_compile transport/scan.py transport/freeze_prediction.py transport/collect_resolution.py
+          python transport/collect_resolution.py --self-test
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          w=json.loads(Path("transport/watchset.json").read_text())
+          assert w["public_activation_commit"]=="319cdaa153a7523d22dff754c15cc5e3fd983238"
+          assert w["public_activation_cutoff"]=="2026-10-06T01:58:55Z"
+          assert len(w["repositories"])==len(set(w["repositories"]))==89
+          PY
+      - name: Scan frozen public frame
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python transport/scan.py | tee /tmp/scan.json
+      - name: Persist only new first-seen evidence
+        run: |
+          if git diff --quiet -- transport/seen.json transport/inbox; then
+            echo "No new first-seen cases."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add transport/seen.json transport/inbox
+          git commit -m "Freeze public prospective first-seen evidence"
+          git push origin HEAD:main
