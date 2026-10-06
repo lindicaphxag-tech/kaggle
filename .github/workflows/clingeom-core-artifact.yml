@@ -5,9 +5,13 @@ on:
     paths:
       - "research/medical_geometry/**"
       - "CLINGEOM_PUBLIC_ARTIFACT.md"
+      - "REPRODUCE_CLINGEOM.md"
+      - "README.md"
+      - "CITATION.cff"
       - ".github/workflows/clingeom-core-artifact.yml"
   push:
     branches:
+      - main
       - artifact/clingeom-v0
     paths:
       - "research/medical_geometry/**"
