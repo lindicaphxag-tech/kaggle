@@ -36,3 +36,8 @@ np.testing.assert_allclose(debt.eager_prompt_iou, 0.25, atol=1e-12)
 print(f'roundtrip_45_direct_iou={debt.direct_prompt_iou:.9f}')
 print(f'roundtrip_45_eager_iou={debt.eager_prompt_iou:.9f}')
 print(f'roundtrip_45_avoidable_iou_loss={debt.avoidable_prompt_iou_loss:.9f}')
+
+print(f'roundtrip_45_log_volume_debt={debt.log_volume_debt:.9f}')
+print(f'roundtrip_45_fidelity_retention={debt.fidelity_retention:.9f}')
+np.testing.assert_allclose(debt.log_volume_debt, np.log(4.0), atol=1e-12)
+np.testing.assert_allclose(debt.fidelity_retention, 0.25, atol=1e-12)
