@@ -79,6 +79,7 @@ def test_rewrite_modules_are_bound_to_bundle_digest():
         model,
         input_shape=(64, 64, 64),
         input_affine=np.eye(4),
+        repair_channel_cat=True,
     )
     record = rewritten.rewrites[0]
     obligation = rewritten.source_report.repair_obligations[0]
