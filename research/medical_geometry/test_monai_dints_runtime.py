@@ -75,3 +75,34 @@ def test_clingeom_bundle_matches_monai_dints_phase_structure():
         rel_tol=0,
         abs_tol=1e-12,
     )
+
+
+def test_fx_bundle_compiler_recovers_monai_dints_channel_fibers_automatically():
+    block = FactorizedReduceBlock(
+        in_channel=1,
+        out_channel=2,
+        spatial_dims=3,
+    )
+    result = compile_fx_bundle_geometry(
+        block,
+        input_shape=(8, 8, 8),
+        input_channels=1,
+    )
+    bundle = result.output_bundle
+
+    assert bundle.shape == (4, 4, 4)
+    assert bundle.channels == 2
+    assert len(bundle.fibers) == 2
+
+    a = bundle.fibers[0].supports[0]
+    b = bundle.fibers[1].supports[0]
+    assert np.allclose(a.jump, [2, 2, 2])
+    assert np.allclose(b.jump, [2, 2, 2])
+    assert np.allclose(a.start, [0, 0, 0])
+    assert np.allclose(b.start, [1, 1, 1])
+
+    patient_affine = np.eye(4, dtype=np.float64)
+    patient_affine[:3, :3] = np.diag([0.7, 0.7, 5.0])
+    cert = certify_single_lattice(bundle, patient_affine)
+    assert cert.valid is False
+    assert cert.unique_center_lattices == 2
