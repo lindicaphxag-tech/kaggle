@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "surface": "clingeom-public-prospective-transport",
-  "public_activation_commit": null,
-  "public_activation_cutoff": null,
+  "public_activation_commit": "e2021356533586d09192eb9afa42a374f4856acb",
+  "public_activation_cutoff": "2026-10-06T03:10:20Z",
   "prediction_sla_hours": 6,
   "repository_count": 12,
   "historical_sampling_provenance": {
@@ -39,5 +39,6 @@
     "geometry provenance / silent metadata substitution"
   ],
   "information_barrier": "Before prediction freeze, transport may read only original GitHub issue endpoint fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
-  "claim_boundary": "Capture is not a mechanism match, prospective success, clinical validation, external adoption, or L8/L9 credit."
+  "claim_boundary": "Capture is not a mechanism match, prospective success, clinical validation, external adoption, or L8/L9 credit.",
+  "eligibility_rule": "Only issues created strictly after public_activation_cutoff can become prospective candidates on this public surface. Earlier private-branch observations are provenance only and are never upgraded retroactively."
 }
