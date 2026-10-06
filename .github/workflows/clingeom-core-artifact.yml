@@ -33,8 +33,9 @@ jobs:
       - run: python -m pip install --upgrade pip numpy pytest
       - name: Exact contracts and repair synthesis
         run: |
-          python -m pytest -q             research/medical_geometry/test_clingeom.py             research/medical_geometry/test_lattice_bundle.py             research/medical_geometry/test_repair_synthesis.py
+          python -m pytest -q             research/medical_geometry/test_clingeom.py             research/medical_geometry/test_lattice_bundle.py             research/medical_geometry/test_repair_synthesis.py             research/medical_geometry/test_prompt_representation.py
           PYTHONPATH=. python research/medical_geometry/benchmark_clingeom.py
+          PYTHONPATH=. python research/medical_geometry/benchmark_prompt_representation.py
 
   torch-compiler:
     runs-on: ubuntu-latest
