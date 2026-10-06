@@ -24,8 +24,9 @@ jobs:
         with: {python-version: "3.12"}
       - name: Validate transport source
         run: |
-          python -m py_compile transport/scan.py transport/freeze_prediction.py transport/collect_resolution.py
+          python -m py_compile transport/scan.py transport/freeze_prediction.py transport/freeze_disposition.py transport/collect_resolution.py transport/validate_ledger.py
           python transport/collect_resolution.py --self-test
+          python transport/validate_ledger.py
           python - <<'PY'
           import json
           from pathlib import Path
