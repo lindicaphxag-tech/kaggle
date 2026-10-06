@@ -2,7 +2,9 @@ import numpy as np
 
 from research.medical_geometry.clingeom import FeatureLattice
 from research.medical_geometry.repair_synthesis import (
-    synthesize_lattice_repair,\n    synthesize_merge_repair,\n    verify_merge_bundle,
+    synthesize_lattice_repair,
+    synthesize_merge_repair,
+    verify_merge_bundle,
     target_to_source_index_map,
     verify_repair_plan,
 )
