@@ -286,3 +286,66 @@ only at the final boundary.
 
 This is a representation statement, not a prediction that model Dice changes
 by the same amount.
+
+
+## T12 — dimensionless prompt wrapping debt and refinement monotonicity
+
+For one fixed physical transform path with exact final map
+
+    A = Ak ... A1,
+
+define
+
+    V_direct = prod(|A| d)
+
+for one deferred final AABB projection and
+
+    V_eager = prod(|Ak| ... |A1| d)
+
+for eager AABB projection after every stage.
+
+ClinGeom records the dimensionless prompt wrapping debt
+
+    delta_path = log(V_eager / V_direct) >= 0.
+
+Because exact transported volume is identical for both representations,
+
+    IoU_eager / IoU_direct = V_direct / V_eager = exp(-delta_path).
+
+Thus exp(-delta_path) is the exact fraction of direct AABB prompt fidelity
+retained after intermediate AABB restrictions.
+
+### Monotonicity under adding projection boundaries
+
+Suppose one coarse stage B A is split into two stages A then B. The
+elementwise inequality
+
+    |B A| <= |B| |A|
+
+shows that replacing a coarse projection boundary by two finer projection
+boundaries cannot decrease the enclosing widths. Repeating this argument gives:
+
+> refining a transform path with additional intermediate AABB projections
+> cannot reduce delta_path and cannot increase fidelity retention.
+
+The public tests check this property over deterministic randomized invertible
+3-D affine maps.
+
+### Prior-art boundary: classical wrapping effect
+
+Repeated axis-aligned enclosure of transformed sets is a classical wrapping
+effect in interval/set propagation. ClinGeom does not claim that phenomenon,
+the absolute-matrix inequality, or box-volume inflation as new mathematics.
+
+The medical-AI contribution is narrower:
+
+1. interpret the loss as prompt-language semantic debt in patient space;
+2. bind it to a typed prompt representation contract;
+3. use the certificate to decide whether approximation is permitted;
+4. prefer an exact richer primitive (OBB -> parallelepiped -> mask) when the
+   target model API supports one;
+5. defer lossy projection to the final model boundary when internal transforms
+   can retain exact geometry.
+
+The debt certificate is therefore an execution-semantic decision object, not a
+new interval-arithmetic theorem.

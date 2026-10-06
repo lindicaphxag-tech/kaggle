@@ -49,6 +49,8 @@ class ApproximationDebtCertificate:
     direct_prompt_iou: float
     eager_prompt_iou: float
     path_overcoverage_ratio: float
+    log_volume_debt: float
+    fidelity_retention: float
     avoidable_prompt_iou_loss: float
     should_defer_projection: bool
 
@@ -272,6 +274,9 @@ def certify_aabb_approximation_debt(
         raise RuntimeError('eager AABB volume violated the absolute-matrix bound')
     direct_iou = min(1.0, exact_volume / direct_volume)
     eager_iou = min(1.0, exact_volume / eager_volume)
+    volume_ratio = max(1.0, eager_volume / direct_volume)
+    log_volume_debt = float(np.log(volume_ratio))
+    fidelity_retention = float(eager_iou / direct_iou) if direct_iou > 0 else 0.0
     return ApproximationDebtCertificate(
         total_linear_map=total,
         direct_target_widths=direct_widths,
@@ -281,7 +286,9 @@ def certify_aabb_approximation_debt(
         eager_stagewise_aabb_volume=eager_volume,
         direct_prompt_iou=direct_iou,
         eager_prompt_iou=eager_iou,
-        path_overcoverage_ratio=max(0.0, eager_volume / direct_volume - 1.0),
+        path_overcoverage_ratio=volume_ratio - 1.0,
+        log_volume_debt=log_volume_debt,
+        fidelity_retention=fidelity_retention,
         avoidable_prompt_iou_loss=max(0.0, direct_iou - eager_iou),
         should_defer_projection=bool(eager_iou + atol < direct_iou),
     )
