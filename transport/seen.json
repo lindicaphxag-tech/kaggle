@@ -285,6 +285,94 @@
       "source": "inbox/FIRST_SEEN_20261007T142855Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "ed6d199769797bc0d52114f0a06dd8706c0b7849ba41f9491c45accc1eea0719"
+    },
+    {
+      "created_at": "2026-10-07T19:44:51Z",
+      "first_frozen_at": "2026-10-07T20:35:21Z",
+      "id": "google-deepmind/mujoco#3670",
+      "issue_number": 3670,
+      "prediction_deadline_at": "2026-10-08T02:35:21Z",
+      "repository": "google-deepmind/mujoco",
+      "source": "inbox/FIRST_SEEN_20261007T203521Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "3798e86325e8730c7de47e232b20c1c38bf508425de95c4b1c0ad1bb82025cda"
+    },
+    {
+      "created_at": "2026-10-07T15:50:30Z",
+      "first_frozen_at": "2026-10-07T20:35:21Z",
+      "id": "huggingface/lerobot#4868",
+      "issue_number": 4868,
+      "prediction_deadline_at": "2026-10-08T02:35:21Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261007T203521Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "a6fa4228761cce7d1b0b5171226b12b239aed6d80f74a29a072e0f03c2fdc003"
+    },
+    {
+      "created_at": "2026-10-07T17:19:41Z",
+      "first_frozen_at": "2026-10-07T20:35:21Z",
+      "id": "huggingface/lerobot#4870",
+      "issue_number": 4870,
+      "prediction_deadline_at": "2026-10-08T02:35:21Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261007T203521Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "82ab1fca896d96392f132202ff4bb54f28bc362923079e9e1bbee48878f08e0d"
+    },
+    {
+      "created_at": "2026-10-07T18:06:21Z",
+      "first_frozen_at": "2026-10-07T20:35:21Z",
+      "id": "isaac-sim/IsaacLab#8368",
+      "issue_number": 8368,
+      "prediction_deadline_at": "2026-10-08T02:35:21Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261007T203521Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "b867161ff86d14ab4e776d5533150070b822f5996e6d3b03b8ff1a2dee7a5b8d"
+    },
+    {
+      "created_at": "2026-10-07T18:53:37Z",
+      "first_frozen_at": "2026-10-07T20:35:21Z",
+      "id": "ros2/rclcpp#3317",
+      "issue_number": 3317,
+      "prediction_deadline_at": "2026-10-08T02:35:21Z",
+      "repository": "ros2/rclcpp",
+      "source": "inbox/FIRST_SEEN_20261007T203521Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "9dc771c9fca69b66bafb41988c67cd2c2fd9398082a4ece40110b8a2965810d4"
+    },
+    {
+      "created_at": "2026-10-07T18:45:56Z",
+      "first_frozen_at": "2026-10-07T20:35:21Z",
+      "id": "tesseract-robotics/tesseract#1376",
+      "issue_number": 1376,
+      "prediction_deadline_at": "2026-10-08T02:35:21Z",
+      "repository": "tesseract-robotics/tesseract",
+      "source": "inbox/FIRST_SEEN_20261007T203521Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "f317bb0a8e11dd7f01de4c0b3631223c528aaec57419f3f0b79981cd116cf095"
+    },
+    {
+      "created_at": "2026-10-07T18:45:58Z",
+      "first_frozen_at": "2026-10-07T20:35:21Z",
+      "id": "tesseract-robotics/tesseract#1377",
+      "issue_number": 1377,
+      "prediction_deadline_at": "2026-10-08T02:35:21Z",
+      "repository": "tesseract-robotics/tesseract",
+      "source": "inbox/FIRST_SEEN_20261007T203521Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "dc83d27c78ed2100f874a3bb2b903ae32afb3c63080925a2d3e1a26c287c72da"
+    },
+    {
+      "created_at": "2026-10-07T18:45:59Z",
+      "first_frozen_at": "2026-10-07T20:35:21Z",
+      "id": "tesseract-robotics/tesseract#1378",
+      "issue_number": 1378,
+      "prediction_deadline_at": "2026-10-08T02:35:21Z",
+      "repository": "tesseract-robotics/tesseract",
+      "source": "inbox/FIRST_SEEN_20261007T203521Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "99e5417add443599edb454f0e88466ceca7b43d58bffe529e9d32936feea5266"
     }
   ]
 }
