@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "artifact": "ClinGeom",
+  "version": "0.1.0",
+  "release_branch": "release/clingeom-v0.1.0",
+  "frozen_commit": "016b09d1d88f86ee20da5ddb7dab5fd471c50a27",
+  "public_ci": {
+    "workflow": "ClinGeom public core artifact",
+    "run_id": 37701895349,
+    "conclusion": "success",
+    "jobs": {
+      "numpy_core_python_3_10": "success",
+      "numpy_core_python_3_12": "success",
+      "numpy_core_python_3_13": "success",
+      "torch_compiler": "success",
+      "monai_dints_runtime": "success"
+    }
+  },
+  "deterministic_evidence": {
+    "numpy_core": {
+      "pytest": {
+        "passed": 50,
+        "seconds": 0.46
+      },
+      "dice_lies": {
+        "voxel_dice": 1,
+        "patient_centroid_error_mm": 41,
+        "original_centroid_mm": [
+          11.5,
+          30,
+          32
+        ],
+        "wrong_centroid_mm": [
+          52.5,
+          30,
+          32
+        ]
+      },
+      "feature_geometry": {
+        "anisotropic_spacing_mm": [
+          0.7,
+          0.7,
+          5
+        ],
+        "shape_only_origin_offset_norm_mm": 7.645586962424794
+      },
+      "negative_control": {
+        "avgpool_max_affine_error_mm": 0
+      },
+      "prompt_representation": {
+        "rotation_45_analytic_iou": 0.5,
+        "rotation_45_sampled_iou": 0.500118343,
+        "max_analytic_vs_sampled_abs_error": 0.001226075,
+        "frozen_error_gate": 0.002,
+        "roundtrip_45_direct_iou": 1,
+        "roundtrip_45_eager_iou": 0.25,
+        "roundtrip_45_avoidable_iou_loss": 0.75,
+        "roundtrip_45_log_volume_debt": 1.386294361,
+        "roundtrip_45_fidelity_retention": 0.25
+      }
+    },
+    "lattice_bundle": {
+      "anisotropic_spacing_mm": [
+        0.7,
+        0.7,
+        5
+      ],
+      "phase_separation_mm": 5.0970579749498635,
+      "single_affine_minimax_error_lower_bound_mm": 2.5485289874749317,
+      "unique_center_lattices": 2,
+      "single_lattice_valid": false,
+      "t13": {
+        "theorem": "one global point-affine iff all channel-fiber affine center maps are equivalent",
+        "reports_distinct_patient_lattice_types": true,
+        "reports_minimum_contiguous_fibers": true,
+        "rejects_point_affine_partition_for_multi_support_channels": true
+      }
+    },
+    "pinned_monai": {
+      "commit": "efb240ac97fcb619d842b2c7872d7db942eb7cd9",
+      "resolved_package": "monai-1.6.1rc0+24.gefb240ac",
+      "pytest_passed": 3,
+      "pytest_seconds": 1.8
+    }
+  },
+  "uploaded_artifacts": {
+    "numpy_evidence": {
+      "artifact_id": 11518215799,
+      "zip_sha256": "0c374be281798e689f9e263562b8b20f00db8d5b964954602f6517c3abfd463d"
+    },
+    "channel_fiber_evidence": {
+      "artifact_id": 11518585289,
+      "zip_sha256": "cd036830cd7c5c1faf692f9634cff30bec9649ff90d986c053b7dac6847e8585"
+    },
+    "monai_dints_witness": {
+      "artifact_id": 11518640050,
+      "zip_sha256": "f03abb657b8ec9da04014a4747f95847e756cb62d4929ae28d876d5a8cf2735b"
+    }
+  },
+  "external_evidence_at_freeze": {
+    "independent_third_party_reproduction": 0,
+    "external_maintainer_adoption": 0,
+    "prospective_clingeom_hits": 0,
+    "clinical_validation": false
+  },
+  "claim_boundary": [
+    "public self-authored executable evidence is not external adoption",
+    "the MONAI DiNTS case is an architecture-level motivating witness, not a MONAI bug claim",
+    "prompt representation fidelity is not a bound on final segmentation accuracy",
+    "ClinGeom is not a clinical safety system"
+  ]
+}
