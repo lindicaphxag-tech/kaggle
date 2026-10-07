@@ -349,3 +349,67 @@ The medical-AI contribution is narrower:
 
 The debt certificate is therefore an execution-semantic decision object, not a
 new interval-arithmetic theorem.
+
+
+## T13 — exact completeness and minimality of point-affine channel bundles
+
+Assume each channel fiber g of one feature tensor is point-lattice representable
+by one affine patient-space center map F_g(i), with a common tensor spatial shape.
+
+Then a single global patient-space affine F is exact for the entire tensor if
+and only if
+
+    F_g = F
+
+for every channel fiber g.
+
+The forward direction is immediate: if one global F exactly represents every
+channel, each fiber map must equal it. The reverse direction is constructive:
+if all fiber maps are identical, that common map is an exact tensor-level affine.
+
+Therefore the number
+
+    r_patient = | { F_g } |
+
+of distinct patient-space affine-map equivalence classes is the minimum number
+of distinct point-lattice semantic types required by the tensor.
+
+ClinGeom additionally requires channel fibers to be contiguous ranges. For the
+ordered type-id sequence c_1,...,c_m, the minimum number of contiguous fibers is
+
+    m_min = 1 + sum_{j=1}^{m-1} [c_j != c_{j+1}].
+
+Hence semantic type count and contiguous storage complexity are different.
+For example, the channel order A/B/A has two distinct patient-lattice types but
+requires three contiguous fibers.
+
+### Strong boundary: multi-support channels
+
+If any output channel structurally depends on more than one distinct patient-space
+support lattice, then no partition of channels into point-valued affine fibers
+is exact, regardless of how many channel groups are introduced. This is the
+case after dense mixing of distinct phase fibers in T8.
+
+The semantic type must then be lifted from a point-affine fiber to a richer
+support-set representation rather than increasing the number of point-affine
+fibers indefinitely.
+
+### Executable certificate
+
+`certify_minimal_point_affine_partition` returns:
+
+- whether a point-affine partition exists at all;
+- the number of distinct patient-lattice affine types;
+- the minimum number of channel-contiguous fibers;
+- the ordered affine-type ids;
+- whether one global affine is exact.
+
+The public tests include homogeneous, factorized-reduction, A/B/A and dense-mix
+witnesses.
+
+### Falsification boundary
+
+T13 assumes affine center maps and a fixed numerical equivalence tolerance for
+the executable certificate. It does not claim that every learned feature can be
+semantically reduced to a point sample; multi-support channels are explicitly
+outside that family and trigger semantic lifting.
