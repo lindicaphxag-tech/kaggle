@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "artifact": "ClinGeom",
+  "version": "0.2.0",
+  "release_branch": "release/clingeom-v0.2.0",
+  "frozen_commit": "7e570b05071ae65dc1abc636701c5a75ca1424a3",
+  "public_ci": {
+    "run_id": 37703000016,
+    "conclusion": "success",
+    "numpy_tests_passed": 54,
+    "jobs": {
+      "numpy_core_python_3_10": "success",
+      "numpy_core_python_3_12": "success",
+      "numpy_core_python_3_13": "success",
+      "torch_compiler": "success",
+      "monai_dints_runtime": "success"
+    }
+  },
+  "new_in_v0_2": {
+    "t13": {
+      "name": "exact completeness and minimality of point-affine channel bundles",
+      "properties": [
+        "single global affine iff all point-valued channel-fiber affine center maps are equivalent",
+        "minimum distinct patient-lattice type count",
+        "minimum contiguous channel-fiber count under fixed channel order",
+        "multi-support channel rejects all point-affine partitions"
+      ]
+    },
+    "t14": {
+      "name": "exact minimax collapse radius for parallel patient lattices",
+      "theorem": "best single-affine worst-case error equals minimum-enclosing-ball radius of patient-space translation vectors",
+      "two_phase_anisotropic": {
+        "spacing_mm": [
+          0.7,
+          0.7,
+          5
+        ],
+        "num_lattices": 2,
+        "optimal_translation_mm": [
+          0.35,
+          0.35,
+          2.5
+        ],
+        "exact_minimax_radius_mm": 2.5485289874749317,
+        "diameter_lower_bound_mm": 2.5485289874749317
+      },
+      "eight_phase_unit_cube": {
+        "num_lattices": 8,
+        "optimal_translation_mm": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "exact_minimax_radius_mm": 0.8660254037844386,
+        "analytic_expected_radius": 0.8660254037844386
+      },
+      "applicability": "all support affines must share one patient-space linear part"
+    },
+    "prior_art_boundary": {
+      "polyphase_sampling": [
+        "Chaman & Dokmanic, CVPR 2021, Adaptive Polyphase Sampling",
+        "Rojas-Gomez et al., NeurIPS 2022, Learnable Polyphase Sampling"
+      ],
+      "nonclaim": "ClinGeom does not claim discovery of polyphase components or shift-equivariant downsampling",
+      "target_claim": "patient-space semantic typing, minimal exact affine representation, multi-support lifting, and millimetre-valued collapse authorization"
+    }
+  },
+  "retained_v0_1_evidence": {
+    "voxel_dice": 1,
+    "patient_centroid_error_mm": 41,
+    "phase_separation_mm": 5.0970579749498635,
+    "two_phase_single_affine_lower_bound_mm": 2.5485289874749317,
+    "rotation_45_aabb_fidelity": 0.5,
+    "roundtrip_deferred_iou": 1,
+    "roundtrip_eager_iou": 0.25,
+    "max_analytic_sampled_error": 0.001226075
+  },
+  "uploaded_artifacts": {
+    "numpy_evidence": {
+      "id": 11518217903,
+      "sha256": "607f6442c9d79719d0bee6b0d2975070249192cc3c467046c536fbbe910a3bad"
+    },
+    "channel_fiber_evidence": {
+      "id": 11518252178,
+      "sha256": "5c582243e1fef5628779ced494876143673fdc645c7fd89dbcb4a52c77e99cd8"
+    },
+    "monai_dints_witness": {
+      "id": 11518606824,
+      "sha256": "15c79f6742c89eabed53ae662a4030182af4aa32fe14999d7732303a5f67733c"
+    }
+  },
+  "external_state_at_freeze": {
+    "independent_reproduction": 0,
+    "external_maintainer_adoption": 0,
+    "clin_geom_prospective_hits": 0,
+    "clinical_validation": false,
+    "explicit_repository_license": false
+  }
+}
