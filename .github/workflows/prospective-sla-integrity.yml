@@ -1,0 +1,35 @@
+name: Public prospective SLA integrity
+
+on:
+  push:
+    branches:
+      - fix/prospective-sla-failclosed
+    paths:
+      - "transport/**"
+      - ".github/workflows/prospective-sla-integrity.yml"
+  pull_request:
+    paths:
+      - "transport/**"
+      - ".github/workflows/prospective-scan.yml"
+      - ".github/workflows/prospective-sla-integrity.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deadline-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile frozen transport
+        run: python -m compileall -q transport
+      - name: Built-in expiry self-test
+        run: python transport/expire_pending.py --self-test
+      - name: Existing first-seen ledger integrity
+        run: python transport/validate_ledger.py
+      - name: Expired copies, idempotence, and tamper refusal
+        run: python -m unittest transport.test_expire_pending -v

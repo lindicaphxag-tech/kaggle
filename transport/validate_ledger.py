@@ -9,9 +9,11 @@ ROOT=Path(__file__).resolve().parent
 SEEN=ROOT/"seen.json"
 PRED=ROOT/"predictions"
 DISP=ROOT/"dispositions"
+EXP=ROOT/"expirations"
 
 PRED_HASH_FIELDS=("case_id","source_surface_sha256","contract_id","independence_class","predicted_relation","predicted_mechanism","owner_boundary","discriminating_experiment","falsifier","repair_boundary","prediction_frozen_at")
 DISP_HASH_FIELDS=("case_id","source_surface_sha256","first_frozen_at","prediction_deadline_at","disposition_frozen_at","independence_class","disposition","reason")
+EXP_HASH_FIELDS=("case_id","source_surface_sha256","first_frozen_at","prediction_deadline_at","expiry_recorded_at","reason")
 
 def parse(v):
     return dt.datetime.fromisoformat(v.replace("Z","+00:00")).astimezone(dt.timezone.utc)
@@ -41,7 +43,7 @@ def main():
     if len(ids)!=len(set(ids)):
         raise ValueError("duplicate seen case id")
 
-    counts={"pending":0,"prediction":0,"excluded":0}
+    counts={"pending":0,"prediction":0,"excluded":0,"expired":0}
     for entry in seen:
         case=entry["id"]
         surface=source_surface(entry)
@@ -52,10 +54,11 @@ def main():
 
         pred=PRED/f"{safe(case)}.json"
         disp=DISP/f"{safe(case)}.json"
+        exp=EXP/f"{safe(case)}.json"
         status=entry["status"]
 
         if status=="candidate-frozen-awaiting-prediction":
-            if pred.exists() or disp.exists():
+            if pred.exists() or disp.exists() or exp.exists():
                 raise ValueError(f"{case}: pending case already has terminal artifact")
             if parse(entry["first_frozen_at"])>parse(entry["prediction_deadline_at"]):
                 raise ValueError(f"{case}: impossible first-seen/deadline order")
@@ -63,7 +66,7 @@ def main():
             continue
 
         if status=="prediction-frozen-awaiting-resolution":
-            if not pred.exists() or disp.exists():
+            if not pred.exists() or disp.exists() or exp.exists():
                 raise ValueError(f"{case}: prediction state/artifact mismatch")
             doc=load(pred)
             if doc["case_id"]!=case or doc["source_surface_sha256"]!=entry["surface_sha256"]:
@@ -74,11 +77,34 @@ def main():
                 raise ValueError(f"{case}: seen/prediction digest mismatch")
             if bool(doc["prediction_within_sla"]) != (parse(doc["prediction_frozen_at"])<=parse(doc["prediction_deadline_at"])):
                 raise ValueError(f"{case}: prediction SLA flag mismatch")
+            if not doc["prediction_within_sla"]:
+                raise ValueError(f"{case}: late mechanism prediction cannot count as prospective evidence")
             counts["prediction"]+=1
             continue
 
+        if status=="deadline_missed_unadjudicated":
+            if pred.exists() or disp.exists() or not exp.exists():
+                raise ValueError(f"{case}: expired state/artifact mismatch")
+            doc=load(exp)
+            if doc["case_id"]!=case or doc["source_surface_sha256"]!=entry["surface_sha256"]:
+                raise ValueError(f"{case}: expired source identity mismatch")
+            if doc["expiry_sha256"]!=digest(doc,EXP_HASH_FIELDS):
+                raise ValueError(f"{case}: expiration digest mismatch")
+            if entry.get("expiry_sha256")!=doc["expiry_sha256"]:
+                raise ValueError(f"{case}: seen/expiration digest mismatch")
+            if entry.get("expiry_source")!=str(exp.relative_to(ROOT)):
+                raise ValueError(f"{case}: expiration source path mismatch")
+            if entry.get("expiry_recorded_at")!=doc["expiry_recorded_at"]:
+                raise ValueError(f"{case}: expiration timestamp mismatch")
+            if parse(doc["expiry_recorded_at"])<=parse(doc["prediction_deadline_at"]):
+                raise ValueError(f"{case}: expiration was recorded before deadline")
+            if doc.get("independence_class")!="UNADJUDICATED" or doc.get("primary_prospective_I2_eligible") is not False:
+                raise ValueError(f"{case}: expired case improperly claims adjudication or I2 eligibility")
+            counts["expired"]+=1
+            continue
+
         if status.startswith("excluded_"):
-            if pred.exists() or not disp.exists():
+            if pred.exists() or exp.exists() or not disp.exists():
                 raise ValueError(f"{case}: exclusion state/artifact mismatch")
             doc=load(disp)
             if doc["case_id"]!=case or doc["source_surface_sha256"]!=entry["surface_sha256"]:

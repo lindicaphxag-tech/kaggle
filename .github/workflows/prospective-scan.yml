@@ -42,7 +42,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python -m py_compile             transport/scan.py             transport/freeze_prediction.py             transport/freeze_disposition.py             transport/collect_resolution.py             transport/validate_ledger.py
+          python -m py_compile             transport/scan.py             transport/freeze_prediction.py             transport/freeze_disposition.py             transport/collect_resolution.py             transport/validate_ledger.py             transport/expire_pending.py
+          python transport/expire_pending.py --self-test
           python transport/collect_resolution.py --self-test
           python transport/validate_ledger.py
           python - <<'PY'
@@ -90,6 +91,9 @@ jobs:
             python transport/freeze_prediction.py "$f"
             rm "$f"
           done
+
+      - name: Freeze missed six-hour deadlines without post-hoc adjudication
+        run: python transport/expire_pending.py
 
       - name: Scan frozen public frame
         env:

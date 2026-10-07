@@ -28,7 +28,12 @@ def main():
     case=draft["case_id"]
     if case not in entries: raise ValueError(f"{case}: no public first-seen record")
     source=entries[case]
-    now=parse(a.at) if a.at else dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
+    if source.get("status") != "candidate-frozen-awaiting-prediction":
+        raise ValueError(f"{case}: already disposed, predicted, or expired")
+    if a.at: raise ValueError("--at is disabled for live ledger writes; backdating is forbidden")
+    now=dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
+    if now > parse(source["prediction_deadline_at"]):
+        raise ValueError(f"{case}: prediction deadline elapsed; no retrospective freeze allowed")
     frozen={k:draft[k] for k in REQUIRED}
     frozen.update({
         "schema_version":1,
