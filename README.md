@@ -11,9 +11,9 @@ They are deliberately kept separate in claims: public self-authored artifacts ar
 
 ## ClinGeom — start here
 
-Frozen evidence pack: [`research/medical_geometry/EVIDENCE_V0.1.0.md`](research/medical_geometry/EVIDENCE_V0.1.0.md) · machine-readable manifest: [`EVIDENCE_MANIFEST_V0.1.0.json`](research/medical_geometry/EVIDENCE_MANIFEST_V0.1.0.json)
+Frozen evidence pack: [`research/medical_geometry/EVIDENCE_V0.2.0.md`](research/medical_geometry/EVIDENCE_V0.2.0.md) · machine-readable manifest: [`EVIDENCE_MANIFEST_V0.2.0.json`](research/medical_geometry/EVIDENCE_MANIFEST_V0.2.0.json)
 
-**Frozen public version:** [`release/clingeom-v0.1.0`](https://github.com/lindicaphxag-tech/kaggle/tree/release/clingeom-v0.1.0) at `016b09d1d88f86ee20da5ddb7dab5fd471c50a27` (public core CI green). Use the frozen branch for independent reproduction; `main` is the continuing research line.
+**Frozen public version:** [`release/clingeom-v0.2.0`](https://github.com/lindicaphxag-tech/kaggle/tree/release/clingeom-v0.2.0) at `7e570b05071ae65dc1abc636701c5a75ca1424a3` (public core CI green; 54 NumPy-core tests). Use the frozen branch for independent reproduction; `main` is the continuing research line.
 
 ClinGeom asks a narrow question with broad consequences:
 
@@ -25,6 +25,7 @@ The public core currently contains:
 - voxel-Dice-perfect / patient-space-wrong counterexamples;
 - model-derived feature lattices and channel-fibered lattice bundles;
 - T13 minimality certificate: exact patient-lattice type count, minimum contiguous channel-fiber count, and explicit detection when no point-affine partition can represent a multi-support channel;
+- T14 exact collapse-radius certificate: optimal millimetre-valued single-affine approximation for parallel patient lattices;
 - PyTorch / `torch.fx` spatial-semantics propagation and merge checking;
 - constructive common-lattice repair synthesis;
 - prompt representation-closure certificates;
