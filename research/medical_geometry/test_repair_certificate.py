@@ -8,6 +8,8 @@ from research.medical_geometry.clingeom import FeatureLattice
 from research.medical_geometry.repair_synthesis import (
     _make_plan,
     synthesize_lattice_repair,
+    synthesize_merge_repair,
+    verify_merge_bundle,
     target_to_source_index_map,
     verify_repair_plan,
 )
@@ -72,3 +74,27 @@ def test_valid_integer_crop_is_still_accepted():
     plan = synthesize_lattice_repair(source, target)
     assert plan.kind == 'exact_crop'
     assert verify_repair_plan(source, target, plan)
+
+def test_merge_bundle_cannot_lie_about_repair_cost():
+    left = lattice((32, 32, 32), (2, 2, 2), (0, 0, 0))
+    right = lattice((32, 32, 32), (2, 2, 2), (0.5, 0.5, 0.5))
+    bundle = synthesize_merge_repair(left, right)
+    assert verify_merge_bundle(left, right, bundle)
+    assert bundle.interpolation_count == 1
+    assert not verify_merge_bundle(
+        left, right, replace(bundle, interpolation_count=0)
+    )
+    assert not verify_merge_bundle(
+        left, right, replace(bundle, retained_fraction_left=1.0)
+    )
+    assert not verify_merge_bundle(
+        left, right, replace(bundle, retained_fraction_right=1.0)
+    )
+
+
+def test_merge_bundle_role_mismatch_fails_closed():
+    left = lattice((32, 32, 32), (2, 2, 2), (0, 0, 0))
+    right = lattice((32, 32, 32), (2, 2, 2), (0.5, 0.5, 0.5))
+    bundle = synthesize_merge_repair(left, right, role='feature')
+    assert verify_merge_bundle(left, right, bundle, role='feature')
+    assert not verify_merge_bundle(left, right, bundle, role='label')
