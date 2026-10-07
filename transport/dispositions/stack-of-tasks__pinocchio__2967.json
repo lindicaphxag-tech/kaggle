@@ -1,0 +1,15 @@
+{
+  "case_id": "stack-of-tasks/pinocchio#2967",
+  "claim_boundary": "An exclusion/disposition record is not a prospective mechanism success, external adoption, or L8/L9 credit.",
+  "disposition": "excluded_protocol_2_4_analytic_derivative_correctness",
+  "disposition_frozen_at": "2026-10-07T23:35:00Z",
+  "disposition_sha256": "6f2ca63327d7a9eb2feff8d1ac764f54795e1709fedb4d8c27cac50f75c2faa3",
+  "disposition_within_sla": true,
+  "first_frozen_at": "2026-10-07T23:33:03Z",
+  "independence_class": "EXCLUDED",
+  "information_barrier": "Disposition uses only the already-frozen original issue title/body. Comments, linked workflow logs, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden before this freeze.",
+  "prediction_deadline_at": "2026-10-08T05:33:03Z",
+  "reason": "The original frozen issue is a finite-difference disagreement in analytic gravity, static-torque and RNEA q-derivatives for Universal/SphericalZYX/Ellipsoid joint models. Its own first-seen text already localizes the error to same-joint Jacobian blocks where the motion subspace varies with q. The reported failure concerns a deterministic analytic derivative implementation, not an unknown producer/consumer semantic ABI or an ambiguous repair-authority boundary under the frozen SemRepair contract. No prospective I2 or externally validated mechanism claim is inferred.",
+  "schema_version": 1,
+  "source_surface_sha256": "c5f25b8ad41487c8a9527d9a21af61998f5b6a779a97c017d70ca2c652fa07c1"
+}
