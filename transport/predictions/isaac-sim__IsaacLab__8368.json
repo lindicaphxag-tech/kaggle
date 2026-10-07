@@ -1,0 +1,20 @@
+{
+  "case_id": "isaac-sim/IsaacLab#8368",
+  "claim_boundary": "A frozen prediction is not a correctness or I2 claim.",
+  "contract_id": "render_partition_isolation_v1",
+  "discriminating_experiment": "In fresh processes with the same explicit scene partitions, repeat the env-0-only light/emission toggle while disabling temporal reconstruction/denoising or forcing per-frame history reset. Keep geometry, camera, materials, partition tags, and USD intensity readbacks fixed. Test analytic lights and emissive mesh separately. The prediction is supported if untouched-env leakage collapses to the no-edit noise bound specifically when temporal history is disabled/reset.",
+  "falsifier": "The prediction is falsified if cross-environment leakage remains at the same magnitude after temporal reconstruction/denoising is disabled and history is cleared, or if the supposedly untouched environments show corresponding USD/light-state changes, or if the same leakage appears under Isaac RTX with the same partition tags and settling protocol.",
+  "first_frozen_at": "2026-10-07T20:35:21Z",
+  "independence_class": "I1",
+  "owner_boundary": "OVRTX render-product temporal reconstruction / denoiser state partitioning, downstream of IsaacLab/USD scene authoring and partition tags but upstream of final RGB output.",
+  "predicted_mechanism": "OVRTX temporal reconstruction or denoising state is shared or keyed above the per-render-product / per-scene-partition scope, so an env-0 lighting update contaminates reconstruction history used by untouched environments even though the USD light-intensity state itself remains partition-correct.",
+  "predicted_relation": "With geometry, materials, cameras, and all non-target environments fixed, changing lighting or emissive intensity in scene partition P0 must not change RGB output of render products bound to disjoint partitions beyond each untouched environment's frozen no-edit noise envelope.",
+  "prediction_deadline_at": "2026-10-08T02:35:21Z",
+  "prediction_frozen_at": "2026-10-07T20:37:41Z",
+  "prediction_sha256": "b23ee31f441e33bc00cf7e71bca185a3aba1b1696cdddb3f3f034599aacfa840",
+  "prediction_within_sla": true,
+  "repair_boundary": "Partition or reset OVRTX temporal/denoiser accumulation state per render product / scene partition; do not compensate output pixels, alter policy observations, or globally reset all renderer state as the semantic repair.",
+  "schema_version": 1,
+  "source_surface_sha256": "b867161ff86d14ab4e776d5533150070b822f5996e6d3b03b8ff1a2dee7a5b8d",
+  "status": "prediction-frozen-awaiting-resolution"
+}
