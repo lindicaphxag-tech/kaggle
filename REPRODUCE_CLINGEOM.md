@@ -86,3 +86,31 @@ Negative results are explicitly useful. Do not tune thresholds after seeing the 
 - stars, forks or downloads alone;
 - historical bugs used only as motivating examples;
 - unpublished private experiments.
+
+## D. Adversarial repair verification and postcondition
+
+The public evidence is not only a synthetic mismatch. These tests attempt
+to fool the verification/execution boundary with a correctly signed but
+out-of-domain sampling map, incorrect source shapes, inaccurate atomic
+repair-cost claims, and corrupted post-rewrite spatial phases.
+
+```bash
+python -m pytest -q \
+  research/medical_geometry/test_repair_certificate.py \
+  research/medical_geometry/test_torch_repair_certificate.py \
+  research/medical_geometry/test_fx_postcondition.py
+```
+
+Expected: all three test modules pass. No threshold tuning is allowed.
+Associated public source/evidence: [PR #16](https://github.com/lindicaphxag-tech/kaggle/pull/16)
+and [PR #20](https://github.com/lindicaphxag-tech/kaggle/pull/20).
+
+## E. Pinned external highdicom witness
+
+[Execution record](research/medical_geometry/upstream_repros/HIGHDICOM_454_RESULT.md)
+and [minimal patch proposal](research/medical_geometry/upstream_repros/HIGHDICOM_454_PATCH_PROPOSAL.md)
+are public. The pinned CI workflow installs the audited highdicom #454 PR head
+and MONAI 1.6.1. It observes exact affine round-trip but lost automatic
+`FrameOfReferenceUID`. This is a third-party-code *observation*, not
+third-party *confirmation* or adoption.
+
