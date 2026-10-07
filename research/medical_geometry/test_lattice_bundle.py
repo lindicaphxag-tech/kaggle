@@ -3,13 +3,16 @@ import pytest
 
 from research.medical_geometry.clingeom import FeatureLattice
 from research.medical_geometry.lattice_bundle import (
+    ChannelFiber,
     LatticeBundle,
     all_bundle_supports,
     bundle_from_lattice,
     bundle_summary,
+    certify_minimal_point_affine_partition,
     certify_single_lattice,
     dense_conv_mix_bundle,
     factorized_reduce_bundle,
+    shift_lattice_origin,
 )
 
 
@@ -112,3 +115,57 @@ def test_bundle_summary_exposes_channel_fiber_provenance():
     assert summary["fibers"][1]["channel_range"] == [6, 12]
     assert "phase=(0,0,0)" in summary["fibers"][0]["provenance"]
     assert "phase=(1,1,1)" in summary["fibers"][1]["provenance"]
+
+
+def test_minimal_point_affine_partition_is_exact_for_homogeneous_tensor():
+    source = bundle_from_lattice(16, FeatureLattice.input_grid((16, 16, 16)))
+    cert = certify_minimal_point_affine_partition(source, anisotropic_affine())
+    assert cert.point_affine_representable
+    assert cert.distinct_patient_lattice_types == 1
+    assert cert.minimum_contiguous_fibers == 1
+    assert cert.globally_single_affine
+    assert cert.fiber_type_ids == (0,)
+
+
+def test_factorized_reduce_requires_exactly_two_patient_lattice_types():
+    source = bundle_from_lattice(16, FeatureLattice.input_grid((24, 24, 24)))
+    reduced = factorized_reduce_bundle(source, out_channels=32)
+    cert = certify_minimal_point_affine_partition(reduced, anisotropic_affine())
+    assert cert.point_affine_representable
+    assert cert.distinct_patient_lattice_types == 2
+    assert cert.minimum_contiguous_fibers == 2
+    assert not cert.globally_single_affine
+    assert cert.fiber_type_ids == (0, 1)
+
+
+def test_distinct_lattice_type_count_differs_from_contiguous_fiber_minimum():
+    a = FeatureLattice.input_grid((12, 12, 12))
+    b = shift_lattice_origin(a, (1, 0, 0))
+    bundle = LatticeBundle(
+        a.shape,
+        6,
+        (
+            ChannelFiber(0, 2, (a,), 'A-left'),
+            ChannelFiber(2, 4, (b,), 'B-middle'),
+            ChannelFiber(4, 6, (a,), 'A-right'),
+        ),
+    )
+    cert = certify_minimal_point_affine_partition(bundle, anisotropic_affine())
+    assert cert.point_affine_representable
+    assert cert.distinct_patient_lattice_types == 2
+    assert cert.minimum_contiguous_fibers == 3
+    assert cert.fiber_type_ids == (0, 1, 0)
+
+
+def test_dense_channel_mix_has_no_exact_point_affine_partition():
+    source = bundle_from_lattice(16, FeatureLattice.input_grid((24, 24, 24)))
+    reduced = factorized_reduce_bundle(source, out_channels=32)
+    mixed = dense_conv_mix_bundle(
+        reduced, out_channels=8, kernel_size=1, stride=1, padding=0
+    )
+    cert = certify_minimal_point_affine_partition(mixed, anisotropic_affine())
+    assert not cert.point_affine_representable
+    assert cert.distinct_patient_lattice_types is None
+    assert cert.minimum_contiguous_fibers is None
+    assert not cert.globally_single_affine
+    assert cert.fiber_type_ids == ()
