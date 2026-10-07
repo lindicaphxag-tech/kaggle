@@ -208,6 +208,17 @@
       "source": "inbox/FIRST_SEEN_20261006T205628Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "7783a773bf11aaa6c2d285f4e6bdc857f6a96c4367350280c751b22dc98d39fe"
+    },
+    {
+      "created_at": "2026-10-06T21:56:33Z",
+      "first_frozen_at": "2026-10-07T00:38:33Z",
+      "id": "google-deepmind/mujoco#3662",
+      "issue_number": 3662,
+      "prediction_deadline_at": "2026-10-07T06:38:33Z",
+      "repository": "google-deepmind/mujoco",
+      "source": "inbox/FIRST_SEEN_20261007T003833Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "5d89ea5deac1c5da571e427af071e8ec21bd72c9c157fa1453e10102b2183fce"
     }
   ]
 }

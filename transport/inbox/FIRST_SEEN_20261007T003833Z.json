@@ -1,0 +1,26 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "sebas77",
+      "body": "### The feature, motivation and pitch\n\nAI wrote the code for me but I didn't want to change the package at all, so I had to abandon the idea to bake the mujoco components to prevent the run-time conversion. Why isn't this function supported? the mujoco binary can be serialized in and loaded from asset files. Out of curiosity and partially interest at this point.\n\n### Alternatives\n\n_No response_\n\n### Additional context\n\n_No response_",
+      "created_at": "2026-10-06T21:56:33Z",
+      "html_url": "https://github.com/google-deepmind/mujoco/issues/3662",
+      "id": "google-deepmind/mujoco#3662",
+      "issue_number": 3662,
+      "labels": [
+        "enhancement"
+      ],
+      "repository": "google-deepmind/mujoco",
+      "surface_sha256": "5d89ea5deac1c5da571e427af071e8ec21bd72c9c157fa1453e10102b2183fce",
+      "title": "Why doens't unity plugin support Mujoco baked components?"
+    }
+  ],
+  "post_activation_issue_identities_observed": 17,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-07T00:38:33Z",
+  "schema_version": 1
+}
