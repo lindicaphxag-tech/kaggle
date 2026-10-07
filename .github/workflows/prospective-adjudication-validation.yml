@@ -68,7 +68,7 @@ jobs:
           assert entry["status"]=="adjudicated_i1_no_credit"
           assert entry["credit_decision"]=="no_credit"
           assert entry["mechanism_match"]=="unresolved"
-          adj=json.loads(Path(entry["adjudication_source"]).read_text())
+          adj=json.loads((Path("transport") / entry["adjudication_source"]).read_text())
           assert adj["predicted_independence_class"]=="I1"
           assert adj["final_independence_class"]=="I1"
           assert adj["credit_decision"]=="no_credit"
