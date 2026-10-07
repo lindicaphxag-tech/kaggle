@@ -1,15 +1,16 @@
 cff-version: 1.2.0
-message: "If you use the public ClinGeom artifact, cite the repository commit you evaluated. A paper citation will replace this provisional software citation when available."
-title: "ClinGeom and Semantic Reliability Public Research Artifacts"
+message: "If you use ClinGeom, cite the frozen release branch and exact commit you evaluated. A paper citation will replace this provisional software citation when available."
+title: "ClinGeom: Typed Patient-Space Geometry for Medical AI"
 type: software
 authors:
   - family-names: "lindicaphxag-tech"
 repository-code: "https://github.com/lindicaphxag-tech/kaggle"
-url: "https://github.com/lindicaphxag-tech/kaggle"
-version: "0.1-public-artifact"
-date-released: "2026-10-06"
+url: "https://github.com/lindicaphxag-tech/kaggle/tree/release/clingeom-v0.1.0"
+version: "0.1.0"
+date-released: "2026-10-08"
 keywords:
   - medical imaging
   - patient-space geometry
+  - representation closure
   - semantic reliability
   - reproducible research
