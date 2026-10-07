@@ -9,6 +9,7 @@ from research.medical_geometry.lattice_bundle import (
     bundle_from_lattice,
     bundle_summary,
     certify_minimal_point_affine_partition,
+    certify_parallel_lattice_collapse,
     certify_single_lattice,
     dense_conv_mix_bundle,
     factorized_reduce_bundle,
@@ -169,3 +170,82 @@ def test_dense_channel_mix_has_no_exact_point_affine_partition():
     assert cert.minimum_contiguous_fibers is None
     assert not cert.globally_single_affine
     assert cert.fiber_type_ids == ()
+
+
+def test_two_phase_parallel_collapse_recovers_exact_d_over_two_bound():
+    source = bundle_from_lattice(16, FeatureLattice.input_grid((24, 24, 24)))
+    reduced = factorized_reduce_bundle(source, out_channels=32)
+    cert = certify_parallel_lattice_collapse(reduced, anisotropic_affine())
+    d = float(np.linalg.norm([0.7, 0.7, 5.0]))
+    assert cert.applicable
+    assert cert.num_unique_lattices == 2
+    assert cert.exact_minimax_radius_mm == pytest.approx(d / 2.0)
+    assert cert.diameter_lower_bound_mm == pytest.approx(d / 2.0)
+    np.testing.assert_allclose(cert.optimal_translation_mm, [0.35, 0.35, 2.5])
+    assert not cert.safe_under_tolerance
+
+
+def test_eight_polyphase_offsets_have_cube_circumsphere_collapse_radius():
+    base = FeatureLattice.input_grid((12, 12, 12))
+    supports = tuple(
+        shift_lattice_origin(base, (x, y, z))
+        for x in (0, 1)
+        for y in (0, 1)
+        for z in (0, 1)
+    )
+    bundle = LatticeBundle(
+        base.shape,
+        8,
+        tuple(
+            ChannelFiber(i, i + 1, (support,), f'phase-{i}')
+            for i, support in enumerate(supports)
+        ),
+    )
+    affine = np.eye(4)
+    cert = certify_parallel_lattice_collapse(bundle, affine)
+    assert cert.applicable
+    assert cert.num_unique_lattices == 8
+    np.testing.assert_allclose(cert.optimal_translation_mm, [0.5, 0.5, 0.5], atol=1e-12)
+    assert cert.exact_minimax_radius_mm == pytest.approx(np.sqrt(3.0) / 2.0)
+    assert cert.diameter_lower_bound_mm == pytest.approx(np.sqrt(3.0) / 2.0)
+
+
+def test_parallel_collapse_certificate_can_authorize_submillimeter_tolerance():
+    base = FeatureLattice.input_grid((8, 8, 8))
+    shifted = FeatureLattice(
+        base.shape,
+        base.jump.copy(),
+        np.array([0.1, 0.0, 0.0]),
+        base.receptive_field.copy(),
+    )
+    bundle = LatticeBundle(
+        base.shape,
+        2,
+        (
+            ChannelFiber(0, 1, (base,), 'base'),
+            ChannelFiber(1, 2, (shifted,), 'shifted'),
+        ),
+    )
+    cert = certify_parallel_lattice_collapse(bundle, np.eye(4), tolerance_mm=0.06)
+    assert cert.applicable
+    assert cert.exact_minimax_radius_mm == pytest.approx(0.05)
+    assert cert.safe_under_tolerance
+
+
+def test_parallel_collapse_rejects_lattices_with_different_linear_parts():
+    a = FeatureLattice.input_grid((8, 8, 8))
+    b = FeatureLattice(
+        a.shape,
+        np.array([2.0, 1.0, 1.0]),
+        np.zeros(3),
+        a.receptive_field.copy(),
+    )
+    bundle = LatticeBundle(
+        a.shape,
+        2,
+        (ChannelFiber(0, 1, (a,), 'a'), ChannelFiber(1, 2, (b,), 'b')),
+    )
+    cert = certify_parallel_lattice_collapse(bundle, np.eye(4))
+    assert not cert.applicable
+    assert cert.exact_minimax_radius_mm is None
+    assert cert.optimal_affine is None
