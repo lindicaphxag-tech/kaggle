@@ -44,6 +44,7 @@ jobs:
             research/medical_geometry/test_clingeom.py \
             research/medical_geometry/test_lattice_bundle.py \
             research/medical_geometry/test_repair_synthesis.py \
+            research/medical_geometry/test_repair_certificate.py \
             research/medical_geometry/test_prompt_representation.py
       - name: Produce deterministic NumPy evidence
         run: |
