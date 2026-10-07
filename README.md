@@ -64,6 +64,22 @@ PYTHONPATH=. python research/medical_geometry/benchmark_channel_fibers.py
 
 See [`CLINGEOM_PUBLIC_ARTIFACT.md`](CLINGEOM_PUBLIC_ARTIFACT.md), [`REPRODUCE_CLINGEOM.md`](REPRODUCE_CLINGEOM.md), and [`research/medical_geometry/CLINGEOM_THEOREMS.md`](research/medical_geometry/CLINGEOM_THEOREMS.md) for the full claim boundary.
 
+## Three inspectable external-review entry points
+
+These are public, pinned, executable research artifacts—not third-party adoption claims.
+
+1. **Real medical-library interoperability witness:** [highdicom #454 / MONAI physical-frame identity](research/medical_geometry/upstream_repros/HIGHDICOM_454_RESULT.md), [minimal upstream patch proposal](research/medical_geometry/upstream_repros/HIGHDICOM_454_PATCH_PROPOSAL.md), [reproducer](research/medical_geometry/upstream_repros/highdicom_454_frame_identity.py). On the pinned open highdicom PR head, voxel-to-world affine round-trips (max error `0.0`) but automatic DICOM FrameOfReferenceUID does not; explicit caller-provided UID does. [Public successful run](https://github.com/lindicaphxag-tech/kaggle/actions/runs/37476416622).
+2. **Adversarial certificate repair:** [PR #16](https://github.com/lindicaphxag-tech/kaggle/pull/16) rejects even a *freshly signed* resampling plan when it extrapolates beyond source feature support; the PyTorch executor independently checks the signed source shape and valid sampling domain. [Full green CI](https://github.com/lindicaphxag-tech/kaggle/actions/runs/37702733728).
+3. **Post-rewrite executable proof obligation:** [PR #20](https://github.com/lindicaphxag-tech/kaggle/pull/20) independently re-types the *actual rewritten* `torch.fx` graph and requires zero patient-space fusion obligations. Tests deliberately corrupt the repaired phase/axis mapping and check fail-closed behavior. [Full green CI](https://github.com/lindicaphxag-tech/kaggle/actions/runs/37703217555).
+
+To run the two focused correctness regressions:
+
+```bash
+python -m pytest -q research/medical_geometry/test_repair_certificate.py
+python -m pytest -q research/medical_geometry/test_torch_repair_certificate.py research/medical_geometry/test_fx_postcondition.py
+```
+
+**Evidence boundary:** these are first-party reproducibility artifacts and a pinned observation on an external codebase. highdicom maintainer confirmation, independent reproduction, external adoption, clinical performance improvement, and prospective new-defect status remain separate, unclaimed milestones.
 ## SemRepair prospective evidence transport
 
 The `transport/` surface is intentionally narrower: it freezes first-seen public issue evidence, prediction digests, deadlines and later resolution evidence. It does **not** award itself research credit or retroactively convert known cases into prospective discoveries.
