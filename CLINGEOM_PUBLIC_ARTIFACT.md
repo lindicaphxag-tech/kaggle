@@ -11,7 +11,7 @@ possible.
 
 ## Start here
 
-Frozen evidence pack: [`research/medical_geometry/EVIDENCE_V0.1.0.md`](research/medical_geometry/EVIDENCE_V0.1.0.md) · machine-readable manifest: [`EVIDENCE_MANIFEST_V0.1.0.json`](research/medical_geometry/EVIDENCE_MANIFEST_V0.1.0.json)
+Frozen evidence pack: [`research/medical_geometry/EVIDENCE_V0.2.0.md`](research/medical_geometry/EVIDENCE_V0.2.0.md) · machine-readable manifest: [`EVIDENCE_MANIFEST_V0.2.0.json`](research/medical_geometry/EVIDENCE_MANIFEST_V0.2.0.json)
 
 - Research entry point: [`research/medical_geometry/README.md`](research/medical_geometry/README.md)
 - Frozen theorem/claim boundary: [`research/medical_geometry/CLINGEOM_THEOREMS.md`](research/medical_geometry/CLINGEOM_THEOREMS.md)
@@ -36,6 +36,7 @@ PYTHONPATH=. python research/medical_geometry/benchmark_prompt_representation.py
 - exact patient-space reindex certificates;
 - voxel-Dice-perfect / patient-space-wrong counterexamples;
 - model-derived feature lattices and channel-conditioned `LatticeBundle` semantics;
+- exact minimal patient-lattice type/fiber certificates and exact minimax single-affine collapse radius for parallel lattice families;
 - PyTorch / `torch.fx` geometry propagation;
 - tensor-valid but patient-space-invalid merge detection;
 - constructive common-lattice repair synthesis;
