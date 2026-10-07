@@ -441,3 +441,77 @@ T13 assumes affine center maps and a fixed numerical equivalence tolerance for
 the executable certificate. It does not claim that every learned feature can be
 semantically reduced to a point sample; multi-support channels are explicitly
 outside that family and trigger semantic lifting.
+
+
+## T14 — exact minimax collapse radius for parallel patient lattices
+
+Let a finite family of patient-space feature-lattice affines share one linear
+part L and differ only by translations t_1,...,t_m:
+
+    F_g(i) = L i + t_g.
+
+Approximate the entire family by one affine with the same linear part and a
+single translation q:
+
+    F_q(i) = L i + q.
+
+Because the linear parts cancel, the worst patient-space center error for
+fiber g is independent of feature index:
+
+    ||F_g(i) - F_q(i)|| = ||t_g - q||.
+
+Therefore the optimal single-affine minimax error is exactly
+
+    r* = min_q max_g ||t_g - q||,
+
+which is the radius of the Euclidean minimum enclosing ball of the translation
+vectors {t_g}. Its center q* gives the optimal approximate affine translation.
+
+This upgrades the two-fiber T7 bound. For m=2, the minimum enclosing ball is
+the midpoint and
+
+    r* = ||t_1 - t_2|| / 2.
+
+For the eight unit-cube phase offsets {0,1}^3,
+
+    q* = (1/2, 1/2, 1/2)
+    r* = sqrt(3) / 2.
+
+### Compiler consequence
+
+A bundle of parallel patient lattices may be collapsed to one approximate affine
+under a declared tolerance epsilon **iff**
+
+    r* <= epsilon.
+
+Otherwise the compiler must preserve the LatticeBundle (or lift to a richer
+support representation). This turns an informal 'close enough' affine choice
+into an exact millimetre-valued authorization certificate.
+
+### Relation to the diameter bound
+
+The familiar diameter lower bound
+
+    diam({t_g}) / 2 <= r*
+
+is exact for two fibers but can be non-tight for more general point sets.
+ClinGeom reports both the diameter/2 lower bound and the exact minimum-enclosing-
+ball radius.
+
+### Prior-art boundary
+
+Minimum enclosing balls are classical computational geometry, and ClinGeom does
+not claim that optimization problem as new. The contribution target is narrower:
+identify polyphase / channel-conditioned feature lattices in patient coordinates
+and use the exact enclosing-ball radius as a semantic type-collapse certificate
+for medical-AI feature tensors.
+
+The executable implementation enumerates boundary sets of at most four
+translations, sufficient in three dimensions, and is intended for the small
+support cardinalities carried by one feature tensor.
+
+### Falsification boundary
+
+T14 requires equal patient-space linear parts. If support lattices differ in
+jump/direction/scale, the parallel-lattice theorem is inapplicable and the
+certificate must refuse rather than report a misleading radius.
