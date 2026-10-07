@@ -42,7 +42,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python -m py_compile             transport/scan.py             transport/freeze_prediction.py             transport/freeze_disposition.py             transport/collect_resolution.py             transport/validate_ledger.py
+          python -m py_compile             transport/scan.py             transport/freeze_prediction.py             transport/freeze_disposition.py             transport/freeze_adjudication.py             transport/collect_resolution.py             transport/validate_ledger.py
           python transport/collect_resolution.py --self-test
           python transport/validate_ledger.py
           python - <<'PY'
@@ -69,8 +69,14 @@ jobs:
 
           dispositions=cases("transport/pending_dispositions")
           predictions=cases("transport/pending_predictions")
-          overlap=dispositions & predictions
-          assert not overlap, f"same case queued for disposition and prediction: {sorted(overlap)}"
+          adjudications=cases("transport/pending_adjudications")
+          overlaps={
+              "disposition/prediction": dispositions & predictions,
+              "disposition/adjudication": dispositions & adjudications,
+              "prediction/adjudication": predictions & adjudications,
+          }
+          bad={name: sorted(items) for name,items in overlaps.items() if items}
+          assert not bad, f"same case queued for conflicting decisions: {bad}"
           PY
 
       - name: Freeze pending blind dispositions and predictions
@@ -88,6 +94,12 @@ jobs:
           prediction_files=(transport/pending_predictions/*.json)
           for f in "${prediction_files[@]}"; do
             python transport/freeze_prediction.py "$f"
+            rm "$f"
+          done
+
+          adjudication_files=(transport/pending_adjudications/*.json)
+          for f in "${adjudication_files[@]}"; do
+            python transport/freeze_adjudication.py "$f"
             rm "$f"
           done
 
