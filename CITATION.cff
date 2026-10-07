@@ -5,8 +5,8 @@ type: software
 authors:
   - family-names: "lindicaphxag-tech"
 repository-code: "https://github.com/lindicaphxag-tech/kaggle"
-url: "https://github.com/lindicaphxag-tech/kaggle/tree/release/clingeom-v0.1.0"
-version: "0.1.0"
+url: "https://github.com/lindicaphxag-tech/kaggle/tree/release/clingeom-v0.2.0"
+version: "0.2.0"
 date-released: "2026-10-08"
 keywords:
   - medical imaging
