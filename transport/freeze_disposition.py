@@ -50,6 +50,8 @@ def main():
         raise ValueError(f"{case}: not awaiting prediction/disposition")
 
     now = parse(a.at) if a.at else dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
+    if now > parse(source["prediction_deadline_at"]):
+        raise ValueError(f"{case}: disposition deadline elapsed; record administrative expiry instead")
     frozen = {
         "schema_version": 1,
         "case_id": case,
