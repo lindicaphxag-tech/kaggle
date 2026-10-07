@@ -11,6 +11,8 @@ They are deliberately kept separate in claims: public self-authored artifacts ar
 
 ## ClinGeom — start here
 
+Frozen evidence pack: [`research/medical_geometry/EVIDENCE_V0.1.0.md`](research/medical_geometry/EVIDENCE_V0.1.0.md) · machine-readable manifest: [`EVIDENCE_MANIFEST_V0.1.0.json`](research/medical_geometry/EVIDENCE_MANIFEST_V0.1.0.json)
+
 **Frozen public version:** [`release/clingeom-v0.1.0`](https://github.com/lindicaphxag-tech/kaggle/tree/release/clingeom-v0.1.0) at `016b09d1d88f86ee20da5ddb7dab5fd471c50a27` (public core CI green). Use the frozen branch for independent reproduction; `main` is the continuing research line.
 
 ClinGeom asks a narrow question with broad consequences:
