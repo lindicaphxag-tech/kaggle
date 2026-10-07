@@ -252,6 +252,39 @@
       "source": "inbox/FIRST_SEEN_20261007T071101Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "834a26a6e1d4dac98db423b6b8a1ffdecb79c321af74a985c41f83f1c7773df7"
+    },
+    {
+      "created_at": "2026-10-07T08:20:54Z",
+      "first_frozen_at": "2026-10-07T14:28:55Z",
+      "id": "gazebosim/gz-transport#978",
+      "issue_number": 978,
+      "prediction_deadline_at": "2026-10-07T20:28:55Z",
+      "repository": "gazebosim/gz-transport",
+      "source": "inbox/FIRST_SEEN_20261007T142855Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "70e2b46ab463cd3a9cadac1410c179cb5cba3299edcc24dbcae1d3abafceabbf"
+    },
+    {
+      "created_at": "2026-10-07T11:16:14Z",
+      "first_frozen_at": "2026-10-07T14:28:55Z",
+      "id": "isaac-sim/IsaacSim#870",
+      "issue_number": 870,
+      "prediction_deadline_at": "2026-10-07T20:28:55Z",
+      "repository": "isaac-sim/IsaacSim",
+      "source": "inbox/FIRST_SEEN_20261007T142855Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "8da2af0920edcdad6f78a4c6cc94296f52de061ec65b1fa34e5e77a44769c7b9"
+    },
+    {
+      "created_at": "2026-10-07T07:30:11Z",
+      "first_frozen_at": "2026-10-07T14:28:55Z",
+      "id": "stereolabs/zed-ros2-wrapper#459",
+      "issue_number": 459,
+      "prediction_deadline_at": "2026-10-07T20:28:55Z",
+      "repository": "stereolabs/zed-ros2-wrapper",
+      "source": "inbox/FIRST_SEEN_20261007T142855Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "ed6d199769797bc0d52114f0a06dd8706c0b7849ba41f9491c45accc1eea0719"
     }
   ]
 }
