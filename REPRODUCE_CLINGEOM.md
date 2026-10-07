@@ -1,5 +1,9 @@
 # ClinGeom Independent Reproduction
 
+**Frozen public version:** `release/clingeom-v0.1.0` at `016b09d1d88f86ee20da5ddb7dab5fd471c50a27`.
+
+Use that branch for independent reproduction; `main` is the continuing research branch.
+
 This document minimizes the cost of independently checking the public ClinGeom claims.
 
 ## A. NumPy-only semantic core
@@ -7,6 +11,8 @@ This document minimizes the cost of independently checking the public ClinGeom c
 ```bash
 git clone https://github.com/lindicaphxag-tech/kaggle.git
 cd kaggle
+git checkout release/clingeom-v0.1.0
+# frozen anchor: 016b09d1d88f86ee20da5ddb7dab5fd471c50a27
 python -m pip install numpy pytest
 python -m pytest -q \
   research/medical_geometry/test_clingeom.py \
