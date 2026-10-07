@@ -564,13 +564,38 @@ def verify_merge_bundle(
     right: FeatureLattice,
     bundle: MergeRepairBundle,
     *,
+    role: RepairRole | None = None,
     atol: float = 1e-9,
 ) -> bool:
-    """Independently verify both component repairs and atomic bundle digest."""
+    """Verify repair plans and the claimed interpolation/coverage trade-off.
 
+    A plan digest alone does not validate an accompanying numeric summary:
+    reject any bundle that understates interpolation cost or inflates
+    retained patient-space coverage.
+    """
+    if not verify_repair_plan(left, bundle.target, bundle.left, role=role, atol=atol):
+        return False
+    if not verify_repair_plan(right, bundle.target, bundle.right, role=role, atol=atol):
+        return False
+    if bundle.bundle_digest != _bundle_digest(bundle.target, bundle.left, bundle.right):
+        return False
+    expected_interpolations = (
+        int(bundle.left.requires_interpolation) + int(bundle.right.requires_interpolation)
+    )
+    if bundle.interpolation_count != expected_interpolations:
+        return False
+
+    if 'refuse' not in {bundle.left.kind, bundle.right.kind}:
+        target_cells = float(np.prod(bundle.target.shape))
+        expected_left = target_cells / float(np.prod(left.shape))
+        expected_right = target_cells / float(np.prod(right.shape))
+        return (
+            bool(np.isclose(bundle.retained_fraction_left, expected_left, atol=atol, rtol=0))
+            and bool(np.isclose(bundle.retained_fraction_right, expected_right, atol=atol, rtol=0))
+        )
+    # Refused bundles do not claim two executable repairs. Preserve the
+    # existing refusal protocol, but do not accept impossible fractions.
     return (
-        verify_repair_plan(left, bundle.target, bundle.left, atol=atol)
-        and verify_repair_plan(right, bundle.target, bundle.right, atol=atol)
-        and bundle.bundle_digest
-        == _bundle_digest(bundle.target, bundle.left, bundle.right)
+        0.0 <= bundle.retained_fraction_left <= 1.0
+        and 0.0 <= bundle.retained_fraction_right <= 1.0
     )
