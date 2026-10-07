@@ -1,0 +1,6 @@
+{
+  "case_id": "stack-of-tasks/pinocchio#2967",
+  "independence_class": "EXCLUDED",
+  "disposition": "excluded_protocol_2_4_analytic_derivative_correctness",
+  "reason": "The original frozen issue is a finite-difference disagreement in analytic gravity, static-torque and RNEA q-derivatives for Universal/SphericalZYX/Ellipsoid joint models. Its own first-seen text already localizes the error to same-joint Jacobian blocks where the motion subspace varies with q. The reported failure concerns a deterministic analytic derivative implementation, not an unknown producer/consumer semantic ABI or an ambiguous repair-authority boundary under the frozen SemRepair contract. No prospective I2 or externally validated mechanism claim is inferred."
+}
