@@ -1,6 +1,0 @@
-{
-  "case_id": "gazebosim/gz-transport#978",
-  "independence_class": "EXCLUDED",
-  "disposition": "excluded_protocol_2_4_availability_freeze",
-  "reason": "The frozen original surface reports a Zenoh-specific GUI freeze, timeout, unresponsiveness, and eventual process termination while ZMQ works. This is an availability/crash symptom rather than silent or semantically misleading correctness, so Protocol 2.4 excludes it from the primary semantic set."
-}

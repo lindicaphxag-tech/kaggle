@@ -1,0 +1,15 @@
+{
+  "case_id": "stereolabs/zed-ros2-wrapper#459",
+  "claim_boundary": "An exclusion/disposition record is not a prospective mechanism success, external adoption, or L8/L9 credit.",
+  "disposition": "excluded_i0_exact_mechanism_and_fix_exposed_and_crash",
+  "disposition_frozen_at": "2026-10-07T20:43:29Z",
+  "disposition_sha256": "2e3b092376eb6f5d284427cb3b097507ee262ccf4905b818bf7eed1a6e35e006",
+  "disposition_within_sla": false,
+  "first_frozen_at": "2026-10-07T14:28:55Z",
+  "independence_class": "I0",
+  "information_barrier": "Disposition uses only the already-frozen original issue title/body. Comments, linked workflow logs, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden before this freeze.",
+  "prediction_deadline_at": "2026-10-07T20:28:55Z",
+  "reason": "The frozen original surface already identifies the exact clock-domain mismatch: default rclcpp::Time is RCL_SYSTEM_TIME, TIMEZERO_ROS is RCL_ROS_TIME, publishVideoDepth may return without assigning pub_ts, and the body supplies the exact initialization repair. The observed outcome is also an uncaught runtime_error/SIGABRT crash.",
+  "schema_version": 1,
+  "source_surface_sha256": "ed6d199769797bc0d52114f0a06dd8706c0b7849ba41f9491c45accc1eea0719"
+}

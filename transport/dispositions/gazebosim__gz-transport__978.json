@@ -1,0 +1,15 @@
+{
+  "case_id": "gazebosim/gz-transport#978",
+  "claim_boundary": "An exclusion/disposition record is not a prospective mechanism success, external adoption, or L8/L9 credit.",
+  "disposition": "excluded_protocol_2_4_availability_freeze",
+  "disposition_frozen_at": "2026-10-07T20:43:28Z",
+  "disposition_sha256": "86a06f39f3c9d391584739416ea80f147c78628b9bddfaec0b70480a8aacf0b3",
+  "disposition_within_sla": false,
+  "first_frozen_at": "2026-10-07T14:28:55Z",
+  "independence_class": "EXCLUDED",
+  "information_barrier": "Disposition uses only the already-frozen original issue title/body. Comments, linked workflow logs, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden before this freeze.",
+  "prediction_deadline_at": "2026-10-07T20:28:55Z",
+  "reason": "The frozen original surface reports a Zenoh-specific GUI freeze, timeout, unresponsiveness, and eventual process termination while ZMQ works. This is an availability/crash symptom rather than silent or semantically misleading correctness, so Protocol 2.4 excludes it from the primary semantic set.",
+  "schema_version": 1,
+  "source_surface_sha256": "70e2b46ab463cd3a9cadac1410c179cb5cba3299edcc24dbcae1d3abafceabbf"
+}

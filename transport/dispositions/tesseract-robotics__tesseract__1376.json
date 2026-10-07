@@ -1,0 +1,15 @@
+{
+  "case_id": "tesseract-robotics/tesseract#1376",
+  "claim_boundary": "An exclusion/disposition record is not a prospective mechanism success, external adoption, or L8/L9 credit.",
+  "disposition": "excluded_i0_exact_mechanism_and_fix_exposed",
+  "disposition_frozen_at": "2026-10-07T20:43:29Z",
+  "disposition_sha256": "f9c1a1ca2d9ad2e71b6d209bbe4a7c95deb4607dcb6ac0c98e41264f5adea0c5",
+  "disposition_within_sla": true,
+  "first_frozen_at": "2026-10-07T20:35:21Z",
+  "independence_class": "I0",
+  "information_barrier": "Disposition uses only the already-frozen original issue title/body. Comments, linked workflow logs, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden before this freeze.",
+  "prediction_deadline_at": "2026-10-08T02:35:21Z",
+  "reason": "The frozen original surface identifies Eigen isApprox on differently shaped dynamic matrices as the out-of-bounds mechanism and gives the exact shape-check repair, with an existing JointState equality pattern as precedent.",
+  "schema_version": 1,
+  "source_surface_sha256": "f317bb0a8e11dd7f01de4c0b3631223c528aaec57419f3f0b79981cd116cf095"
+}

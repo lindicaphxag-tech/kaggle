@@ -1,0 +1,15 @@
+{
+  "case_id": "tesseract-robotics/tesseract#1378",
+  "claim_boundary": "An exclusion/disposition record is not a prospective mechanism success, external adoption, or L8/L9 credit.",
+  "disposition": "excluded_i0_exact_mechanism_and_fix_exposed",
+  "disposition_frozen_at": "2026-10-07T20:43:29Z",
+  "disposition_sha256": "84a9aa2cc9ae63b0cade32bcaf075c41455d24743764bb717df5fc7adc3e82e5",
+  "disposition_within_sla": true,
+  "first_frozen_at": "2026-10-07T20:35:21Z",
+  "independence_class": "I0",
+  "information_barrier": "Disposition uses only the already-frozen original issue title/body. Comments, linked workflow logs, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden before this freeze.",
+  "prediction_deadline_at": "2026-10-08T02:35:21Z",
+  "reason": "The frozen original surface already identifies pointersEqual dereferencing ResourceLocator pointers into a base non-virtual operator== that always returns true, explains the semantic consequence for parent-relative resolution, and proposes virtual derived equality or an explicit weaker documented contract.",
+  "schema_version": 1,
+  "source_surface_sha256": "99e5417add443599edb454f0e88466ceca7b43d58bffe529e9d32936feea5266"
+}

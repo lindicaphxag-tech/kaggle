@@ -1,0 +1,15 @@
+{
+  "case_id": "ros2/rclcpp#3317",
+  "claim_boundary": "An exclusion/disposition record is not a prospective mechanism success, external adoption, or L8/L9 credit.",
+  "disposition": "excluded_i0_exact_race_and_workaround_exposed_and_crash",
+  "disposition_frozen_at": "2026-10-07T20:43:29Z",
+  "disposition_sha256": "c952e6f3cbf10e3d2ef9425102a06d503526a4ccf4ce159cd89f9c02fab6f5bb",
+  "disposition_within_sla": true,
+  "first_frozen_at": "2026-10-07T20:35:21Z",
+  "independence_class": "I0",
+  "information_barrier": "Disposition uses only the already-frozen original issue title/body. Comments, linked workflow logs, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden before this freeze.",
+  "prediction_deadline_at": "2026-10-08T02:35:21Z",
+  "reason": "The frozen original surface already localizes the race to rcl_clock_add/remove_jump_callback from action-server construction/destruction versus the expiration thread, identifies the missing clock mutex, supplies TSan evidence, and gives a mutex-based workaround. The reported unsanitized manifestation is heap corruption/crash.",
+  "schema_version": 1,
+  "source_surface_sha256": "9dc771c9fca69b66bafb41988c67cd2c2fd9398082a4ece40110b8a2965810d4"
+}

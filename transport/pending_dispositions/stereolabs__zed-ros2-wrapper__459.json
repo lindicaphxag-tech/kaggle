@@ -1,6 +1,0 @@
-{
-  "case_id": "stereolabs/zed-ros2-wrapper#459",
-  "independence_class": "I0",
-  "disposition": "excluded_i0_exact_mechanism_and_fix_exposed_and_crash",
-  "reason": "The frozen original surface already identifies the exact clock-domain mismatch: default rclcpp::Time is RCL_SYSTEM_TIME, TIMEZERO_ROS is RCL_ROS_TIME, publishVideoDepth may return without assigning pub_ts, and the body supplies the exact initialization repair. The observed outcome is also an uncaught runtime_error/SIGABRT crash."
-}

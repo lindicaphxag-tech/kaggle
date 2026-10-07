@@ -1,6 +1,0 @@
-{
-  "case_id": "tesseract-robotics/tesseract#1378",
-  "independence_class": "I0",
-  "disposition": "excluded_i0_exact_mechanism_and_fix_exposed",
-  "reason": "The frozen original surface already identifies pointersEqual dereferencing ResourceLocator pointers into a base non-virtual operator== that always returns true, explains the semantic consequence for parent-relative resolution, and proposes virtual derived equality or an explicit weaker documented contract."
-}

@@ -1,6 +1,0 @@
-{
-  "case_id": "huggingface/lerobot#4868",
-  "independence_class": "EXCLUDED",
-  "disposition": "excluded_protocol_2_4_feature_request",
-  "reason": "The frozen original surface explicitly labels itself a feature request for SO-ARM 102 native support and documentation and does not report a silent semantic correctness failure. It is outside the primary prospective failure protocol."
-}

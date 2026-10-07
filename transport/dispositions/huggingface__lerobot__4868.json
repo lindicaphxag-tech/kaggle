@@ -1,0 +1,15 @@
+{
+  "case_id": "huggingface/lerobot#4868",
+  "claim_boundary": "An exclusion/disposition record is not a prospective mechanism success, external adoption, or L8/L9 credit.",
+  "disposition": "excluded_protocol_2_4_feature_request",
+  "disposition_frozen_at": "2026-10-07T20:43:29Z",
+  "disposition_sha256": "fc3020ebfd64a3b6ab98e473f3ee06d4b9118297a5b6d0e4cebfff3cee9eb590",
+  "disposition_within_sla": true,
+  "first_frozen_at": "2026-10-07T20:35:21Z",
+  "independence_class": "EXCLUDED",
+  "information_barrier": "Disposition uses only the already-frozen original issue title/body. Comments, linked workflow logs, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden before this freeze.",
+  "prediction_deadline_at": "2026-10-08T02:35:21Z",
+  "reason": "The frozen original surface explicitly labels itself a feature request for SO-ARM 102 native support and documentation and does not report a silent semantic correctness failure. It is outside the primary prospective failure protocol.",
+  "schema_version": 1,
+  "source_surface_sha256": "a6fa4228761cce7d1b0b5171226b12b239aed6d80f74a29a072e0f03c2fdc003"
+}

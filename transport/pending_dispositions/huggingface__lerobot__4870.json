@@ -1,6 +1,0 @@
-{
-  "case_id": "huggingface/lerobot#4870",
-  "independence_class": "I0",
-  "disposition": "excluded_i0_exact_mechanisms_and_repairs_exposed",
-  "reason": "The frozen original surface already identifies both mechanisms: empty TDMPC queues because PolicyServer calls predict_action_chunk directly, and time-major (horizon,batch,action) output being consumed as batch-first. It also supplies two explicit repair directions. Independent mechanism prediction is no longer possible."
-}

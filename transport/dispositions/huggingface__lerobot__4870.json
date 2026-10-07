@@ -1,0 +1,15 @@
+{
+  "case_id": "huggingface/lerobot#4870",
+  "claim_boundary": "An exclusion/disposition record is not a prospective mechanism success, external adoption, or L8/L9 credit.",
+  "disposition": "excluded_i0_exact_mechanisms_and_repairs_exposed",
+  "disposition_frozen_at": "2026-10-07T20:43:29Z",
+  "disposition_sha256": "bc122057c45bef30821d20e72d796531f3cd02b648847e94befe4720fc6da6a9",
+  "disposition_within_sla": true,
+  "first_frozen_at": "2026-10-07T20:35:21Z",
+  "independence_class": "I0",
+  "information_barrier": "Disposition uses only the already-frozen original issue title/body. Comments, linked workflow logs, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden before this freeze.",
+  "prediction_deadline_at": "2026-10-08T02:35:21Z",
+  "reason": "The frozen original surface already identifies both mechanisms: empty TDMPC queues because PolicyServer calls predict_action_chunk directly, and time-major (horizon,batch,action) output being consumed as batch-first. It also supplies two explicit repair directions. Independent mechanism prediction is no longer possible.",
+  "schema_version": 1,
+  "source_surface_sha256": "82ab1fca896d96392f132202ff4bb54f28bc362923079e9e1bbee48878f08e0d"
+}

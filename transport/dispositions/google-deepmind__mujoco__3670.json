@@ -1,0 +1,15 @@
+{
+  "case_id": "google-deepmind/mujoco#3670",
+  "claim_boundary": "An exclusion/disposition record is not a prospective mechanism success, external adoption, or L8/L9 credit.",
+  "disposition": "excluded_i0_exact_mechanism_and_repair_exposed",
+  "disposition_frozen_at": "2026-10-07T20:43:29Z",
+  "disposition_sha256": "97da048b244036b938f52df6ce59611b8e31de6bfcf1a6540bcd099cda9b969e",
+  "disposition_within_sla": true,
+  "first_frozen_at": "2026-10-07T20:35:21Z",
+  "independence_class": "I0",
+  "information_barrier": "Disposition uses only the already-frozen original issue title/body. Comments, linked workflow logs, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden before this freeze.",
+  "prediction_deadline_at": "2026-10-08T02:35:21Z",
+  "reason": "The frozen original surface already identifies the shared _optim path, its fixed 10-step gradient descent and approximate ellipsoid SDF, tests alternative hypotheses, and specifies exact Newton/bisection/support-gap repairs with quantitative expected outcomes. There is no independent mechanism prediction left to freeze.",
+  "schema_version": 1,
+  "source_surface_sha256": "3798e86325e8730c7de47e232b20c1c38bf508425de95c4b1c0ad1bb82025cda"
+}

@@ -1,0 +1,15 @@
+{
+  "case_id": "isaac-sim/IsaacSim#870",
+  "claim_boundary": "An exclusion/disposition record is not a prospective mechanism success, external adoption, or L8/L9 credit.",
+  "disposition": "excluded_i0_exact_mechanism_and_repair_exposed",
+  "disposition_frozen_at": "2026-10-07T20:43:29Z",
+  "disposition_sha256": "598f718ca8b09d98c7eaac7b584c04c6b93b4a07f81fa6c6da3932ac00439b47",
+  "disposition_within_sla": false,
+  "first_frozen_at": "2026-10-07T14:28:55Z",
+  "independence_class": "I0",
+  "information_barrier": "Disposition uses only the already-frozen original issue title/body. Comments, linked workflow logs, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden before this freeze.",
+  "prediction_deadline_at": "2026-10-07T20:28:55Z",
+  "reason": "The frozen original surface already identifies the strong-reference mechanism: the closure still captures the bound method through callback even though __self__ is weak-proxied, gives affected source locations, a plain-Python reproducer, and concrete weakref.ref/WeakMethod repairs. No independent mechanism prediction remains possible.",
+  "schema_version": 1,
+  "source_surface_sha256": "8da2af0920edcdad6f78a4c6cc94296f52de061ec65b1fa34e5e77a44769c7b9"
+}
