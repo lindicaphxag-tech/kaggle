@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -20,8 +21,31 @@ class LatticeRepair3d(nn.Module):
         super().__init__()
         if plan.kind == "refuse":
             raise ValueError("cannot instantiate a refused lattice repair")
+        self.source_shape = tuple(int(x) for x in plan.source_shape)
+        if len(self.source_shape) != 3 or any(n <= 0 for n in self.source_shape):
+            raise ValueError("invalid source shape in lattice repair plan")
         self.kind = plan.kind
         self.target_shape = tuple(int(x) for x in plan.target_shape)
+        if len(self.target_shape) != 3 or any(n <= 0 for n in self.target_shape):
+            raise ValueError("invalid target shape in lattice repair plan")
+        # An independent execution-time guard: the affine index map may be
+        # algebraically valid but still ask grid_sample to extrapolate from
+        # beyond the source lattice. Never silently accept padded zeros.
+        if self.kind == "resample":
+            mapping = np.asarray(plan.target_to_source_index, dtype=np.float64)
+            if mapping.shape != (4, 4) or not np.all(np.isfinite(mapping)):
+                raise ValueError("invalid source index map in resampling plan")
+            hi = np.asarray(self.target_shape, dtype=np.float64) - 1.0
+            corners = np.array([
+                [i, j, k, 1.0]
+                for i in (0.0, hi[0])
+                for j in (0.0, hi[1])
+                for k in (0.0, hi[2])
+            ], dtype=np.float64)
+            mapped = (mapping @ corners.T).T[:, :3]
+            source_hi = np.asarray(self.source_shape, dtype=np.float64) - 1.0
+            if np.any(mapped < -1e-9) or np.any(mapped > source_hi + 1e-9):
+                raise ValueError("resampling plan maps target points outside source lattice")
         self.interpolation = plan.interpolation
         self.crop_start = plan.crop_start
         self.crop_stop = plan.crop_stop
@@ -71,6 +95,11 @@ class LatticeRepair3d(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         if x.ndim != 5:
             raise ValueError("LatticeRepair3d expects NCDHW tensors")
+        if tuple(x.shape[-3:]) != self.source_shape:
+            raise ValueError(
+                f"tensor source shape {tuple(x.shape[-3:])} does not match "
+                f"certified source shape {self.source_shape}"
+            )
 
         if self.kind == "identity":
             return x
