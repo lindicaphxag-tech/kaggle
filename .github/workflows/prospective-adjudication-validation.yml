@@ -3,7 +3,7 @@ name: Prospective adjudication integrity
 on:
   push:
     branches:
-      - transport/adjudication-v1
+      - transport/adjudication-v2
   pull_request:
     paths:
       - "transport/**"
