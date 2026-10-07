@@ -11,6 +11,8 @@ They are deliberately kept separate in claims: public self-authored artifacts ar
 
 ## ClinGeom — start here
 
+**Frozen public version:** [`release/clingeom-v0.1.0`](https://github.com/lindicaphxag-tech/kaggle/tree/release/clingeom-v0.1.0) at `016b09d1d88f86ee20da5ddb7dab5fd471c50a27` (public core CI green). Use the frozen branch for independent reproduction; `main` is the continuing research line.
+
 ClinGeom asks a narrow question with broad consequences:
 
 > When a medical image, prompt, annotation, feature tensor or deformation field changes representation, does it still denote the same patient-space object?
@@ -20,6 +22,7 @@ The public core currently contains:
 - exact patient-space reindex certificates;
 - voxel-Dice-perfect / patient-space-wrong counterexamples;
 - model-derived feature lattices and channel-fibered lattice bundles;
+- T13 minimality certificate: exact patient-lattice type count, minimum contiguous channel-fiber count, and explicit detection when no point-affine partition can represent a multi-support channel;
 - PyTorch / `torch.fx` spatial-semantics propagation and merge checking;
 - constructive common-lattice repair synthesis;
 - prompt representation-closure certificates;
