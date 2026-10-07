@@ -1,0 +1,59 @@
+name: Freeze prospective dispositions
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "transport/pending_dispositions/**"
+      - ".github/workflows/prospective-freeze-dispositions.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: semrepair-public-dispositions
+  cancel-in-progress: false
+
+jobs:
+  freeze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Freeze all pending dispositions with actual execution time
+        shell: bash
+        run: |
+          set -euo pipefail
+          git pull --rebase origin main
+          shopt -s nullglob
+          files=(transport/pending_dispositions/*.json)
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "No pending dispositions."
+            exit 0
+          fi
+          python -m py_compile transport/freeze_disposition.py transport/validate_ledger.py
+          for f in "${files[@]}"; do
+            python transport/freeze_disposition.py "$f"
+            rm "$f"
+          done
+          python transport/validate_ledger.py
+
+      - name: Commit frozen disposition evidence
+        shell: bash
+        run: |
+          if git diff --quiet -- transport/seen.json transport/dispositions transport/pending_dispositions; then
+            echo "No disposition changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A transport/seen.json transport/dispositions transport/pending_dispositions
+          git commit -m "Freeze prospective disposition evidence"
+          git push origin HEAD:main
