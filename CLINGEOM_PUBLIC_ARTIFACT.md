@@ -11,6 +11,8 @@ possible.
 
 ## Start here
 
+Frozen evidence pack: [`research/medical_geometry/EVIDENCE_V0.1.0.md`](research/medical_geometry/EVIDENCE_V0.1.0.md) · machine-readable manifest: [`EVIDENCE_MANIFEST_V0.1.0.json`](research/medical_geometry/EVIDENCE_MANIFEST_V0.1.0.json)
+
 - Research entry point: [`research/medical_geometry/README.md`](research/medical_geometry/README.md)
 - Frozen theorem/claim boundary: [`research/medical_geometry/CLINGEOM_THEOREMS.md`](research/medical_geometry/CLINGEOM_THEOREMS.md)
 - Independent reproduction task: [Issue #9](https://github.com/lindicaphxag-tech/kaggle/issues/9)
