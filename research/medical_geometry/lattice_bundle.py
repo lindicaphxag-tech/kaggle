@@ -13,6 +13,7 @@ global feature affine and track when channel mixing destroys that property.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from itertools import combinations
 from typing import Iterable
 
 import numpy as np
@@ -90,6 +91,20 @@ class PointAffinePartitionCertificate:
     minimum_contiguous_fibers: int | None
     globally_single_affine: bool
     fiber_type_ids: tuple[int, ...]
+    reason: str
+
+@dataclass(frozen=True)
+class ParallelLatticeCollapseCertificate:
+    """Exact minimax collapse certificate for parallel patient-space lattices."""
+
+    applicable: bool
+    num_unique_lattices: int
+    common_linear: np.ndarray | None
+    optimal_translation_mm: np.ndarray | None
+    exact_minimax_radius_mm: float | None
+    diameter_lower_bound_mm: float | None
+    optimal_affine: np.ndarray | None
+    safe_under_tolerance: bool | None
     reason: str
 
 
@@ -249,6 +264,132 @@ def certify_minimal_point_affine_partition(
                 'multiple patient-space affine types are required; the reported '
                 'contiguous-fiber count is minimal for the current channel order'
             )
+        ),
+    )
+
+def _sphere_from_boundary(points: np.ndarray) -> tuple[np.ndarray, float] | None:
+    """Return the unique minimum-radius sphere through 1..4 boundary points."""
+    pts = np.asarray(points, dtype=np.float64)
+    n = len(pts)
+    if n == 0 or n > 4 or pts.shape != (n, 3):
+        raise ValueError('boundary must contain 1..4 three-dimensional points')
+    if n == 1:
+        return pts[0].copy(), 0.0
+    if n == 2:
+        center = 0.5 * (pts[0] + pts[1])
+        return center, float(np.linalg.norm(pts[0] - center))
+    if n == 3:
+        a, b, d = pts
+        v1 = b - a
+        v2 = d - a
+        gram = np.array(
+            [[np.dot(v1, v1), np.dot(v1, v2)],
+             [np.dot(v1, v2), np.dot(v2, v2)]],
+            dtype=np.float64,
+        )
+        rhs = 0.5 * np.array([np.dot(v1, v1), np.dot(v2, v2)])
+        if np.linalg.matrix_rank(gram, tol=1e-12) < 2:
+            return None
+        coeff = np.linalg.solve(gram, rhs)
+        center = a + coeff[0] * v1 + coeff[1] * v2
+        return center, float(np.linalg.norm(center - a))
+    a = pts[0]
+    matrix = 2.0 * (pts[1:] - a)
+    rhs = np.sum(pts[1:] ** 2, axis=1) - np.sum(a ** 2)
+    if np.linalg.matrix_rank(matrix, tol=1e-12) < 3:
+        return None
+    center = np.linalg.solve(matrix, rhs)
+    return center, float(np.linalg.norm(center - a))
+
+
+def _smallest_enclosing_ball(points: np.ndarray, *, atol: float = 1e-10) -> tuple[np.ndarray, float]:
+    """Exact finite 3-D minimum enclosing ball by boundary enumeration.
+
+    In R^3 an enclosing ball is determined by at most four boundary points.
+    This exhaustive implementation is intended for the small number of spatial
+    support lattices carried by one feature tensor, not large point clouds.
+    """
+    pts = np.asarray(points, dtype=np.float64)
+    if pts.ndim != 2 or pts.shape[1] != 3 or len(pts) == 0:
+        raise ValueError('points must have shape [N, 3] with N > 0')
+    unique = np.unique(np.round(pts, decimals=12), axis=0)
+    best_center = unique[0].copy()
+    best_radius = float('inf')
+    for size in range(1, min(4, len(unique)) + 1):
+        for ids in combinations(range(len(unique)), size):
+            candidate = _sphere_from_boundary(unique[list(ids)])
+            if candidate is None:
+                continue
+            center, radius = candidate
+            distances = np.linalg.norm(unique - center, axis=1)
+            cover_tol = atol * max(1.0, radius, float(distances.max(initial=0.0)))
+            if np.all(distances <= radius + cover_tol):
+                if radius < best_radius - cover_tol:
+                    best_center = center
+                    best_radius = radius
+    if not np.isfinite(best_radius):
+        raise RuntimeError('failed to construct a finite enclosing ball')
+    return best_center, float(best_radius)
+
+
+def certify_parallel_lattice_collapse(
+    bundle: LatticeBundle,
+    input_affine: np.ndarray,
+    *,
+    tolerance_mm: float = 1e-6,
+    linear_tolerance: float = 1e-10,
+) -> ParallelLatticeCollapseCertificate:
+    """Compute the exact best single-affine approximation for parallel lattices.
+
+    When all unique patient-space support affines share one linear part and
+    differ only by translation, the worst-case error of collapsing them to one
+    affine is independent of feature index. Minimizing that error is exactly
+    the Euclidean minimum-enclosing-ball problem over their translation vectors.
+    """
+    supports = all_bundle_supports(bundle)
+    affines = [feature_affine(input_affine, support) for support in supports]
+    common = affines[0][:3, :3].copy()
+    if any(
+        not np.allclose(a[:3, :3], common, atol=linear_tolerance, rtol=linear_tolerance)
+        for a in affines[1:]
+    ):
+        return ParallelLatticeCollapseCertificate(
+            applicable=False,
+            num_unique_lattices=len(affines),
+            common_linear=None,
+            optimal_translation_mm=None,
+            exact_minimax_radius_mm=None,
+            diameter_lower_bound_mm=None,
+            optimal_affine=None,
+            safe_under_tolerance=None,
+            reason=(
+                'support lattices do not share one patient-space linear part; '
+                'parallel-lattice collapse theorem does not apply'
+            ),
+        )
+
+    translations = np.stack([a[:3, 3] for a in affines], axis=0)
+    center, radius = _smallest_enclosing_ball(translations)
+    diameter = 0.0
+    for i, left in enumerate(translations):
+        for right in translations[i + 1:]:
+            diameter = max(diameter, float(np.linalg.norm(left - right)))
+
+    optimal = np.eye(4, dtype=np.float64)
+    optimal[:3, :3] = common
+    optimal[:3, 3] = center
+    return ParallelLatticeCollapseCertificate(
+        applicable=True,
+        num_unique_lattices=len(affines),
+        common_linear=common,
+        optimal_translation_mm=center,
+        exact_minimax_radius_mm=radius,
+        diameter_lower_bound_mm=diameter / 2.0,
+        optimal_affine=optimal,
+        safe_under_tolerance=bool(radius <= tolerance_mm),
+        reason=(
+            'exact minimax radius is the minimum-enclosing-ball radius of '
+            'patient-space lattice translations'
         ),
     )
 
