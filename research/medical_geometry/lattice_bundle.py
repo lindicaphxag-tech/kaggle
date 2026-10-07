@@ -81,6 +81,17 @@ class SingleLatticeCertificate:
     representative: FeatureLattice | None
     reason: str
 
+@dataclass(frozen=True)
+class PointAffinePartitionCertificate:
+    """Minimal exact channel partition into point-valued patient-space lattices."""
+
+    point_affine_representable: bool
+    distinct_patient_lattice_types: int | None
+    minimum_contiguous_fibers: int | None
+    globally_single_affine: bool
+    fiber_type_ids: tuple[int, ...]
+    reason: str
+
 
 def bundle_from_lattice(
     channels: int,
@@ -166,6 +177,80 @@ def certify_single_lattice(
         "one global feature affine would collapse distinct channel sampling lattices",
     )
 
+
+def certify_minimal_point_affine_partition(
+    bundle: LatticeBundle,
+    input_affine: np.ndarray,
+    *,
+    tolerance_mm: float = 1e-6,
+) -> PointAffinePartitionCertificate:
+    """Certify the minimal exact point-affine channel representation.
+
+    This strengthens certify_single_lattice. If any channel fiber structurally
+    depends on multiple distinct lattices, no partition into point-valued
+    affine fibers is exact. Otherwise every fiber has one patient-space affine
+    center map; the certificate counts both distinct map types and the minimum
+    channel-contiguous segments required by the current channel order.
+    """
+    ordered = tuple(sorted(bundle.fibers, key=lambda fiber: fiber.channel_start))
+    patient_affines: list[np.ndarray] = []
+
+    for fiber in ordered:
+        supports = _deduplicate_supports(fiber.supports)
+        if len(supports) != 1:
+            return PointAffinePartitionCertificate(
+                point_affine_representable=False,
+                distinct_patient_lattice_types=None,
+                minimum_contiguous_fibers=None,
+                globally_single_affine=False,
+                fiber_type_ids=(),
+                reason=(
+                    'at least one channel fiber has multiple structural patient-space '
+                    'supports, so no exact point-affine channel partition exists'
+                ),
+            )
+        patient_affines.append(feature_affine(input_affine, supports[0]))
+
+    representatives: list[np.ndarray] = []
+    type_ids: list[int] = []
+
+    for affine in patient_affines:
+        corners = physical_corners(bundle.shape, affine)
+        assigned: int | None = None
+        for class_id, representative in enumerate(representatives):
+            representative_corners = physical_corners(bundle.shape, representative)
+            error = float(
+                np.max(np.linalg.norm(corners - representative_corners, axis=1))
+            )
+            if error <= tolerance_mm:
+                assigned = class_id
+                break
+        if assigned is None:
+            representatives.append(affine)
+            assigned = len(representatives) - 1
+        type_ids.append(assigned)
+
+    distinct_types = len(representatives)
+    contiguous = 1 + sum(
+        left != right for left, right in zip(type_ids, type_ids[1:])
+    )
+    globally_single = distinct_types == 1
+
+    return PointAffinePartitionCertificate(
+        point_affine_representable=True,
+        distinct_patient_lattice_types=distinct_types,
+        minimum_contiguous_fibers=contiguous,
+        globally_single_affine=globally_single,
+        fiber_type_ids=tuple(type_ids),
+        reason=(
+            'all channel fibers share one patient-space affine'
+            if globally_single
+            else (
+                'multiple patient-space affine types are required; the reported '
+                'contiguous-fiber count is minimal for the current channel order'
+            )
+        ),
+    )
 
 def shift_lattice_origin(
     lattice: FeatureLattice,
