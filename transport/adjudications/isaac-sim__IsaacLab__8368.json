@@ -1,0 +1,15 @@
+{
+  "adjudicated_at": "2026-10-07T23:43:19Z",
+  "adjudication_sha256": "428d07270ef6e1538ca19e0dba55b99dadfe6a1dc740c06251e0f5e379dc84b6",
+  "case_id": "isaac-sim/IsaacLab#8368",
+  "claim_boundary": "Final adjudication is bound to one immutable first-seen surface, prediction digest, and resolution snapshot. Independence may be preserved or downgraded after resolution, never upgraded.",
+  "credit_decision": "no_credit",
+  "final_independence_class": "I1",
+  "mechanism_match": "unresolved",
+  "predicted_independence_class": "I1",
+  "prediction_sha256": "b23ee31f441e33bc00cf7e71bca185a3aba1b1696cdddb3f3f034599aacfa840",
+  "reason": "The original frozen issue surface already proposed partition filtering, shared rendering state, or denoising as candidate causes and explicitly asked whether global temporal/denoiser state could account for the leakage. The frozen prediction sharpened that exposed mechanism family to a concrete OVRTX temporal/denoiser owner boundary and discriminating reset experiment, so it is surface-guided I1 rather than independent I2. The bound post-freeze resolution snapshot contains no maintainer confirmation or falsification.",
+  "resolution_evidence_sha256": "0a51a3938ec78a4a7fed381d80106e9eb999147bc2078cdb19660ce893ac472c",
+  "schema_version": 1,
+  "source_surface_sha256": "b867161ff86d14ab4e776d5533150070b822f5996e6d3b03b8ff1a2dee7a5b8d"
+}

@@ -400,16 +400,22 @@
       "surface_sha256": "82ab1fca896d96392f132202ff4bb54f28bc362923079e9e1bbee48878f08e0d"
     },
     {
+      "adjudication_sha256": "428d07270ef6e1538ca19e0dba55b99dadfe6a1dc740c06251e0f5e379dc84b6",
+      "adjudication_source": "adjudications/isaac-sim__IsaacLab__8368.json",
       "created_at": "2026-10-07T18:06:21Z",
+      "credit_decision": "no_credit",
+      "final_independence_class": "I1",
       "first_frozen_at": "2026-10-07T20:35:21Z",
       "id": "isaac-sim/IsaacLab#8368",
       "issue_number": 8368,
+      "mechanism_match": "unresolved",
       "prediction_deadline_at": "2026-10-08T02:35:21Z",
       "prediction_sha256": "b23ee31f441e33bc00cf7e71bca185a3aba1b1696cdddb3f3f034599aacfa840",
       "prediction_source": "predictions/isaac-sim__IsaacLab__8368.json",
       "repository": "isaac-sim/IsaacLab",
+      "resolution_evidence_sha256": "0a51a3938ec78a4a7fed381d80106e9eb999147bc2078cdb19660ce893ac472c",
       "source": "inbox/FIRST_SEEN_20261007T203521Z.json",
-      "status": "prediction-frozen-awaiting-resolution",
+      "status": "adjudicated_i1_no_credit",
       "surface_sha256": "b867161ff86d14ab4e776d5533150070b822f5996e6d3b03b8ff1a2dee7a5b8d"
     },
     {
