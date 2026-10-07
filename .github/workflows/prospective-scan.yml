@@ -1,4 +1,4 @@
-name: Public prospective first-seen transport
+name: Public prospective transport transaction
 
 on:
   push:
@@ -16,19 +16,19 @@ permissions:
   issues: write
 
 concurrency:
-  group: semrepair-public-transport-write
+  group: semrepair-public-transport-transaction
   cancel-in-progress: false
 
 jobs:
-  validate-and-scan:
+  transaction:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Sync latest public ledger before scanning
+      - name: Sync latest public ledger
         shell: bash
         run: |
           set -euo pipefail
@@ -38,42 +38,92 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Validate transport source
+      - name: Validate transport source and pending-decision exclusivity
+        shell: bash
         run: |
-          python -m py_compile transport/scan.py transport/freeze_prediction.py transport/freeze_disposition.py transport/collect_resolution.py transport/validate_ledger.py
+          set -euo pipefail
+          python -m py_compile             transport/scan.py             transport/freeze_prediction.py             transport/freeze_disposition.py             transport/collect_resolution.py             transport/validate_ledger.py
           python transport/collect_resolution.py --self-test
           python transport/validate_ledger.py
           python - <<'PY'
           import json
           from pathlib import Path
+
           w=json.loads(Path("transport/watchset.json").read_text())
           assert w["public_activation_commit"]=="319cdaa153a7523d22dff754c15cc5e3fd983238"
           assert w["public_activation_cutoff"]=="2026-10-06T01:58:55Z"
           assert len(w["repositories"])==len(set(w["repositories"]))==89
+
+          def cases(folder):
+              out=set()
+              p=Path(folder)
+              if not p.exists():
+                  return out
+              for path in p.glob("*.json"):
+                  doc=json.loads(path.read_text())
+                  cid=doc["case_id"]
+                  if cid in out:
+                      raise AssertionError(f"duplicate pending case in {folder}: {cid}")
+                  out.add(cid)
+              return out
+
+          dispositions=cases("transport/pending_dispositions")
+          predictions=cases("transport/pending_predictions")
+          overlap=dispositions & predictions
+          assert not overlap, f"same case queued for disposition and prediction: {sorted(overlap)}"
           PY
+
+      - name: Freeze pending blind dispositions and predictions
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+
+          disposition_files=(transport/pending_dispositions/*.json)
+          for f in "${disposition_files[@]}"; do
+            python transport/freeze_disposition.py "$f"
+            rm "$f"
+          done
+
+          prediction_files=(transport/pending_predictions/*.json)
+          for f in "${prediction_files[@]}"; do
+            python transport/freeze_prediction.py "$f"
+            rm "$f"
+          done
 
       - name: Scan frozen public frame
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: python transport/scan.py | tee /tmp/scan.json
 
-      - name: Persist only new first-seen evidence
+      - name: Collect digest-authorized post-freeze evidence
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python transport/collect_resolution.py
+
+      - name: Validate completed transaction
+        run: python transport/validate_ledger.py
+
+      - name: Persist one atomic public-ledger transaction
         id: persist
         shell: bash
         run: |
-          if git diff --quiet -- transport/seen.json transport/inbox; then
-            echo "No new first-seen cases."
+          set -euo pipefail
+          if git diff --quiet -- transport; then
+            echo "No public-ledger changes."
             echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add transport/seen.json transport/inbox
-          git commit -m "Freeze public prospective first-seen evidence"
+          git add -A transport
+          git commit -m "Advance public prospective evidence ledger"
+          git pull --rebase origin main
           git push origin HEAD:main
           echo "changed=true" >> "$GITHUB_OUTPUT"
 
-      - name: Open visible prediction queue for new frozen cases
+      - name: Open visible prediction queue for newly frozen cases
         if: steps.persist.outputs.changed == 'true'
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -87,6 +137,7 @@ jobs:
 
           report=json.loads(Path("/tmp/scan.json").read_text())
           if report["new_candidate_count"] == 0:
+              print("No newly frozen cases; no prediction-queue issue needed.")
               raise SystemExit(0)
 
           watch=json.loads(Path("transport/watchset.json").read_text())
@@ -94,12 +145,12 @@ jobs:
           deadline=first_seen+dt.timedelta(hours=int(watch["prediction_sla_hours"]))
           stamp=first_seen.strftime("%Y%m%dT%H%M%SZ")
           source=f"transport/inbox/FIRST_SEEN_{stamp}.json"
+          deadline_z=deadline.replace(microsecond=0).isoformat().replace("+00:00","Z")
 
           case_lines=[
               f"- `{c['id']}` — surface `{c['surface_sha256']}`"
               for c in report["new_candidates"]
           ]
-          deadline_z=deadline.replace(microsecond=0).isoformat().replace("+00:00","Z")
           body=(
               "Blind prospective triage is required for newly frozen public surfaces. "
               "This queue notice is generated only from the first-seen scan result and "
@@ -109,8 +160,8 @@ jobs:
               + "\n".join(case_lines)
               + "\n\nBefore the deadline, each case must be either: "
               "(a) frozen as an exclusion/disposition from the original surface, or "
-              "(b) given a tamper-evident mechanism prediction via "
-              "`transport/freeze_prediction.py`. Capture alone is not I2 credit."
+              "(b) given a tamper-evident mechanism prediction. "
+              "Capture alone is not I2 credit."
           )
           payload=json.dumps({
               "title": (
