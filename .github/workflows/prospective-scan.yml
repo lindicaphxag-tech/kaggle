@@ -1,4 +1,5 @@
 name: Public prospective first-seen transport
+
 on:
   push:
     branches: [main]
@@ -7,21 +8,30 @@ on:
       - ".github/workflows/prospective-scan.yml"
   schedule:
     - cron: "11 * * * *"
+    - cron: "41 * * * *"
   workflow_dispatch:
+
 permissions:
   contents: write
+  issues: write
+
 concurrency:
   group: semrepair-public-first-seen
   cancel-in-progress: false
+
 jobs:
   validate-and-scan:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-        with: {fetch-depth: 0}
+        with:
+          fetch-depth: 0
+
       - uses: actions/setup-python@v5
-        with: {python-version: "3.12"}
+        with:
+          python-version: "3.12"
+
       - name: Validate transport source
         run: |
           python -m py_compile transport/scan.py transport/freeze_prediction.py transport/freeze_disposition.py transport/collect_resolution.py transport/validate_ledger.py
@@ -35,14 +45,19 @@ jobs:
           assert w["public_activation_cutoff"]=="2026-10-06T01:58:55Z"
           assert len(w["repositories"])==len(set(w["repositories"]))==89
           PY
+
       - name: Scan frozen public frame
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: python transport/scan.py | tee /tmp/scan.json
+
       - name: Persist only new first-seen evidence
+        id: persist
+        shell: bash
         run: |
           if git diff --quiet -- transport/seen.json transport/inbox; then
             echo "No new first-seen cases."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git config user.name "github-actions[bot]"
@@ -50,3 +65,65 @@ jobs:
           git add transport/seen.json transport/inbox
           git commit -m "Freeze public prospective first-seen evidence"
           git push origin HEAD:main
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Open visible prediction queue for new frozen cases
+        if: steps.persist.outputs.changed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import datetime as dt
+          import json
+          import os
+          import urllib.request
+          from pathlib import Path
+
+          report=json.loads(Path("/tmp/scan.json").read_text())
+          if report["new_candidate_count"] == 0:
+              raise SystemExit(0)
+
+          watch=json.loads(Path("transport/watchset.json").read_text())
+          first_seen=dt.datetime.fromisoformat(report["scanned_at"].replace("Z","+00:00"))
+          deadline=first_seen+dt.timedelta(hours=int(watch["prediction_sla_hours"]))
+          stamp=first_seen.strftime("%Y%m%dT%H%M%SZ")
+          source=f"transport/inbox/FIRST_SEEN_{stamp}.json"
+
+          case_lines=[
+              f"- `{c['id']}` — surface `{c['surface_sha256']}`"
+              for c in report["new_candidates"]
+          ]
+          deadline_z=deadline.replace(microsecond=0).isoformat().replace("+00:00","Z")
+          body=(
+              "Blind prospective triage is required for newly frozen public surfaces. "
+              "This queue notice is generated only from the first-seen scan result and "
+              "does not inspect comments, linked PRs, later commits, diagnoses, or fixes.\n\n"
+              f"**Frozen surface:** `{source}`\n\n"
+              f"**Prediction / disposition deadline:** `{deadline_z}`\n\n"
+              + "\n".join(case_lines)
+              + "\n\nBefore the deadline, each case must be either: "
+              "(a) frozen as an exclusion/disposition from the original surface, or "
+              "(b) given a tamper-evident mechanism prediction via "
+              "`transport/freeze_prediction.py`. Capture alone is not I2 credit."
+          )
+          payload=json.dumps({
+              "title": (
+                  f"[prospective] {report['new_candidate_count']} frozen case(s) "
+                  f"need blind triage before {deadline.strftime('%Y-%m-%d %H:%MZ')}"
+              ),
+              "body": body,
+          }).encode()
+          req=urllib.request.Request(
+              f"https://api.github.com/repos/{os.environ['GITHUB_REPOSITORY']}/issues",
+              data=payload,
+              method="POST",
+              headers={
+                  "Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}",
+                  "Accept": "application/vnd.github+json",
+                  "X-GitHub-Api-Version": "2022-11-28",
+                  "Content-Type": "application/json",
+              },
+          )
+          with urllib.request.urlopen(req) as response:
+              print(response.read().decode())
+          PY
