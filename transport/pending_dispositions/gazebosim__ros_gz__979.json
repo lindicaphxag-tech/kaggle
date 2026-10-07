@@ -1,0 +1,6 @@
+{
+  "case_id": "gazebosim/ros_gz#979",
+  "independence_class": "I0",
+  "disposition": "excluded_i0_exact_lifetime_race_and_fix_exposed_and_crash",
+  "reason": "The frozen original surface already gives the complete teardown race: Subscribe binds Handler::OnImage to raw this; Handler objects are destroyed before the transport node; ignition-transport copies callback handlers then invokes them after releasing its mutex, so Node destruction/Unsubscribe does not wait for an already-running callback; an in-flight frame therefore calls OnImage on a destroyed Handler. The issue also supplies a mutex-protected closed-flag repair, quantitative 31/100 -> 0/100 reproducer evidence, and a downstream workaround. The observed failure is SIGSEGV during shutdown, also outside the primary silent-semantic-correctness protocol."
+}
