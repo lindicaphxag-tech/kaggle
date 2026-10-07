@@ -60,8 +60,6 @@ def test_certificate_cannot_be_rebound_to_a_different_source_grid():
     source = lattice((16, 16, 16), (4, 4, 4), (0, 0, 0))
     target = lattice((15, 15, 15), (4, 4, 4), (1.5, 1.5, 1.5))
     plan = synthesize_lattice_repair(source, target)
-    shifted_source = lattice((16, 16, 16), (4, 4, 4), (0, 0, 0))
-    shifted_source.shape = (18, 16, 16) if hasattr(shifted_source, '__dict__') else shifted_source.shape
     # Shape rebinding must be rejected, even if the computed affine index map
     # is unchanged by spatial extent alone.
     other_source = lattice((18, 16, 16), (4, 4, 4), (0, 0, 0))
