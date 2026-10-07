@@ -407,6 +407,34 @@ fibers indefinitely.
 The public tests include homogeneous, factorized-reduction, A/B/A and dense-mix
 witnesses.
 
+### Prior-art boundary: polyphase sampling and shift equivariance
+
+ClinGeom does **not** claim discovery of polyphase components, phase-sensitive
+downsampling, or the fact that ordinary stride breaks shift equivariance.
+Adaptive Polyphase Sampling (APS; Chaman & Dokmanić, CVPR 2021) explicitly
+enumerates/selects polyphase sampling grids to obtain shift invariance, and
+Learnable Polyphase Sampling (LPS; Rojas-Gomez et al., NeurIPS 2022) learns
+polyphase down/up-sampling rules for shift-invariant/equivariant networks.
+
+T7/T13 make a different claim. They treat channel-dependent sampling phases as
+**patient-space semantic types** inside an otherwise ordinary medical feature
+tensor and ask:
+
+1. whether one tensor-level patient-space affine is exact;
+2. the minimum number of distinct patient-lattice affine types;
+3. the minimum contiguous channel-fiber representation under fixed channel order;
+4. when dense mixing produces a multi-support channel for which *no*
+   point-affine channel partition is exact.
+
+Thus the target contribution is not a new anti-aliasing or shift-equivariant
+architecture. It is an executable spatial type/minimality system for auditing
+existing medical-AI graphs whose downstream code may otherwise assign one
+patient-space affine to a tensor that contains multiple sampling phases.
+
+References:
+- Chaman & Dokmanić, *Truly Shift-Invariant Convolutional Neural Networks*, CVPR 2021.
+- Rojas-Gomez et al., *Learnable Polyphase Sampling for Shift Invariant and Equivariant Convolutional Networks*, NeurIPS 2022.
+
 ### Falsification boundary
 
 T13 assumes affine center maps and a fixed numerical equivalence tolerance for
