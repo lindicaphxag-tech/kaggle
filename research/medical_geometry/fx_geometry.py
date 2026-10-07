@@ -20,7 +20,47 @@ import torch.nn as nn
 from .clingeom import FeatureLattice, feature_affine
 from .repair_synthesis import MergeRepairBundle, synthesize_merge_repair
 from .torch_geometry import UnsupportedGeometryOp, _apply_supported_geometry
+from .torch_repair import LatticeRepair3d
 
+
+class _RepairLeafTracer(fx.Tracer):
+    """Preserve opaque repair operators when rechecking a rewritten FX graph."""
+
+    def is_leaf_module(self, m: nn.Module, module_qualified_name: str) -> bool:
+        return isinstance(m, LatticeRepair3d) or super().is_leaf_module(
+            m, module_qualified_name
+        )
+
+
+def _repair_output_lattice(
+    repair: LatticeRepair3d, source: FeatureLattice
+) -> FeatureLattice:
+    """Independently propagate the *executed* repair's sampling coordinates."""
+    if tuple(source.shape) != repair.source_shape:
+        raise UnsupportedGeometryOp(
+            'rewritten repair input lattice differs from certified source shape'
+        )
+    mapping = repair.target_to_source_index.detach().cpu().numpy()
+    if mapping.shape != (4, 4) or not np.all(np.isfinite(mapping)):
+        raise UnsupportedGeometryOp('rewritten repair has invalid index map')
+    if not np.allclose(
+        mapping[:3, :3], np.diag(np.diag(mapping[:3, :3])), atol=1e-10, rtol=0
+    ):
+        raise UnsupportedGeometryOp(
+            'rewritten repair uses an off-axis map unsupported by point-lattice type v1'
+        )
+    if not np.allclose(mapping[3], [0.0, 0.0, 0.0, 1.0], atol=1e-10, rtol=0):
+        raise UnsupportedGeometryOp('rewritten repair has invalid homogeneous row')
+    jump = source.jump * np.diag(mapping[:3, :3])
+    if np.any(jump <= 0.0):
+        raise UnsupportedGeometryOp('rewritten repair has non-positive grid jump')
+    start = source.start + source.jump * mapping[:3, 3]
+    receptive = (
+        source.receptive_field.copy()
+        if repair.kind in {'identity', 'exact_crop'}
+        else np.full(3, np.nan, dtype=np.float64)
+    )
+    return FeatureLattice(repair.target_shape, jump, start, receptive)
 
 @dataclass(frozen=True)
 class FXNodeGeometry:
@@ -154,7 +194,11 @@ def compile_fx_geometry(
     if affine.shape != (4, 4) or not np.all(np.isfinite(affine)):
         raise ValueError("input_affine must be a finite 4x4 matrix")
 
-    gm = fx.symbolic_trace(module)
+    if any(isinstance(child, LatticeRepair3d) for child in module.modules()):
+        tracer = _RepairLeafTracer()
+        gm = fx.GraphModule(module, tracer.trace(module))
+    else:
+        gm = fx.symbolic_trace(module)
     env: dict[fx.Node, FeatureLattice] = {}
     typed_nodes: list[FXNodeGeometry] = []
     obligations: list[MergeRepairObligation] = []
@@ -174,7 +218,9 @@ def compile_fx_geometry(
             if not node.args:
                 raise UnsupportedGeometryOp(f"module {node.target!r} has no tensor input")
             source = _node_lattice(env, node.args[0])
-            lattice = _apply_supported_geometry(layer, source)
+            lattice = (_repair_output_lattice(layer, source)
+                       if isinstance(layer, LatticeRepair3d)
+                       else _apply_supported_geometry(layer, source))
             env[node] = lattice
 
         elif node.op == "call_function" and node.target in {operator.add, torch.add}:

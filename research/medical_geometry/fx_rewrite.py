@@ -28,6 +28,7 @@ class RewrittenGeometryModel:
     graph_module: fx.GraphModule
     source_report: FXGeometryReport
     rewrites: tuple[RewriteRecord, ...]
+    postcondition_report: FXGeometryReport
 
 
 def _unique_module_name(gm: fx.GraphModule, base: str) -> str:
@@ -132,8 +133,25 @@ def rewrite_patient_space_merges(
     graph.lint()
     gm.recompile()
 
+    # A compiled repair is not a proof merely because its plan was accepted:
+    # independently re-type the ACTUAL rewritten graph and require no
+    # unresolved patient-space fusion obligations.
+    postcondition = compile_fx_geometry(
+        gm,
+        input_shape=input_shape,
+        input_affine=input_affine,
+        role=role,
+        strict=True,
+        require_channel_aligned_cat=repair_channel_cat,
+    )
+    if postcondition.repair_obligations:
+        raise UnsupportedGeometryOp(
+            "rewritten FX graph still has patient-space merge obligations"
+        )
+
     return RewrittenGeometryModel(
         graph_module=gm,
         source_report=report,
         rewrites=tuple(records),
+        postcondition_report=postcondition,
     )

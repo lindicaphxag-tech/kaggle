@@ -92,7 +92,8 @@ jobs:
             research/medical_geometry/test_torch_repair.py \
             research/medical_geometry/test_torch_repair_certificate.py \
             research/medical_geometry/test_fx_geometry.py \
-            research/medical_geometry/test_fx_rewrite.py
+            research/medical_geometry/test_fx_rewrite.py \
+            research/medical_geometry/test_fx_postcondition.py
       - name: Produce channel-fiber evidence
         run: |
           PYTHONPATH=. python research/medical_geometry/benchmark_channel_fibers.py | tee channel-fiber-report.json
