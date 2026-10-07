@@ -1,0 +1,7 @@
+{
+  "case_id": "isaac-sim/IsaacLab#8368",
+  "final_independence_class": "I1",
+  "mechanism_match": "unresolved",
+  "credit_decision": "no_credit",
+  "reason": "The original frozen issue surface already proposed partition filtering, shared rendering state, or denoising as candidate causes and explicitly asked whether global temporal/denoiser state could account for the leakage. The frozen prediction sharpened that exposed mechanism family to a concrete OVRTX temporal/denoiser owner boundary and discriminating reset experiment, so it is surface-guided I1 rather than independent I2. The bound post-freeze resolution snapshot contains no maintainer confirmation or falsification."
+}

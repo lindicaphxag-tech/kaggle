@@ -6,6 +6,7 @@ import argparse, datetime as dt, hashlib, json, os, sys, urllib.error, urllib.re
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parent
+SEEN=ROOT/"seen.json"
 PRED=ROOT/"predictions"; RES=ROOT/"resolution"; API="https://api.github.com"
 HASH_FIELDS=("case_id","source_surface_sha256","contract_id","independence_class","predicted_relation","predicted_mechanism","owner_boundary","discriminating_experiment","falsifier","repair_boundary","prediction_frozen_at")
 
@@ -56,10 +57,19 @@ def main():
     token=os.environ.get("GITHUB_TOKEN")
     if not token: raise RuntimeError("GITHUB_TOKEN required")
     changed=[]
+    state=json.loads(SEEN.read_text(encoding="utf-8"))
+    finalized={
+        item.get("id")
+        for item in state.get("seen",[])
+        if isinstance(item,dict) and str(item.get("status","")).startswith("adjudicated_")
+    }
     if PRED.exists():
         for path in sorted(PRED.glob("*.json")):
+            pred=json.loads(path.read_text(encoding="utf-8"))
+            if pred.get("case_id") in finalized:
+                continue
             if collect(path,token): changed.append(str(path))
-    print(json.dumps({"changed":changed},sort_keys=True))
+    print(json.dumps({"changed":changed,"finalized_skipped":sorted(finalized)},sort_keys=True))
 if __name__=="__main__":
     try: main()
     except Exception as exc:

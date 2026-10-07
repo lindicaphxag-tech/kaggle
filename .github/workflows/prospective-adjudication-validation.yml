@@ -1,0 +1,76 @@
+name: Prospective adjudication integrity
+
+on:
+  push:
+    branches:
+      - transport/adjudication-v2
+  pull_request:
+    paths:
+      - "transport/**"
+      - ".github/workflows/prospective-scan.yml"
+      - ".github/workflows/prospective-adjudication-validation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  adjudication-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compile transport
+        run: |
+          python -m py_compile             transport/scan.py             transport/freeze_prediction.py             transport/freeze_disposition.py             transport/freeze_adjudication.py             transport/collect_resolution.py             transport/validate_ledger.py
+
+      - name: Validate pre-adjudication ledger
+        run: python transport/validate_ledger.py
+
+      - name: Prove post-hoc independence upgrade is rejected
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          source=Path("transport/pending_adjudications/isaac-sim__IsaacLab__8368.json")
+          doc=json.loads(source.read_text())
+          doc["final_independence_class"]="I2"
+          doc["mechanism_match"]="supported"
+          doc["credit_decision"]="prospective_i2_credit"
+          Path("/tmp/forbidden-upgrade.json").write_text(json.dumps(doc))
+          PY
+          if python transport/freeze_adjudication.py /tmp/forbidden-upgrade.json               --at 2026-10-08T00:00:00Z; then
+            echo "ERROR: forbidden I1 -> I2 upgrade was accepted"
+            exit 1
+          fi
+
+      - name: Freeze legitimate I1 no-credit adjudication in workspace
+        run: |
+          python transport/freeze_adjudication.py             transport/pending_adjudications/isaac-sim__IsaacLab__8368.json             --at 2026-10-08T00:00:00Z
+          rm transport/pending_adjudications/isaac-sim__IsaacLab__8368.json
+
+      - name: Validate finalized ledger
+        run: python transport/validate_ledger.py
+
+      - name: Prove finalized resolution is collector-ineligible
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          state=json.loads(Path("transport/seen.json").read_text())
+          entry=next(x for x in state["seen"] if x["id"]=="isaac-sim/IsaacLab#8368")
+          assert entry["status"]=="adjudicated_i1_no_credit"
+          assert entry["credit_decision"]=="no_credit"
+          assert entry["mechanism_match"]=="unresolved"
+          adj=json.loads((Path("transport") / entry["adjudication_source"]).read_text())
+          assert adj["predicted_independence_class"]=="I1"
+          assert adj["final_independence_class"]=="I1"
+          assert adj["credit_decision"]=="no_credit"
+          print("finalized adjudication: pass")
+          PY
