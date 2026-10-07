@@ -12,7 +12,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: semrepair-public-dispositions
+  group: semrepair-public-transport-write
   cancel-in-progress: false
 
 jobs:

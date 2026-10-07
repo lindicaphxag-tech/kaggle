@@ -12,7 +12,7 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: semrepair-public-resolution
+  group: semrepair-public-transport-write
   cancel-in-progress: false
 jobs:
   collect:
@@ -20,6 +20,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {fetch-depth: 0}
+      - name: Sync latest public ledger before collecting
+        shell: bash
+        run: |
+          set -euo pipefail
+          git pull --rebase origin main
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: python transport/collect_resolution.py --self-test
