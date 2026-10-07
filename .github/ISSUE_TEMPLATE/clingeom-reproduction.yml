@@ -1,0 +1,70 @@
+name: ClinGeom independent reproduction / falsification
+description: Report a clean reproduction, numerical divergence, or counterexample against a frozen ClinGeom artifact.
+title: "[ClinGeom reproduction] "
+labels:
+  - help wanted
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for testing ClinGeom. Negative and null results are explicitly welcome. Please use a frozen release branch unless you are testing unreleased main.
+  - type: input
+    id: commit
+    attributes:
+      label: Exact ClinGeom commit / release branch
+      placeholder: "release/clingeom-v0.2.0 @ 7e570b05071ae65dc1abc636701c5a75ca1424a3"
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Python, NumPy/PyTorch/MONAI versions where relevant.
+      placeholder: |
+        Ubuntu 24.04
+        Python 3.12.x
+        NumPy ...
+        PyTorch ...
+        MONAI ...
+    validations:
+      required: true
+  - type: textarea
+    id: commands
+    attributes:
+      label: Exact commands
+      render: shell
+    validations:
+      required: true
+  - type: dropdown
+    id: outcome
+    attributes:
+      label: Outcome
+      options:
+        - Confirms the frozen claim
+        - Falsifies the frozen claim
+        - Partial / numerically different reproduction
+        - Could not execute the protocol
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Full relevant output / divergence
+      description: Include the failing assertion or numerical difference. Do not retune thresholds before reporting it.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: analysis
+    attributes:
+      label: Optional interpretation
+      description: Keep observed evidence separate from speculation about mechanism.
+  - type: checkboxes
+    id: independence
+    attributes:
+      label: Independence
+      options:
+        - label: I ran this from the public artifact without private thresholds or hidden expected outputs.
+          required: true
+        - label: I have not silently discarded a negative result or retuned a frozen tolerance after seeing the outcome.
+          required: true
