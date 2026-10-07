@@ -263,24 +263,61 @@ def verify_repair_plan(
     target: FeatureLattice,
     plan: LatticeRepairPlan,
     *,
+    role: RepairRole | None = None,
     atol: float = 1e-9,
 ) -> bool:
-    """Independently re-derive the index map and validate an emitted plan."""
+    """Verify a repair independently, including its signed semantic claims.
 
-    expected = target_to_source_index_map(source, target)
-    if not np.allclose(expected, plan.target_to_source_index, atol=atol, rtol=0):
+    A matching index matrix is necessary but not sufficient: a mathematically
+    valid mapping can still sample beyond the available physical lattice.
+    The certificate must also be bound to its claimed geometry/parameters and
+    the caller's value role (when explicitly provided).
+    """
+    if tuple(plan.source_shape) != tuple(source.shape):
+        return False
+    if tuple(plan.target_shape) != tuple(target.shape):
         return False
 
-    if plan.kind == "identity":
+    expected = target_to_source_index_map(source, target)
+    mapping = np.asarray(plan.target_to_source_index, dtype=np.float64)
+    if mapping.shape != (4, 4) or not np.all(np.isfinite(mapping)):
+        return False
+    if not np.allclose(expected, mapping, atol=atol, rtol=0):
+        return False
+
+    # Recalculate rather than merely trusting the hash carried by the plan.
+    payload = {
+        'kind': plan.kind,
+        'source_shape': list(source.shape),
+        'target_shape': list(target.shape),
+        'source_jump': np.asarray(source.jump, dtype=float).round(12).tolist(),
+        'source_start': np.asarray(source.start, dtype=float).round(12).tolist(),
+        'target_jump': np.asarray(target.jump, dtype=float).round(12).tolist(),
+        'target_start': np.asarray(target.start, dtype=float).round(12).tolist(),
+        'target_to_source_index': mapping.round(12).tolist(),
+        'exact': plan.exact,
+        'requires_interpolation': plan.requires_interpolation,
+        'interpolation': plan.interpolation,
+        'crop_start': None if plan.crop_start is None else list(plan.crop_start),
+        'crop_stop': None if plan.crop_stop is None else list(plan.crop_stop),
+        'reason': plan.reason,
+    }
+    if _canonical_digest(payload) != plan.certificate_digest:
+        return False
+
+    if plan.kind == 'identity':
         return (
             plan.exact
             and not plan.requires_interpolation
+            and plan.interpolation is None
             and tuple(source.shape) == tuple(target.shape)
             and np.allclose(source.jump, target.jump, atol=atol, rtol=0)
             and np.allclose(source.start, target.start, atol=atol, rtol=0)
+            and plan.crop_start == (0, 0, 0)
+            and plan.crop_stop == tuple(source.shape)
         )
 
-    if plan.kind == "exact_crop":
+    if plan.kind == 'exact_crop':
         if plan.crop_start is None or plan.crop_stop is None:
             return False
         start = np.asarray(plan.crop_start, dtype=int)
@@ -290,6 +327,7 @@ def verify_repair_plan(
         return (
             plan.exact
             and not plan.requires_interpolation
+            and plan.interpolation is None
             and np.all(stop - start == target_shape)
             and np.all(start >= 0)
             and np.all(stop <= source_shape)
@@ -297,18 +335,36 @@ def verify_repair_plan(
             and np.allclose(expected[:3, 3], start, atol=atol, rtol=0)
         )
 
-    if plan.kind == "resample":
+    if plan.kind == 'resample':
+        if (plan.exact or not plan.requires_interpolation
+                or plan.interpolation not in {'nearest', 'trilinear'}
+                or plan.crop_start is not None or plan.crop_stop is not None):
+            return False
+        if role is not None and plan.interpolation != _interpolation_for_role(role):
+            return False
+        # An affine map's extrema over a rectangular domain lie at corners.
+        # Refuse extrapolation even for a correctly signed index transform.
+        target_max = np.asarray(target.shape, dtype=np.float64) - 1.0
+        source_max = np.asarray(source.shape, dtype=np.float64) - 1.0
+        corners = np.array([
+            [i, j, k, 1.0]
+            for i in (0.0, target_max[0])
+            for j in (0.0, target_max[1])
+            for k in (0.0, target_max[2])
+        ], dtype=np.float64)
+        mapped = (expected @ corners.T).T[:, :3]
+        return bool(np.all(mapped >= -atol) and np.all(mapped <= source_max + atol))
+
+    if plan.kind == 'refuse':
         return (
             not plan.exact
             and plan.requires_interpolation
-            and plan.interpolation in {"nearest", "trilinear"}
+            and plan.interpolation is None
+            and plan.crop_start is None
+            and plan.crop_stop is None
         )
 
-    if plan.kind == "refuse":
-        return not plan.exact and plan.requires_interpolation and plan.interpolation is None
-
     return False
-
 
 @dataclass(frozen=True)
 class MergeRepairBundle:
