@@ -1,0 +1,6 @@
+{
+  "case_id": "tesseract-robotics/tesseract#1376",
+  "independence_class": "I0",
+  "disposition": "excluded_i0_exact_mechanism_and_fix_exposed",
+  "reason": "The frozen original surface identifies Eigen isApprox on differently shaped dynamic matrices as the out-of-bounds mechanism and gives the exact shape-check repair, with an existing JointState equality pattern as precedent."
+}

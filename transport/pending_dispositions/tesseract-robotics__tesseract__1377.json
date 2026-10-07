@@ -1,0 +1,6 @@
+{
+  "case_id": "tesseract-robotics/tesseract#1377",
+  "independence_class": "I0",
+  "disposition": "excluded_i0_exact_mechanisms_and_repairs_exposed",
+  "reason": "The frozen original surface already exposes both mechanisms: rhs Environment is read without locking, and command histories dispatch through non-virtual Command::operator== so only types are compared. It also proposes consistent dual locking and virtual/type-dispatched value equality repairs."
+}
