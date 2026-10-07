@@ -1,0 +1,15 @@
+{
+  "case_id": "gazebosim/ros_gz#979",
+  "claim_boundary": "An exclusion/disposition record is not a prospective mechanism success, external adoption, or L8/L9 credit.",
+  "disposition": "excluded_i0_exact_lifetime_race_and_fix_exposed_and_crash",
+  "disposition_frozen_at": "2026-10-07T20:53:13Z",
+  "disposition_sha256": "2b1ee25040757537c2e7eb9ae79fd540ab20ebac73ae5d349330104961ca525f",
+  "disposition_within_sla": true,
+  "first_frozen_at": "2026-10-07T20:50:51Z",
+  "independence_class": "I0",
+  "information_barrier": "Disposition uses only the already-frozen original issue title/body. Comments, linked workflow logs, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden before this freeze.",
+  "prediction_deadline_at": "2026-10-08T02:50:51Z",
+  "reason": "The frozen original surface already gives the complete teardown race: Subscribe binds Handler::OnImage to raw this; Handler objects are destroyed before the transport node; ignition-transport copies callback handlers then invokes them after releasing its mutex, so Node destruction/Unsubscribe does not wait for an already-running callback; an in-flight frame therefore calls OnImage on a destroyed Handler. The issue also supplies a mutex-protected closed-flag repair, quantitative 31/100 -> 0/100 reproducer evidence, and a downstream workaround. The observed failure is SIGSEGV during shutdown, also outside the primary silent-semantic-correctness protocol.",
+  "schema_version": 1,
+  "source_surface_sha256": "5ac438f638f8cb7b7e50b24f25c73a1c9ed838c9f1a4e0a57f8acaa01e84b0b4"
+}
