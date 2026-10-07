@@ -1,0 +1,47 @@
+name: ClinGeom highdicom #454 frame-identity witness
+
+on:
+  pull_request:
+    paths:
+      - "research/medical_geometry/upstream_repros/highdicom_454_frame_identity.py"
+      - ".github/workflows/clingeom-highdicom-454.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "research/medical_geometry/upstream_repros/highdicom_454_frame_identity.py"
+      - ".github/workflows/clingeom-highdicom-454.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  witness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pinned public runtime
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install "monai==1.6.1"
+          python -m pip install "git+https://github.com/ImagingDataCommons/highdicom.git@4524bb0b0c8b3141f6f5b26d047b8da43c69e61e"
+      - name: Execute frame-identity witness
+        run: |
+          python research/medical_geometry/upstream_repros/highdicom_454_frame_identity.py | tee highdicom-454-frame-identity.json
+          {
+            echo "### highdicom #454 physical-frame witness"
+            echo
+            echo '```json'
+            cat highdicom-454-frame-identity.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload witness
+        uses: actions/upload-artifact@v4
+        with:
+          name: highdicom-454-frame-identity
+          path: highdicom-454-frame-identity.json
