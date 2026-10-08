@@ -29,8 +29,8 @@ def normalize(image):
     if finite.size == 0:
         raise ValueError("No finite MRI intensities")
     lo, hi = np.percentile(finite, [1, 99])
-    return np.clip((np.nan_to_num(pixels, nan=float(lo)) - lo) /
-                   max(float(hi - lo), 1e-6), 0, 1)
+    return np.asarray(np.clip((np.nan_to_num(pixels, nan=float(lo)) - lo) /
+                   max(float(hi - lo), 1e-6), 0, 1), dtype=np.float32)
 
 
 def dice(x, y):
@@ -153,7 +153,7 @@ def render_operators(volume, affine, out):
     crop_map = np.eye(4)
     crop_map[:3, 3] = corner
     A_crop = affine @ crop_map
-    x = torch.from_numpy(np.ascontiguousarray(cropped))[None, None]
+    x = torch.from_numpy(np.ascontiguousarray(cropped, dtype=np.float32))[None, None]
     weight = torch.ones(1, 1, 3, 3, 3, dtype=torch.float32) / 27.0
     with torch.no_grad():
         conv = F.conv3d(x, weight, stride=4, padding=1).numpy()[0, 0]
@@ -212,7 +212,13 @@ def main():
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     path = Path(args.image)
-    source_sha = hashlib.sha256(path.read_bytes()).hexdigest()
+    source_bytes = path.read_bytes()
+    source_sha = hashlib.sha256(source_bytes).hexdigest()
+    source_blob = hashlib.sha1(
+        b"blob " + str(len(source_bytes)).encode("ascii") + b"\0" + source_bytes
+    ).hexdigest()
+    if source_blob != SOURCE_BLOB:
+        raise ValueError("NIfTI does not match the pinned official NiBabel Git blob")
     im = nib.load(str(path))
     volume = np.asarray(im.dataobj, dtype=np.float32)
     affine = np.asarray(im.affine, dtype=np.float64)
@@ -226,7 +232,7 @@ def main():
         source_description="NiBabel documentation: Someone structural brain MRI",
         source_repo="https://github.com/nipy/nibabel",
         source_commit=SOURCE_COMMIT,
-        source_git_blob=SOURCE_BLOB,
+        source_git_blob=source_blob,
         source_file_sha256=source_sha,
         shape=list(volume.shape),
         source_affine=affine.tolist(),
