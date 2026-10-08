@@ -298,7 +298,7 @@ def run(source_root: Path, config: Path, checkpoint: Path,
     subjects = evidence["subjects"]
     if not evidence.get("data_selection_label_blind") or len(subjects) != expected_patients:
         raise ValueError("Original prospectively selected cohort required: 3 subjects")
-    if len(set(s["independent_subject"] for s in subjects)) != 3:
+    if len(set(s["independent_subject"] for s in subjects)) != expected_patients:
         raise ValueError("Reused subject in externally held-out cohort")
     model, joint, head, before, tail = _source_model_and_cuts(
         source_root, config, checkpoint
