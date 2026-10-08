@@ -1,0 +1,68 @@
+name: brain_mask maintainer-native NIfTI exporter patch and tests
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/clingeom-brainmask-native-regression.yml"
+      - "research/medical_geometry/upstream_repros/test_brainmask_predict_export_space.py"
+      - "research/medical_geometry/upstream_repros/brainmask_export_with_native_tests.patch"
+      - "research/medical_geometry/upstream_repros/BRAINMASK_MAINTAINER_TESTS.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  original-red-patched-green:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install only NumPy, NiBabel and pytest (no TensorFlow required)
+        run: python -m pip install "numpy>=1.24,<3" "nibabel>=5,<6" "pytest>=8,<10"
+      - name: Download exact original upstream exporter
+        run: |
+          set -euo pipefail
+          mkdir -p upstream/tests
+          curl -fL --retry 3 \
+            "https://raw.githubusercontent.com/ecalabr/brain_mask/ca789fb26b70e359b61a8d52968813dd772fb4b1/predict.py" \
+            -o upstream/predict.py
+          test "$(git hash-object upstream/predict.py)" = "d4b03f5b851928ead5ef014af75cd1dd5fbd64dc"
+          cp research/medical_geometry/upstream_repros/test_brainmask_predict_export_space.py \
+            upstream/tests/test_predict_export_space.py
+      - name: Demand positive nonaxial regressions FAIL on original unmodified source
+        run: |
+          set +e
+          python -m pytest -q upstream/tests/test_predict_export_space.py \
+            -k test_nonaxial_reorder_back_to_original_patient_space
+          result=$?
+          set -e
+          if [ "$result" -eq 0 ]; then
+            echo "::error::Nonaxial regression unexpectedly passed the original upstream defect"
+            exit 1
+          fi
+          echo "PASS expected original-source RED: eight nonaxial cases detect stale frame"
+      - name: Apply exact source fix PLUS upstream-native regression tests
+        run: |
+          set -euo pipefail
+          rm upstream/tests/test_predict_export_space.py
+          git -C upstream init -q
+          git -C upstream apply --check \
+            "$GITHUB_WORKSPACE/research/medical_geometry/upstream_repros/brainmask_export_with_native_tests.patch"
+          git -C upstream apply \
+            "$GITHUB_WORKSPACE/research/medical_geometry/upstream_repros/brainmask_export_with_native_tests.patch"
+          git -C upstream diff --check
+          python -m py_compile upstream/predict.py upstream/tests/test_predict_export_space.py
+      - name: Require every patched regression GREEN on upstream project paths
+        run: python -m pytest -q upstream/tests/test_predict_export_space.py
+      - name: Produce maintainer-copyable patch summary
+        run: |
+          git -C upstream status --short
+          sha256sum research/medical_geometry/upstream_repros/brainmask_export_with_native_tests.patch
+          echo "PASS: original fails, minimal upstream patch + standard tests pass"
