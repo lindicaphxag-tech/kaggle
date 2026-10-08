@@ -135,3 +135,26 @@ def test_unsupported_activation_is_refused_not_silently_approximated():
             mod,input_field(),input_value_intervals=[(1,14)],
             uniform_input_world_hessian_bounds=B,
         )
+
+def test_default_instance_norm_refused_as_structurally_local_but_conditional_transport_admitted():
+    from research.medical_geometry.torch_fx_bundle import compile_fx_bundle_geometry
+    from research.medical_geometry.torch_geometry import UnsupportedGeometryOp
+
+    block=model()
+    x=input_field()
+    # The live default MONAI network depends on volume-wide InstanceNorm
+    # statistics, including far-away voxels; no local-support proof is valid.
+    with pytest.raises(UnsupportedGeometryOp, match="spatial statistics"):
+        compile_fx_bundle_geometry(
+            block,input_shape=tuple(x.shape[-3:]),input_channels=int(x.shape[1])
+        )
+
+    # But once this exact input has been executed, its normalization parameters
+    # are frozen constants for the conditional continuous output field. The
+    # specialized sample-conditioned C2 transport remains admissible, and
+    # must never be described as a structural locality certificate.
+    _,_,proof,repaired,error=validate_actual()
+    assert proof.weights_and_sample_sha256
+    assert max(float(v) for v in error.flatten()) <= (
+        max(repaired.conditional_value_error_bounds) + 2e-4
+    )

@@ -20,6 +20,8 @@ from torch.fx import GraphModule, Node, symbolic_trace
 
 from .lattice_bundle import (
     LatticeBundle,
+    ChannelFiber,
+    _deduplicate_supports,
     bundle_from_lattice,
     concat_channel_bundles,
     dense_conv_mix_bundle,
@@ -141,7 +143,20 @@ def _pointwise_add(a: LatticeBundle, b: LatticeBundle) -> LatticeBundle:
         raise BundleGeometryError(
             "pointwise addition requires matching channel-fiber patient-space supports"
         )
-    return a
+    # Matching sampling CENTERS do not imply matching receptive supports.
+    # Addition depends on both tensors. Returning only `a` silently erases
+    # the right branch's dependency (e.g. same-center anisotropic AvgPool3d).
+    # Keep the componentwise union of source neighborhoods for each fiber.
+    merged_fibers = tuple(
+        ChannelFiber(
+            left.channel_start,
+            left.channel_stop,
+            _deduplicate_supports((*left.supports, *right.supports)),
+            "pointwise sum of both spatial dependency supports",
+        )
+        for left, right in zip(a.fibers, b.fibers, strict=True)
+    )
+    return LatticeBundle(a.shape, a.channels, merged_fibers)
 
 
 def _cat_bundle(node: Node, env: dict[Node, LatticeBundle]) -> LatticeBundle:

@@ -150,14 +150,33 @@ def certify_and_repair_default_monai(
     input_value_intervals: Sequence[tuple[float,float]],
     uniform_input_world_hessian_bounds: float | Sequence[float],
 ) -> tuple["RepairedChannelFibers",ConditionalMONAICurvature]:
+    import copy
+
     from .channel_fiber_runtime import repair_channel_fibers
     from .torch_fx_bundle import compile_fx_bundle_geometry
     proof=derive_default_monai_sample_conditional_curvature(
         block,x,input_value_intervals=input_value_intervals,
         uniform_input_world_hessian_bounds=uniform_input_world_hessian_bounds,
     )
+    # Two DIFFERENT statements must not be conflated:
+    # (1) Structural provenance: live InstanceNorm uses *all* spatial voxels,
+    #     so the general-purpose spatial-support compiler must reject it.
+    # (2) Conditional one-sample transport: after THIS input's statistics
+    #     are measured, y(p) = scale_this_sample * raw_conv(p) + offset_this_sample.
+    #     Only for this fixed sample, the convolution's center lattice is
+    #     sufficient for the independently proved conditional C2 interpolation.
+    #
+    # Extract the spatial-center geometry from a separate, normalization-free
+    # *shadow* topology, never from the live network with a falsely local
+    # InstanceNorm. The shadow performs NO output inference and cannot be
+    # substituted for the real network's predictions/statistics. The proof
+    # below still requires the exact original normalization class, real
+    # sample, explicit world-space Hessian and bounded interpolation budget.
+    spatial_shadow=copy.deepcopy(block)
+    spatial_shadow.norm=nn.Identity()
     bundle=compile_fx_bundle_geometry(
-        block,input_shape=tuple(x.shape[-3:]),input_channels=int(x.shape[1])
+        spatial_shadow,input_shape=tuple(x.shape[-3:]),
+        input_channels=int(x.shape[1])
     ).output_bundle
     if tuple(f.channel_start for f in bundle.fibers)!=proof.fiber_starts:
         raise ValueError("runtime fiber layout differs from curvature derivation")
