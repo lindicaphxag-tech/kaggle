@@ -48,6 +48,56 @@ def orient_hidden_to_acquisition(
     return np.transpose(x, PLANE_TO_ACQUISITION_AXES[plane] + (3,))
 
 
+def orient_acquisition_to_hidden(canonical: np.ndarray, plane: str) -> np.ndarray:
+    """Invert the chart exactly, still never relabel learned channels."""
+    if plane not in PLANE_TO_ACQUISITION_AXES:
+        raise ValueError("undocumented model plane")
+    x = np.asarray(canonical)
+    if x.ndim != 4 or not np.isfinite(x).all():
+        raise ValueError("expected finite [D,H,W,C] learned hidden feature")
+    inverse = tuple(int(i) for i in np.argsort(PLANE_TO_ACQUISITION_AXES[plane]))
+    return np.transpose(x, inverse + (3,))
+
+
+def _nonlinear_tail(model):
+    """Find the exact FINAL source residual block, including its shortcut.
+
+    The first of its last three BatchNorm layers receives the root tensor of
+    the final original bneck_resid3d. Cutting at that INPUT retains BOTH
+    the learned 3x3 branch and skip branch inside the resulting tail model.
+    Cutting after the last residual block would merely recover logit averaging.
+    """
+    import tensorflow as tf
+
+    all_norms = [
+        layer for layer in model.layers
+        if isinstance(layer, tf.keras.layers.BatchNormalization)
+    ]
+    if len(all_norms) < 6 or len(all_norms) % 3:
+        raise ValueError("unexpected native Unet3dBneck three-BN residual topology")
+    root = all_norms[-3].input
+    before = tf.keras.Model(
+        inputs=model.inputs, outputs=root, name="original_before_final_bneck"
+    )
+    after = tf.keras.Model(
+        inputs=root, outputs=model.output, name="original_last_bneck_and_head"
+    )
+    tail_conv = [
+        layer for layer in after.layers
+        if isinstance(layer, tf.keras.layers.Conv3D)
+        and tuple(layer.kernel_size) == (3, 3, 3)
+    ]
+    if not tail_conv:
+        raise ValueError("cut failed: no original learned 3x3 convolution remains")
+    tail_activation = [
+        layer for layer in after.layers
+        if isinstance(layer, tf.keras.layers.LeakyReLU)
+    ]
+    # Source may use tf.nn.leaky_relu via Lambda/TFOpLambda, so check
+    # predicted original equality and an empirical noncommutator too.
+    return before, after, len(tail_conv), len(tail_activation)
+
+
 def _digest_weights(weights) -> str:
     return sha256(
         b"".join(np.ascontiguousarray(w.numpy()).tobytes() for w in weights)
@@ -150,7 +200,7 @@ def run(
     if not np.allclose(scan.affine, acquired_affine, atol=1e-5, rtol=0):
         raise ValueError("source-loader patch affine differs from original MRI")
 
-    raw_features, mapped_features, mapped_logits = [], [], []
+    before_last_bneck, learned_tail, tail_3d_conv_count, tail_leaky_layers = (\n        _nonlinear_tail(model)\n    )\n    raw_features, mapped_features, mapped_logits = [], [], []\n    raw_early_features, mapped_early_features = [], []
     per_plane = {}
     hidden_channels = None
     for plane in PLANE_TO_ACQUISITION_AXES:
@@ -167,6 +217,26 @@ def run(
             head_output = tf.nn.sigmoid(
                 classifier(hidden_tf, training=False)
             ).numpy()
+        with tf.device("/CPU:0"):
+            earlier_tf = before_last_bneck(
+                np.ascontiguousarray(source)[None], training=False
+            )
+            verified_tail_output = learned_tail(
+                earlier_tf, training=False
+            ).numpy()[0, ..., 0]
+        nonlinear_tail_replay_error = float(
+            np.max(np.abs(verified_tail_output - predictions_tf.numpy()[0, ..., 0]))
+        )
+        if nonlinear_tail_replay_error > 2e-5:
+            raise ValueError(
+                f"{plane}: earliest real nonlinear residual tail does not "
+                "reproduce the exact original unmodified pretrained network"
+            )
+        earlier = np.asarray(earlier_tf.numpy()[0], dtype=np.float32)
+        if earlier.shape[:3] != (64, 64, 64) or not np.isfinite(earlier).all():
+            raise ValueError("unexpected genuine pre-residual learned feature")
+        raw_early_features.append(earlier)
+        mapped_early_features.append(orient_hidden_to_acquisition(earlier, plane))
         hidden = np.asarray(hidden_tf.numpy()[0], dtype=np.float32)
         predictions = np.asarray(predictions_tf.numpy()[0, ..., 0], np.float32)
         if (
@@ -208,7 +278,7 @@ def run(
             "trained_model_to_replayed_classifier_max_abs_error": replay_error,
             "new_source_forward_to_prior_export_max_abs_error": original_error,
             "inverse_plane_feature_head_to_native_patched_export_max_abs_error": mapped_error,
-            "actual_hidden_sha256": sha256(hidden.tobytes()).hexdigest(),
+            "actual_hidden_sha256": sha256(hidden.tobytes()).hexdigest(),\n            "original_pre_residual_tail_replay_max_abs_error": nonlinear_tail_replay_error,\n            "original_pre_residual_true_feature_sha256": sha256(earlier.tobytes()).hexdigest(),\n            "original_pre_residual_feature_channels": int(earlier.shape[-1]),
         }
 
     # Aggregation uses fixed weights. No training, weighting or ROI selection.
@@ -249,6 +319,67 @@ def run(
     wrong_mask = wrong_probability >= .5
     correct_mask = correct_probability >= .5
 
+    # Actual pretrained *nonlinear* boundary, including the original 3x3
+    # residual block and original learned classifier. Unlike pre-head 1x1
+    # fusion, it cannot generally commute with mean or orientation.
+    early_raw = np.mean(
+        np.stack(raw_early_features).astype(np.float64), axis=0
+    ).astype(np.float32)
+    early_canonical = np.mean(
+        np.stack(mapped_early_features).astype(np.float64), axis=0
+    ).astype(np.float32)
+    with tf.device("/CPU:0"):
+        early_wrong_prediction = learned_tail(
+            tf.convert_to_tensor(early_raw[None]), training=False
+        ).numpy()[0, ..., 0]
+        # Naive "only feature chart" repair: use the AXIAL learned tail
+        # unmodified on a canonical acquisition voxel array.
+        early_canonical_axial_operator_prediction = learned_tail(
+            tf.convert_to_tensor(early_canonical[None]), training=False
+        ).numpy()[0, ..., 0]
+    # Operator + feature coordinate transport: transport each original
+    # learned 3x3x3 tail into the input plane's native chart, evaluate,
+    # then map the resultant *prediction* back to the acquisition grid.
+    # This physically conjugates the FROZEN trained tail by the
+    # orientation, rather than silently assuming learned kernels rotate
+    # equivariantly when the feature tensor is merely transposed.
+    physically_conjugated_operator_probabilities = {}
+    for plane, axes in PLANE_TO_ACQUISITION_AXES.items():
+        rotated_input = orient_acquisition_to_hidden(early_canonical, plane)
+        with tf.device("/CPU:0"):
+            native_prediction = learned_tail(
+                tf.convert_to_tensor(np.ascontiguousarray(rotated_input)[None]),
+                training=False,
+            ).numpy()[0, ..., 0]
+        canonical_prediction = np.transpose(native_prediction, axes)
+        if not np.isfinite(canonical_prediction).all():
+            raise ValueError("trained nonlinear tail produced invalid values")
+        physically_conjugated_operator_probabilities[plane] = canonical_prediction
+    nonlinear_conjugate_prediction = np.mean(
+        np.stack(list(physically_conjugated_operator_probabilities.values())).astype(np.float64),
+        axis=0,
+    )
+    if not (
+        np.isfinite(early_wrong_prediction).all()
+        and np.isfinite(early_canonical_axial_operator_prediction).all()
+        and np.isfinite(nonlinear_conjugate_prediction).all()
+    ):
+        raise ValueError("trained nonlinear residual-tail fusion is not finite")
+    learned_operator_orientation_noncommutator = {
+        p: float(np.mean(np.abs(
+            early_canonical_axial_operator_prediction.astype(np.float64)
+            - out.astype(np.float64)
+        )))
+        for p, out in physically_conjugated_operator_probabilities.items()
+        if p != "ax"
+    }
+    # The axial learned operator serves as the untransported baseline.
+    if not np.array_equal(
+        physically_conjugated_operator_probabilities["ax"],
+        early_canonical_axial_operator_prediction,
+    ):
+        raise ValueError("transported identity operator does not match axial anchor")
+
     # Optional physical/semantic diagnostics are descriptive only;
     # feature-channel correspondence across differently oriented inference
     # is not implied by equal channel indices.
@@ -265,7 +396,7 @@ def run(
         "reused_original_model_weights_sha256": actual_parameter_hash,
         "source_checkpoint_changes_weights": changed,
         "true_trained_internal_hidden_features": True,
-        "head": "original exact pretrained Conv3D(1x1x1) followed by sigmoid",
+        "head": "original exact pretrained Conv3D(1x1x1) followed by sigmoid",\n        "original_pre_residual_nonlinear_tail_3d_convs": tail_3d_conv_count,\n        "original_pre_residual_nonlinear_tail_leaky_layers": tail_leaky_layers,\n        "actual_nonlinear_tail_replay_for_all_original_plane_inputs": True,
         "hidden_channels": hidden_channels,
         "input_planes": list(PLANE_TO_ACQUISITION_AXES),
         "intervention": (
@@ -289,7 +420,7 @@ def run(
         "aligned_logit_ensemble": score(
             logit_fusion_probability >= .5, reference, acquired_affine
         ),
-        "aligned_feature_vs_probability_fusion_mean_abs_difference": float(
+        "nonlinear_pre_residual_raw_index_feature_fusion": score(\n            early_wrong_prediction >= .5, reference, acquired_affine\n        ),\n        "nonlinear_pre_residual_correctly_oriented_features_with_untransported_axial_tail": score(\n            early_canonical_axial_operator_prediction >= .5, reference, acquired_affine\n        ),\n        "nonlinear_pre_residual_correctly_oriented_features_with_conjugated_learned_operator_fusion": score(\n            nonlinear_conjugate_prediction >= .5, reference, acquired_affine\n        ),\n        "nonlinear_pre_residual_operator_orientation_noncommutation_mae": (\n            learned_operator_orientation_noncommutator\n        ),\n        "nonlinear_operator_conjugation_mixing_independent_mechanism_claimed": False,\n        "aligned_feature_vs_probability_fusion_mean_abs_difference": float(
             np.mean(np.abs(correct_probability.astype(np.float64) - ordinary_probability_fusion))
         ),
         "wrong_vs_correct_hidden_feature_fusion_voxel_disagreement": int(
@@ -333,7 +464,7 @@ def main():
         "aligned": evidence["correct_patient_grid_hidden_feature_fusion"],
         "native_probability": evidence["standard_inverse_export_probability_fusion"],
         "feature_semantics_not_proven": not evidence["feature_channel_equivariance_proven"],
-        "exact_logit_reduction_error": evidence["prehead_feature_fusion_vs_aligned_logit_ensemble_max_abs_error"],
+        "exact_logit_reduction_error": evidence["prehead_feature_fusion_vs_aligned_logit_ensemble_max_abs_error"],\n        "genuine_nonlinear_mixing_results": {\n            "unaligned": evidence["nonlinear_pre_residual_raw_index_feature_fusion"],\n            "aligned_untransported": evidence["nonlinear_pre_residual_correctly_oriented_features_with_untransported_axial_tail"],\n            "aligned_conjugated_operator": evidence["nonlinear_pre_residual_correctly_oriented_features_with_conjugated_learned_operator_fusion"],\n            "trained_learned_operator_noncommutator": evidence["nonlinear_pre_residual_operator_orientation_noncommutation_mae"],\n        },
     }, sort_keys=True))
 
 
