@@ -9,6 +9,12 @@ the same patient-space object after indexing, resampling, fusion and coordinate
 changes—and synthesizes an exact repair or representation lift when that is
 possible.
 
+## Latest authentic pretrained 3-D MRI execution
+
+[**Merged PR #68**](https://github.com/lindicaphxag-tech/kaggle/pull/68) connects the *same pinned public T1 U-Net checkpoint's* true three-plane NIfTI predictions to a fixed downstream prediction-level ensemble, comparing incorrect same-index fusion against explicitly inverse-reoriented physical-grid fusion. [Public genuine-model CI](https://github.com/lindicaphxag-tech/kaggle/actions/runs/37819406496) and the [source / result / negative control dossier](research/medical_geometry/upstream_repros/REAL_PRETRAINED_PLANE_FUSION_RESULT.md) record one-example paired weak-reference Dice 0.0458 vs 0.1700 and physical HD95 50.93 vs 40.90 mm. All six new adversarial source-provenance tests passed. Native exporter/orientation libraries remain fair alternative baselines.
+
+This is **not** an expert clinical segmentation gain, learned internal encoder fusion, multisubject validation or a third-party accepted contribution. Further scientific novelty depends on showing the compiler's channel-dependent pre-mix transport on *actual trained internal features* across independently annotated studies and above standard spatial transform tracking.
+
 ## Start here
 
 Frozen evidence pack: [`research/medical_geometry/EVIDENCE_V0.2.0.md`](research/medical_geometry/EVIDENCE_V0.2.0.md) · machine-readable manifest: [`EVIDENCE_MANIFEST_V0.2.0.json`](research/medical_geometry/EVIDENCE_MANIFEST_V0.2.0.json)
