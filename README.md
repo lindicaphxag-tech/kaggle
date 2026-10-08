@@ -39,6 +39,13 @@ cross-repository CI is still author-operated, not independent endorsement.
 
 ## ClinGeom — start here
 
+**New actual-image evidence (2026-10-08):** [Real 3-D brain MRI witness](research/medical_geometry/REAL_MRI_WITNESS.md) from NiBabel's pinned `someones_anatomy.nii.gz` has now **run successfully** with [public real-image CI](https://github.com/lindicaphxag-tech/kaggle/actions/runs/37709285219) and [actual Figure 1 / Figure 3 PNG + JSON artifact](https://github.com/lindicaphxag-tech/kaggle/actions/runs/37709285219/artifacts/11521335416). This is **actual scanned MRI, not an AI-generated image**. The ROI is explicitly a *controlled synthetic experimental marker*, not expert segmentation; the Conv3d/Pool3d figures are real operator outputs, not pretrained inference.
+
+On the same acquired MRI, joint-array reindex voxel Dice stays `1.0`, stale-affine patient-grid Dice is `0.0`, certified repair restores `1.0`, and the marker centroid shifts `71.5 mm` before repair. Actual Conv/Pool operator centers differ by `7.14471 mm` in the example's world coordinates. **Independent NiBabel native `as_reoriented()` check agrees on the affine (error `0.0`) and reindexed voxels.** [Merged public PR #33](https://github.com/lindicaphxag-tech/kaggle/pull/33).
+
+These measurements concern controlled representation mechanics on a real medical image. They do **not** show a lesion error, clinical outcome, trained-model benefit, third-party adoption or independent reproduction.
+
+
 **New execution evidence (2026-10-08):** [ClinGeom PR #32](https://github.com/lindicaphxag-tech/kaggle/pull/32) runs the **actual pinned MONAI DiNTS `FactorizedReduceBlock`** and rebinds its two output channel fibers to one patient-space target before readout. On a controlled analytic linear field under 0.7×0.7×5 mm spacing, naive shared-index reading has mean absolute field error **6.400000**; typed per-fiber transport has MAE **9.18e-7**, maximum absolute error **3.81e-6**. The structural source phases are **5.0971 mm** apart. The runtime refuses non-point-valued/multi-support fibers and target regions requiring extrapolation. [All-five-jobs-green public CI and JSON artifact](https://github.com/lindicaphxag-tech/kaggle/actions/runs/37708936748) · [reproduce source](research/medical_geometry/benchmark_monai_dints_fiber_repair.py). **Fixed sampling weights, analytic signal, NOT trained segmentation accuracy or clinical performance.**
 **Independent reviewers wanted:** [5-minute highdicom #454 before/after reproduction task](https://github.com/lindicaphxag-tech/kaggle/issues/28) — fixed upstream SHA, public passing author-operated CI, exact success/falsification criteria, and credit for an independent report. **Open request; no external reproduction yet.**
 
