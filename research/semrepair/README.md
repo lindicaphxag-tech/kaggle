@@ -143,6 +143,28 @@ remains the mapping to concrete repair authorities, admissible robot
 probe/tap signals, risk budgets and refusal. No arbitrary robot-safety
 theorem or external adoption is claimed.
 
+### Related methods and novelty restriction
+
+This bounded-noise correction is **not** a newly invented optimal-decision-tree
+algorithm. Prior work already covers:
+
+- [Cicalese, Laber & Saettler, ICML 2014](https://proceedings.mlr.press/v32/cicalese14.html):
+  adaptive diagnosis decision trees with worst-case and expected testing costs;
+- [Golovin, Krause & Ray, NeurIPS 2010](https://arxiv.org/abs/1010.3091):
+  noisy equivalence-class determination and edge-cutting active learning;
+- [Yong, Gao & Ozay, 2017](https://arxiv.org/abs/1701.06731):
+  group-based active diagnosis under partial/noisy sensing;
+- [Robust Diagnosis Using State-Set Observation, IFAC 2006](https://doi.org/10.3182/20060829-4-CN-2909.00231):
+  bounded-error set-valued fault diagnosis.
+
+The research contribution under investigation is **not interval partition
+enumeration**. It is the robot-system-specific assignment of admissible
+intervention/tap evidence to **concrete implementation/dependency/evidence-bound
+repair authorities**, where a wrong repair to one member of a compensating
+fault pair can make the end-to-end behavior worse. Realized improvements over
+these active-diagnosis baselines require blinded, real-stack experiments and
+external independent replication; they are not assumed by the finite witness.
+
 ## Native MuJoCo: hidden semantics under controller nuisance
 
 The finite four-world example above uses a frozen experiment table. The more
