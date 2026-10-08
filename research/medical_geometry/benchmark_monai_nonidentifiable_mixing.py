@@ -63,6 +63,11 @@ def run():
     err_b=float((corrected_b.tensor-truth_b).abs().max())
     if max(err_a,err_b)>2e-6:
         raise AssertionError("pre-mix transport failed physically correct target fusion")
+    effective_rf=corrected_b.output_bundle.fibers[0].supports[0].receptive_field
+    # The fused tensor has one sampling CENTER lattice, but trilinear
+    # re-reading uses neighboring source samples. Retaining the user-declared
+    # nominal receptive field would underreport actual physical support.
+    np.testing.assert_allclose(effective_rf,[4.0,4.0,4.0],atol=1e-9)
     # Minimax impossibility: for any single postmix estimate z (same input for
     # both hypotheses), at least one world has absolute error >= 0.7/2.
     return {
@@ -75,6 +80,9 @@ def run():
         "premix_corrected_case_B_max_error":err_b,
         "output_bundle_after_premix_has_single_lattice":len(corrected_a.output_bundle.fibers)==1,
         "source_repairs":len(corrected_b.source_repair_digests),
+        "nominal_target_receptive_field_input_voxels":list(target.receptive_field),
+        "certified_output_receptive_support_envelope_input_voxels":list(effective_rf),
+        "support_envelope_is_conservative_not_exact_recovered_signal":True,
         "known_input_fields":"controlled linear signed functions; not clinical images",
         "pretrained_network":False,
         "clinical_effect_claim":False
