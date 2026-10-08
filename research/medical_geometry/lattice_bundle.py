@@ -129,9 +129,32 @@ def _center_signature(lattice: FeatureLattice, decimals: int = 12) -> tuple:
 
 
 def _deduplicate_supports(supports: Iterable[FeatureLattice]) -> tuple[FeatureLattice, ...]:
+    """Compact equal CENTER lattices without discarding physical support.
+
+    Two source features can have identical (shape, start, jump) but different
+    receptive footprints, e.g. an identity branch and anisotropic pooled
+    branch. A dense downstream operator may depend on both. Picking the first
+    feature is order-dependent and UNSOUND as a support certificate.
+
+    Keep one center-lattice entry, with the componentwise maximum receptive
+    width. This is a conservative box enclosing the union of same-centered
+    footprints; it is not a claim of equal feature values or semantics.
+    """
     seen: dict[tuple, FeatureLattice] = {}
     for support in supports:
-        seen.setdefault(_center_signature(support), support)
+        rf = np.asarray(support.receptive_field, dtype=np.float64)
+        if rf.shape != (3,) or not np.all(np.isfinite(rf)) or np.any(rf <= 0):
+            raise ValueError("source receptive support must be finite and positive")
+        key = _center_signature(support)
+        prev = seen.get(key)
+        if prev is None:
+            seen[key] = support
+            continue
+        union_rf = np.maximum(np.asarray(prev.receptive_field, dtype=np.float64), rf)
+        seen[key] = FeatureLattice(
+            prev.shape, np.asarray(prev.jump, dtype=np.float64).copy(),
+            np.asarray(prev.start, dtype=np.float64).copy(), union_rf,
+        )
     return tuple(seen.values())
 
 
