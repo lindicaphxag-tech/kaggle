@@ -16,6 +16,11 @@ compensating physical semantics, what is the **minimum admissible evidence**
 needed to authorize one concrete implementation-bound repair?
 
 - [**One-page reviewer / falsification packet**](research/semrepair/README.md)
+- [**Bounded-noise diagnostic correction**](research/semrepair/noisy_authority_game.py):
+  `python research/semrepair/noisy_authority_game.py` — the old v0.1
+  overlapping-ball quotient can **falsely reject** feasible active diagnosis;
+  the new exact minimax belief-set game restores a two-probe solution in a
+  frozen four-world counterexample. This is not a false-authorization finding.
 - [**Cross-repository CPU verifier**](research/semrepair/reproduce_crossrepo.py):
   `python research/semrepair/reproduce_crossrepo.py`
 - [Frozen Semantic ABI source](https://github.com/lindicaphxag-tech/Isaac-GR00T/commit/f69254a1e3a621a10236902ac77e9c1b1c7de668)
