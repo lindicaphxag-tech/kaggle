@@ -38,7 +38,7 @@ def test_refuses_non_pointwise_mixer_and_shape_mismatch():
     with pytest.raises(ValueError,match="pointwise dense"):
         physically_align_then_mix(x,bundle,target,nn.Conv3d(2,1,3,padding=1))
     with pytest.raises(ValueError,match="pointwise dense"):
-        physically_align_then_mix(x,bundle,target,nn.Conv3d(2,1,1,groups=2))
+        physically_align_then_mix(x,bundle,target,nn.Conv3d(2,2,1,groups=2))
     with pytest.raises(ValueError,match="channel count"):
         physically_align_then_mix(x[:,0:1],bundle,target,mix)
 
