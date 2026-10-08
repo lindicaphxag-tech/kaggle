@@ -1,0 +1,65 @@
+name: highdicom #454 paired pre/post patch proof
+
+on:
+  pull_request:
+    paths:
+      - 'research/medical_geometry/upstream_repros/patch_highdicom_454.py'
+      - 'research/medical_geometry/upstream_repros/highdicom_454_patch_regression.py'
+      - '.github/workflows/clingeom-highdicom-454-patched.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'research/medical_geometry/upstream_repros/patch_highdicom_454.py'
+      - 'research/medical_geometry/upstream_repros/highdicom_454_patch_regression.py'
+      - '.github/workflows/clingeom-highdicom-454-patched.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  paired:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned upstream without unreviewed floating versions
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install 'monai==1.6.1'
+          python -m pip install 'git+https://github.com/ImagingDataCommons/highdicom.git@4524bb0b0c8b3141f6f5b26d047b8da43c69e61e'
+      - name: Baseline witness — geometry preserved, UID absent
+        run: |
+          PYTHONPATH=. python research/medical_geometry/upstream_repros/highdicom_454_frame_identity.py | tee before-uid-patch.json
+      - name: Apply minimal proposed patch to pinned installed source
+        run: |
+          python research/medical_geometry/upstream_repros/patch_highdicom_454.py "$(python -c 'import highdicom.volume; print(highdicom.volume.__file__)')"
+      - name: Re-run independent round-trip and precedence assertions
+        run: |
+          PYTHONPATH=. python research/medical_geometry/upstream_repros/highdicom_454_patch_regression.py | tee after-uid-patch.json
+      - name: Report both sides without changing result definitions
+        if: always()
+        run: |
+          {
+            echo '### Fixed highdicom #454 before/after evidence'
+            echo ''
+            echo 'Original pinned source (expected identity gap)'
+            echo '```json'
+            cat before-uid-patch.json 2>/dev/null || true
+            echo '```'
+            echo 'Minimal patch applied to the same pinned installed source'
+            echo '```json'
+            cat after-uid-patch.json 2>/dev/null || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: highdicom-454-paired-before-after
+          path: |
+            before-uid-patch.json
+            after-uid-patch.json
+          if-no-files-found: warn
