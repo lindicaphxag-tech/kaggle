@@ -26,9 +26,20 @@ The controller-only arm's zero-survivor status means a **four-way common-success
 
 ### 2. A second, stateful semantic mismatch on a real frozen PPO policy
 
+**Larger fixed 48-seed physical execution:** [public run #37809684134](https://github.com/lindicaphxag-tech/ManiSkill/actions/runs/37809684134), with source episode IDs 20001–20048, recorded:
+
+| Frozen policy/controller intervention | PickCube success / 48 |
+|---|---:|
+| Source checkpoint, original achieved-relative controller | **47** |
+| Naive action-copy to previous-target-relative controller | **6** |
+| Exact memory-aware inverse adapter, refuses out-of-range target-native command | **8** |
+| Bounded approximate projection using real controller target memory | **48** |
+
+**40/48** exact-adapter episodes refused because at least one requested native target action exceeded its representable domain. The projected version logged **43 non-exact intervention steps**. This is a separate physical-run observation, not a guarantee that projection maintains exact semantics, safety or zero controller deviation.
+
 A published third-party PPO checkpoint was **SHA-256 verified, loaded and frozen**—no policy retraining. In actual ManiSkill PickCube simulation, the source controller interprets actions as **achieved-pose-relative delta**; the destination controller uses **previous-target-relative delta**, so conversion requires live controller target memory and a representability test.
 
-[Public 32-seed, memory-blind ablation](https://github.com/lindicaphxag-tech/ManiSkill/actions/runs/37812437614) reports:
+The complementary [public 32-seed **memory-blind ablation**](https://github.com/lindicaphxag-tech/ManiSkill/actions/runs/37812437614) uses source IDs 22001–22032 (disjoint from the 48-seed IDs) and reports:
 
 | Controller path | Observed PickCube successes / 32 | Semantic interpretation |
 |---|---:|---|
