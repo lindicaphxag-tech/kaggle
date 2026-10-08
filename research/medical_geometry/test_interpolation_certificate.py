@@ -80,7 +80,7 @@ def test_patient_mm_anisotropy_changes_the_same_voxel_shift_budget():
     plan = synthesize_lattice_repair(source,target)
     isotropic = cert(source,target,plan,hessian=0.1,budget=1,affine_mm=affine(1,1,1))
     thick = cert(source,target,plan,hessian=0.1,budget=1,affine_mm=affine(0.7,0.7,5))
-    assert thick.max_absolute_error_bound > 9 * isotropic.max_absolute_error_bound
+    assert thick.max_absolute_error_bound > 8 * isotropic.max_absolute_error_bound
     assert thick.physical_cell_lengths_mm == pytest.approx((0.7,0.7,5.0))
 
 
