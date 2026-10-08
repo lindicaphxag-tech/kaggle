@@ -1,0 +1,58 @@
+name: ClinGeom paired real MRI and existing brain mask
+
+on:
+  pull_request:
+    paths:
+      - 'research/medical_geometry/real_paired_mask_witness.py'
+      - 'research/medical_geometry/REAL_PAIRED_MASK_WITNESS.md'
+      - '.github/workflows/clingeom-real-paired-mask.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  existing-real-mask:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install small CPU geometry-only dependencies
+        run: python -m pip install 'numpy>=1.26,<3' 'scipy>=1.11' 'nibabel>=5.2,<6' 'matplotlib>=3.8'
+      - name: Download genuine anonymized MRI and existing mask from pinned upstream
+        run: |
+          curl -fL --retry 3 --max-time 120 'https://raw.githubusercontent.com/ecalabr/brain_mask/ca789fb26b70e359b61a8d52968813dd772fb4b1/example_data/example001/example001_t1.nii.gz' -o example001_t1.nii.gz
+          curl -fL --retry 3 --max-time 120 'https://raw.githubusercontent.com/ecalabr/brain_mask/ca789fb26b70e359b61a8d52968813dd772fb4b1/example_data/example001/example001_brain_mask.nii.gz' -o example001_brain_mask.nii.gz
+          test "$(git hash-object example001_t1.nii.gz)" = '81b1e5260ee4a579d8ac490cac113df9c1cb942f'
+          test "$(git hash-object example001_brain_mask.nii.gz)" = 'e0dd089b3544da4352e751a24dc27a828904bad7'
+      - name: Run actual MRI+mask world-geometry and surface witness
+        run: |
+          python -m research.medical_geometry.real_paired_mask_witness --image example001_t1.nii.gz --mask example001_brain_mask.nii.gz --out artifacts/paired
+      - name: Independently assert the saved numerical witness is coherent
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('artifacts/paired')
+          d=json.loads((p/'real_pair_mri_mask_results.json').read_text())
+          assert d['control_joint_reindex_dice']==1
+          assert 0<=d['stale_fixed_grid_dice']<1
+          assert d['repaired_fixed_grid_dice']==1
+          assert d['repaired_centroid_error_mm']<1e-6
+          assert d['repaired_surface_mm']['symmetric_hd95_center_mm']==0
+          assert d['stale_surface_mm']['symmetric_hd95_center_mm']>0
+          assert d['independent_nibabel_affine_max_abs_difference']<1e-6
+          assert d['independent_nibabel_voxel_reindex_exact']
+          assert (p/d['source_figure']).stat().st_size>10000
+          print('PASS: actual MRI and provided brain mask, physical-surface repair')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: ClinGeom-paired-real-MRI-mask-evidence
+          path: artifacts/paired/
+          if-no-files-found: error
+          retention-days: 60
