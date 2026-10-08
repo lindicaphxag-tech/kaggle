@@ -78,6 +78,7 @@ def patient_affine():
 
 def test_fx_compiler_recovers_factorized_reduce_channel_fibers():
     model = FactorizedReduce3D(8, 16)
+    model.eval()  # frozen BatchNorm is spatially local in inference
     x = torch.zeros(1, 8, 32, 32, 32)
     y = model(x)
     assert tuple(y.shape) == (1, 16, 16, 16, 16)
