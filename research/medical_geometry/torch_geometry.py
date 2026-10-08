@@ -37,9 +37,6 @@ _PASS_THROUGH = (
     nn.SiLU,
     nn.ELU,
     nn.PReLU,
-    nn.BatchNorm3d,
-    nn.InstanceNorm3d,
-    nn.GroupNorm,
     nn.Dropout,
     nn.Dropout3d,
 )
@@ -64,6 +61,25 @@ def _pool_stride(module: nn.MaxPool3d | nn.AvgPool3d) -> tuple[int, int, int]:
 
 
 def _apply_supported_geometry(module: nn.Module, lattice: FeatureLattice) -> FeatureLattice:
+    # Geometric center maps and dependency support are DIFFERENT contracts.
+    # GroupNorm always uses current-volume spatial statistics; BatchNorm3d
+    # and InstanceNorm3d use them in training (and in eval if running stats
+    # are disabled). Such an operation makes an output voxel depend on distant
+    # voxels. Reusing the unchanged local receptive_field would be unsound.
+    if isinstance(module, nn.GroupNorm):
+        raise UnsupportedGeometryOp(
+            "GroupNorm globally couples spatial voxels; local receptive support "
+            "cannot be passed through without a global-dependency type"
+        )
+    if isinstance(module, (nn.InstanceNorm3d, nn.BatchNorm3d)):
+        if module.training or not module.track_running_stats:
+            raise UnsupportedGeometryOp(
+                f"{type(module).__name__} uses input-dependent spatial statistics; "
+                "a local receptive-support certificate is not sound"
+            )
+        # In eval mode with tracked running statistics the affine normalization
+        # is pointwise in space, so the sampling/support lattice is unchanged.
+        return lattice
     if isinstance(module, nn.Conv3d):
         return propagate_conv_lattice(
             lattice,
