@@ -200,7 +200,11 @@ def run(
     if not np.allclose(scan.affine, acquired_affine, atol=1e-5, rtol=0):
         raise ValueError("source-loader patch affine differs from original MRI")
 
-    before_last_bneck, learned_tail, tail_3d_conv_count, tail_leaky_layers = (\n        _nonlinear_tail(model)\n    )\n    raw_features, mapped_features, mapped_logits = [], [], []\n    raw_early_features, mapped_early_features = [], []
+    before_last_bneck, learned_tail, tail_3d_conv_count, tail_leaky_layers = (
+        _nonlinear_tail(model)
+    )
+    raw_features, mapped_features, mapped_logits = [], [], []
+    raw_early_features, mapped_early_features = [], []
     per_plane = {}
     hidden_channels = None
     for plane in PLANE_TO_ACQUISITION_AXES:
@@ -278,7 +282,10 @@ def run(
             "trained_model_to_replayed_classifier_max_abs_error": replay_error,
             "new_source_forward_to_prior_export_max_abs_error": original_error,
             "inverse_plane_feature_head_to_native_patched_export_max_abs_error": mapped_error,
-            "actual_hidden_sha256": sha256(hidden.tobytes()).hexdigest(),\n            "original_pre_residual_tail_replay_max_abs_error": nonlinear_tail_replay_error,\n            "original_pre_residual_true_feature_sha256": sha256(earlier.tobytes()).hexdigest(),\n            "original_pre_residual_feature_channels": int(earlier.shape[-1]),
+            "actual_hidden_sha256": sha256(hidden.tobytes()).hexdigest(),
+            "original_pre_residual_tail_replay_max_abs_error": nonlinear_tail_replay_error,
+            "original_pre_residual_true_feature_sha256": sha256(earlier.tobytes()).hexdigest(),
+            "original_pre_residual_feature_channels": int(earlier.shape[-1]),
         }
 
     # Aggregation uses fixed weights. No training, weighting or ROI selection.
@@ -396,7 +403,10 @@ def run(
         "reused_original_model_weights_sha256": actual_parameter_hash,
         "source_checkpoint_changes_weights": changed,
         "true_trained_internal_hidden_features": True,
-        "head": "original exact pretrained Conv3D(1x1x1) followed by sigmoid",\n        "original_pre_residual_nonlinear_tail_3d_convs": tail_3d_conv_count,\n        "original_pre_residual_nonlinear_tail_leaky_layers": tail_leaky_layers,\n        "actual_nonlinear_tail_replay_for_all_original_plane_inputs": True,
+        "head": "original exact pretrained Conv3D(1x1x1) followed by sigmoid",
+        "original_pre_residual_nonlinear_tail_3d_convs": tail_3d_conv_count,
+        "original_pre_residual_nonlinear_tail_leaky_layers": tail_leaky_layers,
+        "actual_nonlinear_tail_replay_for_all_original_plane_inputs": True,
         "hidden_channels": hidden_channels,
         "input_planes": list(PLANE_TO_ACQUISITION_AXES),
         "intervention": (
@@ -420,7 +430,20 @@ def run(
         "aligned_logit_ensemble": score(
             logit_fusion_probability >= .5, reference, acquired_affine
         ),
-        "nonlinear_pre_residual_raw_index_feature_fusion": score(\n            early_wrong_prediction >= .5, reference, acquired_affine\n        ),\n        "nonlinear_pre_residual_correctly_oriented_features_with_untransported_axial_tail": score(\n            early_canonical_axial_operator_prediction >= .5, reference, acquired_affine\n        ),\n        "nonlinear_pre_residual_correctly_oriented_features_with_conjugated_learned_operator_fusion": score(\n            nonlinear_conjugate_prediction >= .5, reference, acquired_affine\n        ),\n        "nonlinear_pre_residual_operator_orientation_noncommutation_mae": (\n            learned_operator_orientation_noncommutator\n        ),\n        "nonlinear_operator_conjugation_mixing_independent_mechanism_claimed": False,\n        "aligned_feature_vs_probability_fusion_mean_abs_difference": float(
+        "nonlinear_pre_residual_raw_index_feature_fusion": score(
+            early_wrong_prediction >= .5, reference, acquired_affine
+        ),
+        "nonlinear_pre_residual_correctly_oriented_features_with_untransported_axial_tail": score(
+            early_canonical_axial_operator_prediction >= .5, reference, acquired_affine
+        ),
+        "nonlinear_pre_residual_correctly_oriented_features_with_conjugated_learned_operator_fusion": score(
+            nonlinear_conjugate_prediction >= .5, reference, acquired_affine
+        ),
+        "nonlinear_pre_residual_operator_orientation_noncommutation_mae": (
+            learned_operator_orientation_noncommutator
+        ),
+        "nonlinear_operator_conjugation_mixing_independent_mechanism_claimed": False,
+        "aligned_feature_vs_probability_fusion_mean_abs_difference": float(
             np.mean(np.abs(correct_probability.astype(np.float64) - ordinary_probability_fusion))
         ),
         "wrong_vs_correct_hidden_feature_fusion_voxel_disagreement": int(
@@ -464,7 +487,13 @@ def main():
         "aligned": evidence["correct_patient_grid_hidden_feature_fusion"],
         "native_probability": evidence["standard_inverse_export_probability_fusion"],
         "feature_semantics_not_proven": not evidence["feature_channel_equivariance_proven"],
-        "exact_logit_reduction_error": evidence["prehead_feature_fusion_vs_aligned_logit_ensemble_max_abs_error"],\n        "genuine_nonlinear_mixing_results": {\n            "unaligned": evidence["nonlinear_pre_residual_raw_index_feature_fusion"],\n            "aligned_untransported": evidence["nonlinear_pre_residual_correctly_oriented_features_with_untransported_axial_tail"],\n            "aligned_conjugated_operator": evidence["nonlinear_pre_residual_correctly_oriented_features_with_conjugated_learned_operator_fusion"],\n            "trained_learned_operator_noncommutator": evidence["nonlinear_pre_residual_operator_orientation_noncommutation_mae"],\n        },
+        "exact_logit_reduction_error": evidence["prehead_feature_fusion_vs_aligned_logit_ensemble_max_abs_error"],
+        "genuine_nonlinear_mixing_results": {
+            "unaligned": evidence["nonlinear_pre_residual_raw_index_feature_fusion"],
+            "aligned_untransported": evidence["nonlinear_pre_residual_correctly_oriented_features_with_untransported_axial_tail"],
+            "aligned_conjugated_operator": evidence["nonlinear_pre_residual_correctly_oriented_features_with_conjugated_learned_operator_fusion"],
+            "trained_learned_operator_noncommutator": evidence["nonlinear_pre_residual_operator_orientation_noncommutation_mae"],
+        },
     }, sort_keys=True))
 
 
