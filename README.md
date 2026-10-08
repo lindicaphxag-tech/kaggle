@@ -39,6 +39,7 @@ needed to authorize one concrete implementation-bound repair?
   source-seed result with Python stdlib:
   `python research/semrepair/policy-transfer/audit.py`
 - [**Flagship technical brief — abstract, actual results, limitations**](research/semrepair/FLAGSHIP_TECHNICAL_BRIEF.md)
+- [**Flagship evidence — official 100-source robot replay + frozen PPO 32-seed live controller memory**](research/semrepair/ROBOT_ACTION_CONTRACT_FLAGSHIP.md): real failure, local-repair feasibility and explicit negative evidence
 - [**One-page reviewer / falsification packet**](research/semrepair/README.md)
 - [**Bounded-noise diagnostic correction**](research/semrepair/noisy_authority_game.py):
   `python research/semrepair/noisy_authority_game.py` — the old v0.1
