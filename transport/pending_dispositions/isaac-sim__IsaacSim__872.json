@@ -1,0 +1,6 @@
+{
+  "case_id": "isaac-sim/IsaacSim#872",
+  "independence_class": "EXCLUDED",
+  "disposition": "excluded_protocol_2_4_documentation_only",
+  "reason": "The frozen original issue is explicitly a documentation correction to a Python SIGALRM shutdown-watchdog recommendation and an os.alarm() API typo. The original report itself explains CPython's deferred Python callback execution under native GIL-holding calls, supplies a complete minimal C/Python reproduction, identifies an existing faulthandler-based native watchdog implementation, and requests maintainer documentation changes only. This is not a hidden producer/controller semantic ABI, unresolved physical action-interface diagnosis, or SemRepair repair-authority ambiguity. No prospective mechanism credit is claimed."
+}
