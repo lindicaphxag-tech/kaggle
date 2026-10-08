@@ -20,6 +20,8 @@ from .channel_fiber_runtime import repair_channel_fibers
 from .clingeom import FeatureLattice
 from .lattice_bundle import LatticeBundle, bundle_from_lattice
 from .support_envelope import premix_output_support_envelope
+from .grid_precision_certificate import certify_grid_coordinate_precision
+from .repair_synthesis import synthesize_lattice_repair
 
 
 @dataclass(frozen=True)
@@ -30,6 +32,7 @@ class CertifiedPreMixResult:
     per_output_value_error_bounds: tuple[float, ...] | None
     conv_weight_provenance_sha256: str
     output_receptive_field_envelope: tuple[float, float, float]
+    per_fiber_grid_coordinate_drift_mm: tuple[float, ...] | None = None
 
 
 def _check_pointwise_dense_mix(mix: nn.Module, source_channels: int) -> nn.Conv3d:
@@ -59,6 +62,7 @@ def physically_align_then_mix(
     fiber_world_hessian_bounds: Mapping[int, float] | None = None,
     maximum_output_value_error: float | None = None,
     patient_frame_uid: str | None = None,
+    maximum_grid_coordinate_drift_mm: float | None = None,
 ) -> CertifiedPreMixResult:
     """Move admitted dense fusion AFTER certified physical sampling.
 
@@ -95,6 +99,36 @@ def physically_align_then_mix(
             raise ValueError("output-error authorization requires per-fiber bound")
         if not np.isfinite(maximum_output_value_error) or maximum_output_value_error < 0:
             raise ValueError("invalid maximum output error budget")
+    # Geometry certificates established in real arithmetic do not capture
+    # normalized sampling-grid storage at mixed precision. This optional
+    # patient-mm authorization rejects coordinate quantization *before*
+    # runtime interpolation; it is NOT a whole-operator roundoff guarantee.
+    per_fiber_grid_drift: tuple[float, ...] | None = None
+    if maximum_grid_coordinate_drift_mm is not None:
+        budget = float(maximum_grid_coordinate_drift_mm)
+        if not np.isfinite(budget) or budget < 0:
+            raise ValueError("maximum grid-coordinate drift must be finite and nonnegative")
+        if patient_affine is None:
+            raise ValueError("grid-coordinate precision budget requires patient affine")
+        measured = []
+        for fiber in source_bundle.fibers:
+            if len(fiber.supports) != 1:
+                raise ValueError("mixed-support fiber has no safe sampling coordinate grid")
+            source = fiber.supports[0]
+            plan = synthesize_lattice_repair(source, target, role="feature")
+            if plan.kind == "refuse":
+                raise ValueError("cannot certify grid precision for refused repair")
+            numeric = certify_grid_coordinate_precision(
+                source, target, input_voxel_to_patient_mm=patient_affine,
+                input_dtype=channel_tensor.dtype,
+                resampling_executed=(plan.kind == "resample"),
+            )
+            measured.append(numeric.max_world_coordinate_displacement_mm)
+        per_fiber_grid_drift = tuple(float(v) for v in measured)
+        if any(v > budget for v in per_fiber_grid_drift):
+            raise ValueError(
+                "mixed-precision grid-coordinate drift exceeds patient-mm budget"
+            )
     output_support = premix_output_support_envelope(source_bundle, target)
     aligned = repair_channel_fibers(
         channel_tensor, source_bundle, target,
@@ -135,6 +169,8 @@ def physically_align_then_mix(
             None if patient_affine is None else patient_affine.tolist()
         ),
         "patient_frame_uid": patient_frame_uid,
+        "maximum_grid_coordinate_drift_mm": maximum_grid_coordinate_drift_mm,
+        "per_fiber_grid_coordinate_drift_mm": per_fiber_grid_drift,
         "declared_max_fiber_value_error": maximum_fiber_value_error,
         "declared_max_output_value_error": maximum_output_value_error,
         "fiber_world_hessian_bounds": (
@@ -178,4 +214,5 @@ def physically_align_then_mix(
         per_output_value_error_bounds=per_output,
         conv_weight_provenance_sha256=digest.hexdigest(),
         output_receptive_field_envelope=tuple(float(v) for v in output_support.receptive_field),
+        per_fiber_grid_coordinate_drift_mm=per_fiber_grid_drift,
     )
