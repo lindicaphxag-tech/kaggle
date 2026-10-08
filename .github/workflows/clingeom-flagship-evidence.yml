@@ -1,0 +1,45 @@
+name: ClinGeom flagship evidence integrity
+
+on:
+  pull_request:
+    paths:
+      - "research/medical_geometry/FLAGSHIP_EVIDENCE_2026.json"
+      - "research/medical_geometry/validate_flagship_evidence.py"
+      - "research/medical_geometry/FLAGSHIP_2026.md"
+      - "research/medical_geometry/README.md"
+      - "README.md"
+      - ".github/workflows/clingeom-flagship-evidence.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check claim boundaries, numeric consistency, run/head provenance
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python research/medical_geometry/validate_flagship_evidence.py --live | tee flagship-evidence-audit.json
+          {
+            echo "### Verified ClinGeom evidence anchors"
+            echo ""
+            echo "Four original public PR heads and their author-operated CI status"
+            echo '```json'
+            cat flagship-evidence-audit.json
+            echo '```'
+            echo ""
+            echo "This is source/CI provenance validation, not independent medical model reproduction."
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: clingeom-flagship-evidence-audit
+          path: flagship-evidence-audit.json
