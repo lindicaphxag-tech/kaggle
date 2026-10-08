@@ -157,6 +157,19 @@ jobs:
         with:
           name: clingeom-monai-fiber-repair-evidence
           path: monai-fiber-repair.json
+      - name: Test curvature-gated nonlinear repair in pinned MONAI runtime
+        run: |
+          PYTHONPATH=. python research/medical_geometry/benchmark_monai_dints_quadratic_bound.py | tee monai-quadratic-bound.json
+          {
+            echo '### MONAI nonlinear feature-fiber repair, sharp analytic curvature envelope'
+            echo '```json'
+            cat monai-quadratic-bound.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: clingeom-monai-curvature-bound-evidence
+          path: monai-quadratic-bound.json
       - name: Upload pinned MONAI witness
         uses: actions/upload-artifact@v4
         with:

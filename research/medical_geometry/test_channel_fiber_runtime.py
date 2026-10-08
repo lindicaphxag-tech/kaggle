@@ -77,3 +77,49 @@ def test_runtime_repairs_two_point_value_phases_of_linear_mm_field():
     naive_error=(naive-expected).abs().mean().item()
     assert naive_error > 3.0
     assert repaired_error < 1e-4
+
+
+def test_curvature_budget_fails_closed_without_external_bound():
+    bundle=_reduce_bundle()
+    x=torch.zeros(1,2,4,4,4)
+    with pytest.raises(ValueError, match='per-fiber curvature evidence'):
+        repair_channel_fibers(
+            x, bundle, _target(), maximum_value_error=1.0,
+            input_voxel_to_patient_mm=np.eye(4),
+        )
+    with pytest.raises(ValueError, match='lacks conditional value-error certificate'):
+        repair_channel_fibers(
+            x, bundle, _target(), maximum_value_error=1.0,
+            input_voxel_to_patient_mm=np.eye(4),
+            uniform_world_hessian_bound_by_channel_start={0:0.1},
+        )
+
+
+def test_curvature_budget_limits_actual_two_fiber_transport():
+    bundle=_reduce_bundle()
+    x=torch.zeros(1,2,4,4,4)
+    patient_affine=np.diag([0.7,0.7,5.0,1.0])
+    # Each MONAI factorized branch has a 2-index-step source cell.
+    # Target at 1.5,3.5,5.5 is at 1/4 or 3/4 of each 2-index cell.
+    # For B=0.02, sharp maximum is 0.19485 value units.
+    with pytest.raises(ValueError, match='exceeds or lacks'):
+        repair_channel_fibers(
+            x,bundle,_target(),
+            input_voxel_to_patient_mm=patient_affine,
+            maximum_value_error=0.19,
+            uniform_world_hessian_bound_by_channel_start={0:0.02,1:0.02},
+        )
+    result=repair_channel_fibers(
+        x,bundle,_target(),
+        input_voxel_to_patient_mm=patient_affine,
+        maximum_value_error=0.20,
+        uniform_world_hessian_bound_by_channel_start={0:0.02,1:0.02},
+    )
+    assert result.conditional_value_error_bounds == pytest.approx((0.19485,0.19485))
+    assert result.interpolation_fiber_count == 2
+
+
+def test_legacy_geometry_only_path_never_claims_value_error_certificate():
+    bundle=_reduce_bundle()
+    result=repair_channel_fibers(torch.zeros(1,2,4,4,4),bundle,_target())
+    assert result.conditional_value_error_bounds is None
