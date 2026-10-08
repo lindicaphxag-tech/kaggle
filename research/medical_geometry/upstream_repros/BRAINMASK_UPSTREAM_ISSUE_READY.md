@@ -1,3 +1,21 @@
+## Copy-paste native regression patch (2026-10-08)
+
+**Maintainer-native submission now ready:** [`brainmask_export_with_native_tests.patch`](brainmask_export_with_native_tests.patch) applies directly to the exact original `predict.py` and adds `tests/test_predict_export_space.py` under the original project's own tree. It requires only NumPy, NiBabel and pytest for the focused regression, no ClinGeom or TensorFlow.
+
+[Public original-RED / patched-GREEN matrix](https://github.com/lindicaphxag-tech/kaggle/actions/runs/37749615927): Python **3.10 and 3.12** each produced **8 failing nonaxial tests on original unmodified upstream** and **17 passing tests after applying the two-file patch**. This validates that the regression catches a real source defect, not simply a test that would pass regardless of the implementation.
+
+Maintainer quick replay:
+
+```bash
+git checkout ca789fb26b70e359b61a8d52968813dd772fb4b1
+git apply --check /path/to/brainmask_export_with_native_tests.patch
+git apply /path/to/brainmask_export_with_native_tests.patch
+python -m pip install numpy nibabel pytest
+python -m pytest -q tests/test_predict_export_space.py
+```
+
+This test file compiles the real `predictions_2_nii` method from its AST and stubs only model-patch reconstruction, keeping the unit test lightweight. The separate pinned public full-TF and original-checkpoint experiments remain available for independent scrutiny. **No third-party review or upstream merge is claimed.**
+
 # Maintainer-ready issue — brain_mask nonaxial export attaches a stale source affine
 
 **To submit:** copy the section from **Issue title** through **Maintainer question** into a new issue on https://github.com/ecalabr/brain_mask/issues/new using an account authorized to post. Current GitHub integration returned HTTP 403; **this is NOT already submitted to upstream**.
