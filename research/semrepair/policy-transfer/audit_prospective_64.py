@@ -28,12 +28,28 @@ SOURCE_NAMES = {
         "checkpoint_sha256":
             "74ae6a09b9af5e9e50dc71944f2e99316a8b67b02f3a96ca45df4a6d53dc1bd7",
         "original_log_job_ids": (113441827474, 113441827387, 113441827626, 113441827582),
+        "source_policy_observation_width": 35,
+        "chunk_artifact_ids": (11567061608, 11566388617, 11566353319, 11566732807),
+        "chunk_artifact_zip_sha256": (
+            "b02c3e4f0a667006a33637053ea169ff6f0f9794702797cdcf1eca3a90136442",
+            "27368d0e3587a76fc3ee88689c1afb930ca14e5437469ebf14c68f00132d7e89",
+            "d93c28fb900a3182bb49534f429f24c1bdb4e4c2e381481375f327b841b77935",
+            "f13c1a6b2472b138ef0742c2b65db119c07a9741e4f2e7fe8021c27dd80fa11a",
+        ),
     },
     "stack_cube": {
         "seed_start": 61001,
         "checkpoint_sha256":
             "e63cc8d8ffdca3d03553a21ea615c759b2b224493a7e7e12bee7efc29d5bad9c",
         "original_log_job_ids": (113441827912, 113441827469, 113441827476, 113441827424),
+        "source_policy_observation_width": 48,
+        "chunk_artifact_ids": (11567121270, 11566847601, 11566328610, 11566264133),
+        "chunk_artifact_zip_sha256": (
+            "1ed2df637427df21bd7bc5b28bd1a660842883937987ab8f57ff9d5d14c4c468",
+            "f9318d96583c320decb6275a74ed70ee0a639b591d2d6be5681d01be3b9a8c2c",
+            "3c8f163fe6e04476548e830bfbcde016eaf99c36bb82a86f7570b09226327217",
+            "4f8f8e180e3e40766836773035ecd74a84f3b57ac123636bb2d10fab2600a7b7",
+        ),
     },
 }
 
@@ -86,6 +102,18 @@ def audit(payload: dict) -> dict:
         require(tuple(dataset.get("original_log_job_ids", ())) ==
                 spec["original_log_job_ids"],
                 f"{task}: original eight-seed job identities not frozen")
+        require(dataset.get("source_checkpoint_sha256") ==
+                spec["checkpoint_sha256"],
+                f"{task}: source PPO checkpoint does not match frozen model identity")
+        require(dataset.get("source_policy_observation_width") ==
+                spec["source_policy_observation_width"],
+                f"{task}: source network input ABI changed")
+        require(tuple(dataset.get("original_chunk_artifact_ids", ())) ==
+                spec["chunk_artifact_ids"],
+                f"{task}: source artifact identifiers were substituted")
+        require(tuple(dataset.get("original_chunk_artifact_zip_sha256", ())) ==
+                spec["chunk_artifact_zip_sha256"],
+                f"{task}: original eight-seed artifact digests were substituted")
         seeds = [e.get("seed") for e in episodes]
         expected = list(range(spec["seed_start"], spec["seed_start"] + 32))
         require(seeds == expected, f"{task}: skipped/duplicated/reordered original seeds")
@@ -194,6 +222,10 @@ def self_test(original: dict) -> dict:
         ("missing original seed", lambda p: p["datasets"]["pull_cube"]["episodes"].pop()),
         ("reorder source states", lambda p: p["datasets"]["stack_cube"]["episodes"].reverse()),
         ("wrong checkpoint provenance", lambda p: p.update(pretrained_model_hf_revision="main")),
+        ("wrong task-model SHA", lambda p: p["datasets"]["pull_cube"]
+         .update(source_checkpoint_sha256="0"*64)),
+        ("wrong raw archive digest", lambda p: p["datasets"]["stack_cube"]
+         ["original_chunk_artifact_zip_sha256"].__setitem__(0,"0"*64)),
         ("fabricated improvement", lambda p: p["datasets"]["pull_cube"]["episodes"][0]
          ["success_once"].update(stateless=True)),
         ("nonboolean task success", lambda p: p["datasets"]["stack_cube"]["episodes"][0]
