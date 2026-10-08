@@ -24,6 +24,8 @@ SPLITS={
     "mini":{"train":(1,2),"val":(3,),"test":(4,)},
     "pilot":{"train":tuple(range(1,7)),
              "val":tuple(range(7,10)),"test":tuple(range(10,13))},
+    "prospective":{"train":tuple(range(1,9)),
+                   "val":tuple(range(9,13)),"test":tuple(range(13,17))},
 }
 CS=(.0001,.001,.01,.1,1.)
 
