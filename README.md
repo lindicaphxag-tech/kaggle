@@ -15,6 +15,7 @@ They are deliberately kept separate in claims: public self-authored artifacts ar
 compensating physical semantics, what is the **minimum admissible evidence**
 needed to authorize one concrete implementation-bound repair?
 
+- [**Flagship technical brief — abstract, actual results, limitations**](research/semrepair/FLAGSHIP_TECHNICAL_BRIEF.md)
 - [**One-page reviewer / falsification packet**](research/semrepair/README.md)
 - [**Bounded-noise diagnostic correction**](research/semrepair/noisy_authority_game.py):
   `python research/semrepair/noisy_authority_game.py` — the old v0.1
