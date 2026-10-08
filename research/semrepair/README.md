@@ -245,6 +245,58 @@ real simulation dynamics.
 
 [Public native MuJoCo CI](https://github.com/lindicaphxag-tech/kaggle/actions/workflows/semrepair-native-mujoco.yml)
 
+## Native ManiSkill 2×2 causal intervention: first official task-level result
+
+The [public native PegInsertionSide factorial replay run #37715587885](https://github.com/lindicaphxag-tech/ManiSkill/actions/runs/37715587885)
+runs the same eight officially supplied motion-planning demonstrations
+independently through the *actual upstream action-conversion/controller
+implementation* in four source configurations:
+
+| converter #1495 | controller #1472 | Official demos successfully replayed |
+|---|---|---|
+| Off | Off | **6/8** |
+| On | Off | **6/8** |
+| Off | On | **0/8** |
+| On | On | **6/8** |
+
+All four source trees are fixed to exact Git commits; the #1472 controller/test
+blob is independently hash-checked. Failed conversions are retained as
+failures, **not** silently removed. Zero success in the controller-only cell
+makes a conventional four-way matched learned-policy comparison **impossible
+on the eight development-exposed demonstrations**, which is itself a concrete
+and important limit on what the data can establish.
+
+The observed four-cell interaction in conversion success is descriptive:
+`6/8 - 0/8 - 6/8 + 6/8 = +0.75` on this small development set.
+It is neither statistical evidence of general task-level learned-policy
+improvement nor evidence of a maintainer-confirmed upstream defect.
+
+**The most revealing practical behavior:** fixing the controller sign alone
+can destroy demonstrated behavior even though the original end-to-end pipeline
+replays correctly. Correct producer/controller interaction matters; using
+a *different* local repair is not automatically licensed by the same
+end-effector output.
+
+This is a test of a real existing robotics stack, not only a toy MuJoCo
+witness, but **no maintainer has yet adopted the SemRepair authority framework**.
+The two distinct upstream PRs (#1495 and #1472) remain separate fixes.
+
+The associated [CPU-native two-arm Diffusion Policy run #37713921020](https://github.com/lindicaphxag-tech/ManiSkill/actions/runs/37713921020)
+successfully trained both baseline and combined cells for **two optimizer
+steps each**, using **six paired source-seed demos/893 transitions** in each.
+Both showed **0% task success** on tiny 20-step evaluation horizons.
+That demonstrates reproducible *pipeline execution*, not an improvement
+from one repair.
+
+**Replication policy:** the first eight are development-exposed, and a
+predeclared four-cell 32-source-episode extension is being run with the next
+24 forming a **four-cell-analysis replication slice**.
+These 24 are **not a completely untouched dataset**: a previous two-arm
+Kaggle study replayed the first 100 source demonstrations and published
+aggregate baseline+combined results. The new replication can test
+converter/controller interaction on additional source episodes, but cannot
+be described as a fully independent data holdout.
+
 ## Formal and real-stack evidence
 
 | Evidence | Exact public reference | What it demonstrates | What it does **not** demonstrate |
