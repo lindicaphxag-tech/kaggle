@@ -74,6 +74,46 @@ disagreement after orientation in the attached JSON, but it does not
 establish a learned channel gauge, cross-patient reliability, or safe
 pre-head fusion authorization.
 
+
+## Critical falsification control: frozen pre-head **equals** logit ensembling
+
+**Mathematical identity, to be numerically checked on the exact authentic
+trained model in the revised CI run**: if `h_i` are the acquired-grid
+last-layer hidden features, the final pretrained head is an affine,
+pointwise `z_i=W h_i+b` and the fusion has fixed equal positive weights,
+then
+
+```text
+sigmoid(W * mean_i(h_i) + b) = sigmoid(mean_i(W * h_i + b))
+```
+
+The right side is **standard spatially aligned logit averaging**, with
+no access to hidden channel content necessary. The old Dice difference
+between our pre-head composition and post-probability mean could be
+explained *entirely by averaging before versus after the sigmoid*.
+Therefore this particular 32-channel pre-head experiment is a real
+internal-feature computation, but it **cannot substantiate a new
+feature-level mixing mechanism**. Its value is as a strict provenance
+oracle, a quantitative counterexample to raw-index mixing, and a
+demonstration of when not to overclaim novelty.
+
+The revised authentic execution now independently computes per-plane
+pretrained original-head **logits** on correctly mapped learned hidden
+features, averages them, sigmoid-transforms them, asserts absolute
+agreement with the earlier aligned pre-head computation `<=2e-5`,
+and reports this numerical residual as an explicit evidence field. If
+that numerical control fails, we must diagnose the model or graph.
+A pure numerical unit test also demonstrates that logit averaging and
+post-sigmoid probability averaging can result in *opposite binary labels*
+without any feature-level nonlinearity or new learned weights.
+
+**Decision:** do not submit the 0.210957 versus 0.170020 single-study
+Dice difference as original representation learning. The next valid
+methodological advance would need a *nonlinear learned mixing boundary*,
+a learned mapping of representation/channel gauges, or a gate whose
+benefit is measured on independent expert-labelled studies against
+logit and probability ensemble controls.
+
 ## Controls and scientific boundaries
 
 - Authentic original HDF5 weight load and weight SHA match against previous
