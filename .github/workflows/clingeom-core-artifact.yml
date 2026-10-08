@@ -170,6 +170,20 @@ jobs:
         with:
           name: clingeom-monai-curvature-bound-evidence
           path: monai-quadratic-bound.json
+      - name: Test model-weight-derived patient-space curvature proof
+        run: |
+          python -m pytest -q research/medical_geometry/test_weight_curvature.py
+          PYTHONPATH=. python research/medical_geometry/benchmark_weight_derived_monai.py | tee monai-weight-curvature.json
+          {
+            echo '### MONAI linear-weight C2 propagation and numerical residual'
+            echo '```json'
+            cat monai-weight-curvature.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: clingeom-monai-weight-curvature-evidence
+          path: monai-weight-curvature.json
       - name: Upload pinned MONAI witness
         uses: actions/upload-artifact@v4
         with:
