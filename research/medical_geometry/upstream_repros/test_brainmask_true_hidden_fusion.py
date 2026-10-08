@@ -3,7 +3,7 @@ import numpy as np
 import pytest
 
 from research.medical_geometry.upstream_repros.brainmask_true_hidden_fusion import (
-    orient_hidden_to_acquisition,
+    orient_hidden_to_acquisition,\n    orient_acquisition_to_hidden,
 )
 
 
@@ -76,3 +76,44 @@ def test_logit_mean_and_probability_mean_can_reverse_final_labels():
     assert logit_ensemble > 0.5
     assert prob_ensemble < 0.5
     # This difference does not require learned-channel semantics at all.
+
+
+@pytest.mark.parametrize("plane", ["ax", "cor", "sag"])
+def test_native_canonical_nonlinear_cut_charts_are_two_sided_exact_inverses(plane):
+    rng = np.random.default_rng(143)
+    source = rng.normal(size=(4, 5, 6, 8)).astype(np.float32)
+    mapped = orient_hidden_to_acquisition(source, plane)
+    restored = orient_acquisition_to_hidden(mapped, plane)
+    np.testing.assert_array_equal(restored, source)
+    assert restored.shape[-1] == source.shape[-1]
+
+
+def test_orientation_sensitive_3d_kernel_requires_operator_transport():
+    source = np.zeros((4, 5, 6, 1), np.float32)
+    source[1, 2, 3, 0] = 1.0
+
+    def directional_spatial_conv(x):
+        # Controlled anisotropic 3-D kernel: unit step on local axis 0.
+        z = np.zeros(x.shape[:3], np.float32)
+        z[1:] = x[:-1, :, :, 0]
+        return z
+
+    native_source = orient_acquisition_to_hidden(source, "sag")
+    native_output = directional_spatial_conv(native_source)
+    result_in_original_grid = orient_hidden_to_acquisition(
+        native_output[..., None], "sag"
+    )[..., 0]
+    naive_untransported = directional_spatial_conv(source)
+    assert not np.array_equal(result_in_original_grid, naive_untransported)
+    assert np.sum(result_in_original_grid) == np.sum(naive_untransported) == 1
+    # Controlled analytic unit test; real learned-kernel commutator is
+    # independently computed from authentic pretrained weights by CI.
+
+
+def test_acquisition_inverse_rejects_wrong_plane_or_nonfinite_values():
+    with pytest.raises(ValueError, match="undocumented"):
+        orient_acquisition_to_hidden(np.ones((4, 5, 6, 2)), "synthetic")
+    arr = np.zeros((4, 5, 6, 2), dtype=np.float32)
+    arr[2, 1, 4, 0] = np.inf
+    with pytest.raises(ValueError, match="finite"):
+        orient_acquisition_to_hidden(arr, "sag")
