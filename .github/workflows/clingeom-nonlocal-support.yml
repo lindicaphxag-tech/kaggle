@@ -1,0 +1,36 @@
+name: ClinGeom nonlocal spatial dependency proof
+
+on:
+  pull_request:
+    paths:
+      - "research/medical_geometry/torch_geometry.py"
+      - "research/medical_geometry/torch_fx_bundle.py"
+      - "research/medical_geometry/test_nonlocal_spatial_support.py"
+      - ".github/workflows/clingeom-nonlocal-support.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  support-soundness:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install CPU-only tensor and geometry dependencies
+        run: |
+          python -m pip install "numpy>=1.26,<3" pytest scipy
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+      - name: Prove nonlocal statistics and correct receptive support
+        run: |
+          PYTHONPATH=. python -m pytest -q research/medical_geometry/test_nonlocal_spatial_support.py
+          PYTHONPATH=. python -m pytest -q research/medical_geometry/test_torch_geometry.py research/medical_geometry/test_torch_fx_bundle.py
+      - name: Check source compilation
+        run: python -m compileall -q research/medical_geometry/torch_geometry.py research/medical_geometry/torch_fx_bundle.py research/medical_geometry/test_nonlocal_spatial_support.py
