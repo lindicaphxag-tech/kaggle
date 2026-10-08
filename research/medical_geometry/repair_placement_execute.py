@@ -81,13 +81,16 @@ def rewrite_two_phase_fusion(
     patient_frame_uid: str,
     world_hessian_bounds_by_channel_start: dict[int, float],
     maximum_output_value_error: float,
+    authorized_site_costs: dict[str, int] | None = None,
 ) -> ExecutedPlacementRewrite:
     """Compile and execute exactly one pre-mix transport insertion.
 
     This supports only a two-phase graph with one unbranched cat -> 1x1
-    pointwise mixer -> output. A min-cut chooses the independently certified
-    cat repair site; FX is rewritten only after the minimum-cut and physical
-    interpolation certificates pass.
+    pointwise mixer -> output. A min-cut chooses between a single pre-mix
+    repair after cat and TWO independent repairs before cat, using caller-
+    supplied positive integer planning costs. The physical plans and error
+    obligations are verified before the minimum-cut/FX rewrite. Costs are
+    user-supplied proxies, not measured latency or clinical utility.
     """
     if model.training or any(p.requires_grad for p in model.parameters()):
         raise ValueError("rewrite requires a frozen eval-mode model")
@@ -97,6 +100,13 @@ def rewrite_two_phase_fusion(
         raise ValueError("invalid output value error budget")
     if not isinstance(world_hessian_bounds_by_channel_start, dict):
         raise ValueError("per-fiber uniform curvature premises must be explicit")
+    if authorized_site_costs is None:
+        authorized_site_costs = {"cat": 1}
+    if (not isinstance(authorized_site_costs, dict)
+            or not authorized_site_costs
+            or set(authorized_site_costs) - {"cat", "left", "right"}
+            or any(type(v) is not int or v <= 0 for v in authorized_site_costs.values())):
+        raise ValueError("authorized repair sites need positive integer costs")
 
     try:
         report = compile_fx_bundle_geometry(
@@ -201,6 +211,7 @@ def rewrite_two_phase_fusion(
         "world_hessian_premises": sorted(world_hessian_bounds_by_channel_start.items()),
         "max_output_error": maximum_output_value_error,
         "derived_error": errors,
+        "authorized_site_costs": sorted(authorized_site_costs.items()),
         "mixer_weights": hashlib.sha256(
             mixer.weight.detach().cpu().contiguous().numpy().tobytes()
         ).hexdigest(),
@@ -208,28 +219,60 @@ def rewrite_two_phase_fusion(
     digest = hashlib.sha256(json.dumps(
         inputs, sort_keys=True, separators=(",", ":"), allow_nan=False
     ).encode()).hexdigest()
+    site_names = {"cat": cat.name, "left": left.name, "right": right.name}
+    admitted = {
+        site_names[key]: AdmittedSite(cost=cost, proof_digest=digest)
+        for key, cost in authorized_site_costs.items()
+    }
     placement = plan_fx_repair_placement(
         gm, bad_sources=(left.name, right.name),
         irreversible_fusions=(mixer_node.name,),
-        admitted={cat.name: AdmittedSite(cost=1, proof_digest=digest)},
+        admitted=admitted,
     )
-    if placement.sites != (cat.name,):
-        raise RuntimeError("min-cut did not select the proved pre-fusion site")
+    if not (placement.sites == (cat.name,)
+            or placement.sites == tuple(sorted((left.name, right.name)))):
+        raise RuntimeError("unexpected repair cut; refusing partial branch authority")
 
-    # All preflight checks above succeed before touching the graph.
+    # Graph modifications begin only after all candidate proofs and min-cut
+    # postconditions succeeded. The original nn.Module remains unmodified.
     module_name = "_clingeom_certified_pre_mix"
     if hasattr(gm, module_name):
         raise ValueError("module name collision: refusing overwrite")
-    gm.add_module(module_name, FixedFiberTransport(source, target, plans))
-    with gm.graph.inserting_before(mixer_node):
-        aligned = gm.graph.call_module(module_name, args=(cat,))
-    mixer_node.args = (aligned,)
+    if placement.sites == (cat.name,):
+        gm.add_module(module_name, FixedFiberTransport(source, target, plans))
+        with gm.graph.inserting_before(mixer_node):
+            aligned = gm.graph.call_module(module_name, args=(cat,))
+        mixer_node.args = (aligned,)
+        repair_node_name = aligned.name
+    else:
+        # The repair plans are independently tied to each branch's real
+        # patient-space phase; do not move a shared mixed tensor post-fusion.
+        for i, (node, plan) in enumerate(((left, plans[0]), (right, plans[1]))):
+            name = f"{module_name}_branch_{i}"
+            if hasattr(gm, name):
+                raise ValueError("repair module name collision")
+            gm.add_module(name, LatticeRepair3d(plan))
+            with gm.graph.inserting_before(cat):
+                repaired = gm.graph.call_module(name, args=(node,))
+            node.replace_all_uses_with(repaired)
+            # replace_all_uses_with also rewires the new module's own input;
+            # restore its original source explicitly.
+            repaired.args = (node,)
+        args = list(cat.args)
+        if args[0] not in ((left, right), [left, right]):
+            # Both cat inputs should now reference the two new repairs.
+            node_args = args[0]
+            if (not isinstance(node_args, (tuple, list))
+                    or len(node_args) != 2
+                    or any(not isinstance(n, fx.Node) for n in node_args)):
+                raise RuntimeError("branch repair broke concatenation")
+        repair_node_name = cat.name
     gm.graph.lint()
     gm.recompile()
     if (tuple(output_support.shape) != tuple(target.shape)
             or tuple(mixed_bundle.shape) != tuple(target.shape)):
         raise RuntimeError("post-rewrite patient-space lattice is inconsistent")
     return ExecutedPlacementRewrite(
-        gm, aligned.name, mixer_node.name, placement.sites,
+        gm, repair_node_name, mixer_node.name, placement.sites,
         output_support, errors, digest,
     )
