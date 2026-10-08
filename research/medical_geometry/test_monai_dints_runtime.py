@@ -131,3 +131,14 @@ def test_monai_real_runtime_has_tight_conditional_quadratic_envelope():
     assert metrics['naive_common_index_mean_absolute_error'] > (
         metrics['physically_repaired_mean_absolute_error']
     )
+
+
+def test_bitwise_identical_post_fusion_tensors_cannot_recover_both_worlds():
+    from research.medical_geometry.benchmark_monai_bitwise_identical_fusion import run
+    result=run()
+    assert result['post_fusion_tensors_bitwise_equal'] is True
+    assert result['post_fusion_max_abs_difference'] == 0
+    assert result['correct_patient_target_difference'] == 0.5
+    assert result['minimax_lower_bound_for_any_post_fusion_only_estimator'] == 0.25
+    assert result['premix_world_A_max_abs_error'] < 1e-6
+    assert result['premix_world_B_max_abs_error'] < 1e-6
