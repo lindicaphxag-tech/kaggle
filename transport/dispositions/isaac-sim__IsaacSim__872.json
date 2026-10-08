@@ -1,0 +1,15 @@
+{
+  "case_id": "isaac-sim/IsaacSim#872",
+  "claim_boundary": "An exclusion/disposition record is not a prospective mechanism success, external adoption, or L8/L9 credit.",
+  "disposition": "excluded_protocol_2_4_documentation_only_exact_mechanism_and_repair_exposed",
+  "disposition_frozen_at": "2026-10-08T01:51:59Z",
+  "disposition_sha256": "ca206d11ae343a2c64074c9659e8807893fd628db416ab1020fba37d10d69b17",
+  "disposition_within_sla": true,
+  "first_frozen_at": "2026-10-08T01:18:00Z",
+  "independence_class": "EXCLUDED",
+  "information_barrier": "Disposition uses only the already-frozen original issue title/body. Comments, linked workflow logs, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden before this freeze.",
+  "prediction_deadline_at": "2026-10-08T07:18:00Z",
+  "reason": "The frozen original issue is a documentation-only correction, not a new runtime semantic defect. It already explains that CPython defers Python SIGALRM callbacks while a GIL-holding native call does not return to the interpreter, identifies the os.alarm versus signal.alarm typo, provides a C/Python counterexample, and specifies external-process or native faulthandler watchdog remedies. No independent mechanism prediction remains.",
+  "schema_version": 1,
+  "source_surface_sha256": "77ca87b2f81aad2cc43de0ced0a6579b59e1c7a92dcb852b5936d8f6a8239700"
+}
