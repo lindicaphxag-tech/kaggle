@@ -1,0 +1,100 @@
+{
+  "schema": "clingeom.flagship.evidence.v1",
+  "snapshot_date": "2026-10-09",
+  "project": "ClinGeom — patient-space semantic repair",
+  "evidence_class": "author-operated public reproducibility; not external adoption",
+  "entries": [
+    {
+      "id": "P1",
+      "kind": "genuine_pretrained_model_export",
+      "source_project": "ecalabr/brain_mask",
+      "source_revision": "ca789fb26b70e359b61a8d52968813dd772fb4b1",
+      "pr": 46,
+      "head_sha": "05912df08b66db9e160ef23b7654061da77f16e7",
+      "run_id": 37718977979,
+      "artifact_id": 11524838113,
+      "metrics": {
+        "axial": {
+          "original": 1,
+          "repaired": 1
+        },
+        "coronal": {
+          "original": 0.0041171965,
+          "repaired": 1
+        },
+        "sagittal": {
+          "original": 0.3630825519,
+          "repaired": 1
+        }
+      },
+      "measurement": "Dice between the SAME learned prediction in the correct physical grid and the original vs repaired export; not segmentation accuracy",
+      "checkpoint": true,
+      "real_mri": true
+    },
+    {
+      "id": "P2",
+      "kind": "bitwise_fusion_indistinguishability",
+      "source_project": "Project-MONAI/MONAI",
+      "source_revision": "efb240ac97fcb619d842b2c7872d7db942eb7cd9",
+      "pr": 45,
+      "head_sha": "9ae4020d280dab443f5884a9fda8cb1270648c07",
+      "run_id": 37718214998,
+      "artifact_id": 11525235321,
+      "metrics": {
+        "postmix_float32_max_absolute_difference": 0,
+        "physically_intended_target_difference": 0.5,
+        "minimax_postmix_lower_bound": 0.25,
+        "premix_repair_max_absolute_error": 5.96e-8
+      },
+      "measurement": "constructed worlds, genuine MONAI/PyTorch operators and exact IEEE-754 collision; no trained-model improvement",
+      "checkpoint": false,
+      "real_mri": false
+    },
+    {
+      "id": "P3",
+      "kind": "upstream_native_source_fix_red_green",
+      "source_project": "ecalabr/brain_mask",
+      "source_revision": "ca789fb26b70e359b61a8d52968813dd772fb4b1",
+      "pr": 50,
+      "head_sha": "bc8430401596f6daecaff8fa48c066a26111b8c7",
+      "run_id": 37749615927,
+      "metrics": {
+        "python_versions": [
+          "3.10",
+          "3.12"
+        ],
+        "original_nonaxial_expected_failures_per_version": 8,
+        "patched_test_passes_per_version": 17
+      },
+      "measurement": "upstream-shaped patch tested inside author's own CI; NOT merged or reviewed by ecalabr",
+      "checkpoint": false,
+      "real_mri": false
+    },
+    {
+      "id": "P4",
+      "kind": "highdicom_uid_bridge_paired_patch",
+      "source_project": "ImagingDataCommons/highdicom",
+      "source_revision": "4524bb0b0c8b3141f6f5b26d047b8da43c69e61e",
+      "pr": 25,
+      "head_sha": "a9ee877cbb8559196628c2f74a441092542c2442",
+      "run_id": 37706342122,
+      "metrics": {
+        "affine_max_abs_error_before": 0,
+        "affine_max_abs_error_after": 0,
+        "uid_auto_roundtrip_before": false,
+        "uid_auto_roundtrip_after": true,
+        "explicit_override_after": true
+      },
+      "measurement": "source-local two-hunk patch on pinned highdicom PR revision; NOT accepted by highdicom maintainers",
+      "checkpoint": false,
+      "real_mri": false
+    }
+  ],
+  "attribution": {
+    "upstream_maintainer_adoption": false,
+    "independent_reproduction": false,
+    "clinical_accuracy_gain": false,
+    "arxiv_submission": false,
+    "reviewer_acceptance": false
+  }
+}
