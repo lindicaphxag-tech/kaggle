@@ -1,0 +1,36 @@
+name: Native MuJoCo semantic repair-authority identification
+
+on:
+  push:
+    branches:
+      - research/semrepair-native-mujoco-authority
+    paths:
+      - "research/semrepair/**"
+      - ".github/workflows/semrepair-native-mujoco.yml"
+  pull_request:
+    paths:
+      - "research/semrepair/**"
+      - ".github/workflows/semrepair-native-mujoco.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-physical-identification:
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.12", "3.13"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install fixed official CPU MuJoCo bindings
+        run: python -m pip install mujoco==3.3.7
+      - name: Native physical worlds, tap synthesis and repair closure
+        run: python research/semrepair/mujoco_native_authority.py
+      - name: Independent exact-rational oracle
+        run: python research/semrepair/independent_oracle.py
