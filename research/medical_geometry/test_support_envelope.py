@@ -11,7 +11,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from research.medical_geometry.clingeom import FeatureLattice
-from research.medical_geometry.lattice_bundle import ChannelFiber, LatticeBundle
+from research.medical_geometry.lattice_bundle import ChannelFiber, LatticeBundle, dense_conv_mix_bundle
 from research.medical_geometry.pre_mix_compiler import physically_align_then_mix
 from research.medical_geometry.support_envelope import (
     interpolation_receptive_envelope, premix_output_support_envelope,
@@ -125,3 +125,33 @@ def test_real_pytorch_anisotropic_pool_and_pointwise_mix_keep_wide_footprint():
         result.output_bundle.fibers[0].supports[0].receptive_field,
         target.receptive_field
     )
+
+
+def test_actual_3d_conv_sees_offcenter_impulse_hidden_by_center_only_provenance():
+    # REAL PyTorch ops: the pooled branch sees an off-center source voxel
+    # that the point branch does not see at the queried lattice center.
+    # Dense 1x1 fusion therefore depends on an expanded 3D input region,
+    # even though BOTH branches have the exact same output shape and centers.
+    x=torch.zeros((1,1,9,9,9),dtype=torch.float32)
+    x[0,0,4,2,4]=1.0
+    narrow=x
+    broad=F.avg_pool3d(x,kernel_size=(3,5,1),stride=1,padding=(1,2,0))
+    assert broad.shape==narrow.shape
+    with torch.no_grad():
+        mixer=nn.Conv3d(2,1,kernel_size=1,bias=False)
+        mixer.weight.fill_(1.0)
+        y=mixer(torch.cat((narrow,broad),dim=1))
+    assert x[0,0,4,4,4].item()==0.0
+    assert y[0,0,4,4,4].item()>0.0  # off-center source voxel matters
+
+    source=LatticeBundle((9,9,9),2,(
+        ChannelFiber(0,1,(_lattice(shape=(9,9,9),rf=(1,1,1)),),"point"),
+        ChannelFiber(1,2,(_lattice(shape=(9,9,9),rf=(3,5,1)),),"anisotropic-pool"),
+    ))
+    structural=dense_conv_mix_bundle(
+        source,out_channels=1,kernel_size=1,stride=1,padding=0
+    )
+    np.testing.assert_allclose(
+        structural.fibers[0].supports[0].receptive_field,[3.,5.,1.]
+    )
+    assert structural.fibers[0].supports[0].receptive_field[1]>1
