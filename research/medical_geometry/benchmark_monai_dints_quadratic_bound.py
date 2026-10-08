@@ -23,7 +23,7 @@ from research.medical_geometry.torch_fx_bundle import compile_fx_bundle_geometry
 def run() -> dict:
     spacing=(0.7,0.7,5.0)
     hessian=0.02
-    budget=0.10
+    budget=0.20
     patient_affine=np.diag([*spacing,1.0])
     block=FactorizedReduceBlock(in_channel=1,out_channel=2,spatial_dims=3)
     block.act=nn.Identity()
@@ -69,7 +69,7 @@ def run() -> dict:
     naive_error=(runtime[:,:,:3,:3,:3]-target_truth).abs()
     certified=guarded.conditional_value_error_bounds
     assert certified is not None and len(certified)==2
-    assert all(abs(b-0.097425)<2e-9 for b in certified)
+    assert all(abs(b-0.19485)<2e-9 for b in certified)
     assert float(actual_error.max()) <= max(certified)+2e-5
     assert float(actual_error.max()) >= max(certified)-2e-5
     assert float(naive_error.mean()) > float(actual_error.mean())
