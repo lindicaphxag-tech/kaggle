@@ -93,7 +93,7 @@ def _renamed_score(pred: np.ndarray, truth: np.ndarray, affine: np.ndarray):
     if measured is None:
         # All six methods MUST have the same number of scored ROIs; dropping
         # empty predictions selectively corrupts patient-wise HD95 rankings.
-        # Explicit fully finite, predeclared empty-mask policy:
+        # Explicit fully finite empty-mask correction adopted after initial pilot:
         # (both empty) => zero, (only one empty) => crop's physical diameter.
         vec = np.array([
             [x, y, z] for x in (-63., 63.) for y in (-63., 63.)
@@ -361,7 +361,7 @@ def run(source_root: Path, config: Path, checkpoint: Path,
         "real_original_pretrained_parameter_digest": parameter_digest,
         "model_loaded_once_and_all_weights_frozen": True,
         "threshold_predeclared": 0.5,
-        "physical_hd95_empty_policy_frozen": (
+        "hd95_analysis_amendment_after_initial_pilot": (
             "both masks empty: 0; exactly one empty: physical diagonal "
             "diameter of 64^3 crop; otherwise symmetric 95-percentile "
             "patient-world boundary distance; NEVER drop undefined ROI"
@@ -374,6 +374,8 @@ def run(source_root: Path, config: Path, checkpoint: Path,
         "patient_level_unit_not_crop_level_pseudoreplication": True,
         "reference_status": "source public datasets describe masks as manually corrected/refined; no independent rater verification",
         "only_crop_pilot_not_whole_volume": True,
+        "hd95_policy_originally_had_arm_specific_missingness": True,
+        "initial_run_metric_change_is_posthoc_correction_not_preregistered": True,
         "training_or_hyperparameter_search_on_holdout": False,
         "claimed_to_outperform_strong_baselines": False,
         "clinical_accuracy_claim": False,
