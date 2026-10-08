@@ -184,6 +184,20 @@ jobs:
         with:
           name: clingeom-monai-weight-curvature-evidence
           path: monai-weight-curvature.json
+      - name: Certify unchanged default ReLU/InstanceNorm MONAI topology
+        run: |
+          python -m pytest -q research/medical_geometry/test_default_monai_curvature.py
+          PYTHONPATH=. python research/medical_geometry/benchmark_default_monai_curvature.py | tee default-monai-conditional-c2.json
+          {
+            echo '### Conditional Hessian transport through actual default MONAI activation and normalization'
+            echo '```json'
+            cat default-monai-conditional-c2.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: clingeom-default-monai-conditional-c2
+          path: default-monai-conditional-c2.json
       - name: Upload pinned MONAI witness
         uses: actions/upload-artifact@v4
         with:
