@@ -94,6 +94,7 @@ jobs:
             research/medical_geometry/test_torch_repair_dtype.py \
             research/medical_geometry/test_channel_fiber_runtime.py \
             research/medical_geometry/test_pre_mix_compiler.py \
+            research/medical_geometry/test_support_envelope.py \
             research/medical_geometry/test_torch_repair_certificate.py \
             research/medical_geometry/test_fx_geometry.py \
             research/medical_geometry/test_fx_rewrite.py \
