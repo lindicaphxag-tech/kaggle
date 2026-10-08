@@ -1,0 +1,36 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "CreaV",
+      "body": "Hello AlpaSim Challenge organizers,\n\nOur team registration has already been approved, and we would like to add a teammate as an additional submitter. We understand that the submitter roster is frozen after approval except by administrator exception.\n\nCould you please advise whether adding a submitter is possible and, if so, how we should request an exception? What information would you need from us, and is there a private channel for sharing team or account details?\n\nThank you for your help.",
+      "created_at": "2026-10-08T06:51:43Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/197",
+      "id": "NVlabs/alpasim#197",
+      "issue_number": 197,
+      "labels": [],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "d1e9ed24cec1b26e40f171cee0cfad02c3ad2b50df5166c5b6a71629f2cc364f",
+      "title": "[AlpaSim E2E Challenge 2026] How can an approved team add a submitter?"
+    },
+    {
+      "author_login": "PannagaS",
+      "body": "## Feature request\n\n#### Feature description\nNone of the parameters in nav2_smoother (SimpleSmoother, SavitzkyGolaySmoother, or the SmootherServer itself) are dynamically reconfigurable. Every tuning change requires a lifecycle restart. In #4907 the smoother server and plugins were called out as still not using the ParameterHandler pattern, but they were out of scope for that ticket because they had no dynamic parameters to migrate in the first place.\n\n#### Implementation considerations\nI'd like to take this on. My own use has been with `nav2_constrained_smoother`, where retuning the optimizer weights currently means a lifecycle restart each time, which is slow when iterating on a real robot. That package has the same gap (it reads its parameter structs once in configure() and has no dynamic callbacks), and in #4907 @SteveMacenski mentioned it uses a different model that may be worth updating. I'd propose doing this in two steps: first the nav2_smoother server and its two bundled plugins to establish the ParameterHandler pattern, then nav2_constrained_smoother as a follow-up PR once the pattern is agreed on.\n\n#### Implementation considerations\n- Follow the `nav2_util::ParameterHandler<ParamsT>` pattern already used by nav2_planner and nav2_navfn_planner: a Parameters struct, on_set validation, post_set update under the handler mutex, activate/deactivate from the lifecycle node, and a mutex lock at the top of smooth().\n- `SavitzkyGolaySmoother` needs validation that window_size stays odd and >= 3, and a coefficient recompute when window_size or poly_order change.\n- `SmootherServer`'s own parameters (costmap_topic, footprint_topic, robot_base_frame, transform_tolerance, smoother_plugins) are structural, so there is nothing to make dynamic at the server level. Open question: add a thin handler anyway for consistency with the other servers, or leave the server untouched and only update the plugins.\n- Add a `test_dynamic_parameters.cpp` per plugin matching the pattern in `nav2_planner`, and update the docs pages to mark parameters dynamic.\n- Would like to contribute to main (Rolling); Jazzy and Kilted would need a backport as they don't have the ParameterHandler base class. \n\n",
+      "created_at": "2026-10-08T03:43:33Z",
+      "html_url": "https://github.com/ros-navigation/navigation2/issues/6628",
+      "id": "ros-navigation/navigation2#6628",
+      "issue_number": 6628,
+      "labels": [],
+      "repository": "ros-navigation/navigation2",
+      "surface_sha256": "8d237d323c132e82c7189ecb39bc0fbeaa4c3df3ec28e685b57f4ddef25bd12b",
+      "title": "Add dynamic parameter support for nav2_smoother_server"
+    }
+  ],
+  "post_activation_issue_identities_observed": 36,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-08T07:17:50Z",
+  "schema_version": 1
+}

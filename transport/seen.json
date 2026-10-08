@@ -522,6 +522,28 @@
       "source": "inbox/FIRST_SEEN_20261008T011800Z.json",
       "status": "excluded_protocol_2_4_documentation_only_exact_mechanism_and_repair_exposed",
       "surface_sha256": "77ca87b2f81aad2cc43de0ced0a6579b59e1c7a92dcb852b5936d8f6a8239700"
+    },
+    {
+      "created_at": "2026-10-08T06:51:43Z",
+      "first_frozen_at": "2026-10-08T07:17:50Z",
+      "id": "NVlabs/alpasim#197",
+      "issue_number": 197,
+      "prediction_deadline_at": "2026-10-08T13:17:50Z",
+      "repository": "NVlabs/alpasim",
+      "source": "inbox/FIRST_SEEN_20261008T071750Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "d1e9ed24cec1b26e40f171cee0cfad02c3ad2b50df5166c5b6a71629f2cc364f"
+    },
+    {
+      "created_at": "2026-10-08T03:43:33Z",
+      "first_frozen_at": "2026-10-08T07:17:50Z",
+      "id": "ros-navigation/navigation2#6628",
+      "issue_number": 6628,
+      "prediction_deadline_at": "2026-10-08T13:17:50Z",
+      "repository": "ros-navigation/navigation2",
+      "source": "inbox/FIRST_SEEN_20261008T071750Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "8d237d323c132e82c7189ecb39bc0fbeaa4c3df3ec28e685b57f4ddef25bd12b"
     }
   ]
 }
