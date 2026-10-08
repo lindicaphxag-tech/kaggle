@@ -1,0 +1,37 @@
+name: SemRepair cross-repository frozen reproduction
+
+on:
+  push:
+    branches:
+      - research/semrepair-cross-repo-reproduction
+      - main
+    paths:
+      - "research/semrepair/**"
+      - ".github/workflows/semrepair-crossrepo-reproduction.yml"
+  pull_request:
+    paths:
+      - "research/semrepair/**"
+      - ".github/workflows/semrepair-crossrepo-reproduction.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cross-repo:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Compile external verifier
+        run: python -m py_compile research/semrepair/reproduce_crossrepo.py
+      - name: Prove falsified result rejection
+        run: python research/semrepair/reproduce_crossrepo.py --self-test
+      - name: Independently clone pinned artifact and verify result
+        run: python research/semrepair/reproduce_crossrepo.py
