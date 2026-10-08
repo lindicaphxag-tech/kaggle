@@ -8,6 +8,9 @@ on:
       - "research/medical_geometry/upstream_repros/test_brainmask_pretrained_weakmask_eval.py"
       - "research/medical_geometry/upstream_repros/brainmask_pretrained_plane_fusion.py"
       - "research/medical_geometry/upstream_repros/test_brainmask_pretrained_plane_fusion.py"
+      - "research/medical_geometry/upstream_repros/brainmask_true_hidden_fusion.py"
+      - "research/medical_geometry/upstream_repros/test_brainmask_true_hidden_fusion.py"
+      - "research/medical_geometry/upstream_repros/REAL_TRAINED_HIDDEN_FUSION_RESULT.md"
       - "research/medical_geometry/upstream_repros/REAL_PRETRAINED_PLANE_FUSION_RESULT.md"
       - "research/medical_geometry/upstream_repros/BRAINMASK_LEARNED_INFERENCE.md"
       - ".github/workflows/clingeom-brainmask-pretrained-planes.yml"
@@ -71,6 +74,7 @@ jobs:
         run: |
           python -m pytest -q research/medical_geometry/upstream_repros/test_brainmask_pretrained_weakmask_eval.py
           python -m pytest -q research/medical_geometry/upstream_repros/test_brainmask_pretrained_plane_fusion.py
+          python -m pytest -q research/medical_geometry/upstream_repros/test_brainmask_true_hidden_fusion.py
       - name: Execute real trained model with unchanged native TF extraction/reconstruction
         run: |
           python -m research.medical_geometry.upstream_repros.brainmask_pretrained_native_export \
@@ -141,6 +145,39 @@ jobs:
             cat artifacts/learned/pretrained_plane_fusion.json
             echo '~~~'
           } >> "$GITHUB_STEP_SUMMARY"
+      - name: Intervene on REAL learned internal features before frozen pretrained head
+        run: |
+          python -m research.medical_geometry.upstream_repros.brainmask_true_hidden_fusion \
+            --source-root original \
+            --image real_t1.nii.gz \
+            --provided-mask provided_brain_mask.nii.gz \
+            --config t1.yml \
+            --checkpoint official.hdf5 \
+            --predictions-root artifacts/learned \
+            --output artifacts/learned/authentic_hidden_feature_fusion.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("artifacts/learned/authentic_hidden_feature_fusion.json").read_text())
+          assert d["true_trained_internal_hidden_features"]
+          assert d["hidden_channels"] >= 2
+          assert d["all_original_weights_frozen"]
+          assert not d["feature_channel_equivariance_proven"]
+          assert not d["trained_model_accuracy_improvement_claimed"]
+          for k in ("ax","cor","sag"):
+              z=d["per_plane_oracles"][k]
+              assert z["trained_model_to_replayed_classifier_max_abs_error"] <= 2e-5
+              assert z["new_source_forward_to_prior_export_max_abs_error"] <= 2e-5
+              assert z["inverse_plane_feature_head_to_native_patched_export_max_abs_error"] <= 2e-5
+          print("PASS: real learned encoder features, authentic frozen classifier and nonclaims")
+          PY
+          {
+            echo "### Authentic pretrained hidden features before frozen 1x1x1 head"
+            echo "Three independent orientations; one MRI, one frozen model; provided weak mask is not expert ground truth."
+            echo '~~~json'
+            cat artifacts/learned/authentic_hidden_feature_fusion.json
+            echo '~~~'
+          } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
           name: ClinGeom-brainmask-actual-learned-export-original-and-fixed
@@ -149,5 +186,6 @@ jobs:
             artifacts/learned/native_pretrained_export_figure.png
             artifacts/learned/pretrained_weak_reference_export_metrics.json
             artifacts/learned/pretrained_plane_fusion.json
+            artifacts/learned/authentic_hidden_feature_fusion.json
           if-no-files-found: error
           retention-days: 60
