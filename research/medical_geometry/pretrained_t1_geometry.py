@@ -156,7 +156,21 @@ def main():
     params.train_dims=[64,64,64]
     params.policy=tf.keras.mixed_precision.Policy("float32")
     model=Networks(params)()
+    # Independent proof that the official HDF5 checkpoint actually populates
+    # model parameters; simply calling load_weights is not enough evidence.
+    before_weights=[
+        np.asarray(w.numpy()).copy() for w in model.weights
+    ]
     model.load_weights(str(args.checkpoint))
+    after_weights=[np.asarray(w.numpy()) for w in model.weights]
+    modified_variables=sum(
+        not np.array_equal(x, y) for x, y in zip(before_weights, after_weights)
+    )
+    if modified_variables <= 0:
+        raise AssertionError("No pretrained parameters changed after checkpoint load")
+    model_parameters_sha256=hashlib.sha256(
+        b"".join(np.ascontiguousarray(w).tobytes() for w in after_weights)
+    ).hexdigest()
     data_in=np.ascontiguousarray(crop)[None,:,:,:,None]
     prediction=np.asarray(model(data_in,training=False).numpy())
     if prediction.shape!=(1,64,64,64,1):
@@ -186,6 +200,8 @@ def main():
         "provided_mask_foreground_count":int(provided.sum()),
         "prediction_vs_provided_mask_dice_not_expert_gt":float(dice(learned,provided)),
         "model_weight_load":"completed without skip_mismatch or by_name",
+        "checkpoint_changed_variable_count":int(modified_variables),
+        "model_loaded_parameters_sha256":model_parameters_sha256,
         "clinical_ground_truth":False,
         "task_performance_improvement":False,
         "independent_external_reproduction":False
