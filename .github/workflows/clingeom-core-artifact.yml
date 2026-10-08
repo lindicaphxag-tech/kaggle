@@ -212,6 +212,19 @@ jobs:
         with:
           name: clingeom-monai-nonidentifiable-fusion
           path: monai-nonidentifiable-fusion.json
+      - name: Prove bitwise exact post-fusion collision in actual MONAI float32
+        run: |
+          PYTHONPATH=. python research/medical_geometry/benchmark_monai_bitwise_identical_fusion.py | tee monai-bitwise-collision.json
+          {
+            echo '### Exact float32 indistinguishability after fusion'
+            echo '```json'
+            cat monai-bitwise-collision.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: clingeom-monai-exact-float32-collision
+          path: monai-bitwise-collision.json
       - name: Upload pinned MONAI witness
         uses: actions/upload-artifact@v4
         with:
