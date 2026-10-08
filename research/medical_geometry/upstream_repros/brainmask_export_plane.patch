@@ -1,0 +1,31 @@
+diff --git a/predict.py b/predict.py
+--- a/predict.py
++++ b/predict.py
+@@ -29,7 +29,27 @@
+ 
+     # 3D inference
+     predictions = reconstruct_infer_patches_3d(predictions, infer_dir, params)
++
++    # The inference loader permutes coronal/sagittal arrays into a model
++    # coordinate convention. Reverse that mapping *before* assigning the
++    # unmodified source NIfTI affine or applying source-grid masks.
++    if params.resample_spacing or params.load_shape:
++        raise ValueError(
++            "Prediction export cannot reuse the source affine after "
++            "resample_spacing/load_shape without an inverse spatial transform"
++        )
++    if params.data_plane == "cor":
++        predictions = np.transpose(predictions, (0, 2, 1))
++    elif params.data_plane == "sag":
++        predictions = np.transpose(predictions, (2, 0, 1))
++    elif params.data_plane != "ax":
++        raise ValueError(f"Unsupported data_plane for NIfTI export: {params.data_plane}")
++    if tuple(predictions.shape) != tuple(nii1.shape[:3]):
++        raise ValueError(
++            f"Prediction shape {predictions.shape} does not match source "
++            f"image shape {nii1.shape[:3]} after inverse plane transform"
++        )
+ 
+     # mask predictions based on provided mask
+     if mask:
+         mask_nii = glob(infer_dir + '/*' + mask + '.nii.gz')[0]
