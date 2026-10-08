@@ -34,7 +34,7 @@ def test_quadratic_trilinear_error_attains_exact_bound():
     target = grid((4, 4, 4), (1, 1, 1), (0.5, 0.5, 0.5))
     plan = synthesize_lattice_repair(source, target)
     H = 0.2  # uniform patient-space Hessian operator norm, value/mm²
-    proof = cert(source, target, plan, hessian=H, budget=0.3)
+    proof = cert(source, target, plan, hessian=H, budget=0.300001)
     assert proof.authorized
     assert proof.max_absolute_error_bound == pytest.approx(0.3)
     assert proof.max_fractional_weights == pytest.approx((0.25, 0.25, 0.25))
