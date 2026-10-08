@@ -94,3 +94,29 @@ learned representation equivalence, clinical safety or downstream Dice.
 
 Since there is no third-party reproduction yet, all passing runs remain
 **author-operated software evidence**, not independent adoption.
+
+## Prior art and novelty boundary (October 2026)
+
+Neural-network derivative/curvature bound propagation is **prior art**:
+
+- Entesari & Fazlyab, *Hierarchical End-to-End Taylor Bounds for Complete
+  Neural Network Verification*, L4DC 2026:
+  https://proceedings.mlr.press/v331/entesari26a.html
+- Shi et al., *Efficiently Computing Local Lipschitz Constants of Neural
+  Networks via Bound Propagation*, 2022:
+  https://arxiv.org/abs/2210.07394
+
+So neither `sum |W| B` nor compositional smooth-network certification
+is claimed as newly discovered by ClinGeom. Moreover, MONAI DiNTS ships
+with ReLU activation and instance normalization by default; the current
+method explicitly replaces them with identity in its controlled-weight
+experiment and refuses to certify the default model using this linear rule.
+
+The falsifiable research hypothesis is whether **combining patient-space
+channel-fiber types, explicit numerical semantics, admitted model-weight
+proof obligations, domain checks and an actually executed repair** yields
+new practical guarantees or upstream bug prevention not delivered by
+existing general-purpose bounds alone. Meaningful next evidence requires
+either a justified bound across a real trained model's operations or an
+external reproducible failure/fix. Controlled-weight CI is necessary but
+not sufficient for a major medical-AI paper.
