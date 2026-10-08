@@ -64,6 +64,23 @@ The self-test deliberately tampers with numeric cost, refusal status, implementa
 
 [Cross-repository CI](https://github.com/lindicaphxag-tech/kaggle/actions/workflows/semrepair-crossrepo-reproduction.yml) repeats this on Python 3.10 / 3.12 / 3.13, separate from the [origin artifact CI run 37471167749](https://github.com/lindicaphxag-tech/Isaac-GR00T/actions/runs/37471167749). Both are still author-operated CI; this is **not** a new independent third-party replication count.
 
+## October 2026 novelty audit
+
+The closely related [GaugeBench paper (2026-10-06)](https://arxiv.org/abs/2610.07597)
+already studies physically equivalent robot-description changes and exact
+two-description policy transport. [ExecSpec (2026-06)](https://arxiv.org/abs/2606.03724)
+already treats action unnormalization and controller convention as an
+executable-policy specification concern. Those results are **prior art, not
+SemRepair inventions**.
+
+The narrower research hypothesis is **active identification of unknown
+semantic contracts up to a concrete repair-authority class**, with
+risk-bounded probe/tap evidence and mandatory refusal under
+unidentifiability. See the
+[claim restrictions and blinded-experiment kill criteria](GAUGEBENCH_NOVELTY_AUDIT_2026_10.md).
+The existing native MuJoCo case is a controlled structural witness, **not yet
+the blinded cross-stack test required to establish a new general method**.
+
 ## Why it matters
 
 A robot pipeline can contain two locally incorrect transformations whose errors cancel at the end. An output-only evaluator may see the same physical result before and after both defects, even though repairing just one component makes execution worse.
