@@ -96,6 +96,7 @@ jobs:
             research/medical_geometry/test_pre_mix_compiler.py \
             research/medical_geometry/test_support_envelope.py \
             research/medical_geometry/test_exact_declared_chart_witness.py \
+            research/medical_geometry/test_executed_premix_witness.py \
             research/medical_geometry/test_semantic_certificate_binding.py \
             research/medical_geometry/test_torch_repair_certificate.py \
             research/medical_geometry/test_fx_geometry.py \
