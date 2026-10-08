@@ -1,0 +1,64 @@
+name: ClinGeom external manually refined MRI cohort (independent)
+
+on:
+  pull_request:
+    paths:
+      - "research/medical_geometry/upstream_repros/fetch_external_expert_holdout.py"
+      - "research/medical_geometry/upstream_repros/brainmask_external_annotated.py"
+      - ".github/workflows/clingeom-external-annotated.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  externally-annotated-t1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      CUDA_VISIBLE_DEVICES: "-1"
+      TF_CPP_MIN_LOG_LEVEL: "2"
+      TF_NUM_INTEROP_THREADS: "2"
+      TF_NUM_INTRAOP_THREADS: "2"
+      OMP_NUM_THREADS: "2"
+      HF_HUB_DISABLE_TELEMETRY: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install public MRI/source metadata and NIfTI validation
+        run: |
+          python -m pip install "numpy==1.24.3" "scipy==1.9.3" "nibabel==3.2.2" "huggingface_hub==0.35.3" "pyyaml==6.0" "pytest==7.4.4"
+      - name: Acquire independently released annotated T1 MRIs without reading masks for selection
+        run: |
+          python -m research.medical_geometry.upstream_repros.fetch_external_expert_holdout \
+            --output-root external_holdout --synthstrip-subjects 2
+          python - <<'PY'
+          import json
+          import nibabel as nib
+          import numpy as np
+          from pathlib import Path
+          manifest=json.loads(Path("external_holdout/external_subject_manifest.json").read_text())
+          assert manifest["data_selection_label_blind"]
+          assert len(manifest["subjects"]) == 3
+          assert len(set(r["independent_subject"] for r in manifest["subjects"])) == 3
+          for case in manifest["subjects"]:
+              folder=Path(case["directory"])
+              x=nib.load(str(folder/"image.nii.gz"))
+              y=nib.load(str(folder/"mask.nii.gz"))
+              if x.shape != y.shape or not np.allclose(x.affine,y.affine,rtol=0,atol=1e-4):
+                  raise ValueError("External manually refined annotation is not exactly in input MRI physical grid")
+              if min(x.shape) < 64:
+                  raise ValueError("No common 64-cube available")
+              if not np.isfinite(x.affine).all() or abs(np.linalg.det(x.affine[:3,:3]))<1e-8:
+                  raise ValueError("Invalid MRI patient-space affine")
+          print("PASS three external independent public source MRI+label pairs in matching patient grids")
+          PY
+      - name: Publish provenance-only external dataset audit (never raw MRI)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ClinGeom-external-annotation-provenance
+          path: external_holdout/external_subject_manifest.json
+          if-no-files-found: error
+          retention-days: 60
