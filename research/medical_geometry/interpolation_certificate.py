@@ -43,9 +43,6 @@ def _max_fractional_weight(source_coord: np.ndarray) -> float:
     # For a grid node exactly at an integer, alpha = 0; at non-integers the
     # interpolation shape weights are alpha and 1-alpha.
     fractional = np.mod(source_coord, 1.0)
-    fractional = np.where(
-        np.isclose(fractional, 1.0, atol=1e-12, rtol=0), 0.0, fractional
-    )
     return float(np.max(fractional * (1.0 - fractional)))
 
 
@@ -123,7 +120,7 @@ def certify_interpolation_error(
     weights = tuple(weights)
     M = tuple(hessian_bound * length**2 for length in lengths)
     bound = 0.5 * float(sum(w * m for w, m in zip(weights, M)))
-    accepted = bound <= maximum_allowed_error + 1e-12
+    accepted = bound <= maximum_allowed_error
     return result(
         accepted, bound, M, weights,
         "curvature-conditional bound within budget" if accepted else
