@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - research/semrepair-frozen-policy-transfer-evidence-v1
+      - research/stateful-frozen-policy-review-packet
+      - main
     paths:
       - "research/semrepair/policy-transfer/**"
       - ".github/workflows/semrepair-frozen-policy-transfer-audit.yml"
