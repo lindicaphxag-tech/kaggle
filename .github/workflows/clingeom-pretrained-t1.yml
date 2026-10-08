@@ -70,6 +70,8 @@ jobs:
           assert d["weights"]["git_blob"]=="6ac54600739585f54d9f612d13264b74965ffd33"
           assert d["model_architecture"]=="Unet3dBneck"
           assert d["model_weight_load"]=="completed without skip_mismatch or by_name"
+          assert d["checkpoint_changed_variable_count"]>0
+          assert len(d["model_loaded_parameters_sha256"])==64
           assert len(d["prediction_probability_sha256"])==64
           assert 0<=d["prediction_foreground_count"]<=64**3
           assert d["clinical_ground_truth"] is False
