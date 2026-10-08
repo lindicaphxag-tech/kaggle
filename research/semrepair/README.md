@@ -102,6 +102,47 @@ When two surviving hypotheses require different repairs and cannot be separated 
 
 This is a narrow embodied-systems contribution. We do **not** claim invention of active diagnosis, equivalence-class determination, value of information, fault masking, general proof-carrying actions, or executable policy metadata.
 
+## Bounded-error counterexample and a corrected active diagnosis game
+
+The pinned Semantic ABI v0.1 solver's nonzero-`observation_atol`
+branch conservatively *coalesces the connected components* of overlapping
+observation balls. This does **not** introduce false authorization, but it
+can create **false unidentifiability** and therefore does not solve the
+original worst-case observation game optimally.
+
+[Exact-rational counterexample and minimax correction](noisy_authority_game.py):
+
+```bash
+python research/semrepair/noisy_authority_game.py
+```
+
+Four hidden worlds with distinct concrete repair authorities each produce
+a scalar observation interval of radius `1` per admissible probe. Two
+different probes have overlap graphs that are **each connected**, so naive
+transitive merging collapses each to one non-informative outcome. Yet for
+any actual observation of probe A, the surviving worlds form at most a
+two-world candidate set; the second probe separates every such candidate
+pair. An exact closed-interval cell decomposition and worst-case
+belief-set dynamic program verifies **minimum worst-case diagnostic cost 2**,
+with no unsafe authority leaves.
+
+Unlike a deterministic outcome *partition*, set-valued noisy observations
+produce **overlapping successor belief sets**. The new solver keeps these
+successors distinct and minimizes cost against every admissible adversarial
+observation. It preserves closed-interval touching endpoints; it refuses
+diagnosis if risk rules prohibit the second probe or observation radius
+increases to `3/2`.
+
+**Claim boundary:** the original v0.1 deterministic examples (error radius
+zero) are not retroactively changed. The correction applies to finite
+scalar bounded-adversarial-error models and the *worst-case*, not the
+uniform-expectation stochastic objective (which would require a likelihood).
+Adaptive set-valued diagnosis and exact minimax decision games are
+established algorithmic ideas; the embodied contribution hypothesis
+remains the mapping to concrete repair authorities, admissible robot
+probe/tap signals, risk budgets and refusal. No arbitrary robot-safety
+theorem or external adoption is claimed.
+
 ## Native MuJoCo: hidden semantics under controller nuisance
 
 The finite four-world example above uses a frozen experiment table. The more
