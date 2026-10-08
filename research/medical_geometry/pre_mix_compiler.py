@@ -73,6 +73,7 @@ def physically_align_then_mix(
             raise ValueError("output-error authorization requires per-fiber bound")
         if not np.isfinite(maximum_output_value_error) or maximum_output_value_error < 0:
             raise ValueError("invalid maximum output error budget")
+    output_support = premix_output_support_envelope(source_bundle, target)
     aligned = repair_channel_fibers(
         channel_tensor, source_bundle, target,
         role="feature",
@@ -98,7 +99,6 @@ def physically_align_then_mix(
     output = mixer(aligned.tensor)
     if tuple(output.shape[-3:]) != tuple(target.shape):
         raise RuntimeError("pointwise mixer violated target shape")
-    output_support = premix_output_support_envelope(source_bundle, target)
     digest = sha256(b"clingeom-pre-mix-1x1-support-envelope-v2")
     for p in (mixer.weight, mixer.bias):
         if p is None:
