@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from hashlib import sha256
+import json
 from typing import Mapping
 
 import numpy as np
@@ -57,6 +58,7 @@ def physically_align_then_mix(
     maximum_fiber_value_error: float | None = None,
     fiber_world_hessian_bounds: Mapping[int, float] | None = None,
     maximum_output_value_error: float | None = None,
+    patient_frame_uid: str | None = None,
 ) -> CertifiedPreMixResult:
     """Move admitted dense fusion AFTER certified physical sampling.
 
@@ -65,6 +67,26 @@ def physically_align_then_mix(
     This proves conditional error from sampling, not equivalence to the
     original phase-misaligned network or downstream model performance.
     """
+    # Reject malformed physical charts even if a caller did not request a
+    # numerical error bound: the physical identity is still part of the
+    # semantic provenance of any returned "certified" output.
+    if input_voxel_to_patient_mm is not None:
+        patient_affine = np.asarray(input_voxel_to_patient_mm, dtype=np.float64)
+        if (patient_affine.shape != (4, 4)
+                or not np.all(np.isfinite(patient_affine))
+                or not np.allclose(
+                    patient_affine[3], [0.0, 0.0, 0.0, 1.0],
+                    rtol=0, atol=1e-12,
+                )
+                or np.linalg.matrix_rank(patient_affine[:3, :3]) != 3):
+            raise ValueError("patient affine must be finite, invertible 4x4")
+    else:
+        patient_affine = None
+    if patient_frame_uid is not None and (
+        not isinstance(patient_frame_uid, str)
+        or not patient_frame_uid.strip()
+    ):
+        raise ValueError("patient frame UID must be nonblank if supplied")
     mixer = _check_pointwise_dense_mix(mixer, source_bundle.channels)
     if not channel_tensor.is_floating_point():
         raise ValueError("dense continuous-feature mixing requires a floating tensor")
@@ -99,7 +121,38 @@ def physically_align_then_mix(
     output = mixer(aligned.tensor)
     if tuple(output.shape[-3:]) != tuple(target.shape):
         raise RuntimeError("pointwise mixer violated target shape")
-    digest = sha256(b"clingeom-pre-mix-1x1-support-envelope-v2")
+    # The original digest committed to the mixer/voxel geometry but omitted
+    # the patient-mm basis and input proof assumptions. Equal voxel tensors
+    # with different physical spacing could receive the SAME digest even
+    # though their authorized interpolation-value error bounds differed.
+    #
+    # v3 commits to every declared proof premise. This is a deterministic
+    # provenance fingerprint, NOT a signed/trusted attestation of externally
+    # supplied input bounds or patient identity.
+    digest = sha256(b"clingeom-pre-mix-physical-semantic-provenance-v3")
+    premises = {
+        "patient_affine_mm": (
+            None if patient_affine is None else patient_affine.tolist()
+        ),
+        "patient_frame_uid": patient_frame_uid,
+        "declared_max_fiber_value_error": maximum_fiber_value_error,
+        "declared_max_output_value_error": maximum_output_value_error,
+        "fiber_world_hessian_bounds": (
+            None if fiber_world_hessian_bounds is None
+            else sorted(
+                (int(key), float(value))
+                for key, value in fiber_world_hessian_bounds.items()
+            )
+        ),
+        "computed_per_output_value_error_bounds": per_output,
+        "source_shape": tuple(int(n) for n in channel_tensor.shape),
+        "target_shape": tuple(int(n) for n in output.shape),
+    }
+    digest.update(
+        json.dumps(
+            premises, sort_keys=True, separators=(",", ":"), allow_nan=False
+        ).encode("utf-8")
+    )
     for p in (mixer.weight, mixer.bias):
         if p is None:
             digest.update(b"NONE")
