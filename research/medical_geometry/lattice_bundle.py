@@ -615,11 +615,21 @@ def slice_bundle_spatial(
     bundle: LatticeBundle,
     starts: tuple[int, int, int],
     stops: tuple[int | None, int | None, int | None],
+    *,
+    steps: tuple[int, int, int] = (1, 1, 1),
 ) -> LatticeBundle:
-    """Apply a positive-step spatial slice while preserving patient-space coordinates."""
+    """Type positive-step NCDHW spatial slicing, including phase subsampling.
 
+    Exact spatial indices are start + step*k. This is a *sampling* operation,
+    not interpolation: output sample centers move and jump increases while
+    each sampled feature retains its source receptive-field footprint.
+    """
+    if not (len(starts) == len(stops) == len(steps) == 3):
+        raise ValueError("3-D spatial slice requires three start/stop/step entries")
     new_shape: list[int] = []
-    for n, start, stop in zip(bundle.shape, starts, stops, strict=True):
+    for n, start, stop, step in zip(bundle.shape, starts, stops, steps, strict=True):
+        if (not isinstance(step, int) or isinstance(step, bool) or step <= 0):
+            raise ValueError("only positive integer spatial slice steps are certified")
         if start < 0:
             raise ValueError("negative spatial slice starts are not certified")
         end = n if stop is None else int(stop)
@@ -628,12 +638,18 @@ def slice_bundle_spatial(
         end = min(n, end)
         if start >= end:
             raise ValueError("spatial slice would be empty")
-        new_shape.append(end - start)
+        new_shape.append(len(range(start, end, step)))
     shape = tuple(new_shape)
 
     def transform(support: FeatureLattice) -> FeatureLattice:
-        return shift_lattice_origin(support, starts, new_shape=shape)
+        return FeatureLattice(
+            shape,
+            np.asarray(support.jump, dtype=np.float64) * np.asarray(steps, dtype=np.float64),
+            np.asarray(support.start, dtype=np.float64) +
+            np.asarray(starts, dtype=np.float64) * np.asarray(support.jump, dtype=np.float64),
+            np.asarray(support.receptive_field, dtype=np.float64).copy(),
+        )
 
     return map_bundle_supports(
-        bundle, transform, provenance_suffix=f"slice starts={starts}"
+        bundle, transform, provenance_suffix=f"slice starts={starts}, steps={steps}"
     )
