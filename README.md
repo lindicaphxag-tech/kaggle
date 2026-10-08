@@ -15,6 +15,14 @@ They are deliberately kept separate in claims: public self-authored artifacts ar
 compensating physical semantics, what is the **minimum admissible evidence**
 needed to authorize one concrete implementation-bound repair?
 
+- [**Frozen learned-policy controller-ABI transport — 96 physical test episodes and independently re-countable evidence**](research/semrepair/policy-transfer/README.md):
+  **PickCube predeclared holdout 32/32 vs naive 0/32**; StackCube
+  exploratory **31/32 vs 2/32**; PushCube exploratory **30/32 vs
+  20/32**. All use a published frozen PPO and controller-target-memory-aware
+  action translation without retraining. The bounded projection is NOT an
+  exact semantic equivalence or safety guarantee. One command audits every
+  source-seed result with Python stdlib:
+  `python research/semrepair/policy-transfer/audit.py`
 - [**Flagship technical brief — abstract, actual results, limitations**](research/semrepair/FLAGSHIP_TECHNICAL_BRIEF.md)
 - [**One-page reviewer / falsification packet**](research/semrepair/README.md)
 - [**Bounded-noise diagnostic correction**](research/semrepair/noisy_authority_game.py):
