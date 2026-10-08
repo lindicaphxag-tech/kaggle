@@ -112,9 +112,9 @@ def test_weight_derived_error_budget_controls_actual_real_monai_forward():
     )
     expected=torch.cat([2*target_truth[None,None],-3*target_truth[None,None]],dim=1)
     errors=(repaired.tensor-expected).abs()
-    assert float(errors[:,0].max())==pytest.approx(0.3897,abs=2e-5)
-    assert float(errors[:,1].max())==pytest.approx(0.58455,abs=2e-5)
-    assert float(errors.max())<=max(repaired.conditional_value_error_bounds)+2e-5
+    assert float(errors[:,0].detach().max())==pytest.approx(0.3897,abs=2e-5)
+    assert float(errors[:,1].detach().max())==pytest.approx(0.58455,abs=2e-5)
+    assert float(errors.detach().max())<=max(repaired.conditional_value_error_bounds)+2e-5
 
 
 def test_no_curvature_proof_from_nonlinear_active_monai_block():
