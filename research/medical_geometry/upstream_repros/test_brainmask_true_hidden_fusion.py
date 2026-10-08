@@ -3,7 +3,8 @@ import numpy as np
 import pytest
 
 from research.medical_geometry.upstream_repros.brainmask_true_hidden_fusion import (
-    orient_hidden_to_acquisition,\n    orient_acquisition_to_hidden,
+    orient_hidden_to_acquisition,
+    orient_acquisition_to_hidden,
 )
 
 
