@@ -212,3 +212,30 @@ green CI alone does not establish independent reproduction.
 **Scope:** this is elementary nonidentifiability in a specific physical
 channel-fusion topology. We do not claim a new abstract information-theory
 theorem, downstream trained medical-model improvement, or a bug in MONAI.
+
+## I. Bitwise-exact fusion indistinguishability
+
+**Merged PR:** [#45](https://github.com/lindicaphxag-tech/kaggle/pull/45).
+**Full successful CI:** [Actions 37718214998](https://github.com/lindicaphxag-tech/kaggle/actions/runs/37718214998).
+
+The previous 0.7 mm case (#44) had analytically identical postmix signals,
+but an observed float32 residual of 4.77e-7. This tightened 0.5 mm
+(binary-representable) case checks **IEEE-754 int32 bit reinterpretations**
+of the two real MONAI/PyTorch postmix tensors, not just numerical equality.
+
+```bash
+python -m pytest -q research/medical_geometry/test_monai_dints_runtime.py
+PYTHONPATH=. python research/medical_geometry/benchmark_monai_bitwise_identical_fusion.py
+```
+
+The independent run must verify:
+
+- `post_fusion_tensors_bitwise_equal: true` (not just allclose);
+- `post_fusion_max_abs_difference: 0.0` exactly;
+- `correct_patient_target_difference: 0.5` value units;
+- post-fusion deterministic-estimator worst-case lower bound `0.25`;
+- pre-mix repair max error `0` for the zero world and at most `1e-6`
+  for the signed analytic nonzero world (author run: `5.96e-8`).
+
+Report your own SHA, MONAI/torch/python environment, raw JSON and failures.
+These are constructed analytic fields, not real CT/MRI test images.
