@@ -73,36 +73,70 @@ def norm_zscore_nonzero(x: np.ndarray) -> np.ndarray:
     return np.where(m, (x-mean)/std, 0.).astype(np.float32)
 
 
-def render(img, existing, learned, stale, repaired, filename,
-           source_slice):
-    z = source_slice
-    plane = img[:,:,z].T
-    lo,hi = np.percentile(plane[np.isfinite(plane)],[1,99])
-    nrm = np.clip((plane-lo)/max(float(hi-lo),1e-10),0,1)
-    fig,axes=plt.subplots(1,4,figsize=(15.0,4.3),constrained_layout=True)
-    captions=[
-        "(a) Real T1 MRI + provided mask",
-        "(b) Real frozen 3-D U-Net output",
-        "(c) Controlled stale-affine output",
-        "(d) Known-transform repaired output"
-    ]
-    for ax,title,seg in zip(axes,captions,(existing,learned,stale,repaired)):
-        ax.imshow(nrm,origin="lower",cmap="gray")
-        for mask,color,style in ((existing,"#21C3B9","solid"),
-                                 (seg,"#D95748","dashed")):
-            sl=mask[:,:,z]
-            if np.any(sl) and np.any(~sl):
-                ax.contour(sl.T.astype(float),levels=[.5],
-                           colors=[color],linestyles=style,linewidths=1.2,
-                           origin="lower")
-        ax.set_title(title,fontsize=9)
-        ax.axis("off")
-    fig.suptitle(
-       "ClinGeom | actual checkpoint inference with measured spatial export",
-       fontsize=12)
-    fig.savefig(filename,dpi=210)
-    plt.close(fig)
+def render(full_img, crop_img, crop_corner, existing, learned, stale,
+           repaired, filename, z):
+    """Expert-review figure: full-anatomy context + real prediction + error trace.
 
+    All zoom panels show the *same* acquired MRI voxels and physical grid.
+    The slice is frozen to the crop center (z=32), not picked from model results.
+    """
+    from matplotlib.patches import Rectangle
+
+    def norm(plane):
+        values=np.asarray(plane,dtype=float)
+        finite=values[np.isfinite(values)]
+        if not finite.size:
+            raise ValueError("Real MRI has no finite display intensities")
+        lo,hi=np.percentile(finite,[1,99])
+        return np.clip((values-lo)/max(float(hi-lo),1e-8),0,1)
+
+    fig,axes=plt.subplots(
+        1,4,figsize=(14.8,4.8),constrained_layout=True,
+        gridspec_kw={"width_ratios":[1.25,1.,1.,1.]}
+    )
+    full_k=int(crop_corner[2]+z)
+    full_plane=norm(full_img[:,:,full_k].T)
+    crop_plane=norm(crop_img[:,:,z].T)
+    ax=axes[0]
+    ax.imshow(full_plane,cmap="gray",origin="lower",interpolation="nearest")
+    ax.add_patch(Rectangle(
+        (crop_corner[0],crop_corner[1]),64,64,
+        edgecolor="#D5574B",facecolor="none",linewidth=1.3,
+        linestyle="--"
+    ))
+    ax.set_title("a  Acquired T1 MRI + fixed crop",fontsize=9.4)
+    ax.set_axis_off()
+
+    def contour(axis,mask,color,style,width=1.3):
+        data=mask[:,:,z]
+        if np.any(data) and np.any(~data):
+            axis.contour(data.T.astype(float),levels=[.5],
+                         colors=[color],linewidths=width,
+                         linestyles=style,origin="lower")
+
+    panels=[
+        ("b  Frozen 3-D U-Net output",existing,learned,
+         "#15AEA6","#D95B4B"),
+        ("c  Stale-affine export",learned,stale,
+         "#15AEA6","#D95B4B"),
+        ("d  Exact provenance repair",learned,repaired,
+         "#15AEA6","#D95B4B")
+    ]
+    for ax,(title,reference,result,ca,cb) in zip(axes[1:],panels):
+        ax.imshow(crop_plane,cmap="gray",origin="lower",interpolation="nearest")
+        contour(ax,reference,ca,"solid",1.3)
+        contour(ax,result,cb,"dashed",1.2)
+        ax.set_title(title,fontsize=9.4)
+        ax.set_axis_off()
+    fig.text(
+        .015,.025,
+        "b: teal = provided example mask; red = learned prediction  |  "
+        "c/d: teal = original learned output; dashed red = exported output  |  "
+        "Same physical grid; actual HDF5 checkpoint; controlled affine error",
+        fontsize=8.4,color="#343434"
+    )
+    fig.savefig(filename,dpi=290,bbox_inches="tight",facecolor="white")
+    plt.close(fig)
 
 def main():
     p=argparse.ArgumentParser()
@@ -231,11 +265,12 @@ def main():
            "ni_babel_orientation_agreement":True,
            "repair_comparison":"completed on genuine frozen-checkpoint inference",
         })
-        # Display slice selection is only for illustration, never metric selection.
-        z=int(np.argmax(learned.sum(axis=(0,1))))
-        report["display_slice_rule"]="max frozen-prediction foreground occupancy only, no metric cherry-picking"
+        # Frozen, label-independent display plane avoids selecting a flattering
+        # slice post hoc. Full volume provides actual anatomical context.
+        z=32
+        report["display_slice_rule"]="predeclared center slice z=32 (no result-driven selection)"
         report["display_z_in_crop"]=z
-        render(img[slices],provided,learned,stale,repaired,
+        render(img,img[slices],origin,provided,learned,stale,repaired,
                output/"fig_actual_pretrained_t1_prediction.png",z)
 
     (output/"pretrained_t1_geometry.json").write_text(
