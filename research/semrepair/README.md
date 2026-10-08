@@ -107,9 +107,30 @@ control system, with different software-scale and actuator/plant parameters:
 | correct | 1 | 1 | 1 / 0.2 | no change |
 | nuisance alias | 1 | 4 | 2 / 0.4 | replace gear 4 with 2 |
 
-Because the physical dynamics depend on the ratios of effective force to mass
-and damping to mass, three **different repair authorities** can have exactly
-the same observable state trajectories.
+The controlled slider obeys the physical equation
+
+```text
+mass * q_ddot + damping * q_dot = actuator_gear * producer_scale * u(t)
+```
+
+The external motion therefore depends only on the two parameter ratios
+`(actuator_gear * producer_scale / mass, damping / mass)`, given the same
+initial state. Any two parameter tuples with those same ratios are
+**structurally input/output-indistinguishable for every admissible input
+history** in this specific ideal plant, not merely close for one sampled
+trajectory. The three faulty worlds share both ratios, while they require
+different *factorized local repairs*.
+
+In contrast, a controller-input tap exposes `producer_scale * u(t)` and a
+generalized actuator-force tap exposes `actuator_gear * producer_scale * u(t)`.
+The pair of taps breaks the remaining equivalence under a nonzero command;
+a zero-action probe necessarily carries no discriminating information.
+
+This physical scaling symmetry is standard system-identification reasoning,
+**not** a newly claimed law or theorem. The narrower novel question under
+test is whether an evidence-constrained, risk-aware diagnosis policy can stop
+exactly when a concrete implementation/evidence-bound repair becomes
+authorized, and reject when the necessary tap is unavailable.
 
 The program selects actual native observations:
 
