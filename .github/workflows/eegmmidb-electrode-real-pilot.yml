@@ -1,0 +1,75 @@
+name: EEGMMIDB subject-disjoint electrode stress pilot
+
+on:
+  push:
+    branches:
+      - research/real-eeg-electrode-disjoint-pilot-20261009
+    paths:
+      - 'research/eeg/eegmmidb_real_pilot.py'
+      - 'tests/test_eegmmidb_real_pilot.py'
+      - '.github/workflows/eegmmidb-electrode-real-pilot.yml'
+  workflow_dispatch:
+    inputs:
+      cohort:
+        description: 'Frozen subject cohort'
+        type: choice
+        options: [pilot, full]
+        default: pilot
+
+permissions:
+  contents: read
+
+jobs:
+  baseline-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned scientific CPU dependencies
+        run: |
+          python -m pip install 'mne==1.11.0' 'numpy==2.3.5' 'scipy==1.17.0' 'scikit-learn==1.8.0'
+      - name: Check pre-outcome invariants and compile
+        run: |
+          python -m py_compile research/eeg/eegmmidb_real_pilot.py
+          python -m unittest discover -s tests -p 'test_eegmmidb_real_pilot.py' -v
+
+  true-physionet-eeg-pilot:
+    needs: baseline-contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      PYTHONUNBUFFERED: '1'
+      MNE_DATA: ${{ runner.temp }}/eeg_data
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned scientific CPU dependencies
+        run: |
+          python -m pip install 'mne==1.11.0' 'numpy==2.3.5' 'scipy==1.17.0' 'scikit-learn==1.8.0'
+      - name: Download real EDF source, verify channel IDs and evaluate frozen subject splits
+        env:
+          EEG_COHORT: ${{ github.event.inputs.cohort || 'pilot' }}
+        run: |
+          set -o pipefail
+          python -m research.eeg.eegmmidb_real_pilot \
+            --cohort "$EEG_COHORT" \
+            --data-dir "$RUNNER_TEMP/eeg_data" \
+            --out "eegmmidb_${EEG_COHORT}_results.json" 2>&1 | tee eegmmidb_console.log
+      - name: Preserve original score denominators, EDF hashes and failure logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eegmmidb-true-edf-audit-${{ github.run_id }}
+          if-no-files-found: warn
+          retention-days: 30
+          path: |
+            eegmmidb_*_results.json
+            eegmmidb_console.log
+
+# NO GPU training, NO EEGCLIP/NeuroRVQ checkpoint inference, and NO scientific
+# novelty claim. This is a real EDF, simple classical log-PSD exploratory pilot.
