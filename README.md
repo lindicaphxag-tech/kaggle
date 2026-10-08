@@ -9,6 +9,10 @@ This repository is a public evidence and reproducibility surface for two researc
 
 They are deliberately kept separate in claims: public self-authored artifacts are **not** external adoption, and prospective cases are **not** counted before their frozen criteria are met.
 
+
+**NEW — ClinGeom, actual pretrained MRI evidence:** [PR #68 (merged)](https://github.com/lindicaphxag-tech/kaggle/pull/68) follows genuine frozen T1 3-D U-Net predictions across three orientations into an unchanged downstream prediction fusion, enforcing the declared patient-grid inverse before mixing. [Real TensorFlow run](https://github.com/lindicaphxag-tech/kaggle/actions/runs/37819406496) and [frozen numeric/provenance dossier](research/medical_geometry/upstream_repros/REAL_PRETRAINED_PLANE_FUSION_RESULT.md) show one-sample **wrong-index vs corrected-grid ensemble** weak-reference Dice **0.0458→0.1700** and HD95 **50.93→40.90 mm**, including six adversarial rejection tests. **One MRI, one checkpoint, nonexpert reference; not a clinical improvement, external adoption or a learned internal-feature fusion claim.** [Independent falsification requested](https://github.com/lindicaphxag-tech/kaggle/issues/9).
+
+
 ## SemRepair — start here
 
 **Flagship research question:** When robot interfaces have hidden or mutually
