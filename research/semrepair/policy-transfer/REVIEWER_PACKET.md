@@ -78,6 +78,40 @@ they do not address uncertainty over checkpoint choice, embodiments or
 physical hardware. Reported marginal Wilson intervals are descriptive
 for each arm, **not** CIs on paired treatment gain.
 
+### Independent check: 32-demo converter × controller interaction
+
+A separate [precommitted 32-source-episode four-cell protocol](https://github.com/lindicaphxag-tech/ManiSkill/blob/validation/dp-peg-factorial-32-holdout/research/kaggle_diffusion_policy_peg/FACTORIAL_32_PROTOCOL.md)
+was executed under the official PegInsertionSide-v1 demonstration replay
+path: [public successful Actions run #37806000218](https://github.com/lindicaphxag-tech/ManiSkill/actions/runs/37806000218).
+This is *not* frozen-PPO task reward; it measures whether recorded official
+demonstrations can be converted and replayed successfully.
+
+| Slice | Baseline | Converter only | Controller only | Both fixes |
+|---|---:|---:|---:|---:|
+| Development-exposed first 8 | 6/8 | 6/8 | 0/8 | 6/8 |
+| Frozen new-four-cell-replay next 24 | **19/24** | **19/24** | **0/24** | **19/24** |
+| Overall 32 | **25/32** | **25/32** | **0/32** | **25/32** |
+
+In the second stratum, comparing controller-only to baseline gives 19
+discordant source episodes in the baseline's favor, zero in reverse;
+the exact two-sided sign-test `p=3.814697265625e-06` is a **descriptive
+paired statistic for demonstration conversion**, not robot policy success.
+The four-cell interaction in conversion-success fraction is `19/24`.
+Converter-only and both-fixes converted precisely the same 19 episodes,
+so this sample does **not** establish a separate benefit from applying the
+controller patch on top of the converter patch.
+
+Important qualification: episodes 8–31 were unseen in the earlier *four-cell*
+eight-demo experiment, but parts of this source dataset have been used in
+earlier two-cell studies. They are **not untouched across all prior work**.
+The empty four-way success intersection makes a matched four-cell
+learned-policy trial from these converted demos **not trainable without
+changing the protocol**; it must not be replaced by a favorable
+three-cell learner comparison.
+
+[Independent factorial seed-matrix auditor](https://github.com/lindicaphxag-tech/ManiSkill/blob/validation/dp-peg-factorial-32-holdout/research/kaggle_diffusion_policy_peg/audit_factorial_32.py).
+All runs are first-party, not maintainer-accepted upstream validation.
+
 ### Reproduce and independently falsify
 
 Original first-party native PhysX CPU runs:
