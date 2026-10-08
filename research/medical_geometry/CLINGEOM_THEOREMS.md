@@ -515,3 +515,78 @@ support cardinalities carried by one feature tensor.
 T14 requires equal patient-space linear parts. If support lattices differ in
 jump/direction/scale, the parallel-lattice theorem is inapplicable and the
 certificate must refuse rather than report a misleading radius.
+
+## T14 — conditional physical interpolation error for feature-lattice repair
+
+A geometry-correct interpolation is **not** a proof of functional feature
+recovery. Let f be one twice continuously differentiable scalar patient-space
+field sampled at a regular source feature lattice. Denote the three physical
+source-cell edge vectors by v_j. For a target feature center whose coordinates
+inside one source cell have fractions alpha_j in [0,1], tensor-product linear
+interpolation I satisfies
+
+    |f(x) - If(x)| <= (1/2) sum_j alpha_j (1-alpha_j) M_j,
+
+provided a *uniform, externally justified* bound
+
+    |v_j^T Hessian(f)(z) v_j| <= M_j
+
+holds throughout all source cells used by the interpolation. Repeated 1D
+linear-interpolation error bounds prove the inequality; no mixed-derivative
+term is needed because tensor-product linear interpolation reproduces
+multilinear cross terms exactly.
+
+If a conservative world-space spectral Hessian norm bound B is known, then
+
+    M_j = B ||v_j||²
+
+is sufficient. The source physical edge is obtained from the patient affine
+and model-derived lattice jump:
+
+    v_j = L(A_patient) * diag(jump_source) * e_j.
+
+Since ClinGeom v1 feature-lattice maps are axis-separable, the maximum of
+the stated bound across the complete target lattice is computed without
+enumerating 3D voxels: find the largest alpha_j(1-alpha_j) among target
+indices on each axis and sum the three maxima.
+
+### Sharp quadratic witness
+
+For f(p) = (B/2)||p||² on a 2 mm isotropic source grid, targets at half
+a cell on every axis satisfy alpha_j=1/2, v_j=2 mm, M_j=4B.
+For B=0.2 in output-value units/mm², each axis contributes 0.1
+and the maximum error is exactly
+
+    (1/2) * 3 * (1/4) * (4 * 0.2) = 0.3.
+
+Both a NumPy eight-corner interpolator and the real PyTorch grid_sample
+executor have regression witnesses for this equality, up to documented
+floating-point tolerance.
+
+### Critical assumption and falsification boundary
+
+- This is a **classical conditional interpolation bound**, not a new
+  approximation-theory theorem.
+- A finite set of feature samples cannot establish a global Hessian bound.
+  For example f(i)=0 and f(i)=sin(pi*i) agree at integer sample nodes but
+  differ at half-integer locations. Missing curvature evidence **fails closed**
+  when a value-error budget is requested.
+- The bound applies only to interpolating *one declared underlying scalar
+  field*. It does not prove that distinct learned branches represent the same
+  feature field, share receptive-field content, or preserve segmentation Dice.
+- Exact integer reindex/crop requires no smoothness assumption and has zero
+  interpolation error **on the retained domain**, not full-FOV equivalence.
+- Nearest-neighbor interpolation of class labels is not authorized by a
+  C² scalar-field bound.
+- The physical Hessian envelope is user-provided and must be externally
+  justified over **every touched cell**; the compiler does not infer it from
+  a neural-network output or certify its provenance.
+
+### Compiler consequence
+
+A request for a maximum allowed value-error budget adds a separate
+interpolation-authorization gate to the existing spatial type checker.
+Each resampled FX input branch must provide an explicit uniform physical
+curvature envelope, otherwise the rewrite is refused. Successful geometry
+postconditions and conditional interpolation-error bounds are reported
+**separately**, never conflated into a clinical safety guarantee.

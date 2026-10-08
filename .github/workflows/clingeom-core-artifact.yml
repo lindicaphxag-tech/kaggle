@@ -45,6 +45,7 @@ jobs:
             research/medical_geometry/test_lattice_bundle.py \
             research/medical_geometry/test_repair_synthesis.py \
             research/medical_geometry/test_repair_certificate.py \
+            research/medical_geometry/test_interpolation_certificate.py \
             research/medical_geometry/test_prompt_representation.py
       - name: Produce deterministic NumPy evidence
         run: |
@@ -93,7 +94,8 @@ jobs:
             research/medical_geometry/test_torch_repair_certificate.py \
             research/medical_geometry/test_fx_geometry.py \
             research/medical_geometry/test_fx_rewrite.py \
-            research/medical_geometry/test_fx_postcondition.py
+            research/medical_geometry/test_fx_postcondition.py \
+            research/medical_geometry/test_interpolation_fx_gate.py
       - name: Produce channel-fiber evidence
         run: |
           PYTHONPATH=. python research/medical_geometry/benchmark_channel_fibers.py | tee channel-fiber-report.json
