@@ -1,5 +1,8 @@
 # SemRepair — Independent Reviewer Entry
 
+**Read this first:** [source-bound robot-action contract flagship evidence](ROBOT_ACTION_CONTRACT_FLAGSHIP.md). It connects a verified source-disjoint 100-episode official replay interaction to an independent frozen-PPO, stateful-target-controller intervention with distinct **EXACT REFUSAL** vs **NON-EXACT PROJECTION** outcomes, while preserving task-failure and publication/adoption limits.
+
+
 **Research question:** How much admissible evidence must a robot collect before it may authorize a concrete repair when its tensor interfaces are numerically valid but physical semantics are hidden or mutually compensating?
 
 **Primary method:** *Authority-Optimal Identification of Hidden Semantic Interfaces.*
