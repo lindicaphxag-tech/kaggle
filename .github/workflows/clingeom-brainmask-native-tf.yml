@@ -1,0 +1,92 @@
+name: ClinGeom real upstream TensorFlow export (no reconstruction stub)
+
+on:
+  pull_request:
+    paths:
+      - "research/medical_geometry/upstream_repros/brainmask_full_tf_reconstruction.py"
+      - ".github/workflows/clingeom-brainmask-native-tf.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  upstream-native-tf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CUDA_VISIBLE_DEVICES: "-1"
+      TF_CPP_MIN_LOG_LEVEL: "2"
+      OMP_NUM_THREADS: "2"
+      TF_NUM_INTEROP_THREADS: "2"
+      TF_NUM_INTRAOP_THREADS: "2"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install matching original TensorFlow 2.13 CPU runtime
+        run: |
+          python -m pip install "tensorflow-cpu==2.13.0" "numpy==1.24.3" "nibabel==3.2.2" "scipy==1.9.3" "matplotlib==3.7.2"
+      - name: Download hash-pinned original code and acquired source MRI
+        run: |
+          set -euo pipefail
+          base="https://raw.githubusercontent.com/ecalabr/brain_mask/ca789fb26b70e359b61a8d52968813dd772fb4b1"
+          mkdir -p upstream/utilities
+          touch upstream/utilities/__init__.py
+          for file in predict.py utilities/input_fn_util.py utilities/normalizers.py; do
+            curl -fL --retry 3 "$base/$file" -o "upstream/$file"
+          done
+          curl -fL --retry 3 "$base/example_data/example001/example001_t1.nii.gz" -o real_t1.nii.gz
+          curl -fL --retry 3 "$base/example_data/example001/example001_brain_mask.nii.gz" -o real_brain_mask.nii.gz
+          test "$(git hash-object upstream/predict.py)" = d4b03f5b851928ead5ef014af75cd1dd5fbd64dc
+          test "$(git hash-object upstream/utilities/input_fn_util.py)" = 1c2ce1a9f13f690cdaf28eac5b003e44ec06d192
+          test "$(git hash-object upstream/utilities/normalizers.py)" = 98eb8c4329ed2330b47905ab2e69ac1a5fdb5237
+          test "$(git hash-object real_t1.nii.gz)" = 81b1e5260ee4a579d8ac490cac113df9c1cb942f
+          test "$(git hash-object real_brain_mask.nii.gz)" = e0dd089b3544da4352e751a24dc27a828904bad7
+      - name: Baseline through ORIGINAL TensorFlow extraction, reconstruction and exporter
+        run: |
+          python -m research.medical_geometry.upstream_repros.brainmask_full_tf_reconstruction \
+            --source-dir upstream --image real_t1.nii.gz --mask real_brain_mask.nii.gz \
+            --stage before --out artifacts/native_tf
+      - name: Apply previously validated production-export patch
+        run: |
+          git -C upstream init -q
+          git -C upstream apply --check "$GITHUB_WORKSPACE/research/medical_geometry/upstream_repros/brainmask_export_plane.patch"
+          git -C upstream apply "$GITHUB_WORKSPACE/research/medical_geometry/upstream_repros/brainmask_export_plane.patch"
+          python -m py_compile upstream/predict.py
+      - name: Repair through ORIGINAL TensorFlow extraction and reconstruction
+        run: |
+          python -m research.medical_geometry.upstream_repros.brainmask_full_tf_reconstruction \
+            --source-dir upstream --image real_t1.nii.gz --mask real_brain_mask.nii.gz \
+            --stage after --out artifacts/native_tf
+      - name: Assert native reconstruction tests did NOT stub model patch reconstruction
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          a=Path('artifacts/native_tf')
+          before=json.loads((a/'before_native_tf.json').read_text())
+          after=json.loads((a/'after_native_tf.json').read_text())
+          for r in (before,after):
+              assert r['uses_original_native_tf_patch_extraction']
+              assert r['uses_original_native_tf_patch_reconstruction']
+              assert r['outcomes']['ax']['native_tf_reconstruction_exact']
+              assert r['outcomes']['sag']['native_tf_reconstruction_exact']
+              assert r['model_inference_executed'] is False
+          assert before['outcomes']['ax']['array_dice_when_shapes_match']==1.0
+          assert after['outcomes']['ax']['array_dice_when_shapes_match']==1.0
+          assert before['outcomes']['sag']['source_shape_matches'] is False
+          assert after['outcomes']['sag']['source_shape_matches']
+          assert after['outcomes']['sag']['array_dice_when_shapes_match']==1.0
+          print('PASS native-TF no-reconstruction-stub: original wrong sagittal export, corrected lossless')
+          PY
+      - name: Publish exact native-TF processing evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: ClinGeom-native-TF-physical-export-original-vs-fixed
+          path: |
+            artifacts/native_tf/before_native_tf.json
+            artifacts/native_tf/after_native_tf.json
+          if-no-files-found: error
+          retention-days: 60
