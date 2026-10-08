@@ -14,11 +14,30 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
 from .eegmmidb_real_pilot import load_real_data, SPLITS, SEED
+from .validation_only_margin_control import (
+    fit_validation_margin_threshold, audit_test_predictions,
+)
 from .electrode_ambiguity_certificate import (
     certified_linear_prediction, sklearn_pipeline_raw_weights,
 )
 
 AMBIGUITY_PAIRS = (("C1", "C3"), ("C2", "C4"))
+
+
+def apply_predeclared_pair_swaps(source, groups, *, seed):
+    """Fixed-seed uncertain observed slots; no access to labels or model output."""
+    out=np.asarray(source,dtype=float).copy()
+    rng=np.random.default_rng(seed)
+    traces=[]
+    for row in out:
+        flipped=[]
+        for group in groups:
+            change=bool(rng.integers(0,2))
+            if change:
+                row[list(group)]=row[list(group)[::-1]].copy()
+            flipped.append(change)
+        traces.append(flipped)
+    return out, traces
 
 
 def certify_cohort(X, y, subjects, names, *, cohort='pilot'):
@@ -27,10 +46,11 @@ def certify_cohort(X, y, subjects, names, *, cohort='pilot'):
     subjects = np.asarray(subjects, dtype=int)
     split = SPLITS[cohort]
     train = np.isin(subjects, split['train'])
+    val = np.isin(subjects, split['val'])
     test = np.isin(subjects, split['test'])
     if set(subjects) != set(split['train'] + split['val'] + split['test']):
         raise ValueError('Missing preregistered subjects; abort')
-    if not train.any() or not test.any() or set(y[train]) != {0, 1}:
+    if not train.any() or not val.any() or not test.any() or set(y[train]) != {0, 1}:
         raise ValueError('Bad split or labels')
     if X.shape != (len(y), len(names), 2):
         raise ValueError('Unexpected feature array')
@@ -45,19 +65,18 @@ def certify_cohort(X, y, subjects, names, *, cohort='pilot'):
     )
     classifier.fit(X[train].reshape(int(train.sum()), -1), y[train])
     w, b, classes = sklearn_pipeline_raw_weights(classifier, len(names), 2)
-    x_test = X[test].copy()
-    rng = np.random.default_rng(SEED + 101)
-    flip_bits = []
-    for row in x_test:
-        flips = []
-        for group in groups:
-            flip = bool(rng.integers(0, 2))
-            if flip:
-                row[list(group)] = row[list(group)[::-1]].copy()
-            flips.append(flip)
-        flip_bits.append(flips)
+    x_test, flip_bits = apply_predeclared_pair_swaps(X[test], groups, seed=SEED + 101)
+    x_val, val_flip_bits = apply_predeclared_pair_swaps(X[val], groups, seed=SEED + 202)
+    # For fairness the confidence-only acceptance threshold is selected using
+    # validation subjects and validation certificate coverage ONLY.
+    val_certificates = [certified_linear_prediction(row, w, b, groups) for row in x_val]
+    val_accepted = np.array([c.authorized for c in val_certificates],dtype=bool)
+    val_margins = np.abs(classifier.decision_function(x_val.reshape(len(x_val),-1)))
+    fit = fit_validation_margin_threshold(val_margins, val_accepted)
+    test_margins = np.abs(classifier.decision_function(x_test.reshape(len(x_test),-1)))
     truth = y[test]
     naive = classifier.predict(x_test.reshape(len(x_test), -1))
+    confidence_control = audit_test_predictions(test_margins, naive, y[test], fit.threshold)
     known_identity = classifier.predict(X[test].reshape(len(x_test), -1))
     certificates = [
         certified_linear_prediction(row, w, b, groups) for row in x_test
@@ -93,6 +112,16 @@ def certify_cohort(X, y, subjects, names, *, cohort='pilot'):
         'certified_accepted_accuracy': acc_on(accepted, predictions),
         'naive_accuracy': acc_on(all_test, naive),
         'known_identity_accuracy': acc_on(all_test, known_identity),
+        'validation_only_confidence_baseline': {
+            'threshold': fit.threshold if np.isfinite(fit.threshold) else None,
+            'threshold_is_infinite': not np.isfinite(fit.threshold),
+            'target_validation_coverage': fit.requested_validation_coverage,
+            'actual_validation_coverage': fit.achieved_validation_coverage,
+            'ties_prevent_exact_match': fit.ties_prevent_exact_coverage,
+            'comparison': confidence_control,
+            'calibration_subjects': list(map(int,split['val'])),
+            'no_test_threshold_tuning': True,
+        },
         'false_invariance_certificates': int(np.sum(predictions[accepted] != known_identity[accepted])),
         'abstentions': int(np.sum(~accepted)),
         'per_subject': by_subject,
@@ -105,6 +134,8 @@ def certify_cohort(X, y, subjects, names, *, cohort='pilot'):
             'prediction': predictions.tolist(),
             'naive': naive.tolist(),
             'known_identity': known_identity.tolist(),
+            'confidence_margin': test_margins.tolist(),
+            'confidence_baseline_accepted': confidence_control['accepted'],
             'margin_lower': [c.lower_margin for c in certificates],
             'margin_upper': [c.upper_margin for c in certificates],
         },
@@ -113,6 +144,7 @@ def certify_cohort(X, y, subjects, names, *, cohort='pilot'):
             'Not a new theorem; exact Hungarian assignment is established',
             'Invalid if the ambiguity set misses a possible true mapping',
             'Selective risk may exceed naive full-coverage risk: report both',
+            'Confidence baseline threshold calibrated on validation subjects only',
             'This is not a pretrained EEG foundation model',
         ],
     }
