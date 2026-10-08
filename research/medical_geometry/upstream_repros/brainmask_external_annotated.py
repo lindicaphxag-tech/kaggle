@@ -40,6 +40,9 @@ from .brainmask_pretrained_plane_fusion import PLANE_TO_ACQUISITION_AXES
 
 ROI_OFFSETS_VOXELS = (0, -24, 24)
 ROI_EDGE = 64
+VIEW_DISAGREEMENT_SCALE = 0.10
+TRAINED_SPATIAL_OPERATOR_SCALE = 0.015
+MAX_ALLOWED_BLEND_FACTOR = 0.5
 METHODS = (
     "native_axial",
     "standard_probability_ensemble",
@@ -47,6 +50,7 @@ METHODS = (
     "nonlinear_aligned_untransported",
     "nonlinear_aligned_conjugated",
     "incorrect_raw_index_control",
+    "reliability_gated_fusion",
 )
 
 
@@ -228,6 +232,35 @@ def _run_crop(
             orient_hidden_to_acquisition(native_prob[..., None], plane)[..., 0]
         )
     conjugated = np.mean(np.stack(rotated_outputs).astype(np.float64), axis=0)
+    # New METHOD frozen before examining the 6 independent reserved subjects:
+    # no labels, no learned weights or held-out mask performance needed.
+    # Failure to orient learned spatial operators creates the measured
+    # *actual original-model* operator commutator; disagreement between
+    # independently oriented actual output predictions is a separate
+    # representation-domain-shift warning. These jointly attenuate
+    # a maximum 50% departure from the unchanged in-training axial model.
+    # Not a certified safety guarantee: acceptance requires prospective
+    # task results and nonzero useful fusion coverage.
+    baseline_axial = canonical_probs[0].astype(np.float64)
+    fprob = np.mean(np.stack(canonical_probs).astype(np.float64), axis=0)
+    view_disagreement = np.maximum(
+        np.abs(canonical_probs[1].astype(np.float64) - baseline_axial),
+        np.abs(canonical_probs[2].astype(np.float64) - baseline_axial),
+    )
+    kernel_noncommutation = np.maximum(
+        np.abs(rotated_outputs[1].astype(np.float64) - aligned_naive.astype(np.float64)),
+        np.abs(rotated_outputs[2].astype(np.float64) - aligned_naive.astype(np.float64)),
+    )
+    reliability = np.exp(-np.minimum(
+        50.0,
+        view_disagreement / VIEW_DISAGREEMENT_SCALE
+        + kernel_noncommutation / TRAINED_SPATIAL_OPERATOR_SCALE
+    ))
+    gated_probability = np.clip(
+        baseline_axial
+        + MAX_ALLOWED_BLEND_FACTOR * reliability * (fprob - baseline_axial),
+        0.0, 1.0
+    )
     import scipy.special
     probabilities = {
         "native_axial": canonical_probs[0],
@@ -240,6 +273,7 @@ def _run_crop(
         "nonlinear_aligned_untransported": aligned_naive,
         "nonlinear_aligned_conjugated": conjugated,
         "incorrect_raw_index_control": raw_naive,
+        "reliability_gated_fusion": gated_probability,
     }
     if set(probabilities) != set(METHODS):
         raise ValueError("Missing preregistered analysis arm")
@@ -251,18 +285,20 @@ def _run_crop(
             np.mean(np.abs(conjugated - aligned_naive.astype(np.float64)))
         ),
         "models_trained_on_external_subjects": False,
+        "reliability_gate_mean_weight": float(np.mean(reliability)),
+        "reliability_gate_voxels_weight_above_0_2": int(np.count_nonzero(reliability > .2)),
     }
     return probabilities, {"affine": world_affine, "details": details}
 
 
 def run(source_root: Path, config: Path, checkpoint: Path,
-        manifest: Path, out: Path) -> dict:
+        manifest: Path, out: Path, expected_patients: int = 3) -> dict:
     import tensorflow as tf
     evidence = json.loads(manifest.read_text())
     subjects = evidence["subjects"]
-    if not evidence.get("data_selection_label_blind") or len(subjects) != 3:
+    if not evidence.get("data_selection_label_blind") or len(subjects) != expected_patients:
         raise ValueError("Original prospectively selected cohort required: 3 subjects")
-    if len(set(s["independent_subject"] for s in subjects)) != 3:
+    if len(set(s["independent_subject"] for s in subjects)) != expected_patients:
         raise ValueError("Reused subject in externally held-out cohort")
     model, joint, head, before, tail = _source_model_and_cuts(
         source_root, config, checkpoint
@@ -380,7 +416,14 @@ def run(source_root: Path, config: Path, checkpoint: Path,
         "claimed_to_outperform_strong_baselines": False,
         "clinical_accuracy_claim": False,
         "external_independent_reproduction": False,
-        "patient_count": 3,
+        "patient_count": len(patients),
+        "reserved_cohort_selection_offset": evidence["frozen_public_cohort_offset"],
+        "reliability_gate_frozen_thresholds": {
+            "view_disagreement_scale": VIEW_DISAGREEMENT_SCALE,
+            "trained_spatial_operator_scale": TRAINED_SPATIAL_OPERATOR_SCALE,
+            "max_fusion_weight": MAX_ALLOWED_BLEND_FACTOR,
+        },
+        "prospective_6subject_labels_not_used_to_tune_gate": True,
         "case_level": patients,
         "patient_macro_primary": primary,
         "paired_macro_differences_vs_standard_probability": difference,
@@ -394,8 +437,9 @@ def main():
     parser = argparse.ArgumentParser()
     for name in ("source-root", "config", "checkpoint", "manifest", "output"):
         parser.add_argument("--" + name, type=Path, required=True)
+    parser.add_argument("--expected-patients", type=int, default=3)
     a = parser.parse_args()
-    result = run(a.source_root, a.config, a.checkpoint, a.manifest, a.output)
+    result = run(a.source_root, a.config, a.checkpoint, a.manifest, a.output, expected_patients=a.expected_patients)
     print(json.dumps({
         "subjects": result["patient_count"],
         "patient_macro_primary": result["patient_macro_primary"],

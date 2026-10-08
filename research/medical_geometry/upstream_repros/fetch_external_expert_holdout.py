@@ -73,7 +73,7 @@ def fetch_nfbs(out: Path) -> dict:
     }
 
 
-def fetch_synthstrip(out: Path, count: int) -> tuple[list[dict], dict]:
+def fetch_synthstrip(out: Path, count: int, start_index: int = 0) -> tuple[list[dict], dict]:
     from huggingface_hub import HfApi, hf_hub_download, list_repo_tree
     dataset = "MedOtter/SynthStrip"
     api = HfApi()
@@ -126,8 +126,11 @@ def fetch_synthstrip(out: Path, count: int) -> tuple[list[dict], dict]:
             continue
         taken.add(subject)
         selection.append((folder, subject, modality))
-        if len(selection) == count:
+        if len(selection) == count + start_index:
             break
+    if start_index < 0:
+        raise ValueError("Negative frozen prospective cohort offset")
+    selection = selection[start_index:] if start_index else selection
     if len(selection) != count:
         raise ValueError(
             f"Only {len(selection)} independent T1 eligible SynthStrip "
@@ -177,16 +180,19 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--output-root", required=True, type=Path)
     ap.add_argument("--synthstrip-subjects", type=int, default=2)
+    ap.add_argument("--selection-offset", type=int, default=0)
+    ap.add_argument("--skip-nfbs", action="store_true")
     a = ap.parse_args()
     if a.synthstrip_subjects < 1:
         raise ValueError("Need at least one independent extra subject")
     a.output_root.mkdir(exist_ok=True, parents=True)
-    nfbs = fetch_nfbs(a.output_root)
+    nfbs = None if a.skip_nfbs else fetch_nfbs(a.output_root)
     others, provider = fetch_synthstrip(
-        a.output_root, a.synthstrip_subjects
+        a.output_root, a.synthstrip_subjects,
+        start_index=a.selection_offset
     )
-    records = [nfbs] + others
-    if a.synthstrip_subjects == 2 and tuple(
+    records = ([] if nfbs is None else [nfbs]) + others
+    if a.synthstrip_subjects == 2 and a.selection_offset == 0 and not a.skip_nfbs and tuple(
         r["image_sha256"] for r in records
     ) != FROZEN_PATIENT_IMAGE_SHA256:
         raise ValueError("Frozen independently preselected subject MRI provenance changed")
@@ -194,6 +200,8 @@ def main():
         raise ValueError("cross-source identifier collision")
     manifest = {
         "data_selection_label_blind": True,
+        "frozen_public_cohort_offset": a.selection_offset,
+        "nfbs_included": not a.skip_nfbs,
         "no_mask_tuned_crop": True,
         "no_ground_truth_used_to_select_subjects": True,
         "subjects": records,
