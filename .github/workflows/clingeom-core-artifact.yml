@@ -115,6 +115,19 @@ jobs:
         with:
           name: clingeom-lossless-label-evidence
           path: lossless-label-report.json
+      - name: Prove semantic certificate provenance collision is fixed
+        run: |
+          PYTHONPATH=. python research/medical_geometry/benchmark_semantic_certificate_collision.py | tee semantic-provenance-collision.json
+          {
+            echo '### Exact same tensors but different patient mm semantics'
+            echo '```json'
+            cat semantic-provenance-collision.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: clingeom-semantic-certificate-collision
+          path: semantic-provenance-collision.json
       - name: Produce channel-fiber evidence
         run: |
           PYTHONPATH=. python research/medical_geometry/benchmark_channel_fibers.py | tee channel-fiber-report.json
