@@ -87,10 +87,36 @@ def _mri_and_label(subject: dict) -> tuple:
 
 
 def _renamed_score(pred: np.ndarray, truth: np.ndarray, affine: np.ndarray):
-    original = score(np.asarray(pred) >= 0.5, truth, affine)
+    binary = np.asarray(pred) >= 0.5
+    original = score(binary, truth, affine)
+    measured = original["hd95_mm_against_provided_nonexpert_mask"]
+    if measured is None:
+        # All six methods MUST have the same number of scored ROIs; dropping
+        # empty predictions selectively corrupts patient-wise HD95 rankings.
+        # Explicit fully finite, predeclared empty-mask policy:
+        # (both empty) => zero, (only one empty) => crop's physical diameter.
+        vec = np.array([
+            [x, y, z] for x in (-63., 63.) for y in (-63., 63.)
+            for z in (-63., 63.)
+        ], np.float64)
+        full_crop_world_diameter = float(np.max(
+            np.linalg.norm(vec @ affine[:3, :3].T, axis=1)
+        ))
+        measured = (
+            0.0 if not np.any(binary) and not np.any(truth)
+            else full_crop_world_diameter
+        )
+        missing_policy = (
+            "both_empty_perfect_0" if not np.any(binary) and not np.any(truth)
+            else "one_empty_penalty_physical_crop_diameter"
+        )
+    else:
+        missing_policy = "both_boundaries_present_measured_surface_hd95"
     return {
         "dice": original["dice_against_provided_nonexpert_mask"],
-        "hd95_mm": original["hd95_mm_against_provided_nonexpert_mask"],
+        "hd95_mm": measured,
+        "hd95_raw_nullable_mm": original["hd95_mm_against_provided_nonexpert_mask"],
+        "hd95_empty_policy": missing_policy,
         "centroid_mm": original["centroid_distance_mm_against_provided_nonexpert_mask"],
         "predicted_foreground_voxels": original["foreground_voxels"],
     }
@@ -282,11 +308,11 @@ def run(source_root: Path, config: Path, checkpoint: Path,
             h = [r["metrics"][method]["hd95_mm"] for r in all_rois]
             per_subject[method] = {
                 "mean_fixed_roi_dice": float(np.mean(d)),
-                "mean_defined_fixed_roi_hd95_mm": (
-                    float(np.mean([x for x in h if x is not None]))
-                    if any(x is not None for x in h) else None
+                "mean_defined_fixed_roi_hd95_mm": float(np.mean(h)),
+                "undefined_hd95_rois": sum(
+                    r["metrics"][method]["hd95_raw_nullable_mm"] is None
+                    for r in all_rois
                 ),
-                "undefined_hd95_rois": sum(x is None for x in h),
             }
         patients.append({
             "case_id": subject["case_id"],
@@ -335,6 +361,11 @@ def run(source_root: Path, config: Path, checkpoint: Path,
         "real_original_pretrained_parameter_digest": parameter_digest,
         "model_loaded_once_and_all_weights_frozen": True,
         "threshold_predeclared": 0.5,
+        "physical_hd95_empty_policy_frozen": (
+            "both masks empty: 0; exactly one empty: physical diagonal "
+            "diameter of 64^3 crop; otherwise symmetric 95-percentile "
+            "patient-world boundary distance; NEVER drop undefined ROI"
+        ),
         "roi_offsets_axis0": list(ROI_OFFSETS_VOXELS),
         "roi_edge": ROI_EDGE,
         "image_normalization": "unchanged original TensorFlow source per-plane zscore",
