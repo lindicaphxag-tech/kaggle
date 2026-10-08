@@ -1,0 +1,36 @@
+name: SemRepair bounded-noise adversarial authority diagnosis
+
+on:
+  push:
+    branches:
+      - research/semrepair-robust-observation-game
+    paths:
+      - "research/semrepair/**"
+      - ".github/workflows/semrepair-noisy-authority.yml"
+  pull_request:
+    paths:
+      - "research/semrepair/**"
+      - ".github/workflows/semrepair-noisy-authority.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-adversarial-observation:
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.12", "3.13"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Compile bounded-noise active diagnosis
+        run: python -m py_compile research/semrepair/noisy_authority_game.py
+      - name: Verify robust adversarial observation game
+        run: python research/semrepair/noisy_authority_game.py
+      - name: Regression-check existing exact-partition oracle
+        run: python research/semrepair/independent_oracle.py
