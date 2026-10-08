@@ -49,6 +49,9 @@ def test_nested_sequential_is_serially_compiled():
         ),
         nn.AvgPool3d(kernel_size=2, stride=2),
     )
+    # This verifies inference lattice geometry: BatchNorm uses frozen
+    # running statistics only after eval(), not input-global train stats.
+    model.eval()
     trace = compile_sequential_geometry(
         model, input_shape=(32, 32, 32), input_affine=np.eye(4)
     )
