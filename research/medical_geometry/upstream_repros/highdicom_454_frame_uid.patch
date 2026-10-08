@@ -1,0 +1,31 @@
+diff --git a/src/highdicom/volume.py b/src/highdicom/volume.py
+--- a/src/highdicom/volume.py
++++ b/src/highdicom/volume.py
+@@ -4343,9 +4343,11 @@
+         meta[MetaKeys.SPATIAL_SHAPE] = np.array(self.spatial_shape)[keep_cols]
+         meta[MetaKeys.ORIGINAL_AFFINE] = affine.copy()
+         meta[MetaKeys.AFFINE] = affine.copy()
+         meta[MetaKeys.ORIGINAL_CHANNEL_DIM] = (
+             -1 if self.ndim > 3 else float("nan")
+         )
++        if self.frame_of_reference_uid is not None:
++            meta["highdicom_frame_of_reference_uid"] = str(self.frame_of_reference_uid)
+ 
+         metatensor = monai.data.MetaTensor(array, meta=meta)
+ 
+@@ -4449,10 +4451,15 @@
+                         ' for volumes with >=2 channels.'
+                     )
+ 
+         array = metatensor.cpu().detach().numpy()
++
++        if frame_of_reference_uid is None:
++            frame_of_reference_uid = metatensor.meta.get(
++                "highdicom_frame_of_reference_uid"
++            )
+ 
+         return cls(
+             array=array,
+             affine=metatensor.affine.cpu().detach().numpy(),
+             coordinate_system=coordinate_system,
+             frame_of_reference_uid=frame_of_reference_uid,
