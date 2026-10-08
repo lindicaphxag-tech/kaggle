@@ -1,0 +1,896 @@
+{
+  "schema": "semantic-abi-frozen-policy-transfer/raw-v1",
+  "task": "PushCube-v1",
+  "cohort_role": "exploratory task",
+  "source_repo": "lindicaphxag-tech/ManiSkill",
+  "run_id": 37810291098,
+  "job_id": 113425079070,
+  "run_head_sha": "23e2e72b6f75ae739d43db92e3c33c35585eee83",
+  "implementation_blob_sha": "aa23f9d34609c5051a728edf6eb4c2984359171a",
+  "implementation_path": "research/frozen_ppo_target_memory.py",
+  "checkpoint_repo": "kattri15/actionshift-baselines",
+  "checkpoint_path": "ppo/push_cube_final_ckpt.pt",
+  "checkpoint_sha256": "a4a02198b309e73cb877959079023d967d5f63ec78380de9703a10c9efafc0cf",
+  "episode_horizon_steps": 50,
+  "expected_seed_start": 40001,
+  "expected_seed_count": 32,
+  "author_operated": true,
+  "original_job_url": "https://github.com/lindicaphxag-tech/ManiSkill/actions/runs/37810291098/job/113425079070",
+  "raw_episode_records": [
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40001,
+      "steps": {
+        "memory": 6,
+        "naive": 50,
+        "projected": 6,
+        "source": 6,
+        "stateless": 50
+      },
+      "success_once": {
+        "memory": true,
+        "naive": false,
+        "projected": true,
+        "source": true,
+        "stateless": false
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40002,
+      "steps": {
+        "memory": 7,
+        "naive": 8,
+        "projected": 7,
+        "source": 7,
+        "stateless": 8
+      },
+      "success_once": {
+        "memory": true,
+        "naive": true,
+        "projected": true,
+        "source": true,
+        "stateless": true
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40003,
+      "steps": {
+        "memory": 6,
+        "naive": 50,
+        "projected": 6,
+        "source": 6,
+        "stateless": 50
+      },
+      "success_once": {
+        "memory": true,
+        "naive": false,
+        "projected": true,
+        "source": true,
+        "stateless": false
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40004,
+      "steps": {
+        "memory": 7,
+        "naive": 50,
+        "projected": 7,
+        "source": 7,
+        "stateless": 50
+      },
+      "success_once": {
+        "memory": true,
+        "naive": false,
+        "projected": true,
+        "source": true,
+        "stateless": false
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40005,
+      "steps": {
+        "memory": 6,
+        "naive": 6,
+        "projected": 6,
+        "source": 6,
+        "stateless": 6
+      },
+      "success_once": {
+        "memory": true,
+        "naive": true,
+        "projected": true,
+        "source": true,
+        "stateless": true
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40006,
+      "steps": {
+        "memory": 7,
+        "naive": 7,
+        "projected": 7,
+        "source": 7,
+        "stateless": 7
+      },
+      "success_once": {
+        "memory": true,
+        "naive": true,
+        "projected": true,
+        "source": true,
+        "stateless": true
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40007,
+      "steps": {
+        "memory": 50,
+        "naive": 50,
+        "projected": 50,
+        "source": 50,
+        "stateless": 50
+      },
+      "success_once": {
+        "memory": false,
+        "naive": false,
+        "projected": false,
+        "source": false,
+        "stateless": false
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40008,
+      "steps": {
+        "memory": 7,
+        "naive": 9,
+        "projected": 7,
+        "source": 7,
+        "stateless": 9
+      },
+      "success_once": {
+        "memory": true,
+        "naive": true,
+        "projected": true,
+        "source": true,
+        "stateless": true
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40009,
+      "steps": {
+        "memory": 6,
+        "naive": 7,
+        "projected": 6,
+        "source": 6,
+        "stateless": 7
+      },
+      "success_once": {
+        "memory": true,
+        "naive": true,
+        "projected": true,
+        "source": true,
+        "stateless": true
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40010,
+      "steps": {
+        "memory": 6,
+        "naive": 50,
+        "projected": 6,
+        "source": 6,
+        "stateless": 50
+      },
+      "success_once": {
+        "memory": true,
+        "naive": false,
+        "projected": true,
+        "source": true,
+        "stateless": false
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40011,
+      "steps": {
+        "memory": 7,
+        "naive": 50,
+        "projected": 7,
+        "source": 7,
+        "stateless": 50
+      },
+      "success_once": {
+        "memory": true,
+        "naive": false,
+        "projected": true,
+        "source": true,
+        "stateless": false
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40012,
+      "steps": {
+        "memory": 6,
+        "naive": 8,
+        "projected": 6,
+        "source": 6,
+        "stateless": 8
+      },
+      "success_once": {
+        "memory": true,
+        "naive": true,
+        "projected": true,
+        "source": true,
+        "stateless": true
+      }
+    },
+    {
+      "approximations": {
+        "projected": [
+          {
+            "exactness": "NOT_EXACT",
+            "required_native_amp": 1.0635221004486084,
+            "step": 4
+          }
+        ]
+      },
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.0635221004486084,
+      "refusals": {
+        "memory": {
+          "reason": "required delta outside target native bounds",
+          "required_amp": 1.0635221004486084,
+          "step": 4
+        }
+      },
+      "seed": 40013,
+      "steps": {
+        "memory": 4,
+        "naive": 9,
+        "projected": 7,
+        "source": 7,
+        "stateless": 9
+      },
+      "success_once": {
+        "memory": false,
+        "naive": true,
+        "projected": true,
+        "source": true,
+        "stateless": true
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40014,
+      "steps": {
+        "memory": 6,
+        "naive": 6,
+        "projected": 6,
+        "source": 6,
+        "stateless": 6
+      },
+      "success_once": {
+        "memory": true,
+        "naive": true,
+        "projected": true,
+        "source": true,
+        "stateless": true
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40015,
+      "steps": {
+        "memory": 9,
+        "naive": 50,
+        "projected": 9,
+        "source": 9,
+        "stateless": 50
+      },
+      "success_once": {
+        "memory": true,
+        "naive": false,
+        "projected": true,
+        "source": true,
+        "stateless": false
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40016,
+      "steps": {
+        "memory": 50,
+        "naive": 5,
+        "projected": 50,
+        "source": 50,
+        "stateless": 5
+      },
+      "success_once": {
+        "memory": false,
+        "naive": true,
+        "projected": false,
+        "source": false,
+        "stateless": true
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40017,
+      "steps": {
+        "memory": 7,
+        "naive": 50,
+        "projected": 7,
+        "source": 7,
+        "stateless": 50
+      },
+      "success_once": {
+        "memory": true,
+        "naive": false,
+        "projected": true,
+        "source": true,
+        "stateless": false
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40018,
+      "steps": {
+        "memory": 8,
+        "naive": 6,
+        "projected": 8,
+        "source": 8,
+        "stateless": 6
+      },
+      "success_once": {
+        "memory": true,
+        "naive": true,
+        "projected": true,
+        "source": true,
+        "stateless": true
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40019,
+      "steps": {
+        "memory": 6,
+        "naive": 50,
+        "projected": 6,
+        "source": 6,
+        "stateless": 50
+      },
+      "success_once": {
+        "memory": true,
+        "naive": false,
+        "projected": true,
+        "source": true,
+        "stateless": false
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40020,
+      "steps": {
+        "memory": 6,
+        "naive": 7,
+        "projected": 6,
+        "source": 6,
+        "stateless": 7
+      },
+      "success_once": {
+        "memory": true,
+        "naive": true,
+        "projected": true,
+        "source": true,
+        "stateless": true
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.0000000149011612,
+      "refusals": {},
+      "seed": 40021,
+      "steps": {
+        "memory": 6,
+        "naive": 4,
+        "projected": 6,
+        "source": 6,
+        "stateless": 4
+      },
+      "success_once": {
+        "memory": true,
+        "naive": true,
+        "projected": true,
+        "source": true,
+        "stateless": true
+      }
+    },
+    {
+      "approximations": {
+        "projected": [
+          {
+            "exactness": "NOT_EXACT",
+            "required_native_amp": 1.1746084690093994,
+            "step": 4
+          }
+        ]
+      },
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.1746084690093994,
+      "refusals": {
+        "memory": {
+          "reason": "required delta outside target native bounds",
+          "required_amp": 1.1746084690093994,
+          "step": 4
+        }
+      },
+      "seed": 40022,
+      "steps": {
+        "memory": 4,
+        "naive": 50,
+        "projected": 7,
+        "source": 7,
+        "stateless": 50
+      },
+      "success_once": {
+        "memory": false,
+        "naive": false,
+        "projected": true,
+        "source": true,
+        "stateless": false
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40023,
+      "steps": {
+        "memory": 6,
+        "naive": 7,
+        "projected": 6,
+        "source": 6,
+        "stateless": 7
+      },
+      "success_once": {
+        "memory": true,
+        "naive": true,
+        "projected": true,
+        "source": true,
+        "stateless": true
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40024,
+      "steps": {
+        "memory": 6,
+        "naive": 6,
+        "projected": 6,
+        "source": 6,
+        "stateless": 6
+      },
+      "success_once": {
+        "memory": true,
+        "naive": true,
+        "projected": true,
+        "source": true,
+        "stateless": true
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40025,
+      "steps": {
+        "memory": 6,
+        "naive": 8,
+        "projected": 6,
+        "source": 6,
+        "stateless": 8
+      },
+      "success_once": {
+        "memory": true,
+        "naive": true,
+        "projected": true,
+        "source": true,
+        "stateless": true
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40026,
+      "steps": {
+        "memory": 6,
+        "naive": 6,
+        "projected": 6,
+        "source": 6,
+        "stateless": 6
+      },
+      "success_once": {
+        "memory": true,
+        "naive": true,
+        "projected": true,
+        "source": true,
+        "stateless": true
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40027,
+      "steps": {
+        "memory": 7,
+        "naive": 9,
+        "projected": 7,
+        "source": 7,
+        "stateless": 9
+      },
+      "success_once": {
+        "memory": true,
+        "naive": true,
+        "projected": true,
+        "source": true,
+        "stateless": true
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40028,
+      "steps": {
+        "memory": 7,
+        "naive": 50,
+        "projected": 7,
+        "source": 7,
+        "stateless": 50
+      },
+      "success_once": {
+        "memory": true,
+        "naive": false,
+        "projected": true,
+        "source": true,
+        "stateless": false
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40029,
+      "steps": {
+        "memory": 6,
+        "naive": 7,
+        "projected": 6,
+        "source": 6,
+        "stateless": 7
+      },
+      "success_once": {
+        "memory": true,
+        "naive": true,
+        "projected": true,
+        "source": true,
+        "stateless": true
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40030,
+      "steps": {
+        "memory": 6,
+        "naive": 5,
+        "projected": 6,
+        "source": 6,
+        "stateless": 5
+      },
+      "success_once": {
+        "memory": true,
+        "naive": true,
+        "projected": true,
+        "source": true,
+        "stateless": true
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40031,
+      "steps": {
+        "memory": 7,
+        "naive": 50,
+        "projected": 7,
+        "source": 7,
+        "stateless": 50
+      },
+      "success_once": {
+        "memory": true,
+        "naive": false,
+        "projected": true,
+        "source": true,
+        "stateless": false
+      }
+    },
+    {
+      "approximations": {},
+      "initial_obs_diff": {
+        "memory": 0,
+        "naive": 0,
+        "projected": 0,
+        "stateless": 0
+      },
+      "max_required_native_amp": 1.000000238418579,
+      "refusals": {},
+      "seed": 40032,
+      "steps": {
+        "memory": 7,
+        "naive": 8,
+        "projected": 7,
+        "source": 7,
+        "stateless": 8
+      },
+      "success_once": {
+        "memory": true,
+        "naive": true,
+        "projected": true,
+        "source": true,
+        "stateless": true
+      }
+    }
+  ],
+  "original_console_summary": {
+    "success": {
+      "source": 30,
+      "memory": 28,
+      "projected": 30,
+      "stateless": 20,
+      "naive": 20
+    },
+    "refused": 2,
+    "approximate_steps": {
+      "projected": 2,
+      "stateless": 0
+    },
+    "episodes": 32
+  }
+}
