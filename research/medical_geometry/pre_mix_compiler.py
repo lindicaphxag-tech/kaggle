@@ -18,6 +18,7 @@ import torch.nn as nn
 from .channel_fiber_runtime import repair_channel_fibers
 from .clingeom import FeatureLattice
 from .lattice_bundle import LatticeBundle, bundle_from_lattice
+from .support_envelope import premix_output_support_envelope
 
 
 @dataclass(frozen=True)
@@ -27,6 +28,7 @@ class CertifiedPreMixResult:
     source_repair_digests: tuple[str, ...]
     per_output_value_error_bounds: tuple[float, ...] | None
     conv_weight_provenance_sha256: str
+    output_receptive_field_envelope: tuple[float, float, float]
 
 
 def _check_pointwise_dense_mix(mix: nn.Module, source_channels: int) -> nn.Conv3d:
@@ -96,7 +98,8 @@ def physically_align_then_mix(
     output = mixer(aligned.tensor)
     if tuple(output.shape[-3:]) != tuple(target.shape):
         raise RuntimeError("pointwise mixer violated target shape")
-    digest = sha256(b"clingeom-pre-mix-1x1-v1")
+    output_support = premix_output_support_envelope(source_bundle, target)
+    digest = sha256(b"clingeom-pre-mix-1x1-support-envelope-v2")
     for p in (mixer.weight, mixer.bias):
         if p is None:
             digest.update(b"NONE")
@@ -106,9 +109,20 @@ def physically_align_then_mix(
             digest.update(a.tobytes())
     for s in aligned.plan_certificate_digests:
         digest.update(s.encode("ascii"))
+    # The source footprints and derived output envelope are part of semantic
+    # provenance: equal centers/weights do not imply equal physical support.
+    for fiber in source_bundle.fibers:
+        for support in fiber.supports:
+            digest.update(np.asarray(
+                support.receptive_field, dtype="<f8"
+            ).tobytes())
+    digest.update(np.asarray(
+        output_support.receptive_field, dtype="<f8"
+    ).tobytes())
     return CertifiedPreMixResult(
-        tensor=output, output_bundle=bundle_from_lattice(mixer.out_channels,target),
+        tensor=output, output_bundle=bundle_from_lattice(mixer.out_channels,output_support),
         source_repair_digests=aligned.plan_certificate_digests,
         per_output_value_error_bounds=per_output,
         conv_weight_provenance_sha256=digest.hexdigest(),
+        output_receptive_field_envelope=tuple(float(v) for v in output_support.receptive_field),
     )
