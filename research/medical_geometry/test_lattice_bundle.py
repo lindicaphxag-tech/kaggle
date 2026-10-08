@@ -249,3 +249,56 @@ def test_parallel_collapse_rejects_lattices_with_different_linear_parts():
     assert not cert.applicable
     assert cert.exact_minimax_radius_mm is None
     assert cert.optimal_affine is None
+
+
+# --- Adversarial provenance regression: distinct receptive supports, one center map ---
+def _same_center_different_rf_bundle(reverse=False):
+    import numpy as np
+    short=FeatureLattice((8,8,8),np.ones(3),np.zeros(3),np.array([1.,1.,1.]))
+    wide=FeatureLattice((8,8,8),np.ones(3),np.zeros(3),np.array([3.,5.,1.]))
+    a,b=(wide,short) if reverse else (short,wide)
+    return LatticeBundle((8,8,8),2,(
+        ChannelFiber(0,1,(a,),"first-center"),
+        ChannelFiber(1,2,(b,),"second-center"),
+    ))
+
+
+@pytest.mark.parametrize("reverse",[False,True])
+def test_deduplicating_identical_centers_must_not_erase_wider_receptive_support(reverse):
+    source=_same_center_different_rf_bundle(reverse)
+    grouped=all_bundle_supports(source)
+    assert len(grouped)==1  # one center affine is still correct
+    np.testing.assert_allclose(grouped[0].receptive_field,[3.,5.,1.])
+    assert certify_single_lattice(source,anisotropic_affine()).valid
+
+
+@pytest.mark.parametrize("reverse",[False,True])
+def test_dense_pointwise_mixing_inherits_union_not_first_fiber_support(reverse):
+    source=_same_center_different_rf_bundle(reverse)
+    mixed=dense_conv_mix_bundle(
+        source,out_channels=4,kernel_size=1,stride=1,padding=0
+    )
+    assert len(mixed.fibers)==1
+    assert len(mixed.fibers[0].supports)==1
+    np.testing.assert_allclose(
+        mixed.fibers[0].supports[0].receptive_field,[3.,5.,1.]
+    )
+
+
+def test_factorized_reduction_does_not_erase_matching_center_wide_context():
+    source=_same_center_different_rf_bundle()
+    reduced=factorized_reduce_bundle(source,out_channels=4)
+    assert len(reduced.fibers)==2
+    for fiber in reduced.fibers:
+        assert len(fiber.supports)==1
+        np.testing.assert_allclose(fiber.supports[0].receptive_field,[3.,5.,1.])
+
+
+def test_compacted_support_center_and_receptive_union_are_separate_semantics():
+    source=_same_center_different_rf_bundle()
+    compact=all_bundle_supports(source)[0]
+    original=source.fibers[0].supports[0]
+    np.testing.assert_allclose(compact.start,original.start)
+    np.testing.assert_allclose(compact.jump,original.jump)
+    np.testing.assert_allclose(compact.receptive_field,[3.,5.,1.])
+    assert not np.array_equal(compact.receptive_field,original.receptive_field)
