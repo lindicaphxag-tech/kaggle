@@ -66,17 +66,21 @@ def _getitem_bundle(node: Node, env: dict[Node, LatticeBundle]) -> LatticeBundle
 
     starts: list[int] = []
     stops: list[int | None] = []
+    steps: list[int] = []
     for item in index[2:]:
         if not isinstance(item, slice):
             raise UnsupportedGeometryOp("spatial integer indexing is not certified by bundle FX v1")
-        if item.step not in (None, 1):
-            raise UnsupportedGeometryOp("spatial slice steps other than 1 are not certified")
+        step = 1 if item.step is None else item.step
+        if not isinstance(step, int) or isinstance(step, bool) or step <= 0:
+            raise UnsupportedGeometryOp("only positive integer spatial slice steps are certified")
         starts.append(0 if item.start is None else int(item.start))
         stops.append(None if item.stop is None else int(item.stop))
+        steps.append(step)
     return slice_bundle_spatial(
         source,
         tuple(starts),
         tuple(stops),
+        steps=tuple(steps),
     )
 
 
