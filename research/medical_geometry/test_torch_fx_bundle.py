@@ -105,6 +105,7 @@ def test_fx_compiler_recovers_factorized_reduce_channel_fibers():
 
 def test_dense_conv_after_factorized_reduce_produces_multi_support_output_channels():
     model = ReduceThenMix()
+    model.eval()  # inference-mode tracked BatchNorm statistics
     result = compile_fx_bundle_geometry(
         model, input_shape=(32, 32, 32), input_channels=8
     )
