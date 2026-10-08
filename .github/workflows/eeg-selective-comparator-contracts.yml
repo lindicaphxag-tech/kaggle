@@ -28,5 +28,6 @@ jobs:
           python -m unittest discover -s tests -p 'test_eegmmidb_certificate_real.py' -v
           python -m unittest discover -s tests -p 'test_eeg_selective_margin_control.py' -v
           python -m unittest discover -s tests -p 'test_eegmmidb_real_pilot.py' -v
+          python -m unittest discover -s tests -p 'test_active_provenance_queries.py' -v
 
 # This suite is pure synthetic protocol unit testing; no real EDF scores.
