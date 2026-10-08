@@ -108,6 +108,11 @@ python -m pytest -q research/medical_geometry/test_torch_repair_certificate.py r
 ```
 
 **Evidence boundary:** these are first-party reproducibility artifacts and a pinned observation on an external codebase. highdicom maintainer confirmation, independent reproduction, external adoption, clinical performance improvement, and prospective new-defect status remain separate, unclaimed milestones.
+## New physical-value and upstream compatibility evidence (2026-10-08)
+
+**ClinGeom conditional value repair:** [PR #24](https://github.com/lindicaphxag-tech/kaggle/pull/24) extends the previously verified patient-space lattice repair with a **separate conditional feature-interpolation error budget**. Without a valid uniform world-space Hessian envelope for a resampled branch, a requested value-error guarantee fails closed. A quadratic 2 mm patient-space witness attains the stated 0.3-value-unit bound, including the real PyTorch interpolation executor. This uses classical approximation theory; no pretrained-model or clinical robustness claim is made. [Full public CI](https://github.com/lindicaphxag-tech/kaggle/actions/runs/37706126491).
+
+**highdicom upstream review-ready paired proof:** [PR #25](https://github.com/lindicaphxag-tech/kaggle/pull/25) replays the same pinned highdicom #454 installation **before and after** a two-site FrameOfReferenceUID patch, with unchanged reproduction criteria. Before: two automatic UIDs are lost. After: both UIDs preserved, explicit arguments override metadata, missing legacy metadata stays backward-compatible, and LPS geometry still round-trips with affine error `0.0`. [Paired passing CI and downloadable artifact](https://github.com/lindicaphxag-tech/kaggle/actions/runs/37706342122). See [minimal patch script](research/medical_geometry/upstream_repros/patch_highdicom_454.py) and [post-patch regression](research/medical_geometry/upstream_repros/highdicom_454_patch_regression.py). **This is author-operated validation, not upstream highdicom adoption.**
 ## SemRepair prospective evidence transport
 
 The `transport/` surface is intentionally narrower: it freezes first-seen public issue evidence, prediction digests, deadlines and later resolution evidence. It does **not** award itself research credit or retroactively convert known cases into prospective discoveries.
