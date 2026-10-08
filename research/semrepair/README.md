@@ -258,6 +258,33 @@ real simulation dynamics.
 
 The **real task success** question is intentionally kept separate from semantic agreement. In controller-aware replay, repaired semantics did not establish broad task-level superiority; negative and mixed results remain visible.
 
+## New: official ManiSkill Diffusion Policy training pipeline (2026-10-08)
+
+The prior native PickCube assay tested a **controller target**, not a learned
+robot policy. A separate, public GitHub Actions experiment has now completed
+the **official PegInsertionSide-v1 Diffusion Policy CPU pipeline** through
+independent per-arm demo replay, source-seed pairing, gradient updates, real
+short-horizon evaluation, TensorBoard export and clean process shutdown:
+
+- [Full successful public run 37713921020](https://github.com/lindicaphxag-tech/ManiSkill/actions/runs/37713921020)
+- [Frozen result summary and data/provenance digests](https://github.com/lindicaphxag-tech/ManiSkill/blob/research/native-delta-pose-assay/research/kaggle_diffusion_policy_peg/README.md)
+- Baseline replay `6/8`; composed current #1495 + exact #1472 `6/8`.
+  The six paired source seeds, **893 transitions per arm**, and different
+  converted dataset SHA-256 digests are retained as evidence.
+- Both ~4.40M-parameter models executed **two optimizer updates** and
+  short evaluation loops. **Both achieved 0% success** over tiny two-episode
+  20-step-horizon evaluations. These are entirely insufficient for a
+  performance-superiority or L8 learned-policy effect claim.
+
+This result certifies that the previously blocked **real training pipeline
+is runnable CPU-only**, not that SemRepair increases policy success.
+The experiment uses isolated headless-render/Gymnasium compatibility shims
+and is independent of the upstream #1495 two-file patch.
+
+A separate four-cell converter×controller replay study is underway;
+until it reports real data, converter-only and controller-only effects are
+not attributed or inferred from this two-arm result.
+
 ## Independent falsification requests
 
 The most useful outside contribution is an **independent counterexample**, not a star or a restatement of the author's test log.
