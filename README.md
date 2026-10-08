@@ -39,6 +39,8 @@ cross-repository CI is still author-operated, not independent endorsement.
 
 ## ClinGeom — start here
 
+**Independent reviewers wanted:** [5-minute highdicom #454 before/after reproduction task](https://github.com/lindicaphxag-tech/kaggle/issues/28) — fixed upstream SHA, public passing author-operated CI, exact success/falsification criteria, and credit for an independent report. **Open request; no external reproduction yet.**
+
 Frozen evidence pack: [`research/medical_geometry/EVIDENCE_V0.2.0.md`](research/medical_geometry/EVIDENCE_V0.2.0.md) · machine-readable manifest: [`EVIDENCE_MANIFEST_V0.2.0.json`](research/medical_geometry/EVIDENCE_MANIFEST_V0.2.0.json)
 
 **Frozen public version:** [`release/clingeom-v0.2.0`](https://github.com/lindicaphxag-tech/kaggle/tree/release/clingeom-v0.2.0) at `7e570b05071ae65dc1abc636701c5a75ca1424a3` (public core CI green; 54 NumPy-core tests). Use the frozen branch for independent reproduction; `main` is the continuing research line.
