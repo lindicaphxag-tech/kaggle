@@ -3,6 +3,7 @@ import math
 import numpy as np
 import torch
 import torch.nn as nn
+import pytest
 
 from monai.networks.blocks.dints_block import FactorizedReduceBlock
 
@@ -118,3 +119,15 @@ def test_real_monai_fiber_repair_recovers_patient_coordinate_field():
     assert metrics['naive_shared_index_readout_mae'] > 3.0
     assert metrics['typed_fiber_repair_max_abs_error'] < 2e-4
     assert metrics['repair_plan_kinds'] == ['resample', 'resample']
+
+
+def test_monai_real_runtime_has_tight_conditional_quadratic_envelope():
+    from research.medical_geometry.benchmark_monai_dints_quadratic_bound import run
+
+    metrics=run()
+    assert metrics['number_of_fibers'] == 2
+    assert metrics['computed_value_error_bounds'] == pytest.approx([0.19485,0.19485])
+    assert metrics['physically_repaired_max_absolute_error'] <= 0.19485 + 2e-5
+    assert metrics['naive_common_index_mean_absolute_error'] > (
+        metrics['physically_repaired_mean_absolute_error']
+    )
