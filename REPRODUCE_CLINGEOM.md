@@ -114,3 +114,25 @@ and MONAI 1.6.1. It observes exact affine round-trip but lost automatic
 `FrameOfReferenceUID`. This is a third-party-code *observation*, not
 third-party *confirmation* or adoption.
 
+
+## F. Conditional physical interpolation-value certificates
+
+ClinGeom does **not** infer that interpolating two spatially aligned neural
+features makes their values semantically equivalent. It now offers an
+optional, fail-closed error budget under a declared **uniform patient-space
+Hessian operator norm bound** on each interpolated feature field.
+
+```bash
+python -m pytest -q research/medical_geometry/test_interpolation_certificate.py
+python -m pytest -q research/medical_geometry/test_interpolation_fx_gate.py
+```
+
+Expected: an analytic quadratic field on 2 mm voxels attains the sharp
+0.3 output-value-unit bound for curvature 0.2 units/mm², both with direct
+NumPy eight-corner interpolation and the actual PyTorch grid_sample repair.
+Unknown curvature, excessive curvature, and label-nearest interpolation
+must fail when a numerical value-error budget is requested.
+
+This is an assumption-conditional guarantee, not a measured reliability
+score on pretrained neural features. For pretrained models, external
+curvature envelopes must be established before promoting this claim.
