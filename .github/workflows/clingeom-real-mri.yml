@@ -1,0 +1,44 @@
+name: ClinGeom real MRI patient-space witness
+
+on:
+  pull_request:
+    paths:
+      - "research/medical_geometry/real_mri_witness.py"
+      - "research/medical_geometry/REAL_MRI_WITNESS.md"
+      - ".github/workflows/clingeom-real-mri.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  real-open-mri:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install CPU-only reproducible analysis stack
+        run: |
+          python -m pip install "numpy<3" "nibabel>=5.2,<6" "scipy>=1.11" "matplotlib>=3.8"
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+      - name: Acquire real MRI from pinned official NiBabel source
+        run: |
+          curl -fL --retry 3 --max-time 90 "https://raw.githubusercontent.com/nipy/nibabel/d6a0ba0056445c06407afb421749a8ed5c939c56/doc/source/downloads/someones_anatomy.nii.gz" -o real_anatomy.nii.gz
+          test "$(git hash-object real_anatomy.nii.gz)" = "b7e917e3f891c74fd99cdf82ec579ee254a195d0"
+          sha256sum real_anatomy.nii.gz
+      - name: Render real MRI, controlled geometry failure and actual operator outputs
+        run: |
+          python -m research.medical_geometry.real_mri_witness --image real_anatomy.nii.gz --out artifacts/real_mri
+      - name: Fail closed on wrong geometry or missing real image panels
+        run: |
+          python -c "import json,pathlib; d=json.loads(pathlib.Path('artifacts/real_mri/real_mri_witness.json').read_text()); g=d['geometry']; t=d['operators']; assert g['voxel_dice_after_joint_wrong_reindex']==1; assert g['stale_patient_grid_dice']<1; assert g['repaired_patient_grid_dice']==1; assert g['repaired_residual_mm']<1e-6; assert g['centroid_displacement_mm']>0; assert t['inter_operator_world_phase_mm']>0; assert all(pathlib.Path('artifacts/real_mri/'+n).stat().st_size>10000 for n in ('fig1_real_mri_patient_space.png','fig3_real_mri_operator_lattices.png')); print('PASS real MRI physical-space chain')"
+      - name: Upload the figures, evidence JSON and data provenance
+        uses: actions/upload-artifact@v4
+        with:
+          name: ClinGeom-real-MRI-witness
+          path: artifacts/real_mri/
+          if-no-files-found: error
+          retention-days: 60
