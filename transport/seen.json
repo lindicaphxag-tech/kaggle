@@ -510,13 +510,17 @@
     },
     {
       "created_at": "2026-10-08T01:11:10Z",
+      "disposition_frozen_at": "2026-10-08T01:51:59Z",
+      "disposition_sha256": "ca206d11ae343a2c64074c9659e8807893fd628db416ab1020fba37d10d69b17",
+      "disposition_source": "dispositions/isaac-sim__IsaacSim__872.json",
       "first_frozen_at": "2026-10-08T01:18:00Z",
       "id": "isaac-sim/IsaacSim#872",
+      "independence_class": "EXCLUDED",
       "issue_number": 872,
       "prediction_deadline_at": "2026-10-08T07:18:00Z",
       "repository": "isaac-sim/IsaacSim",
       "source": "inbox/FIRST_SEEN_20261008T011800Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "excluded_protocol_2_4_documentation_only_exact_mechanism_and_repair_exposed",
       "surface_sha256": "77ca87b2f81aad2cc43de0ced0a6579b59e1c7a92dcb852b5936d8f6a8239700"
     }
   ]
