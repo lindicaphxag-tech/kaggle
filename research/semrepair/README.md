@@ -85,6 +85,65 @@ When two surviving hypotheses require different repairs and cannot be separated 
 
 This is a narrow embodied-systems contribution. We do **not** claim invention of active diagnosis, equivalence-class determination, value of information, fault masking, general proof-carrying actions, or executable policy metadata.
 
+## Native MuJoCo: hidden semantics under controller nuisance
+
+The finite four-world example above uses a frozen experiment table. The more
+demanding [native MuJoCo authority experiment](mujoco_native_authority.py)
+instead builds the observation table **by stepping the official MuJoCo 3.3.7
+CPU simulator**. No renderer, GPU, VLA checkpoint, or training is needed.
+
+```bash
+python -m pip install mujoco==3.3.7
+python research/semrepair/mujoco_native_authority.py
+```
+
+The test constructs four concrete worlds in a one-dimensional articulated
+control system, with different software-scale and actuator/plant parameters:
+
+| Hidden world | Producer action scale | Actuator gear | Mass / damping | Correct concrete action |
+|---|---:|---:|---|---|
+| gain fault | 1 | 2 | 1 / 0.2 | replace gear 2 with 1 |
+| producer fault | 2 | 1 | 1 / 0.2 | replace producer scale 2 with 1 |
+| correct | 1 | 1 | 1 / 0.2 | no change |
+| nuisance alias | 1 | 4 | 2 / 0.4 | replace gear 4 with 2 |
+
+Because the physical dynamics depend on the ratios of effective force to mass
+and damping to mass, three **different repair authorities** can have exactly
+the same observable state trajectories.
+
+The program selects actual native observations:
+
+1. **External joint state**: distinguishes the reference from the faulty
+   external-response class but not the three confounded faults.
+2. **Internal command / pre-transmission tap**: separates producer scaling but
+   cannot distinguish gain-2 from gain-4 with compensated mass/damping.
+3. **Internal actuator-force tap**: exposes the remaining confounding.
+4. **Zero input negative control**: none of those taps provides information.
+
+The independent `Fraction`-valued solver computes the least expected
+experiment cost from the resulting MuJoCo measurements. It returns an
+authority-optimal cost **4** under the frozen uniform-prior and declared costs.
+
+**Essential negative controls:**
+
+- external-only experiments: `unsafe_unidentifiable`;
+- external + controller-command tap: `unsafe_unidentifiable`;
+- force tap disallowed by the frozen risk budget: `unsafe_unidentifiable`;
+- after executing each **correct local repair**, the reference trajectory is
+  recovered in the controlled simulator.
+
+Three separate forcing sequences and a conservative additive measurement
+half-width check make accidental distinguishability by rounding less likely.
+These checks are specific to the frozen deterministic plant, observation
+library and perturbation model, not a general robustness theorem.
+
+This is **not** a discovered MuJoCo defect, not a robot-task success result,
+not a maintainer-approved library fix, and not independent third-party
+reproduction. It is an executable causal/identifiability witness produced from
+real simulation dynamics.
+
+[Public native MuJoCo CI](https://github.com/lindicaphxag-tech/kaggle/actions/workflows/semrepair-native-mujoco.yml)
+
 ## Formal and real-stack evidence
 
 | Evidence | Exact public reference | What it demonstrates | What it does **not** demonstrate |
