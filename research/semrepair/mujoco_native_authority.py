@@ -41,9 +41,15 @@ WORLDS = (
     World("nuisance_alias", 1.0, 4.0, 2.0, 0.4, "gear:4-to-2"),
 )
 COMMANDS = (0.0, 0.4, 0.9, -0.3, 0.6, -0.5)
+EXCITATIONS = (
+    COMMANDS,
+    (0.2, -0.7, 0.1, 0.75, -0.25, 0.0),
+    (-0.1, 0.3, 0.0, -0.8, 0.5, 0.6),
+)
 CONTROL_HOLD_STEPS = 15
 PRECISION = 8
 EFFECT_TOL = 2e-8
+MEASUREMENT_HALF_WIDTH = 1e-6
 
 
 def make_model(world: World):
@@ -108,6 +114,57 @@ def corrected(world: World) -> World:
     return world
 
 
+def assert_robust_partitions(traces: dict) -> dict:
+    """Every predicted distinct observation has a >2*epsilon witness.
+
+    This is a fixed-model, bounded-additive-measurement-error condition, not
+    robust system identification under arbitrary stochastic nuisance.
+    """
+    margins: dict[str, float] = {}
+    for key in ("external", "producer_to_controller_ctrl", "transmission_force"):
+        gaps = []
+        for i, left in enumerate(WORLDS):
+            for right in WORLDS[i + 1:]:
+                a, b = traces[left.name][key], traces[right.name][key]
+                if signature(a) == signature(b):
+                    assert max_error(a, b) < MEASUREMENT_HALF_WIDTH
+                else:
+                    gap = max_error(a, b)
+                    assert gap > 2 * MEASUREMENT_HALF_WIDTH, (key, left.name, right.name, gap)
+                    gaps.append(gap)
+        assert gaps, f"no informative {key} observation"
+        margins[key] = min(gaps)
+    return margins
+
+
+def assert_multi_excitation_closure() -> dict:
+    """Falsification controls over several distinct forcing trajectories."""
+    alias_max = 0.0
+    repair_max = 0.0
+    for commands in EXCITATIONS:
+        traces = {world.name: rollout(world, commands) for world in WORLDS}
+        ref = traces["reference"]["external"]
+        gain = traces["gain_fault"]["external"]
+        producer = traces["producer_fault"]["external"]
+        nuisance = traces["nuisance_alias"]["external"]
+        alias_max = max(
+            alias_max,
+            max_error(gain, producer),
+            max_error(gain, nuisance),
+        )
+        assert max_error(gain, ref) > 1e-4
+        for world in WORLDS:
+            repaired = rollout(corrected(world), commands)["external"]
+            repair_max = max(repair_max, max_error(repaired, ref))
+    assert alias_max < EFFECT_TOL
+    assert repair_max < EFFECT_TOL
+    return {
+        "forcing_regimes": len(EXCITATIONS),
+        "external_alias_max_error": alias_max,
+        "correct_local_repair_max_error": repair_max,
+    }
+
+
 def build_report() -> dict:
     traces = {world.name: rollout(world) for world in WORLDS}
     names = tuple(world.name for world in WORLDS)
@@ -116,6 +173,9 @@ def build_report() -> dict:
     gain = traces["gain_fault"]
     producer = traces["producer_fault"]
     nuisance = traces["nuisance_alias"]
+
+    separation_margins = assert_robust_partitions(traces)
+    excitation_closure = assert_multi_excitation_closure()
 
     # The external dynamics cannot separate the three different physical
     # worlds: s=1,g=2,m=1; s=2,g=1,m=1; s=1,g=4,m=2,doubled damping.
@@ -206,6 +266,9 @@ def build_report() -> dict:
         "worlds": [w.name for w in WORLDS],
         "world_authorities": truth,
         "measured_external_alias_max_error": external_alias_error,
+        "additive_sensor_half_width": MEASUREMENT_HALF_WIDTH,
+        "minimum_cross-class_Linf_separation": separation_margins,
+        "multi_excitation_counterfactual_closure": excitation_closure,
         "active_authority_optimum_exact": str(optimal),
         "external_only": "unsafe_unidentifiable" if external_only is None else str(external_only),
         "with_controller_tap_only": "unsafe_unidentifiable" if without_force is None else str(without_force),
