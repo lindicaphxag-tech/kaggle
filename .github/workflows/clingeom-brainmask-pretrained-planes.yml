@@ -87,11 +87,14 @@ jobs:
               assert c["export_evidence"]["original"]["dice_to_correctly_reoriented_same_model_prediction"]<1
               assert c["export_evidence"]["patched"]["dice_to_correctly_reoriented_same_model_prediction"]==1
           assert d["clinical_ground_truth"] is False
+          assert (Path("artifacts/learned")/"native_pretrained_export_figure.png").stat().st_size>10000
           print("PASS original pretrained nonaxial export mismatch; repaired physical frame matches actual learned output")
           PY
       - uses: actions/upload-artifact@v4
         with:
           name: ClinGeom-brainmask-actual-learned-export-original-and-fixed
-          path: artifacts/learned/native_pretrained_plane_export.json
+          path: |
+            artifacts/learned/native_pretrained_plane_export.json
+            artifacts/learned/native_pretrained_export_figure.png
           if-no-files-found: error
           retention-days: 60
