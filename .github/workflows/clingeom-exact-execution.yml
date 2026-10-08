@@ -1,0 +1,57 @@
+name: ClinGeom exact-rational executed interpolation witness
+
+on:
+  pull_request:
+    paths:
+      - "research/medical_geometry/executed_interpolation_witness.py"
+      - "research/medical_geometry/test_executed_interpolation_witness.py"
+      - "research/medical_geometry/benchmark_executed_interpolation_witness.py"
+      - "research/medical_geometry/EXECUTED_NUMERICAL_WITNESS_V1.md"
+      - ".github/workflows/clingeom-exact-execution.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  numerical-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install CPU-only PyTorch and proof dependencies
+        run: |
+          python -m pip install "numpy>=1.26,<3" "pytest>=8"
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+      - name: Execute real-arithmetic versus FP32 counterexample and exact witness tests
+        run: |
+          PYTHONPATH=. python -m pytest -q research/medical_geometry/test_executed_interpolation_witness.py
+      - name: Publish exact arithmetic / executed FP32 discrepancy
+        run: |
+          mkdir -p artifacts
+          PYTHONPATH=. python -m research.medical_geometry.benchmark_executed_interpolation_witness > artifacts/executed_interpolation_witness.json
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          x=json.loads(Path("artifacts/executed_interpolation_witness.json").read_text())
+          assert x["analytic_interpolation_error_bound_real_arithmetic"]==0.0
+          assert x["observed_error_against_ideal_target"]>0.0
+          assert x["conditional_executed_numeric_error_bound_at_computed_coords"]>0.0
+          assert x["witness"]["audited_elements"]==1
+          assert x["witness"]["conditional_combined_bound"]>0.0
+          assert x["is_clinical_data"] is False
+          print("PASS: zero Hessian does not certify finite-precision execution")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ClinGeom-exact-execution-${{ matrix.python-version }}
+          path: artifacts/executed_interpolation_witness.json
+          if-no-files-found: error
+          retention-days: 60
