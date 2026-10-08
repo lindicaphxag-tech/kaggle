@@ -70,14 +70,19 @@ def evaluate_queries(X_test, y_test, channel_names, frozen_model, *, seed=SEED):
         correct=int(oracle[i]>0)
         if not completed.authorized or completed.label!=correct:
             raise RuntimeError("Accepted identity decision differs from known original")
-        # Fixed-seed random query order is a comparison, NOT a minimax guarantee.
-        order=list(planner.rows)
-        rng.shuffle(order)
+        # Strong fair random comparator: at each iteration randomize ONLY
+        # among still-informative physical identity queries. A row whose
+        # identity is inferred from prior answers cannot incur query cost.
         seen=[]
         random_done=planner.propose()
-        for row in order:
-            if random_done.authorized:
-                break
+        while not random_done.authorized:
+            consistent=[p for p in planner.mappings
+                        if all(p[row]==identity for row,identity in seen)]
+            informative=[row for row in planner.rows
+                         if len({p[row] for p in consistent})>1]
+            if not informative:
+                raise RuntimeError("Ambiguous prediction with no informative ID query")
+            row=int(rng.choice(informative))
             seen.append((row,actual_maps[i][row]))
             random_done=planner.propose(seen)
         if not random_done.authorized or random_done.label!=correct:
