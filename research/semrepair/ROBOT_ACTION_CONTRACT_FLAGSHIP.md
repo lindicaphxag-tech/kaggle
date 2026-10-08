@@ -16,6 +16,8 @@ Interventions on ManiSkill PegInsertionSide official trajectory replay are a fro
 | Development source indices 0–31 | 25/32 | 25/32 | **0/32** | 25/32 |
 | Originally preregistered source indices 100–199 | 94/100 | 95/100 | **0/100** | 95/100 |
 
+**Repeatability control:** a fresh [32-source official replay #37818666547](https://github.com/lindicaphxag-tech/ManiSkill/actions/runs/37818666547) re-executed all four fixed original-source configurations and reproduced the exact **25/25/0/25** saved counts; [raw replay artifact](https://github.com/lindicaphxag-tech/ManiSkill/actions/runs/37818666547/artifacts/11568956531). This is a rerun of the **same source demo identities**, not a new independent held-out cohort or third-party replication.
+
 Primary evidence: [native 32-source run](https://github.com/lindicaphxag-tech/ManiSkill/actions/runs/37806000218), [corrected native 100-source replay](https://github.com/lindicaphxag-tech/ManiSkill/actions/runs/37752565886), and the [separate real-HDF5/source audit](https://github.com/lindicaphxag-tech/ManiSkill/actions/runs/37807568126).
 
 The 100–199 holdout uses disjoint **source episode indices**, but some original *seeds* reoccur across cohorts; it is not 100 statistically independent new seeds. The earlier purported 100–199 result that accidentally reused the first HDF5 groups was rejected and withdrawn. The independent audit above is still **contributor-operated**, not third-party execution.
