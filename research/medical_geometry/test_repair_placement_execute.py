@@ -139,3 +139,69 @@ def test_spatial_slicer_refuses_negative_or_zero_stride():
         compile_fx_bundle_geometry(
             BadStride(), input_shape=(8, 8, 8), input_channels=1
         )
+
+
+def test_minimum_cost_switch_executes_distinct_real_fx_repair_positions():
+    model, args = fixture()
+    x = (torch.arange(8, dtype=torch.float32).view(1, 1, 8, 1, 1)
+         .expand(1, 1, 8, 8, 8).clone() * 0.7)
+    common = rewrite_two_phase_fusion(
+        model, **args, authorized_site_costs={"cat": 5, "left": 3, "right": 3}
+    )
+    branches = rewrite_two_phase_fusion(
+        model, **args, authorized_site_costs={"cat": 7, "left": 3, "right": 3}
+    )
+    assert common.selected_sites == ("cat",)
+    assert branches.selected_sites == ("getitem", "getitem_1")
+    assert common.certificate_digest != branches.certificate_digest
+    common_result = common.graph_module(x)
+    branch_result = branches.graph_module(x)
+    assert tuple(common_result.shape) == (1, 1, 3, 3, 3)
+    assert torch.allclose(common_result, branch_result, atol=1e-6)
+    assert torch.allclose(branch_result, torch.zeros_like(branch_result), atol=2e-6)
+    assert "branch_0" not in dict(common.graph_module.named_modules())
+    assert "_clingeom_certified_pre_mix_branch_0" in dict(
+        branches.graph_module.named_modules()
+    )
+    assert "_clingeom_certified_pre_mix_branch_1" in dict(
+        branches.graph_module.named_modules()
+    )
+    assert branches.conditional_per_output_value_error == (
+        common.conditional_per_output_value_error
+    )
+    # Original pretrained/learned weights must not be mutated by this rewrite.
+    assert torch.allclose(model(x), torch.full((1, 1, 4, 4, 4), -0.7))
+
+
+def test_cost_choice_refuses_unprotected_branch_or_malformed_cost():
+    model, args = fixture()
+    from research.medical_geometry.repair_placement import UnrepairablePath
+    with pytest.raises(UnrepairablePath):
+        rewrite_two_phase_fusion(
+            model, **args, authorized_site_costs={"left": 2}
+        )
+    with pytest.raises(UnrepairablePath):
+        rewrite_two_phase_fusion(
+            model, **args, authorized_site_costs={"right": 2}
+        )
+    for costs in ({"cat": True}, {"cat": 0}, {"left": -1}, {"anything": 5}, {}):
+        with pytest.raises(ValueError, match="positive integer costs"):
+            rewrite_two_phase_fusion(
+                model, **args, authorized_site_costs=costs
+            )
+
+
+def test_mismatched_fusion_weights_preserve_scheme_equivalence():
+    model, args = fixture()
+    with torch.no_grad():
+        model.mix.weight[0, 0, 0, 0, 0] = 2.5
+        model.mix.weight[0, 1, 0, 0, 0] = -4.5
+    torch.manual_seed(17)
+    x = torch.randn(2, 1, 8, 8, 8)
+    a = rewrite_two_phase_fusion(
+        model, **args, authorized_site_costs={"cat": 2, "left": 3, "right": 3}
+    )
+    b = rewrite_two_phase_fusion(
+        model, **args, authorized_site_costs={"cat": 10, "left": 3, "right": 3}
+    )
+    assert torch.allclose(a.graph_module(x), b.graph_module(x), atol=2e-6, rtol=2e-6)

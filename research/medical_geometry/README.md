@@ -7,6 +7,57 @@ medical-AI pipelines. It focuses on representation changes that preserve the
 same physical patient-space object but can silently alter tensor-, prompt-, or
 feature-lattice semantics.
 
+## Featured executed method: repair before irreversible fusion
+
+**Live research prototype**, not a clinical system or a universal graph rewriter.
+The concrete problem is not whether a 3-D tensor has a plausible affine:
+two channels may sample different patient-mm phase lattices, and dense channel
+mixing can erase the information needed to correct them afterwards.
+
+The current execution pathway is:
+
+```text
+real torch.fx phase-strided graph
+    -> per-channel patient-space type propagation
+    -> independently checked lattice-repair candidates
+    -> exact minimum-cost admissible cut (hypothetical integer costs)
+    -> actual insertion of channel repair operations
+    -> frozen Conv3d forward, refusal tests and CPU timing evidence
+```
+
+**One-command CPU evidence** (run at repository root):
+
+```bash
+python -m pip install numpy torch pytest
+python -m pytest -q research/medical_geometry/test_repair_placement_execute.py
+python -m research.medical_geometry.benchmark_placement_execution
+```
+
+This executes **two structurally different PyTorch FX programs**: a
+shared post-concatenation/pre-convolution repair and two branchwise repairs
+prior to concatenation. The planner changes the insertion sites when costs
+change. The same original frozen mixer is reused. Actual benchmark timings
+are *measurements*, not the planner's input costs or proofs of speedup.
+
+- [Executable graph rewrite, upstream proof boundaries (#59)](https://github.com/lindicaphxag-tech/kaggle/pull/59)
+- [Competing placement execution, CPU benchmark, raw CI (#61)](https://github.com/lindicaphxag-tech/kaggle/pull/61)
+- [Real pretrained 3-D MRI exporter and nonexpert-mask audit (#55)](https://github.com/lindicaphxag-tech/kaggle/pull/55)
+
+**Separate evidence classes:** the pre-mix graph experiment runs *constructed
+affine-in-patient-mm fields* with an explicitly justified zero-Hessian bound.
+The pinned brain MRI experiment uses a *real pretrained U-Net and one genuine
+acquired MRI*, but its project-provided comparison mask is not an expert gold
+standard, and that exporter experiment does not show ClinGeom repairs improve
+clinical segmentation. Do not conflate the two results.
+
+Standard MONAI `MetaTensor` and invertible spatial transforms already
+solve many single-affine orientation/resampling issues; this work targets
+the additional case of channel-conditioned sampling supports inside model
+graphs. Graph min-cut, trilinear interpolation, and conditional curvature
+bounds are prior mathematics, not new results in isolation. Learned-feature
+curvature, numeric coordinate-map rounding, general-architecture support,
+independent patient-level efficacy and external uptake remain open gates.
+
 ## Three claims under test
 
 ### C1 — Patient-space geometry is a type, not just a tensor shape
