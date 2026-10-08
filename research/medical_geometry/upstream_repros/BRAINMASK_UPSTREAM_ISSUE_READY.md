@@ -41,6 +41,43 @@ On a **predeclared non-cubic central 48×56×40 crop of the same real MRI**, the
 
 Therefore the misregistration is not a consequence of substituting a reconstruction routine in Reproduction 1.
 
+## Reproduction 3 — genuine pretrained model, **equal-shape silent failure**
+
+The strongest test now executes the **original public pretrained T1 3D U-Net**,
+with its original TensorFlow patch extractor/reconstructor and an actual
+acquired MRI center crop. It strictly authenticates upstream `Networks` model
+source, original HDF5 checkpoint and the acquired MRI by Git hashes; **340 model
+parameter variables change on weight load**.
+
+[Green final-head workflow](https://github.com/lindicaphxag-tech/kaggle/actions/runs/37718977979)
+· [public original-vs-repaired **real learned-model MRI image / JSON**](https://github.com/lindicaphxag-tech/kaggle/actions/runs/37718977979/artifacts/11524838113)
+· [merged reproducible source PR #46](https://github.com/lindicaphxag-tech/kaggle/pull/46)
+· [executable code](brainmask_pretrained_native_export.py).
+
+Here the 64³ crop means **all original and patched NIfTI shapes are identical**,
+making the original error *silent to shape-only checking*. On the same genuinely
+learned probability tensor for each model plane, the original exporter attaches
+the original acquisition affine before reversing the plane permutation.
+
+| Plane | Original export Dice vs **its own** correctly inverse-oriented prediction | After source patch |
+|:--|--:|--:|
+| `ax` (negative control) | **1.0000000000** | **1.0000000000** |
+| `cor` | **0.0041171965** | **1.0000000000** |
+| `sag` | **0.3630825519** | **1.0000000000** |
+
+**Important interpretation:** each row compares an original vs patched
+**export of the same exact learned model result**, not the different predictions
+produced by feeding different anatomical orientations to the network.
+Therefore this detects **serialization frame loss** without claiming the
+network should be rotation-equivariant. The source's brain mask is not used
+for this trained-model output test; it is neither ground-truth clinical
+validation nor a trained model accuracy uplift.
+
+This equal-shape example is especially important: merely checking
+`predictions.shape == source.shape` does **not** certify equal physical
+coordinate frames. Only transform provenance or independently checked
+world-coordinate semantics can establish that.
+
 ## Suggested minimal patch
 
 Apply [one-file standard unified diff](brainmask_export_plane.patch) against the pinned upstream `predict.py`:
