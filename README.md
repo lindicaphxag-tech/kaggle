@@ -110,6 +110,13 @@ python -m pytest -q research/medical_geometry/test_torch_repair_certificate.py r
 ```
 
 **Evidence boundary:** these are first-party reproducibility artifacts and a pinned observation on an external codebase. highdicom maintainer confirmation, independent reproduction, external adoption, clinical performance improvement, and prospective new-defect status remain separate, unclaimed milestones.
+## Lossless medical label semantics (2026-10-08)
+
+[ClinGeom PR #27](https://github.com/lindicaphxag-tech/kaggle/pull/27) fixes a real execution-semantics defect in the public repair operator: **segmentation/instance IDs were previously cast to float32 during nearest resampling**, and high int64 values could collide; continuous float64 features had a mismatched float32 sampling grid. The new integer/bool path gathers original values losslessly using float64 source *coordinates* and explicit nearest-even index ties. Float64 features use matching grid precision.
+
+**Adversarial paired evidence:** On 343 synthetic target voxels with int64 IDs above `2**53`, the original float32 surrogate changed **343/343** label values, while the fixed path changed **0/343**. All **52** PyTorch geometry tests and the full Python-version/MONAI integration CI passed. [Full public CI and downloadable JSON](https://github.com/lindicaphxag-tech/kaggle/actions/runs/37707665910). [Runnable negative control](research/medical_geometry/benchmark_lossless_labels.py) · [typed data-value contract](research/medical_geometry/DTYPE_TRANSPORT_CONTRACT.md).
+
+This demonstrates *categorical value preservation in a synthetic numerical stress test*, not clinical incidence, model accuracy improvement, or independent external adoption.
 ## New physical-value and upstream compatibility evidence (2026-10-08)
 
 **ClinGeom conditional value repair:** [PR #24](https://github.com/lindicaphxag-tech/kaggle/pull/24) extends the previously verified patient-space lattice repair with a **separate conditional feature-interpolation error budget**. Without a valid uniform world-space Hessian envelope for a resampled branch, a requested value-error guarantee fails closed. A quadratic 2 mm patient-space witness attains the stated 0.3-value-unit bound, including the real PyTorch interpolation executor. This uses classical approximation theory; no pretrained-model or clinical robustness claim is made. [Full public CI](https://github.com/lindicaphxag-tech/kaggle/actions/runs/37706126491).
