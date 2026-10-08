@@ -107,3 +107,14 @@ def test_fx_bundle_compiler_recovers_monai_dints_channel_fibers_automatically():
     cert = certify_single_lattice(bundle, patient_affine)
     assert cert.valid is False
     assert cert.unique_center_lattices == 2
+
+
+def test_real_monai_fiber_repair_recovers_patient_coordinate_field():
+    from research.medical_geometry.benchmark_monai_dints_fiber_repair import run
+
+    metrics = run()
+    assert metrics['channel_fiber_count'] == 2
+    assert metrics['single_feature_affine_valid'] is False
+    assert metrics['naive_shared_index_readout_mae'] > 3.0
+    assert metrics['typed_fiber_repair_max_abs_error'] < 2e-4
+    assert metrics['repair_plan_kinds'] == ['resample', 'resample']
