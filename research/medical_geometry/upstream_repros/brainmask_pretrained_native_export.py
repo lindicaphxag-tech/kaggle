@@ -17,6 +17,9 @@ os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL","2")
 os.environ.setdefault("TF_NUM_INTEROP_THREADS","2")
 os.environ.setdefault("TF_NUM_INTRAOP_THREADS","2")
 
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 import nibabel as nib
 import numpy as np
 import yaml
@@ -118,6 +121,7 @@ def main():
  "cases":{},
  "tensorflow_version":tf.__version__,
  }
+ figure_data={}
  for plane in ("ax","cor","sag"):
   # Original upstream reader with original upstream z-score normalizer
   x=util._load_single_study(str(study),["t1"],data_format="channels_last",
@@ -146,6 +150,7 @@ def main():
   if not learned_binary.any() or learned_binary.all():
    raise AssertionError("Predeclared .5 threshold makes learned prediction degenerate: "+plane)
   exports={}
+  plane_vis={"reference":learned_binary}
   for label,fn in (("original",native_export),("patched",patched_export)):
    directory=a.out/"exports"/plane/label
    directory.mkdir(parents=True,exist_ok=True)
@@ -155,6 +160,7 @@ def main():
    if saved.shape!=(64,64,64) or not np.allclose(saved.affine,A,atol=1e-5):
     raise AssertionError("Unexpected model export grid")
    agreement=dice(saved_binary,learned_binary)
+   plane_vis[label]=saved_binary
    if label=="patched" and agreement!=1:
     raise AssertionError("Patched native exporter did not preserve real learned output frame: "+plane)
    if label=="original" and plane=="ax" and agreement!=1:
@@ -170,6 +176,7 @@ def main():
      np.ascontiguousarray(np.asarray(saved.dataobj,dtype=np.float32)).tobytes()
     ).hexdigest(),
    }
+  figure_data[plane]=plane_vis
   report["cases"][plane]={
    "actual_checkpoint_prediction_sha256":hashlib.sha256(
      np.ascontiguousarray(yval).tobytes()
@@ -178,6 +185,50 @@ def main():
    "reconstruction_exact_to_real_model_output":True,
    "export_evidence":exports,
   }
+ # Real-image 2x3 figure. All panels use the identical MRI grid, fixed
+ # z=32, not an output-selected 'best looking' slice.
+ fig,axes=plt.subplots(2,3,figsize=(13.8,8),constrained_layout=True)
+ image_slice=np.asarray(image[sl][:,:,32],np.float64).T
+ finite=image_slice[np.isfinite(image_slice)]
+ lo,hi=np.percentile(finite,[1,99])
+ background=np.clip((image_slice-lo)/max(hi-lo,1e-8),0,1)
+ for row,plane in enumerate(("cor","sag")):
+  vis=figure_data[plane]
+  for col,(kind,label) in enumerate((
+    ("reference","True model output in original grid"),
+    ("original","Original upstream NIfTI export"),
+    ("patched","Inverse-plane repaired export"),
+  )):
+   ax=axes[row,col]
+   ax.imshow(background,cmap="gray",origin="lower",interpolation="nearest")
+   for layer,color,line in (("reference","#15B0A8","solid"),
+                            (kind,"#DB5A4A","dashed")):
+    mask=vis[layer][:,:,32].astype(float).T
+    if np.any(mask>.5) and np.any(mask<.5):
+     ax.contour(mask,levels=[.5],colors=[color],
+                linestyles=line,linewidths=1.25,origin="lower")
+   ax.set_title(("Coronal" if row==0 else "Sagittal")+" | "+label,fontsize=9)
+   ax.axis("off")
+ fig.suptitle(
+  "Authentic 3-D U-Net on acquired T1 MRI | same prediction, different export semantics",
+  fontsize=12
+ )
+ fig.text(.02,.005,
+  "Teal = same frozen learned prediction mapped into original patient grid; "
+  "dashed red = exported mask. Original NIfTI affine fixed. "
+  "Controlled plane selection; no clinical annotation.",
+  fontsize=8.0,color="#333333")
+ fig.savefig(a.out/"native_pretrained_export_figure.png",dpi=230,
+             bbox_inches="tight",facecolor="white")
+ plt.close(fig)
+ report["visualization"]={
+  "file":"native_pretrained_export_figure.png",
+  "slice":"predeclared original MRI crop z=32",
+  "real_input":"hash-pinned acquired T1 MRI",
+  "model_output":"actual strictly loaded official HDF5 3D U-Net",
+  "clinical_label":"none",
+  "overlay_semantics":"same learned output vs original/patched export on one voxel/world grid"
+ }
  (a.out/"native_pretrained_plane_export.json").write_text(
   json.dumps(report,indent=2,sort_keys=True)+"\n"
  )
