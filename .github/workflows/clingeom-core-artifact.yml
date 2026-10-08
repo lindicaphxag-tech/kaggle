@@ -93,6 +93,7 @@ jobs:
             research/medical_geometry/test_torch_repair.py \
             research/medical_geometry/test_torch_repair_dtype.py \
             research/medical_geometry/test_channel_fiber_runtime.py \
+            research/medical_geometry/test_pre_mix_compiler.py \
             research/medical_geometry/test_torch_repair_certificate.py \
             research/medical_geometry/test_fx_geometry.py \
             research/medical_geometry/test_fx_rewrite.py \
@@ -198,6 +199,19 @@ jobs:
         with:
           name: clingeom-default-monai-conditional-c2
           path: default-monai-conditional-c2.json
+      - name: Prove information lost by fusion-before-repair in real MONAI
+        run: |
+          PYTHONPATH=. python research/medical_geometry/benchmark_monai_nonidentifiable_mixing.py | tee monai-nonidentifiable-fusion.json
+          {
+            echo '### Two indistinguishable post-mix tensors, two different patient-space targets'
+            echo '```json'
+            cat monai-nonidentifiable-fusion.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: clingeom-monai-nonidentifiable-fusion
+          path: monai-nonidentifiable-fusion.json
       - name: Upload pinned MONAI witness
         uses: actions/upload-artifact@v4
         with:
