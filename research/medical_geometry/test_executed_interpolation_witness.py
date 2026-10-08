@@ -30,8 +30,14 @@ def test_linear_field_zero_hessian_does_not_bound_float32_rounding_error():
     assert witness.conditional_combined_bound>0
     assert witness.audited_elements==1
 
-def test_exact_half_cell_can_have_zero_executed_roundoff():
-    x,source,target,plan=case(0.5)
+def test_exact_normalized_half_cell_can_have_zero_executed_roundoff():
+    # With source length 3, an input index 0.5 maps to normalized -0.5,
+    # exactly representable in FP32. Length 8 would NOT: 2*0.5/7-1
+    # requires an inexact normalization and generates a numerical residual.
+    source=FeatureLattice((3,1,1),np.ones(3),np.zeros(3),np.ones(3))
+    target=FeatureLattice((1,1,1),np.ones(3),np.array([0.5,0,0]),np.ones(3))
+    plan=synthesize_lattice_repair(source,target)
+    x=torch.arange(3,dtype=torch.float32).reshape(1,1,3,1,1)*1000
     witness=certify_executed_interpolation(
         x,source,target,plan,analytic_interpolation_bound=0.)
     assert witness.max_exact_barycentric_residual==0
