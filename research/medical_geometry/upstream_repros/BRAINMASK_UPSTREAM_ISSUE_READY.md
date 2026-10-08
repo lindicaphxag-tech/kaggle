@@ -16,6 +16,32 @@ python -m pytest -q tests/test_predict_export_space.py
 
 This test file compiles the real `predictions_2_nii` method from its AST and stubs only model-patch reconstruction, keeping the unit test lightweight. The separate pinned public full-TF and original-checkpoint experiments remain available for independent scrutiny. **No third-party review or upstream merge is claimed.**
 
+## Reproduction 4 — same real pretrained prediction versus supplied weak reference (2026-10-09)
+
+This *additional* experiment goes beyond comparing each learned output with its
+correctly inverse-oriented self. It uses the actual upstream-provided
+`example001_brain_mask.nii.gz` (pinned blob `e0dd089b...`) as an **imperfect,
+nonexpert independent comparison mask**, evaluates every axial/coronal/sagittal
+export under the **same pinned MRI affine and fixed 64³ crop**, and reports
+Dice, centroid displacement (mm), and world-coordinate HD95 (mm).
+
+[Public successful pinned TensorFlow CPU workflow](https://github.com/lindicaphxag-tech/kaggle/actions/runs/37807593490)
+· [merged learned-mask evaluation PR #55](https://github.com/lindicaphxag-tech/kaggle/pull/55)
+· [metric source](brainmask_pretrained_weakmask_eval.py).
+
+| Plane | Original Dice versus provided mask | Fixed Dice | Original HD95 (mm) | Fixed HD95 (mm) |
+|---|---:|---:|---:|---:|
+| Axial | 0.148993 | 0.148993 | 31.11 | 31.11 |
+| Coronal | 0.068705 | 0.082254 | 45.00 | 42.49 |
+| Sagittal | 0.374345 | 0.363077 | 40.80 | 40.76 |
+
+**Important:** Sagittal Dice **decreases**, despite correcting the known
+coordinate-system bug. This is a real negative result, retained deliberately.
+The mathematical patient-space binding correctness and the agreement of
+predictions with a nonexpert example mask are *distinct* endpoints. These
+numbers do not establish clinical accuracy, safety, or clinical benefit.
+The single MRI and frozen crop are insufficient for generalization.
+
 # Maintainer-ready issue — brain_mask nonaxial export attaches a stale source affine
 
 **To submit:** copy the section from **Issue title** through **Maintainer question** into a new issue on https://github.com/ecalabr/brain_mask/issues/new using an account authorized to post. Current GitHub integration returned HTTP 403; **this is NOT already submitted to upstream**.
