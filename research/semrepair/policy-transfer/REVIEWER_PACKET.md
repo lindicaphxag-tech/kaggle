@@ -43,7 +43,7 @@ and report/stop gates **before** examining these task outcomes.
   projected commands that leave the exact action domain are labeled
   **NOT_EXACT**.
 - All five arms ran for all original states: **64 task-state episodes ×
-  five controller arms = 320 paired physical executions**. No successful
+  five controller arms = 320 controller-arm trials (including exact-mode early refusals)**. No successful
   state was selected in place of failed controller states, and no
   four-way intersection conditioning was applied.
 - **Scope correction:** PullCube is a new task relative to earlier
