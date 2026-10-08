@@ -1,0 +1,38 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "jih0-kim",
+      "body": "### Bug Description\n\nA revolute or prismatic joint whose URDF `<limit>` omits `effort`, or sets `effort=\"0\"`, gets the force range `[-0, 0]`. Position, velocity and force control are all clamped to zero, so the joint never moves, and no warning is raised.\n\nThe bundled urdfpy reads a missing effort as `0.0` (`JointLimit.__init__` in `genesis/ext/urdfpy/urdf.py`), and `parse_urdf` turns any effort into `[-effort, effort]` (`genesis/utils/urdf.py:418`). This range replaces the one from the MuJoCo-based pass (`genesis/engine/entities/rigid_entity/description.py:870`), which leaves such joints unbounded: MuJoCo's URDF importer only sets a force limit when `|effort| > 0`.\n\nAmong the bundled assets, `urdf/3763/mobility*.urdf` (`joint_2`) has no effort.\n\nA negative effort gives the reversed range `[|effort|, -|effort|]`, so every command is clamped to `-|effort|`.\n\n### Steps to Reproduce\n\n```python\nimport genesis as gs\n\nURDF = \"\"\"<robot name=\"arm\">\n  <link name=\"base\"/>\n  <link name=\"arm\">\n    <inertial><origin xyz=\"0.25 0 0\"/><mass value=\"1\"/><inertia ixx=\"0.001\" iyy=\"0.02\" izz=\"0.02\" ixy=\"0\" ixz=\"0\" iyz=\"0\"/></inertial>\n  </link>\n  <joint name=\"joint\" type=\"revolute\">\n    <parent link=\"base\"/><child link=\"arm\"/><axis xyz=\"0 0 1\"/>\n    <limit lower=\"-3\" upper=\"3\" velocity=\"10\" {effort}/>\n  </joint>\n</robot>\"\"\"\n\ngs.init(backend=gs.cpu)\nscene = gs.Scene(show_viewer=False)\nrobots = {\n    effort: scene.add_entity(gs.morphs.URDF(file=URDF.format(effort=effort), fixed=True, pos=(0.0, i, 0.0)))\n    for i, effort in enumerate((\"\", 'effort=\"0\"', 'effort=\"100\"'))\n}\nscene.build()\nfor robot in robots.values():\n    robot.set_dofs_kp([50.0])\n    robot.set_dofs_kv([5.0])\n    robot.control_dofs_position([1.0])\nfor _ in range(200):\n    scene.step()\nfor effort, robot in robots.items():\n    lower, upper = robot.get_dofs_force_range()\n    print(f\"<limit ... {effort or '(no effort)'}>: force range [{float(lower[0])}, {float(upper[0])}], \"\n          f\"angle after 200 steps toward 1.0 rad: {float(robot.get_dofs_position()[0]):.3f}\")\n```\n\n### Expected Behavior\n\nA missing or zero effort leaves the actuation force unbounded, as in MuJoCo, and the joint follows the command like the `effort=\"100\"` one.\n\n### Screenshots/Videos\n\nSame position command for the three arms. Left: main. Right: with the force range the fix produces.\n\n<img width=\"968\" height=\"672\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/1fccdb3f-ba5f-41f1-92fc-5a25e2c58984\" />\n\n### Relevant log output\n\n```shell\n<limit ... (no effort)>: force range [-0.0, 0.0], angle after 200 steps toward 1.0 rad: 0.000\n<limit ... effort=\"0\">: force range [-0.0, 0.0], angle after 200 steps toward 1.0 rad: 0.000\n<limit ... effort=\"100\">: force range [-100.0, 100.0], angle after 200 steps toward 1.0 rad: 1.000\n```\n\n### Environment\n\n- OS: Ubuntu 22.04\n- GPU/CPU: RTX 4070 Ti (reproduced with the CPU backend)\n- GPU-driver version: 535.309.01\n- CUDA / CUDA-toolkit version: N/A (CPU backend)\n\n### Release version or Commit ID\n\n0420a90386126bac78667b190a43663241c334ac (main)\n\n### Additional Context\n",
+      "created_at": "2026-10-08T12:02:25Z",
+      "html_url": "https://github.com/Genesis-Embodied-AI/genesis-world/issues/3502",
+      "id": "Genesis-Embodied-AI/genesis-world#3502",
+      "issue_number": 3502,
+      "labels": [
+        "bug"
+      ],
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "surface_sha256": "a2015de4d729c43f344177f2f01ac4858c201327183ccf6a24e1ea9b2f38c98a",
+      "title": "[Bug]: URDF joints whose `<limit>` has no `effort` (or `effort=\"0\"`) cannot be actuated"
+    },
+    {
+      "author_login": "Dingrui-Wang",
+      "body": "### Describe the bug\nOn `e2e_challenge`, stationary GT tail jitter can classify **forward overshoot** as a lateral corridor exit, causing a zero scene score despite remaining below the intended lateral threshold.\n\nIn [`ground_truth.py`](https://github.com/NVlabs/alpasim/blob/20235345d7ea9eed5d5156099cf219cd35b2e4dc/src/eval/src/eval/scorers/ground_truth.py#L10-L40):\n- Endpoint handling requires the nearest projection to reach `gt_length_m - 1e-9`; small backward jitter can prevent this.\n- `_end_direction()` normalizes the last segment even if it is only micrometers long, so stationary noise can determine the lateral axis.\n\n### Minimal reproduction\nRun in the AlpaSim evaluation environment; no dataset, renderer, or policy is needed:\n\n```python\nfrom shapely.geometry import LineString, Point\nfrom eval.scorers.ground_truth import _end_direction, _lateral_distance_to_gt\n\ncases = [\n    # Nearest projection falls before the endpoint.\n    ([(0, 0), (10, 0), (9.99, 0), (9.99, 0.000002)], (15, 0)),\n    # Projection reaches the endpoint, but final heading is dominated by noise.\n    ([(0, 0), (10, 0), (10, 0.000002)], (15, 0.000002)),\n]\nfor coords, xy in cases:\n    gt = LineString(coords)\n    print(_lateral_distance_to_gt(gt, Point(xy), gt.length, _end_direction(gt)))\n# Actual: 5.0, 5.0 -> exceeds the 4 m corridor threshold.\n# Expected: approximately 0 m lateral deviation along the meaningful +x path.\n```\n\n### Observed rollout / expected behavior\nIn PAI public_2604 scene `clipgt-0ce6f2a3-a6cf-42c3-9133-111139be1dd1`, the first failure occurs at ~9.74 s: reported lateral distance 4.133 m; projection only 0.057 m of arc length before the GT endpoint. There is no collision or offroad at the trigger. MAP route guidance continues beyond the GT stopping position.\n\nPlease make terminal-region detection and heading estimation robust to stationary jitter, while retaining failures for genuine lateral exits. This concerns **scoring**, not the route-generation issue #142.\n\n### Environment\nReproduced with Python 3.12 and official commit `0bb4c4bfe10951ea5589aa8ea514e422cf3c3506`. The relevant file is byte-identical at current public `e2e_challenge` head `20235345d7ea9eed5d5156099cf219cd35b2e4dc` (checked 2026-10-08).\n",
+      "created_at": "2026-10-08T14:00:18Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/198",
+      "id": "NVlabs/alpasim#198",
+      "issue_number": 198,
+      "labels": [],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "75d9fd6515648550854bb207d5245e43f933e8ea5ddb55317c7be4491ab1c2f4",
+      "title": "[BUG] Stationary GT tail jitter can trigger false lateral corridor failures"
+    }
+  ],
+  "post_activation_issue_identities_observed": 38,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-08T15:33:20Z",
+  "schema_version": 1
+}
