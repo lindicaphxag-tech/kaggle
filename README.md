@@ -15,6 +15,10 @@ They are deliberately kept separate in claims: public self-authored artifacts ar
 compensating physical semantics, what is the **minimum admissible evidence**
 needed to authorize one concrete implementation-bound repair?
 
+- [**Flagship reviewer packet: Frozen Robot Policy Transfer — 96 real simulator episodes and a separate 32-demo causal-factor replication**](research/semrepair/policy-transfer/REVIEWER_PACKET.md).
+  Directly inspect mechanism, predeclared versus exploratory data, exact
+  source-seed-paired statistics, original CI links, and negative results.
+  **Known controller semantics; no retraining; no third-party adoption claim.**
 - [**Frozen learned-policy controller-ABI transport — 96 physical test episodes and independently re-countable evidence**](research/semrepair/policy-transfer/README.md):
   **PickCube predeclared holdout 32/32 vs naive 0/32**; StackCube
   exploratory **31/32 vs 2/32**; PushCube exploratory **30/32 vs
