@@ -53,10 +53,10 @@ def run():
         "derived_output_world_hessian_bounds":list(proof.per_output_channel_bounds),
         "per_fiber_max_value_error_bounds":list(res.conditional_value_error_bounds),
         "observed_per_fiber_max_absolute_errors":[
-            float(errors[:,i:i+1].max()) for i in range(2)
+            float(errors[:,i:i+1].detach().max()) for i in range(2)
         ],
-        "naive_common_index_mean_absolute_error":float(naive.mean()),
-        "physically_repaired_mean_absolute_error":float(errors.mean()),
+        "naive_common_index_mean_absolute_error":float(naive.detach().mean()),
+        "physically_repaired_mean_absolute_error":float(errors.detach().mean()),
         "physical_spacing_mm":spacing,
         "weight_provenance_sha256":proof.model_parameter_digest,
         "model_has_identity_activation_and_norm":True,
