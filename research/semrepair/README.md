@@ -165,6 +165,40 @@ fault pair can make the end-to-end behavior worse. Realized improvements over
 these active-diagnosis baselines require blinded, real-stack experiments and
 external independent replication; they are not assumed by the finite witness.
 
+## Pathwise probe exposure: a distinct safety constraint
+
+The bounded-noise minimax oracle above supports
+`maximum_probe_risk`, which filters *each single experiment*.
+That is **not equivalent** to a consumable exposure budget over an
+adaptive sequence. The [cumulative-risk game](cumulative_risk_game.py)
+corrects this distinction without modifying the frozen original
+finite benchmark:
+
+```bash
+python research/semrepair/cumulative_risk_game.py
+```
+
+In the original four-world noisy witness, assign both indispensable
+probes exposure `1/4`. A per-experiment threshold of `3/8` admits
+each independently and returns the previously valid cost `2`,
+**even though the same execution branch consumes `1/2` exposure**.
+A pathwise `3/8` cap must refuse diagnosis; a pathwise `1/2` cap
+permits cost `2`. With zero exposure budget it must stop only if
+the remaining worlds already share an identical concrete authority.
+
+The dynamic state is now **(surviving worlds, remaining exposure)**,
+not just a set of worlds; each transition deducts the chosen
+probe's exposure, and an exact-rational policy certificate checks
+all reachable worst-case observation branches.
+
+*Important limitation:* these additive, deterministic probe-exposure
+scores are abstract resource weights, **not calibrated collision
+probabilities**. Physical deployment needs a separately defended
+risk model, cumulative physical-energy/proximity measurements,
+a safe intervention policy, and external validation. This is an
+implementation-level correctness clarification—not a new mathematical
+novelty claim or an actual robot-safety certificate.
+
 ## Native MuJoCo: hidden semantics under controller nuisance
 
 The finite four-world example above uses a frozen experiment table. The more
