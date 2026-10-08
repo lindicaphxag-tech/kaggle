@@ -1,0 +1,64 @@
+name: ClinGeom executed numeric witness on genuine MRI
+
+on:
+  pull_request:
+    paths:
+      - "research/medical_geometry/benchmark_real_mri_numerical_replay.py"
+      - "research/medical_geometry/REAL_MRI_NUMERICAL_REPLAY.md"
+      - ".github/workflows/clingeom-real-mri-numeric.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  real-mri-fp32-vs-fp64:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install CPU imaging and PyTorch execution runtime
+        run: |
+          python -m pip install "numpy>=1.26,<3" "nibabel>=5.2,<6" "matplotlib>=3.8"
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+      - name: Download actual NiBabel MRI at an immutable Git commit
+        run: |
+          curl -fL --retry 3 --max-time 90 \
+            "https://raw.githubusercontent.com/nipy/nibabel/d6a0ba0056445c06407afb421749a8ed5c939c56/doc/source/downloads/someones_anatomy.nii.gz" \
+            -o actual_brain_mri.nii.gz
+          test "$(git hash-object actual_brain_mri.nii.gz)" = b7e917e3f891c74fd99cdf82ec579ee254a195d0
+      - name: Audit native FP32 and FP64 on identical real MRI voxel values
+        run: |
+          PYTHONPATH=. python -m research.medical_geometry.benchmark_real_mri_numerical_replay \
+            --image actual_brain_mri.nii.gz --out artifacts/real_mri_execution
+      - name: Refuse fake anatomy, missing execution or overstated proof
+        run: |
+          python - <<'PY'
+          import json,math
+          from pathlib import Path
+          p=Path("artifacts/real_mri_execution")
+          d=json.loads((p/"real_mri_numerical_replay.json").read_text())
+          assert d["source_git_blob"]=="b7e917e3f891c74fd99cdf82ec579ee254a195d0"
+          assert d["source_shape"]==[57,67,56]
+          assert d["externally_justified_hessian_bound"] is False
+          assert "ideal patient coordinate rounding" in d["not_claimed"]
+          for dtype in ("torch.float32","torch.float64"):
+              w=d["witness"][dtype]
+              assert w["audited_elements"]==27
+              assert len(w["source_sha256"])==64
+              assert len(w["output_sha256"])==64
+              assert math.isfinite(w["max_exact_barycentric_residual"])
+              assert w["declared_analytic_interpolation_bound"] is None
+          assert (p/"real_mri_fp32_fp64_execution.png").stat().st_size>10000
+          print("PASS: genuine MRI and two executed float precisions independently audited")
+          PY
+      - name: Publish actual-image figure and machine-readable execution proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: ClinGeom-real-MRI-exact-numerical-witness
+          path: artifacts/real_mri_execution/
+          if-no-files-found: error
+          retention-days: 60
