@@ -228,7 +228,31 @@ def main():
         raise ValueError("Invalid NIfTI affine")
     if abs(np.linalg.det(affine[:3, :3])) < 1e-12:
         raise ValueError("Singular NIfTI patient/world geometry")
+
+    # Independent native-NiBabel oracle for the same exact representation
+    # change. This is deliberately separate from ClinGeom/SciPy regridding.
+    orientation = np.array([[0., -1.], [1., 1.], [2., 1.]])
+    native_flip = im.as_reoriented(orientation)
+    H = np.eye(4)
+    H[0, 0] = -1
+    H[0, 3] = volume.shape[0] - 1
+    native_affine_error = float(np.max(np.abs(
+        np.asarray(native_flip.affine, dtype=np.float64) - affine @ H
+    )))
+    if native_affine_error > 1e-6:
+        raise AssertionError("ClinGeom orientation affine disagrees with NiBabel")
+    if not np.allclose(
+        np.asarray(native_flip.dataobj, dtype=np.float32),
+        np.flip(volume, axis=0), rtol=0, atol=1e-5
+    ):
+        raise AssertionError("ClinGeom voxel reindex disagrees with NiBabel")
+
     report = dict(
+        independent_nibabel_reorientation=dict(
+            tested=True, native_affine_max_abs_error_mm=native_affine_error,
+            voxel_reindex_matches=True,
+            library_version=nib.__version__,
+        ),
         source_description="NiBabel documentation: Someone structural brain MRI",
         source_repo="https://github.com/nipy/nibabel",
         source_commit=SOURCE_COMMIT,
