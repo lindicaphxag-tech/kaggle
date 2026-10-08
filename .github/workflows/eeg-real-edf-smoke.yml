@@ -1,0 +1,38 @@
+name: EEG real EDF one-subject ingestion smoke
+on:
+  push:
+    branches:
+      - research/eeg-cert-matched-selective-baseline-20261009
+    paths:
+      - 'research/eeg/eegmmidb_one_subject_smoke.py'
+      - '.github/workflows/eeg-real-edf-smoke.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  read-real-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned EDF science runtime
+        run: |
+          python -m pip install 'mne==1.11.0' 'numpy==2.3.5' 'scipy==1.17.0' 'scikit-learn==1.8.0'
+      - name: Download and actually parse 3 real motor imagery EDF recordings
+        run: |
+          set -o pipefail
+          python -m research.eeg.eegmmidb_one_subject_smoke \
+            --data-dir "$RUNNER_TEMP/mne_data" \
+            --output eeg_edf_ingestion_smoke.json 2>&1 | tee eeg_edf_ingestion.log
+      - name: Retain original hashes and logs even on a failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: real-eeg-one-subject-original-edf-check
+          if-no-files-found: warn
+          path: |
+            eeg_edf_ingestion_smoke.json
+            eeg_edf_ingestion.log
