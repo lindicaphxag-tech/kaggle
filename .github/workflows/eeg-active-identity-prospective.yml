@@ -6,7 +6,15 @@ on:
     paths:
       - '.github/workflows/eeg-active-identity-prospective.yml'
       - 'research/eeg/PROSPECTIVE_ACTIVE_PROVENANCE_V1.md'
+      - 'research/eeg/active_identity_real_assay.py'
+      - 'research/eeg/active_provenance_queries.py'
+      - 'research/eeg/filterbank_logeuclidean_real.py'
+      - 'tests/test_active_identity_real_assay.py'
   workflow_dispatch:
+concurrency:
+  group: eeg-active-prospective-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 jobs:
