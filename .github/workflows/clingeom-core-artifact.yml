@@ -92,6 +92,7 @@ jobs:
             research/medical_geometry/test_torch_fx_bundle.py \
             research/medical_geometry/test_torch_repair.py \
             research/medical_geometry/test_torch_repair_dtype.py \
+            research/medical_geometry/test_channel_fiber_runtime.py \
             research/medical_geometry/test_torch_repair_certificate.py \
             research/medical_geometry/test_fx_geometry.py \
             research/medical_geometry/test_fx_rewrite.py \
@@ -143,6 +144,19 @@ jobs:
       - name: Validate MONAI DiNTS channel-fiber witness
         run: |
           python -m pytest -q research/medical_geometry/test_monai_dints_runtime.py | tee monai-dints-runtime.txt
+      - name: Measure controlled patient-space fiber readout with real MONAI block
+        run: |
+          PYTHONPATH=. python research/medical_geometry/benchmark_monai_dints_fiber_repair.py | tee monai-fiber-repair.json
+          {
+            echo '### MONAI actual runtime, analytic patient-coordinate field'
+            echo '```json'
+            cat monai-fiber-repair.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: clingeom-monai-fiber-repair-evidence
+          path: monai-fiber-repair.json
       - name: Upload pinned MONAI witness
         uses: actions/upload-artifact@v4
         with:
