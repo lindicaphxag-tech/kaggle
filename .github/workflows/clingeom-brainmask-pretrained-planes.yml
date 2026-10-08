@@ -6,6 +6,8 @@ on:
       - "research/medical_geometry/upstream_repros/brainmask_pretrained_native_export.py"
       - "research/medical_geometry/upstream_repros/brainmask_pretrained_weakmask_eval.py"
       - "research/medical_geometry/upstream_repros/test_brainmask_pretrained_weakmask_eval.py"
+      - "research/medical_geometry/upstream_repros/brainmask_pretrained_plane_fusion.py"
+      - "research/medical_geometry/upstream_repros/test_brainmask_pretrained_plane_fusion.py"
       - "research/medical_geometry/upstream_repros/BRAINMASK_LEARNED_INFERENCE.md"
       - ".github/workflows/clingeom-brainmask-pretrained-planes.yml"
   workflow_dispatch:
@@ -67,6 +69,7 @@ jobs:
       - name: "Predeclared weak-reference metrics: physical HD95 unit falsifiers"
         run: |
           python -m pytest -q research/medical_geometry/upstream_repros/test_brainmask_pretrained_weakmask_eval.py
+          python -m pytest -q research/medical_geometry/upstream_repros/test_brainmask_pretrained_plane_fusion.py
       - name: Execute real trained model with unchanged native TF extraction/reconstruction
         run: |
           python -m research.medical_geometry.upstream_repros.brainmask_pretrained_native_export \
@@ -111,6 +114,32 @@ jobs:
             echo '```'
             echo "No expert clinical ground truth, no posthoc plane or threshold selection."
           } >> "$GITHUB_STEP_SUMMARY"
+      - name: Audit real frozen learned predictions through physical-grid fusion
+        run: |
+          python -m research.medical_geometry.upstream_repros.brainmask_pretrained_plane_fusion \
+            --image real_t1.nii.gz \
+            --provided-mask provided_brain_mask.nii.gz \
+            --predictions-root artifacts/learned \
+            --output artifacts/learned/pretrained_plane_fusion.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d = json.loads(Path("artifacts/learned/pretrained_plane_fusion.json").read_text())
+          assert d["actual_frozen_pretrained_model"]
+          assert d["patient_count"] == 1
+          assert d["checkpoint_count"] == 1
+          assert not d["clinical_ground_truth"]
+          assert d["ensemble"]["native_patched_fusion_exactly_matches_inverse_orientation"]
+          assert len(d["ensemble"]["plane_prediction_pairwise_dice_after_reorientation"]) == 3
+          print("PASS: genuine pretrained outputs, exact spatial reindex, real ensemble execution")
+          PY
+          {
+            echo "### True pretrained T1 U-Net: index-only vs physical-grid ensemble"
+            echo "Same one MRI/checkpoint; weak project-provided label is not expert ground truth."
+            echo '~~~json'
+            cat artifacts/learned/pretrained_plane_fusion.json
+            echo '~~~'
+          } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
           name: ClinGeom-brainmask-actual-learned-export-original-and-fixed
@@ -118,5 +147,6 @@ jobs:
             artifacts/learned/native_pretrained_plane_export.json
             artifacts/learned/native_pretrained_export_figure.png
             artifacts/learned/pretrained_weak_reference_export_metrics.json
+            artifacts/learned/pretrained_plane_fusion.json
           if-no-files-found: error
           retention-days: 60
