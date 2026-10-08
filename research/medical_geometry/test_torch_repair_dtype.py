@@ -76,6 +76,11 @@ def test_nearest_int64_round_half_uses_even_index_for_ties():
     plan = synthesize_lattice_repair(source,target,role="label")
     x = torch.arange(8,dtype=torch.int64).reshape(1,1,8,1,1).expand(1,1,8,8,8)
     y = LatticeRepair3d(plan)(x)
-    # Float nearest rounding is ties-to-even; verify against grid_sample.
-    as_float = LatticeRepair3d(plan)(x.float())
-    assert torch.equal(y, as_float.long())
+    # Exact source indices are (0.5, 1.5, ..., 6.5).
+    # Define deterministic nearest-tie semantics from the exact index map:
+    # 0.5->0, 1.5->2, 2.5->2, ..., 6.5->6.
+    # Do not use float32 grid_sample as the oracle: normalized-coordinate
+    # round-off can perturb mathematically exact half-grid positions.
+    expected = torch.tensor([0, 2, 2, 4, 4, 6, 6], dtype=torch.int64)
+    assert torch.equal(y[0, 0, :, 0, 0], expected)
+    assert torch.equal(y, expected[None, None, :, None, None].expand_as(y))
