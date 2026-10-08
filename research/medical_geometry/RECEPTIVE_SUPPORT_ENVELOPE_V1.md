@@ -21,7 +21,7 @@ The input source footprint for each contributing center has radius `R_j/2`.
 Consequently an upper bound on the *union* of all physical supports,
 centered at the target sampling location, has width
 
-    R_out,j <= R_source,j + 2 J_j max_{target i_j} d(frac(s_j(i_j)))
+    R_true,j <= R_bound,j := R_source,j + 2 J_j max_{target i_j} d(frac(s_j(i_j)))
 
 where `d(alpha)=0` at exact integer alpha=0, otherwise
 `d(alpha)=max(alpha,1-alpha)`. This expression is an **admissible envelope**
