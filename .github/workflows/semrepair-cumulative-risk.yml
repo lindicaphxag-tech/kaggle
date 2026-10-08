@@ -1,0 +1,35 @@
+name: SemRepair cumulative-risk authority game
+
+on:
+  push:
+    branches: [research/semrepair-path-risk-ledger]
+    paths:
+      - "research/semrepair/**"
+      - ".github/workflows/semrepair-cumulative-risk.yml"
+  pull_request:
+    paths:
+      - "research/semrepair/**"
+      - ".github/workflows/semrepair-cumulative-risk.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  proof-by-execution:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Compile pure-Python source
+        run: python -m compileall -q research/semrepair
+      - name: Pathwise budget versus per-experiment threshold counterexample
+        run: python research/semrepair/cumulative_risk_game.py
+      - name: Preserve zero-risk noisy diagnosis original witness
+        run: python research/semrepair/noisy_authority_game.py
