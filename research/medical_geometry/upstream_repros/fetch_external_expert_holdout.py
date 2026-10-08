@@ -35,7 +35,7 @@ NFBS_FILES = {
 def git_blob(path: Path) -> str:
     raw = path.read_bytes()
     return hashlib.sha1(
-        b"blob " + str(len(raw)).encode("ascii") + b"\\0" + raw
+        b"blob " + str(len(raw)).encode("ascii") + b"\0" + raw
     ).hexdigest()
 
 
@@ -190,7 +190,7 @@ def main():
         "raw_data_not_redistributed": True,
     }
     (a.output_root / "external_subject_manifest.json").write_text(
-        json.dumps(manifest, sort_keys=True, indent=2) + "\\n"
+        json.dumps(manifest, sort_keys=True, indent=2) + "\n"
     )
     print(json.dumps({
         "subject_count": len(records),
