@@ -1,0 +1,83 @@
+name: ClinGeom upstream brain_mask nonaxial export regression
+
+on:
+  pull_request:
+    paths:
+      - "research/medical_geometry/upstream_repros/brainmask_plane_export_repro.py"
+      - "research/medical_geometry/upstream_repros/brainmask_export_plane.patch"
+      - "research/medical_geometry/upstream_repros/BRAINMASK_NONAXIAL_EXPORT.md"
+      - ".github/workflows/clingeom-brainmask-plane-export.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  upstream-original-vs-surgical-repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install standalone NumPy NIfTI geometry audit runtime
+        run: python -m pip install "numpy>=1.26,<3" "nibabel>=5.2,<6" "scipy>=1.11" "matplotlib>=3.8"
+      - name: Download and authenticate real MRI/mask and exact original upstream code
+        run: |
+          set -euo pipefail
+          base="https://raw.githubusercontent.com/ecalabr/brain_mask/ca789fb26b70e359b61a8d52968813dd772fb4b1"
+          mkdir -p upstream_source/utilities study/example001 artifacts/brainmask
+          curl -fL --retry 3 "$base/predict.py" -o upstream_source/predict.py
+          curl -fL --retry 3 "$base/utilities/input_fn_util.py" -o upstream_source/utilities/input_fn_util.py
+          curl -fL --retry 3 "$base/example_data/example001/example001_t1.nii.gz" -o study/example001/example001_t1.nii.gz
+          curl -fL --retry 3 "$base/example_data/example001/example001_brain_mask.nii.gz" -o study/example001/example001_brain_mask.nii.gz
+          test "$(git hash-object upstream_source/predict.py)" = "d4b03f5b851928ead5ef014af75cd1dd5fbd64dc"
+          test "$(git hash-object upstream_source/utilities/input_fn_util.py)" = "1c2ce1a9f13f690cdaf28eac5b003e44ec06d192"
+          test "$(git hash-object study/example001/example001_t1.nii.gz)" = "81b1e5260ee4a579d8ac490cac113df9c1cb942f"
+          test "$(git hash-object study/example001/example001_brain_mask.nii.gz)" = "e0dd089b3544da4352e751a24dc27a828904bad7"
+      - name: Record native real-data baseline (ax negative control, cor/sag positives)
+        run: |
+          python -m research.medical_geometry.upstream_repros.brainmask_plane_export_repro \
+            --source-dir upstream_source --study-dir study/example001 \
+            --stage before --out artifacts/brainmask
+      - name: Apply standard maintainer-native patch to exact upstream
+        run: |
+          git -C upstream_source init -q
+          git -C upstream_source apply --check "$GITHUB_WORKSPACE/research/medical_geometry/upstream_repros/brainmask_export_plane.patch"
+          git -C upstream_source apply "$GITHUB_WORKSPACE/research/medical_geometry/upstream_repros/brainmask_export_plane.patch"
+          python -m py_compile upstream_source/predict.py
+          git -C upstream_source diff --check
+      - name: Retest exactly the same real MRI/label through corrected upstream
+        run: |
+          python -m research.medical_geometry.upstream_repros.brainmask_plane_export_repro \
+            --source-dir upstream_source --study-dir study/example001 \
+            --stage after --out artifacts/brainmask
+      - name: Require strictly improved nonaxial semantics and unchanged axial control
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          p=Path("artifacts/brainmask")
+          before=json.loads((p/"before_results.json").read_text())["cases"]
+          after=json.loads((p/"after_results.json").read_text())["cases"]
+          assert before["ax"]["fixed_original_patient_grid_dice"]==1
+          assert after["ax"]["fixed_original_patient_grid_dice"]==1
+          for plane in ("cor","sag"):
+              assert before[plane]["fixed_original_patient_grid_dice"]<1
+              assert after[plane]["fixed_original_patient_grid_dice"]==1
+              assert after[plane]["physical_centroid_displacement_mm"]<1e-6
+              assert after[plane]["raw_export_shape"]==before[plane]["source_grid_shape"]
+          assert (p/"real_mri_before_after_upstream_export.png").stat().st_size>10000
+          print("PASS original bad cor/sag, patched exact cor/sag, unchanged axial")
+          PY
+      - name: Publish reviewer-readable numeric witness and genuine MRI figure
+        uses: actions/upload-artifact@v4
+        with:
+          name: ClinGeom-brainmask-native-plane-export-before-after
+          path: |
+            artifacts/brainmask/before_results.json
+            artifacts/brainmask/after_results.json
+            artifacts/brainmask/real_mri_before_after_upstream_export.png
+          if-no-files-found: error
+          retention-days: 60
