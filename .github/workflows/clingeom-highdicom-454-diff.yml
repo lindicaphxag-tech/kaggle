@@ -36,7 +36,7 @@ jobs:
           python -m py_compile highdicom-checkout/src/highdicom/volume.py
       - name: Prove exact source identity with independently generated patch
         run: |
-          python - <<\x27PY\x27
+          python - <<'PY'
           from pathlib import Path
           import runpy
           import shutil
