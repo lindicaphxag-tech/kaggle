@@ -8,14 +8,14 @@ sources, irreversible fusion points, and a finite set of **independently
 authorized** sites, choose the cheapest set of pre-fusion interventions that
 intercepts **every** path from a bad source to destructive mixing.
 
-The existing \`physically_align_then_mix\` repairs one explicit fiber bundle
+The existing `physically_align_then_mix` repairs one explicit fiber bundle
 before one dense 1×1 mixer. Multi-branch encoders also have skip connections,
 concats and multiple hazardous fusions. Repairing the locally obvious branch
 is insufficient if another branch still reaches a mixer uncorrected.
 
 ## Contract and interface
 
-\`choose_repair_sites(graph, bad_sources, irreversible_fusions, admitted)\`
+`choose_repair_sites(graph, bad_sources, irreversible_fusions, admitted)`
 
 - Graph keys are unique **post-operator tensor states**; edges point forward
   through data dependencies. Cyclic/unresolved graphs are refused.
@@ -29,14 +29,14 @@ is insufficient if another branch still reaches a mixer uncorrected.
   memory, wall-clock speed, diagnostic error, or resampling fidelity.
 - Mixing nodes themselves may **never** be marked as repair sites.
 - A graph that has a bad-source-to-fusion path with no admitted upstream
-  intervention is refused with a concrete \`UnrepairablePath.path\`.
+  intervention is refused with a concrete `UnrepairablePath.path`.
 - For feasible instances, the selected sites block every bad-source-to-fusion
   route; the optimum total integer cost is exact relative to the supplied
   candidate sites and costs.
 
 ### Minimal concrete example
 
-\`\`\`python
+```python
 from research.medical_geometry.repair_placement import (
     AdmittedSite, choose_repair_sites
 )
@@ -56,7 +56,7 @@ plan = choose_repair_sites(
     graph, ("phase0", "phase1"), ("irreversible_mix",), admitted
 )
 assert plan.sites == ("concat",) and plan.total_cost == 5
-\`\`\`
+```
 
 The shared concat site is admissible **only if** an external channel-fiber
 proof establishes that all of its branches can be physically aligned there.
@@ -80,15 +80,15 @@ sets, all candidate costs/provenance handles and the chosen site set.
 Tests compare the result against a separate brute-force subset oracle on
 220 seeded 7-node DAGs, plus shared-fusion, skip-bypass, multiple-hazard,
 unreachable-hazard and fail-closed malformed-input cases. All tests are CPU-
-only and require \`pytest\`, not medical scans, MONAI, or a GPU.
+only and require `pytest`, not medical scans, MONAI, or a GPU.
 
 ## Explicit limitations / next decisive research step
 
 1. **This PR is a graph planner only.** It does not yet extract the graph
-   automatically from arbitrary \`torch.fx\` nodes, insert repair operations,
+   automatically from arbitrary `torch.fx` nodes, insert repair operations,
    certify arbitrary channel joins, or measure any task-level gain.
 2. The admission digest is externally supplied. Until verified native
-   \`LatticeBundle\`/repair-synthesis certificates are bound to the graph
+   `LatticeBundle`/repair-synthesis certificates are bound to the graph
    locations, an untrusted caller could forge admissions. **Do not** call
    this a safe automatic medical-model rewrite.
 3. No performance improvement is established by a smaller *estimated*
