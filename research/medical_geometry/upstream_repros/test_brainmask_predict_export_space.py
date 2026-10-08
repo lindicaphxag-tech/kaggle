@@ -1,0 +1,154 @@
+"""Minimal upstream regression tests for brain_mask NIfTI export.
+
+These are executable against the patched original repository, *not* the
+ClinGeom package. The native predict.py function is compiled from its
+unchanged AST so no model checkpoint, TensorFlow or test-only import patch
+is required; only the model reconstructor is replaced with the exact
+model-space tensor to isolate its output mapping contract. Native full-TF
+and real trained-model validations are independently available.
+"""
+import ast
+from glob import glob
+import logging
+import os
+from pathlib import Path
+from types import SimpleNamespace
+
+import nibabel as nib
+import numpy as np
+import pytest
+
+
+def exporter():
+    source=Path(__file__).resolve().parents[1]/"predict.py"
+    parsed=ast.parse(source.read_text())
+    methods=[n for n in parsed.body if isinstance(n,ast.FunctionDef)
+             and n.name=="predictions_2_nii"]
+    assert len(methods)==1, "source exporter missing or duplicated"
+    # The exporter is the exact source function, not its reimplementation.
+    namespace={
+        "__builtins__":__builtins__, "nib":nib,"np":np,"glob":glob,
+        "os":os,"logging":logging,
+        "reconstruct_infer_patches_3d":lambda x,*args:x,
+    }
+    exec(compile(ast.Module(body=methods,type_ignores=[]),str(source),"exec"),
+         namespace)
+    return namespace["predictions_2_nii"]
+
+
+def source_world_affine(sheared):
+    if sheared:
+        return np.array([
+            [.6,-.25,.1,35.0],
+            [.35,1.3,.08,-12.0],
+            [.1,.15,2.25,8.0],
+            [0.,0.,0.,1.]
+        ])
+    return np.array([
+        [.8,0,0,6],
+        [0,1.25,0,-4],
+        [0,0,2.,19],
+        [0,0,0,1.]
+    ])
+
+
+def make_case(tmp_path,shape=(9,11,7),sheared=True):
+    work=tmp_path/"case"
+    work.mkdir()
+    i,j,k=np.indices(shape)
+    # Non-symmetric volumetric signal; permuting axes genuinely changes it.
+    signal=(((i+2*j+3*k)%7)<3).astype(np.float32)
+    mask=(i>=3)&(j<=8)&(k>=1)
+    affine=source_world_affine(sheared)
+    nib.save(nib.Nifti1Image(signal,affine),work/"case_t1.nii.gz")
+    nib.save(nib.Nifti1Image(mask.astype(np.float32),affine),
+             work/"case_mask.nii.gz")
+    return work,signal,mask,affine
+
+
+def model_plane_signal(source_array,plane):
+    if plane=="ax":
+        return source_array.copy()
+    if plane=="cor":
+        return source_array.transpose(0,2,1).copy()
+    if plane=="sag":
+        return source_array.transpose(1,2,0).copy()
+    raise ValueError("unsupported plane")
+
+
+def params(plane,**changes):
+    default=dict(
+        data_prefix=["t1"],model_dir="model01",
+        data_plane=plane,resample_spacing=[],load_shape=[]
+    )
+    default.update(changes)
+    return SimpleNamespace(**default)
+
+
+def run(tmp_path,signal,plane,parameters=None,mask=None):
+    f=exporter()
+    out=tmp_path/("output_"+plane)
+    out.mkdir(exist_ok=True)
+    work=tmp_path/"case"
+    pred=model_plane_signal(signal,plane)
+    path=f(pred,str(work),str(out),parameters or params(plane),mask=mask)
+    return nib.load(path)
+
+
+@pytest.mark.parametrize("plane",["cor","sag"])
+@pytest.mark.parametrize("shape",[(9,11,7),(7,9,13)])
+@pytest.mark.parametrize("sheared",[False,True])
+def test_nonaxial_reorder_back_to_original_patient_space(
+    tmp_path,plane,shape,sheared
+):
+    work,signal,_,affine=make_case(tmp_path,shape,sheared)
+    exported=run(tmp_path,signal,plane)
+    assert exported.shape==signal.shape
+    np.testing.assert_array_equal(np.asarray(exported.dataobj),signal)
+    np.testing.assert_allclose(exported.affine,affine,rtol=0,atol=1e-6)
+
+
+@pytest.mark.parametrize("sheared",[False,True])
+def test_axial_negative_control_remains_exact(tmp_path,sheared):
+    work,signal,_,affine=make_case(tmp_path,sheared=sheared)
+    exported=run(tmp_path,signal,"ax")
+    np.testing.assert_array_equal(np.asarray(exported.dataobj),signal)
+    np.testing.assert_allclose(exported.affine,affine,rtol=0,atol=1e-6)
+
+
+@pytest.mark.parametrize("plane",["cor","sag"])
+def test_reorientation_precedes_source_grid_masking(tmp_path,plane):
+    work,signal,mask,affine=make_case(tmp_path)
+    exported=run(tmp_path,signal,plane,mask="mask")
+    np.testing.assert_array_equal(
+        np.asarray(exported.dataobj),signal*mask
+    )
+    np.testing.assert_allclose(exported.affine,affine,rtol=0,atol=1e-6)
+
+
+@pytest.mark.parametrize("changes",[
+    {"resample_spacing":[1.0,1.0,1.0]},
+    {"load_shape":[9,11,7]},
+    {"resample_spacing":[1.0,1.0,1.0],"load_shape":[9,11,7]},
+])
+def test_missing_inverse_resample_provenance_fails_closed(tmp_path,changes):
+    work,signal,_,_=make_case(tmp_path)
+    with pytest.raises(ValueError,match="resample_spacing/load_shape"):
+        run(tmp_path,signal,"ax",parameters=params("ax",**changes))
+
+
+def test_unknown_plane_cannot_silently_write_source_affine(tmp_path):
+    work,signal,_,_=make_case(tmp_path)
+    with pytest.raises(ValueError,match="Unsupported data_plane"):
+        # The source loader should reject this too, but this directly tests
+        # the serializing boundary in case a new caller bypasses the loader.
+        run(tmp_path,signal,"ax",parameters=params("diagonal"))
+
+
+def test_source_shape_mismatch_refuses_export(tmp_path):
+    work,signal,_,_=make_case(tmp_path)
+    truncated=signal[:-1,:,:]
+    out=tmp_path/"output_ax"
+    out.mkdir()
+    with pytest.raises(ValueError,match="Prediction shape"):
+        exporter()(truncated,str(work),str(out),params("ax"))
