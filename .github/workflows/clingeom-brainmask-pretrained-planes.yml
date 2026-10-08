@@ -8,6 +8,7 @@ on:
       - "research/medical_geometry/upstream_repros/test_brainmask_pretrained_weakmask_eval.py"
       - "research/medical_geometry/upstream_repros/brainmask_pretrained_plane_fusion.py"
       - "research/medical_geometry/upstream_repros/test_brainmask_pretrained_plane_fusion.py"
+      - "research/medical_geometry/upstream_repros/REAL_PRETRAINED_PLANE_FUSION_RESULT.md"
       - "research/medical_geometry/upstream_repros/BRAINMASK_LEARNED_INFERENCE.md"
       - ".github/workflows/clingeom-brainmask-pretrained-planes.yml"
   workflow_dispatch:
