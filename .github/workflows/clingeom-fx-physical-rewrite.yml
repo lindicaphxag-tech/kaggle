@@ -6,6 +6,7 @@ on:
       - "research/medical_geometry/repair_placement_execute.py"
       - "research/medical_geometry/test_repair_placement_execute.py"
       - "research/medical_geometry/benchmark_placement_execution.py"
+      - "research/medical_geometry/README.md"
       - "research/medical_geometry/torch_fx_bundle.py"
       - "research/medical_geometry/lattice_bundle.py"
       - ".github/workflows/clingeom-fx-physical-rewrite.yml"
