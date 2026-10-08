@@ -64,7 +64,7 @@ jobs:
           git -C original apply --check "$GITHUB_WORKSPACE/research/medical_geometry/upstream_repros/brainmask_export_plane.patch"
           git -C original apply "$GITHUB_WORKSPACE/research/medical_geometry/upstream_repros/brainmask_export_plane.patch"
           python -m py_compile original/predict.py
-      - name: Predeclared weak-reference metrics: physical HD95 unit falsifiers
+      - name: "Predeclared weak-reference metrics: physical HD95 unit falsifiers"
         run: |
           python -m pytest -q research/medical_geometry/upstream_repros/test_brainmask_pretrained_weakmask_eval.py
       - name: Execute real trained model with unchanged native TF extraction/reconstruction
