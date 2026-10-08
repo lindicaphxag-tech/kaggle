@@ -89,3 +89,25 @@ independently established novel mathematical theorem. Research novelty, if
 any, lies in integrating execution precision with patient-space geometry
 contracts and applying it in actual multi-fiber medical inference pipelines.
 Clinical benefit, external validation and model accuracy are not inferred.
+
+## Public 24-point execution sweep
+
+The study also ships
+`benchmark_grid_precision_patient_mm.py`, called by the public PyTorch core
+CI, which performs **24 genuine CPU `torch.grid_sample` runs**:
+four source-axis sizes (32/64/128/256), three execution dtypes
+(FP32/FP16/BF16), and two patient physical spacings (0.7/5 mm).
+
+It uploads a raw JSON file with **both** the actual signal execution error
+and the analytically certified coordinate-storage displacement in mm.
+These remain **distinct quantities**: coordinate drift does not account for
+feature-value rounding or interpolation arithmetic.
+
+```bash
+python -m research.medical_geometry.benchmark_grid_precision_patient_mm \
+    --out grid-precision-24.json
+```
+
+This contrasts a physical-space authorization result with raw PyTorch
+execution under the same exact synthetic mathematical field; it is not
+an MRI classification or segmentation benchmark.
