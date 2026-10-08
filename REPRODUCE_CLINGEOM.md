@@ -175,3 +175,40 @@ MONAI implements the wrong topology.
 Independent reports should include exact Git commit, MONAI source SHA,
 PyTorch version, full JSON and failures, and should not copy the
 author-operated CI results as third-party validation.
+
+## H. Repair-before-fusion identifiability challenge
+
+**Merged implementation:** [ClinGeom PR #44](https://github.com/lindicaphxag-tech/kaggle/pull/44).
+**Complete final author-operated run:** [GitHub Actions 37717636413](https://github.com/lindicaphxag-tech/kaggle/actions/runs/37717636413).
+
+The experiment controls the input fields and conv weights but uses real
+MONAI DiNTS `FactorizedReduceBlock` and real PyTorch dense `1x1x1` fusion.
+The two analytic input worlds produce indistinguishable post-mix tensors
+despite different required co-located outputs. A successful run therefore
+validates **where** an admissible physical repair must be executed,
+not clinical segmentation accuracy.
+
+```bash
+python -m pytest -q research/medical_geometry/test_pre_mix_compiler.py
+PYTHONPATH=. python research/medical_geometry/benchmark_monai_nonidentifiable_mixing.py
+```
+
+Falsification checks:
+
+- max difference between the two *already mixed* tensors <= 2e-6;
+- true patient-space targets differ by 0.7 units;
+- any post-mix-only estimator has worst-case lower bound 0.35;
+- each independently corrected pre-mix output matches its target
+  within 2e-6;
+- any already mixed/multi-support feature is refused by point-affine repair;
+- a non-pointwise/grouped fusion fails, rather than borrowing this proof;
+- conditional output interpolation budget, when requested, transports
+  via the actual mixer weights and rejects over-budget repair.
+
+External reviewers should use their own fork and quote **their own**
+run URL and exact dependencies. The merged project's author-operated
+green CI alone does not establish independent reproduction.
+
+**Scope:** this is elementary nonidentifiability in a specific physical
+channel-fusion topology. We do not claim a new abstract information-theory
+theorem, downstream trained medical-model improvement, or a bug in MONAI.
