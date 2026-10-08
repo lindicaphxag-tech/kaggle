@@ -1,0 +1,32 @@
+name: EEG identity matched-coverage comparator unit tests
+
+on:
+  push:
+    branches:
+      - research/eeg-cert-matched-selective-baseline-20261009
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  clean-unit-suite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install version-pinned scientific CPU stack
+        run: |
+          python -m pip install 'mne==1.11.0' 'numpy==2.3.5' 'scipy==1.17.0' 'scikit-learn==1.8.0'
+      - name: Run exactness, cohort and matched-coverage tests
+        run: |
+          python -m compileall -q research/eeg
+          python -m unittest discover -s tests -p 'test_electrode_ambiguity_certificate.py' -v
+          python -m unittest discover -s tests -p 'test_eegmmidb_certificate_real.py' -v
+          python -m unittest discover -s tests -p 'test_eeg_selective_margin_control.py' -v
+          python -m unittest discover -s tests -p 'test_eegmmidb_real_pilot.py' -v
+
+# This suite is pure synthetic protocol unit testing; no real EDF scores.
