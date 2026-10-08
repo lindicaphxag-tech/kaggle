@@ -167,6 +167,17 @@ jobs:
           assert d["prehead_feature_fusion_is_reducible_to_aligned_logit_ensemble"]
           assert not d["prehead_feature_mixing_independent_mechanism_claimed"]
           assert d["prehead_feature_fusion_vs_aligned_logit_ensemble_max_abs_error"] <= 2e-5
+          assert d["actual_nonlinear_tail_replay_for_all_original_plane_inputs"]
+          assert d["original_pre_residual_nonlinear_tail_3d_convs"] >= 1
+          for p in ("ax", "cor", "sag"):
+              assert d["per_plane_oracles"][p]["original_pre_residual_tail_replay_max_abs_error"] <= 2e-5
+          for key in (
+              "nonlinear_pre_residual_raw_index_feature_fusion",
+              "nonlinear_pre_residual_correctly_oriented_features_with_untransported_axial_tail",
+              "nonlinear_pre_residual_correctly_oriented_features_with_conjugated_learned_operator_fusion",
+          ):
+              assert 0 <= d[key]["dice_against_provided_nonexpert_mask"] <= 1
+          assert not d["nonlinear_operator_conjugation_mixing_independent_mechanism_claimed"]
           for k in ("ax","cor","sag"):
               z=d["per_plane_oracles"][k]
               assert z["trained_model_to_replayed_classifier_max_abs_error"] <= 2e-5
