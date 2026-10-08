@@ -7,6 +7,10 @@ on:
     paths:
       - 'research/eeg/eegmmidb_real_pilot.py'
       - 'tests/test_eegmmidb_real_pilot.py'
+      - 'research/eeg/electrode_ambiguity_certificate.py'
+      - 'research/eeg/eegmmidb_certificate_real.py'
+      - 'tests/test_electrode_ambiguity_certificate.py'
+      - 'tests/test_eegmmidb_certificate_real.py'
       - '.github/workflows/eegmmidb-electrode-real-pilot.yml'
   workflow_dispatch:
     inputs:
@@ -35,6 +39,8 @@ jobs:
         run: |
           python -m py_compile research/eeg/eegmmidb_real_pilot.py
           python -m unittest discover -s tests -p 'test_eegmmidb_real_pilot.py' -v
+          python -m unittest discover -s tests -p 'test_electrode_ambiguity_certificate.py' -v
+          python -m unittest discover -s tests -p 'test_eegmmidb_certificate_real.py' -v
 
   true-physionet-eeg-pilot:
     needs: baseline-contracts
@@ -60,6 +66,15 @@ jobs:
             --cohort "$EEG_COHORT" \
             --data-dir "$RUNNER_TEMP/eeg_data" \
             --out "eegmmidb_${EEG_COHORT}_results.json" 2>&1 | tee eegmmidb_console.log
+      - name: Certify linear decisions over unknown electrode assignments
+        env:
+          EEG_COHORT: ${{ github.event.inputs.cohort || 'pilot' }}
+        run: |
+          set -o pipefail
+          python -m research.eeg.eegmmidb_certificate_real \
+            --cohort "$EEG_COHORT" \
+            --data-dir "$RUNNER_TEMP/eeg_data" \
+            --out "eegmmidb_${EEG_COHORT}_certificate.json" 2>&1 | tee eegmmidb_certificate_console.log
       - name: Preserve original score denominators, EDF hashes and failure logs
         if: always()
         uses: actions/upload-artifact@v4
@@ -69,7 +84,9 @@ jobs:
           retention-days: 30
           path: |
             eegmmidb_*_results.json
+            eegmmidb_*_certificate.json
             eegmmidb_console.log
+            eegmmidb_certificate_console.log
 
 # NO GPU training, NO EEGCLIP/NeuroRVQ checkpoint inference, and NO scientific
 # novelty claim. This is a real EDF, simple classical log-PSD exploratory pilot.
