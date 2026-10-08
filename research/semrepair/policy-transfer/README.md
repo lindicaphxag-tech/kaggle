@@ -6,6 +6,27 @@
 > from *achieved-end-effector-relative* actions to *previous-target-relative*
 > actions, even though the normalized numeric action has the same shape?
 
+## Start with the reviewer packet and paired statistics
+
+- [**Single reviewer-facing evidence / novelty / limitations packet**](REVIEWER_PACKET.md)
+- [**Exact paired statistics, Wilson armwise intervals and source hashes**](paired_stats.py)
+- Reproduce with `python research/semrepair/policy-transfer/audit.py` and
+  `python research/semrepair/policy-transfer/paired_stats.py`.
+- **Predeclared PickCube holdout:** projected controller-ABI transport
+  **32/32** vs naive action copying **0/32**; **32 favorable and 0 unfavorable**
+  source-seed-discordant episodes. Exact two-sided paired McNemar
+  `p=4.656612873077393e-10`. This is deterministic, fixed-checkpoint,
+  *author-operated* task evidence, not a measure of across-robot variability.
+- **Exploratory cross-task observations:** StackCube 31/32 vs 2/32
+  (29 favorable, 0 unfavorable); PushCube 30/32 vs 20/32 (11 favorable,
+  1 unfavorable). Neither was prospectively predeclared as confirmatory.
+
+The 2×2 [official delta-pose demonstration replay](https://github.com/lindicaphxag-tech/ManiSkill/actions/runs/37715587885)
+is a **different** experiment: baseline 6/8, converter-only 6/8,
+controller-only 0/8, combined 6/8. It demonstrates a non-monotonic
+controller/converter interaction in *demo replay*, **not** a learned-policy
+success gain. No figures from this 2×2 are pooled with frozen PPO evaluation.
+
 ## Research question and mechanism
 
 A 6D normalized delta action is **not an executable semantic contract**.

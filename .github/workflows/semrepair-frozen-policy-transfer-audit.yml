@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - research/semrepair-frozen-policy-transfer-evidence-v1
+      - research/stateful-frozen-policy-review-packet
+      - main
     paths:
       - "research/semrepair/policy-transfer/**"
       - ".github/workflows/semrepair-frozen-policy-transfer-audit.yml"
@@ -31,15 +33,21 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Syntax and source binding
         run: |
-          python -m py_compile research/semrepair/policy-transfer/audit.py
+          python -m py_compile research/semrepair/policy-transfer/audit.py research/semrepair/policy-transfer/paired_stats.py
           git diff --check
       - name: Recompute 96 original physical-simulation outcomes, source provenance and six adversarial modifications per task
         run: |
           python research/semrepair/policy-transfer/audit.py \
             | tee frozen_policy_transfer_derived_evidence.json
+      - name: Compute paired exact McNemar statistics from all 96 audited episodes
+        run: |
+          python research/semrepair/policy-transfer/paired_stats.py \
+            | tee frozen_policy_transfer_paired_statistics.json
       - name: Publish independently recomputed report
         uses: actions/upload-artifact@v4
         with:
           name: frozen-robot-policy-transfer-audit-${{ matrix.python }}
-          path: frozen_policy_transfer_derived_evidence.json
+          path: |
+            frozen_policy_transfer_derived_evidence.json
+            frozen_policy_transfer_paired_statistics.json
           if-no-files-found: error
