@@ -1,0 +1,37 @@
+name: Prospective 64-state controller-memory evidence audit
+
+on:
+  push:
+    branches:
+      - research/stateful-abi-prospective-64-archive
+      - main
+    paths:
+      - "research/semrepair/policy-transfer/prospective_pull_stack_64.json"
+      - "research/semrepair/policy-transfer/audit_prospective_64.py"
+      - ".github/workflows/stateful-abi-prospective-64.yml"
+  pull_request:
+    paths:
+      - "research/semrepair/policy-transfer/prospective_pull_stack_64.json"
+      - "research/semrepair/policy-transfer/audit_prospective_64.py"
+      - ".github/workflows/stateful-abi-prospective-64.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  full-frozen-denominator-audit:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Compile isolated standard-library audit
+        run: python -m py_compile research/semrepair/policy-transfer/audit_prospective_64.py
+      - name: Re-count original results and reject eleven tampered variants
+        run: python research/semrepair/policy-transfer/audit_prospective_64.py --self-test

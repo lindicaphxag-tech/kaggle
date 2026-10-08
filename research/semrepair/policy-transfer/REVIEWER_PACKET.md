@@ -6,6 +6,63 @@
 **Primary (predeclared) evidence:** PickCube-v1, seeds 21001–21032.
 **Secondary (exploratory) evidence:** StackCube-v1 and PushCube-v1, 32 paired episodes each.
 
+### NEW: prospective independent-checkpoint/seed test — complete and audited
+
+The strongest new source-frozen evidence is
+[**ManiSkill Actions #37815142810 (SUCCESS)**](https://github.com/lindicaphxag-tech/ManiSkill/actions/runs/37815142810).
+After an execution-only GitHub matrix-expression correction
+(commit `9ffa86c6`), **all eight** real PhysX CPU replay chunks plus the
+full-denominator audit completed. The study fixed the untrained PPO models,
+action translation, null controls, 50-step horizon, 64 source state seeds,
+and report/stop gates **before** examining these task outcomes.
+
+[Original preregistration](https://github.com/lindicaphxag-tech/ManiSkill/blob/research/action-abi-independent-pull-stack-replication-v1/research/ACTION_ABI_PULL_STACK_PREREGISTERED_V1.json)
+(Git blob `721509118c490f2e9a5a87a6570922b7106bfbea`).
+[Original 64-state aggregated ZIP](https://github.com/lindicaphxag-tech/ManiSkill/actions/runs/37815142810/artifacts/11567460897)
+(SHA-256 `2a4701dcdc77f9f4f7cf72137e55172f8a6882001be5019d92b7c5af0c50225c`).
+[Permanent 64 individual task-state records](prospective_pull_stack_64.json) |
+[Standard-library third-party-friendly independent verifier](audit_prospective_64.py).
+
+| New frozen cohort (32 physical states) | Source PPO | Direct action copy | Strict exact/refuse | Bounded stateless | **Bounded stateful** |
+|---|---:|---:|---:|---:|---:|
+| PullCube-v1, seeds 51001–51032 | 31 | 14 | 17 | 14 | **31** |
+| StackCube-v1, seeds 61001–61032 | 28 | 0 | 11 | 0 | **30** |
+
+- Same frozen source policy/checkpoint and identical seed within a task,
+  without policy training or selection after outcome. Different tasks use
+  their own **independently published pretrained PPO weights**.
+- **Direct mechanism ablation:** comparing the two *bounded-projection*
+  arms changes only whether the previous **commanded target pose** is
+  correctly carried through the controller ABI.
+  On the 32 original PullCube states: **17 stateful-only successes,
+  zero stateless-only**; on StackCube: **30 stateful-only, zero stateless-only**.
+- **Both preregistered gates passed:** source-policy competence
+  31/32 and 28/32 (minimum 24/32), and net memory contrasts
+  +17 and +30 (minimum +6), respectively. Strict exact-only
+  refuses nonrepresentable commands and achieves 17/32 and 11/32;
+  projected commands that leave the exact action domain are labeled
+  **NOT_EXACT**.
+- All five arms ran for all original states: **64 task-state episodes ×
+  five controller arms = 320 controller-arm trials (including exact-mode early refusals)**. No successful
+  state was selected in place of failed controller states, and no
+  four-way intersection conditioning was applied.
+- **Scope correction:** PullCube is a new task relative to earlier
+  PickCube/PushCube/StackCube source tests. StackCube is a *new precommitted
+  seed cohort*, but StackCube had already been studied exploratorily;
+  it is NOT a wholly previously unseen task family. The frozen protocol
+  itself is preserved rather than rewritten after this observation.
+- This is still **contributor-operated simulation**, not independent
+  scientist replication, not a new embodiment family, not unknown
+  interface identification, and **not upstream SemRepair adoption**.
+  The bounded stateful arm does not prove safety or exactness under clipping.
+
+**Fast review:**
+`python research/semrepair/policy-transfer/audit_prospective_64.py --self-test`.
+The verifier reads all 64 original per-state records, recomputes successes,
+discordant outcomes, predeclared gates, refusals and nonexact projection
+provenance, and rejects deliberately altered records without loading any
+policy or simulator.
+
 ### Research question
 
 Can a *frozen* source manipulation policy survive a change in the target
