@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - research/semrepair-cross-repo-reproduction
+      - research/semrepair-independent-exact-oracle
       - main
     paths:
       - "research/semrepair/**"
@@ -31,6 +32,8 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Compile external verifier
         run: python -m py_compile research/semrepair/reproduce_crossrepo.py
+      - name: Solve frozen experiment table by independent exact rational dynamic program
+        run: python research/semrepair/independent_oracle.py
       - name: Prove falsified result rejection
         run: python research/semrepair/reproduce_crossrepo.py --self-test
       - name: Independently clone pinned artifact and verify result
