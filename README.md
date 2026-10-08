@@ -5,9 +5,37 @@
 This repository is a public evidence and reproducibility surface for two research lines:
 
 1. **ClinGeom** — typed patient-space semantics for medical AI pipelines.
-2. **SemRepair evidence transport** — prospective, timestamped semantic-reliability observations for embodied software.
+2. **SemRepair** — authority-optimal identification of hidden embodied interface semantics, independently checkable frozen CPU artifact, real-stack evidence, and timestamped prospective transport.
 
 They are deliberately kept separate in claims: public self-authored artifacts are **not** external adoption, and prospective cases are **not** counted before their frozen criteria are met.
+
+## SemRepair — start here
+
+**Flagship research question:** When robot interfaces have hidden or mutually
+compensating physical semantics, what is the **minimum admissible evidence**
+needed to authorize one concrete implementation-bound repair?
+
+- [**One-page reviewer / falsification packet**](research/semrepair/README.md)
+- [**Cross-repository CPU verifier**](research/semrepair/reproduce_crossrepo.py):
+  `python research/semrepair/reproduce_crossrepo.py`
+- [Frozen Semantic ABI source](https://github.com/lindicaphxag-tech/Isaac-GR00T/commit/f69254a1e3a621a10236902ac77e9c1b1c7de668)
+  · [origin CI](https://github.com/lindicaphxag-tech/Isaac-GR00T/actions/runs/37471167749)
+  · [external-hosted cross-repo CI](https://github.com/lindicaphxag-tech/kaggle/actions/workflows/semrepair-crossrepo-reproduction.yml)
+- [Real ManiSkill regression PR #1495](https://github.com/mani-skill/ManiSkill/pull/1495)
+  · [current-head 13 / 18-test validation](https://github.com/lindicaphxag-tech/ManiSkill/actions/runs/37687749068)
+  · [GR00T PR #786](https://github.com/NVIDIA/Isaac-GR00T/pull/786)
+
+The frozen finite counterexample requires expected diagnostic cost **3.5**
+to identify the entire hidden ABI, but **1.0** to identify a single authorized
+repair class. A compensated fault requiring a different local repair must still
+be rejected under external-only observations. Lean proves the structural
+stopping boundary, not arbitrary robot safety.
+
+**Claims:** No maintained external SemRepair adoption, confirmed prospective I2,
+or independent third-party SemRepair reproduction is asserted. This repo's
+cross-repository CI is still author-operated, not independent endorsement.
+
+---
 
 ## ClinGeom — start here
 
