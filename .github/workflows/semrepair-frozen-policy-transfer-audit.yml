@@ -1,0 +1,45 @@
+name: Independent frozen-policy task-transfer evidence audit
+
+on:
+  push:
+    branches:
+      - research/semrepair-frozen-policy-transfer-evidence-v1
+    paths:
+      - "research/semrepair/policy-transfer/**"
+      - ".github/workflows/semrepair-frozen-policy-transfer-audit.yml"
+  pull_request:
+    paths:
+      - "research/semrepair/policy-transfer/**"
+      - ".github/workflows/semrepair-frozen-policy-transfer-audit.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reconstruct-from-original-episode-logs:
+    name: independent frozen-log auditor (Python ${{ matrix.python }})
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.12", "3.13"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Syntax and source binding
+        run: |
+          python -m py_compile research/semrepair/policy-transfer/audit.py
+          git diff --check
+      - name: Recompute 96 original physical-simulation outcomes, source provenance and six adversarial modifications per task
+        run: |
+          python research/semrepair/policy-transfer/audit.py \
+            | tee frozen_policy_transfer_derived_evidence.json
+      - name: Publish independently recomputed report
+        uses: actions/upload-artifact@v4
+        with:
+          name: frozen-robot-policy-transfer-audit-${{ matrix.python }}
+          path: frozen_policy_transfer_derived_evidence.json
+          if-no-files-found: error
