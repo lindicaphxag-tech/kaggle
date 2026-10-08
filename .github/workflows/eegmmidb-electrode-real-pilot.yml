@@ -48,7 +48,6 @@ jobs:
     timeout-minutes: 45
     env:
       PYTHONUNBUFFERED: '1'
-      MNE_DATA: ${{ runner.temp }}/eeg_data
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
