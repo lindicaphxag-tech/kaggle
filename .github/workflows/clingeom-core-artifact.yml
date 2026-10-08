@@ -91,6 +91,7 @@ jobs:
             research/medical_geometry/test_torch_fx_geometry.py \
             research/medical_geometry/test_torch_fx_bundle.py \
             research/medical_geometry/test_torch_repair.py \
+            research/medical_geometry/test_torch_repair_dtype.py \
             research/medical_geometry/test_torch_repair_certificate.py \
             research/medical_geometry/test_fx_geometry.py \
             research/medical_geometry/test_fx_rewrite.py \
