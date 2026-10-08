@@ -26,6 +26,10 @@ needed to authorize one concrete implementation-bound repair?
 - [Frozen Semantic ABI source](https://github.com/lindicaphxag-tech/Isaac-GR00T/commit/f69254a1e3a621a10236902ac77e9c1b1c7de668)
   · [origin CI](https://github.com/lindicaphxag-tech/Isaac-GR00T/actions/runs/37471167749)
   · [external-hosted cross-repo CI](https://github.com/lindicaphxag-tech/kaggle/actions/workflows/semrepair-crossrepo-reproduction.yml)
+- [**Official ManiSkill 2×2 intervention**](https://github.com/lindicaphxag-tech/ManiSkill/actions/runs/37715587885):
+  exact source-tree converter×controller replay **6/8, 6/8, 0/8, 6/8**,
+  showing a harmful controller-only intervention and restoration when
+  paired. This is **demo replay**, not learned-policy performance.
 - [Real ManiSkill regression PR #1495](https://github.com/mani-skill/ManiSkill/pull/1495)
   · [current-head 13 / 18-test validation](https://github.com/lindicaphxag-tech/ManiSkill/actions/runs/37687749068)
   · [GR00T PR #786](https://github.com/NVIDIA/Isaac-GR00T/pull/786)
