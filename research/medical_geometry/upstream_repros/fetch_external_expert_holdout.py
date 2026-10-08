@@ -18,6 +18,12 @@ from pathlib import Path
 from urllib.request import urlopen
 
 
+FROZEN_HF_DATASET_COMMIT = "d5a92c65c549b2a099bdb5a6e61ebeed6cb6eca3"
+FROZEN_PATIENT_IMAGE_SHA256 = (
+    "de0a5e82647d5c7ca10c1dfd907d47d464351b4c0fe495c1a98fef87912f998e",
+    "94a8d90daa1dcaa86b67fa4da13c49028516ee2d48e6870b87510ad0879faeb7",
+    "40abe55b8f4f199d3312e7bc2306fb76596760a59a6ba8a45229fafc41efde42",
+)
 NFBS_SOURCE = "MehdiZouitine/pybrook"
 NFBS_REV = "14cd765ea07cf0ea50c9a7ffa56859401e9333a9"
 NFBS_FILES = {
@@ -71,7 +77,9 @@ def fetch_synthstrip(out: Path, count: int) -> tuple[list[dict], dict]:
     from huggingface_hub import HfApi, hf_hub_download, list_repo_tree
     dataset = "MedOtter/SynthStrip"
     api = HfApi()
-    revision = api.dataset_info(dataset).sha
+    revision = FROZEN_HF_DATASET_COMMIT
+    if api.dataset_info(dataset, revision=revision).sha != revision:
+        raise ValueError("Frozen external expert data revision is unavailable")
     nodes = list(
         list_repo_tree(
             dataset, repo_type="dataset", revision=revision, recursive=True
@@ -178,6 +186,10 @@ def main():
         a.output_root, a.synthstrip_subjects
     )
     records = [nfbs] + others
+    if a.synthstrip_subjects == 2 and tuple(
+        r["image_sha256"] for r in records
+    ) != FROZEN_PATIENT_IMAGE_SHA256:
+        raise ValueError("Frozen independently preselected subject MRI provenance changed")
     if len({p["independent_subject"] for p in records}) != len(records):
         raise ValueError("cross-source identifier collision")
     manifest = {
