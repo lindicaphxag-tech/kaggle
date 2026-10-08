@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - "research/medical_geometry/upstream_repros/brainmask_pretrained_native_export.py"
+      - "research/medical_geometry/upstream_repros/brainmask_pretrained_weakmask_eval.py"
+      - "research/medical_geometry/upstream_repros/test_brainmask_pretrained_weakmask_eval.py"
       - "research/medical_geometry/upstream_repros/BRAINMASK_LEARNED_INFERENCE.md"
       - ".github/workflows/clingeom-brainmask-pretrained-planes.yml"
   workflow_dispatch:
@@ -28,7 +30,7 @@ jobs:
           python-version: "3.10"
       - name: Match original CPU model environment
         run: |
-          python -m pip install "tensorflow-cpu==2.13.0" "numpy==1.24.3" "scipy==1.9.3" "nibabel==3.2.2" "matplotlib==3.7.2" "pyyaml==6.0"
+          python -m pip install "tensorflow-cpu==2.13.0" "numpy==1.24.3" "scipy==1.9.3" "nibabel==3.2.2" "matplotlib==3.7.2" "pyyaml==6.0" "pytest==7.4.4"
       - name: Retrieve and pin authentic upstream source, checkpoint and MRI
         run: |
           set -euo pipefail
@@ -45,6 +47,7 @@ jobs:
           curl -fL --retry 3 "$base/trained_models/t1/t1.yml" -o t1.yml
           curl -fL --retry 3 "$base/trained_models/t1/checkpoints/epoch_20_trainloss_128841.2266.hdf5" -o official.hdf5
           curl -fL --retry 3 "$base/example_data/example001/example001_t1.nii.gz" -o real_t1.nii.gz
+          curl -fL --retry 3 "$base/example_data/example001/example001_brain_mask.nii.gz" -o provided_brain_mask.nii.gz
           test "$(git hash-object original/predict.py)" = d4b03f5b851928ead5ef014af75cd1dd5fbd64dc
           test "$(git hash-object original/utilities/input_fn_util.py)" = 1c2ce1a9f13f690cdaf28eac5b003e44ec06d192
           test "$(git hash-object original/utilities/normalizers.py)" = 98eb8c4329ed2330b47905ab2e69ac1a5fdb5237
@@ -54,12 +57,16 @@ jobs:
           test "$(git hash-object t1.yml)" = 7dcc0cc0fa3b2b19e3b28eac47ab983c502b2022
           test "$(git hash-object official.hdf5)" = 6ac54600739585f54d9f612d13264b74965ffd33
           test "$(git hash-object real_t1.nii.gz)" = 81b1e5260ee4a579d8ac490cac113df9c1cb942f
+          test "$(git hash-object provided_brain_mask.nii.gz)" = e0dd089b3544da4352e751a24dc27a828904bad7
       - name: Apply the exact already-tested maintainer-style native source patch
         run: |
           git -C original init -q
           git -C original apply --check "$GITHUB_WORKSPACE/research/medical_geometry/upstream_repros/brainmask_export_plane.patch"
           git -C original apply "$GITHUB_WORKSPACE/research/medical_geometry/upstream_repros/brainmask_export_plane.patch"
           python -m py_compile original/predict.py
+      - name: "Predeclared weak-reference metrics: physical HD95 unit falsifiers"
+        run: |
+          python -m pytest -q research/medical_geometry/upstream_repros/test_brainmask_pretrained_weakmask_eval.py
       - name: Execute real trained model with unchanged native TF extraction/reconstruction
         run: |
           python -m research.medical_geometry.upstream_repros.brainmask_pretrained_native_export \
@@ -90,11 +97,26 @@ jobs:
           assert (Path("artifacts/learned")/"native_pretrained_export_figure.png").stat().st_size>10000
           print("PASS original pretrained nonaxial export mismatch; repaired physical frame matches actual learned output")
           PY
+      - name: Score both native exporters against upstream-provided nonexpert mask
+        run: |
+          python -m research.medical_geometry.upstream_repros.brainmask_pretrained_weakmask_eval \
+            --image real_t1.nii.gz \
+            --provided-mask provided_brain_mask.nii.gz \
+            --predictions-root artifacts/learned \
+            --output artifacts/learned/pretrained_weak_reference_export_metrics.json
+          {
+            echo "### Actual frozen U-Net exports versus upstream-provided nonexpert mask"
+            echo '```json'
+            cat artifacts/learned/pretrained_weak_reference_export_metrics.json
+            echo '```'
+            echo "No expert clinical ground truth, no posthoc plane or threshold selection."
+          } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
           name: ClinGeom-brainmask-actual-learned-export-original-and-fixed
           path: |
             artifacts/learned/native_pretrained_plane_export.json
             artifacts/learned/native_pretrained_export_figure.png
+            artifacts/learned/pretrained_weak_reference_export_metrics.json
           if-no-files-found: error
           retention-days: 60
