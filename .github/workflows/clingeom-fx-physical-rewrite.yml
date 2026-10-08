@@ -1,0 +1,39 @@
+name: ClinGeom executable pre-mix FX rewrite
+
+on:
+  pull_request:
+    paths:
+      - "research/medical_geometry/repair_placement_execute.py"
+      - "research/medical_geometry/test_repair_placement_execute.py"
+      - "research/medical_geometry/torch_fx_bundle.py"
+      - "research/medical_geometry/lattice_bundle.py"
+      - ".github/workflows/clingeom-fx-physical-rewrite.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  physical-geometry-and-execution:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install CPU PyTorch and geometry tests
+        run: |
+          python -m pip install numpy pytest
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+      - name: Compile true strided sampling geometry and execute physical repair
+        run: |
+          python -m pytest -q \
+            research/medical_geometry/test_repair_placement.py \
+            research/medical_geometry/test_repair_placement_fx.py \
+            research/medical_geometry/test_repair_placement_execute.py \
+            research/medical_geometry/test_torch_fx_bundle.py \
+            research/medical_geometry/test_lattice_bundle.py
