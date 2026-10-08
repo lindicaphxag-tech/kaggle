@@ -25,6 +25,10 @@ class ActiveRealAssayContracts(unittest.TestCase):
         self.assertEqual(result["n_test"],4)
         self.assertEqual(result["invariance_violations"],0)
         self.assertEqual(result["known_identity_bacc"],result["post_query_bacc"])
+        # Both active and random policy cannot ask redundant identity questions:
+        # one trusted answer completely resolves each pair.
+        self.assertTrue(all(row["random_queries"]<=2 for row in result["per_trial"]))
+        self.assertTrue(all(row["active_queries"]<=2 for row in result["per_trial"]))
 
     def test_identity_without_grounded_electrode_names_refused(self):
         rng=np.random.default_rng(2)
