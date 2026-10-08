@@ -1,0 +1,52 @@
+name: ClinGeom highdicom #454 standard-diff equivalence
+
+on:
+  pull_request:
+    paths:
+      - "research/medical_geometry/upstream_repros/highdicom_454_frame_uid.patch"
+      - "research/medical_geometry/upstream_repros/HIGHDICOM_454_UPSTREAM_PATCH.md"
+      - ".github/workflows/clingeom-highdicom-454-diff.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  standard-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Fetch exact highdicom upstream revision
+        run: |
+          mkdir highdicom-checkout
+          git -C highdicom-checkout init -q
+          git -C highdicom-checkout remote add origin https://github.com/ImagingDataCommons/highdicom.git
+          git -C highdicom-checkout fetch --depth=1 origin 4524bb0b0c8b3141f6f5b26d047b8da43c69e61e
+          git -C highdicom-checkout checkout --detach FETCH_HEAD
+          test "$(git -C highdicom-checkout rev-parse HEAD)" = 4524bb0b0c8b3141f6f5b26d047b8da43c69e61e
+          cp highdicom-checkout/src/highdicom/volume.py original-volume.py
+      - name: Apply standard unified diff with no fuzz
+        run: |
+          git -C highdicom-checkout apply --check "$GITHUB_WORKSPACE/research/medical_geometry/upstream_repros/highdicom_454_frame_uid.patch"
+          git -C highdicom-checkout apply "$GITHUB_WORKSPACE/research/medical_geometry/upstream_repros/highdicom_454_frame_uid.patch"
+          git -C highdicom-checkout diff --check
+          python -m py_compile highdicom-checkout/src/highdicom/volume.py
+      - name: Prove exact source identity with independently generated patch
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import runpy
+          import shutil
+          src = Path("original-volume.py")
+          copy = Path("second-volume.py")
+          shutil.copyfile(src, copy)
+          producer = runpy.run_path("research/medical_geometry/upstream_repros/patch_highdicom_454.py")
+          producer["apply"](copy)
+          actual = Path("highdicom-checkout/src/highdicom/volume.py").read_bytes()
+          independent = copy.read_bytes()
+          assert actual == independent, "unified diff differs from pinned runtime-validated patch"
+          print("PASS: two independent patch formats produce byte-identical highdicom source")
+          PY
