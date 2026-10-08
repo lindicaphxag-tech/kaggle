@@ -15,6 +15,9 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+from fractions import Fraction
+
+from independent_oracle import fixtures as independently_solve_frozen_table
 
 PUBLIC_REMOTE = "https://github.com/lindicaphxag-tech/Isaac-GR00T.git"
 PUBLIC_BRANCH = "semantic-abi-v0.1"
@@ -58,11 +61,29 @@ def verify_result(data: dict) -> dict:
 
     if not data["repair_authority_expected_cost"] < data["full_abi_expected_cost"]:
         raise ValueError("authority-optimal policy did not improve this fixture")
+
+    # A separate exhaustive Fraction-valued solver reconstructs the frozen
+    # experiment table and proves these costs without importing SemRepair code.
+    exact = independently_solve_frozen_table()
+    if exact["full_abi_expected_cost"] is None or exact["repair_authority_expected_cost"] is None:
+        raise AssertionError("independent oracle unexpectedly found no authorized policy")
+    for output_field, exact_field in (
+        ("full_abi_expected_cost", "full_abi_expected_cost"),
+        ("repair_authority_expected_cost", "repair_authority_expected_cost"),
+        ("tap_resolved_cost", "tap_resolved_cost"),
+        ("same_authority_zero_probe_cost", "same_authority_zero_probe_cost"),
+    ):
+        if Fraction(str(data[output_field])) != exact[exact_field]:
+            raise ValueError(f"{output_field}: source output differs from exact independent oracle")
+    if exact["external_only_cost"] is not None or exact["risk_blocked_cost"] is not None:
+        raise AssertionError("independent oracle failed to reject ambiguous repair authority")
+
     return {
         "status": "verified",
         "artifact_sha": PINNED_COMMIT,
         "schema": SCHEMA,
         "verified_fields": len(numeric) + 4,
+        "independent_exact_partition_solver": True,
         "source_type": "self-authored public SemRepair artifact",
         "claim_boundary": (
             "Independent harness re-execution only; not independent third-party "

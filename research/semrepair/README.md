@@ -16,6 +16,28 @@ python research/semrepair/reproduce_crossrepo.py
 
 Dependencies: Python 3.10+ and Git. No PyTorch, checkpoints, CUDA, simulator, robot, or private data.
 
+### Independent exact mathematical oracle
+
+In addition to checking the upstream program's reported JSON, the public repo
+now contains [`independent_oracle.py`](independent_oracle.py): a **separately
+implemented exhaustive adaptive-partition dynamic program using exact rational
+arithmetic** (`fractions.Fraction`), with no imported SemRepair algorithms.
+
+```bash
+python research/semrepair/independent_oracle.py
+```
+
+It independently derives `7/2` vs `1` expected diagnostic cost from the
+frozen experiment table, proves that external-only compensated faults are
+unidentifiable in this finite experiment library, and computes the cost `2`
+of admitting the internal producer tap. A risk budget excluding that tap
+restores the unidentifiable state. A constant repair-authority map stops at
+exactly zero probes.
+
+The cross-repository verifier now **requires its output to agree with the
+independent exact solver**. This validates a finite, deterministic,
+uniform-prior witness, **not** general stochastic identifiability or safety.
+
 The runner checks out the exact immutable commit
 [`f69254a1`](https://github.com/lindicaphxag-tech/Isaac-GR00T/commit/f69254a1e3a621a10236902ac77e9c1b1c7de668)
 from the publicly frozen `semantic-abi-v0.1` branch of
