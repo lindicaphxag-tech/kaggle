@@ -1,0 +1,97 @@
+name: ClinGeom true pretrained U-Net nonaxial export regression
+
+on:
+  pull_request:
+    paths:
+      - "research/medical_geometry/upstream_repros/brainmask_pretrained_native_export.py"
+      - "research/medical_geometry/upstream_repros/BRAINMASK_LEARNED_INFERENCE.md"
+      - ".github/workflows/clingeom-brainmask-pretrained-planes.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-source-trained-native-tf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      CUDA_VISIBLE_DEVICES: "-1"
+      TF_CPP_MIN_LOG_LEVEL: "2"
+      TF_NUM_INTEROP_THREADS: "2"
+      TF_NUM_INTRAOP_THREADS: "2"
+      OMP_NUM_THREADS: "2"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Match original CPU model environment
+        run: |
+          python -m pip install "tensorflow-cpu==2.13.0" "numpy==1.24.3" "scipy==1.9.3" "nibabel==3.2.2" "matplotlib==3.7.2" "pyyaml==6.0"
+      - name: Retrieve and pin authentic upstream source, checkpoint and MRI
+        run: |
+          set -euo pipefail
+          base="https://raw.githubusercontent.com/ecalabr/brain_mask/ca789fb26b70e359b61a8d52968813dd772fb4b1"
+          mkdir -p original/model original/utilities
+          touch original/model/__init__.py original/utilities/__init__.py
+          curl -fL --retry 3 "$base/predict.py" -o original_predict.py
+          cp original_predict.py original/predict.py
+          curl -fL --retry 3 "$base/utilities/input_fn_util.py" -o original/utilities/input_fn_util.py
+          curl -fL --retry 3 "$base/utilities/normalizers.py" -o original/utilities/normalizers.py
+          curl -fL --retry 3 "$base/model/networks.py" -o original/model/networks.py
+          curl -fL --retry 3 "$base/model/network_layers.py" -o original/model/network_layers.py
+          curl -fL --retry 3 "$base/utilities/activations.py" -o original/utilities/activations.py
+          curl -fL --retry 3 "$base/trained_models/t1/t1.yml" -o t1.yml
+          curl -fL --retry 3 "$base/trained_models/t1/checkpoints/epoch_20_trainloss_128841.2266.hdf5" -o official.hdf5
+          curl -fL --retry 3 "$base/example_data/example001/example001_t1.nii.gz" -o real_t1.nii.gz
+          test "$(git hash-object original/predict.py)" = d4b03f5b851928ead5ef014af75cd1dd5fbd64dc
+          test "$(git hash-object original/utilities/input_fn_util.py)" = 1c2ce1a9f13f690cdaf28eac5b003e44ec06d192
+          test "$(git hash-object original/utilities/normalizers.py)" = 98eb8c4329ed2330b47905ab2e69ac1a5fdb5237
+          test "$(git hash-object original/model/networks.py)" = 7af8f0079b38af6fbac82923d3bc2c4cd445faca
+          test "$(git hash-object original/model/network_layers.py)" = 95eac930ca13df35ac7e1a6d53337c79e7c7d148
+          test "$(git hash-object original/utilities/activations.py)" = 3e3764d985ff2f27b3eb725cae534f5a3bdb8fe0
+          test "$(git hash-object t1.yml)" = 7dcc0cc0fa3b2b19e3b28eac47ab983c502b2022
+          test "$(git hash-object official.hdf5)" = 6ac54600739585f54d9f612d13264b74965ffd33
+          test "$(git hash-object real_t1.nii.gz)" = 81b1e5260ee4a579d8ac490cac113df9c1cb942f
+      - name: Apply the exact already-tested maintainer-style native source patch
+        run: |
+          git -C original init -q
+          git -C original apply --check "$GITHUB_WORKSPACE/research/medical_geometry/upstream_repros/brainmask_export_plane.patch"
+          git -C original apply "$GITHUB_WORKSPACE/research/medical_geometry/upstream_repros/brainmask_export_plane.patch"
+          python -m py_compile original/predict.py
+      - name: Execute real trained model with unchanged native TF extraction/reconstruction
+        run: |
+          python -m research.medical_geometry.upstream_repros.brainmask_pretrained_native_export \
+            --source-dir original \
+            --original-export original_predict.py \
+            --image real_t1.nii.gz \
+            --checkpoint official.hdf5 \
+            --config t1.yml \
+            --out artifacts/learned
+      - name: Require real learned predictions and original/fixed export contrasts
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("artifacts/learned/native_pretrained_plane_export.json").read_text())
+          assert d["true_pretrained_model_inference"]
+          assert d["actual_upstream_patch_extract_and_reconstruct"]
+          assert d["checkpoint_changed_parameter_variables"]>0
+          assert len(d["loaded_parameter_digest"])==64
+          assert d["cases"]["ax"]["export_evidence"]["original"]["dice_to_correctly_reoriented_same_model_prediction"]==1
+          for p in ("cor","sag"):
+              c=d["cases"][p]
+              assert c["reconstruction_exact_to_real_model_output"]
+              assert c["trained_model_foreground_count_in_model_plane"]>0
+              assert c["export_evidence"]["original"]["dice_to_correctly_reoriented_same_model_prediction"]<1
+              assert c["export_evidence"]["patched"]["dice_to_correctly_reoriented_same_model_prediction"]==1
+          assert d["clinical_ground_truth"] is False
+          print("PASS original pretrained nonaxial export mismatch; repaired physical frame matches actual learned output")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ClinGeom-brainmask-actual-learned-export-original-and-fixed
+          path: artifacts/learned/native_pretrained_plane_export.json
+          if-no-files-found: error
+          retention-days: 60
