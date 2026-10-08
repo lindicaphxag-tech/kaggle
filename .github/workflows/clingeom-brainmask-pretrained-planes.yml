@@ -164,6 +164,9 @@ jobs:
           assert d["all_original_weights_frozen"]
           assert not d["feature_channel_equivariance_proven"]
           assert not d["trained_model_accuracy_improvement_claimed"]
+          assert d["prehead_feature_fusion_is_reducible_to_aligned_logit_ensemble"]
+          assert not d["prehead_feature_mixing_independent_mechanism_claimed"]
+          assert d["prehead_feature_fusion_vs_aligned_logit_ensemble_max_abs_error"] <= 2e-5
           for k in ("ax","cor","sag"):
               z=d["per_plane_oracles"][k]
               assert z["trained_model_to_replayed_classifier_max_abs_error"] <= 2e-5
