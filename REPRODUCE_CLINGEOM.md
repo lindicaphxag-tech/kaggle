@@ -136,3 +136,42 @@ must fail when a numerical value-error budget is requested.
 This is an assumption-conditional guarantee, not a measured reliability
 score on pretrained neural features. For pretrained models, external
 curvature envelopes must be established before promoting this claim.
+
+## G. Curvature-gated nonlinear MONAI channel-fiber transport
+
+**Source/evidence:** [merged PR #35](https://github.com/lindicaphxag-tech/kaggle/pull/35)
+· [author-operated five-job successful CI](https://github.com/lindicaphxag-tech/kaggle/actions/runs/37711065982).
+
+Run with the pinned MONAI source revision used by the public CI workflow:
+
+```bash
+PYTHONPATH=. python research/medical_geometry/benchmark_monai_dints_quadratic_bound.py
+python -m pytest -q research/medical_geometry/test_channel_fiber_runtime.py
+```
+
+The first script runs the real pinned MONAI DiNTS `FactorizedReduceBlock`
+on an **analytic quadratic** in millimetre patient space. The input
+curvature is known from the chosen synthetic function rather than
+estimated from trained activations.
+
+Falsifiable first-party values on float32 CPU:
+
+- spacing `[0.7, 0.7, 5.0]` mm;
+- two distinct channel-phase fiber supports;
+- declared world Hessian operator-norm bound `0.02` value units/mm²;
+- sharp physical trilinear bound `0.19485` value units per fiber;
+- naïve shared-index readout MAE `1.49385`;
+- type-directed repaired MAE `0.19485`, max error about `0.1948514`;
+- omit one channel's curvature bound → fail closed;
+- tighten allowed value error below `0.19485` → fail closed.
+
+**Critical interpretation:** geometry alignment does not imply zero feature
+error. This experiment intentionally retains a nonzero residual and
+demonstrates its analytic bound is attainable on an external library's
+real forward path. It does not establish the required curvature bounds
+for learned medical features or patient outcomes, and does not claim
+MONAI implements the wrong topology.
+
+Independent reports should include exact Git commit, MONAI source SHA,
+PyTorch version, full JSON and failures, and should not copy the
+author-operated CI results as third-party validation.
