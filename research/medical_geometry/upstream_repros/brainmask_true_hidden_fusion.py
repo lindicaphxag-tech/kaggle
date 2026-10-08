@@ -150,7 +150,7 @@ def run(
     if not np.allclose(scan.affine, acquired_affine, atol=1e-5, rtol=0):
         raise ValueError("source-loader patch affine differs from original MRI")
 
-    raw_features, mapped_features = [], []
+    raw_features, mapped_features, mapped_logits = [], [], []
     per_plane = {}
     hidden_channels = None
     for plane in PLANE_TO_ACQUISITION_AXES:
@@ -188,9 +188,10 @@ def run(
         # The pointwise FROZEN classifier must commute with the known
         # orientation permutation (modulo floating point).
         with tf.device("/CPU:0"):
-            mapped_head = tf.nn.sigmoid(
-                classifier(tf.convert_to_tensor(mapped[None]), training=False)
+            exact_mapped_logits = classifier(
+                tf.convert_to_tensor(mapped[None]), training=False
             ).numpy()[0, ..., 0]
+            mapped_head = tf.nn.sigmoid(exact_mapped_logits).numpy()
         mapped_error = float(np.max(
             np.abs(mapped_head - exported[plane]["patched"])
         ))
@@ -201,6 +202,7 @@ def run(
             )
         raw_features.append(hidden)
         mapped_features.append(mapped)
+        mapped_logits.append(exact_mapped_logits)
         per_plane[plane] = {
             "true_learned_hidden_shape": list(hidden.shape),
             "trained_model_to_replayed_classifier_max_abs_error": replay_error,
@@ -221,6 +223,23 @@ def run(
         )
         wrong_probability = tf.nn.sigmoid(wrong_logits).numpy()[0, ..., 0]
         correct_probability = tf.nn.sigmoid(correct_logits).numpy()[0, ..., 0]
+    # An affine pointwise classifier commutes with fixed convex averaging.
+    # This is a *decisive* negative novelty control: the current pre-head
+    # experiment is algebraically reducible to calibrated logit averaging,
+    # even though authentic 32-channel model features are involved.
+    logit_fusion = np.mean(np.stack(mapped_logits).astype(np.float64), axis=0)
+    with tf.device("/CPU:0"):
+        logit_fusion_probability = tf.nn.sigmoid(
+            tf.convert_to_tensor(logit_fusion.astype(np.float32))
+        ).numpy()
+    logit_reduction_error = float(np.max(
+        np.abs(correct_probability - logit_fusion_probability)
+    ))
+    if logit_reduction_error > 2e-5:
+        raise ValueError(
+            "frozen linear pretrained classifier failed logit-fusion "
+            "equivalence oracle; cannot attribute any novel mechanism"
+        )
     ordinary_probability_fusion = np.mean(
         np.stack([
             exported[p]["patched"] for p in PLANE_TO_ACQUISITION_AXES
@@ -263,6 +282,12 @@ def run(
         ),
         "standard_inverse_export_probability_fusion": score(
             baseline_mask, reference, acquired_affine
+        ),
+        "prehead_feature_fusion_vs_aligned_logit_ensemble_max_abs_error": logit_reduction_error,
+        "prehead_feature_fusion_is_reducible_to_aligned_logit_ensemble": True,
+        "prehead_feature_mixing_independent_mechanism_claimed": False,
+        "aligned_logit_ensemble": score(
+            logit_fusion_probability >= .5, reference, acquired_affine
         ),
         "aligned_feature_vs_probability_fusion_mean_abs_difference": float(
             np.mean(np.abs(correct_probability.astype(np.float64) - ordinary_probability_fusion))
@@ -308,6 +333,7 @@ def main():
         "aligned": evidence["correct_patient_grid_hidden_feature_fusion"],
         "native_probability": evidence["standard_inverse_export_probability_fusion"],
         "feature_semantics_not_proven": not evidence["feature_channel_equivariance_proven"],
+        "exact_logit_reduction_error": evidence["prehead_feature_fusion_vs_aligned_logit_ensemble_max_abs_error"],
     }, sort_keys=True))
 
 
