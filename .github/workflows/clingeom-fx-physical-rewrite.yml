@@ -5,6 +5,7 @@ on:
     paths:
       - "research/medical_geometry/repair_placement_execute.py"
       - "research/medical_geometry/test_repair_placement_execute.py"
+      - "research/medical_geometry/benchmark_placement_execution.py"
       - "research/medical_geometry/torch_fx_bundle.py"
       - "research/medical_geometry/lattice_bundle.py"
       - ".github/workflows/clingeom-fx-physical-rewrite.yml"
@@ -37,3 +38,14 @@ jobs:
             research/medical_geometry/test_repair_placement_execute.py \
             research/medical_geometry/test_torch_fx_bundle.py \
             research/medical_geometry/test_lattice_bundle.py
+
+      - name: Execute both repair cuts and archive actual CPU observations
+        if: matrix.python-version == '3.12'
+        run: |
+          python -m research.medical_geometry.benchmark_placement_execution | tee clingeom-placement-execution.json
+      - name: Upload complete selection/execution evidence
+        if: matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: clingeom-executed-repair-selection
+          path: clingeom-placement-execution.json
