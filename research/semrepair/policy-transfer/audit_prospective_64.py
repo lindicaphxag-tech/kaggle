@@ -210,7 +210,7 @@ def audit(payload: dict) -> dict:
                             source_checkpoint_sha256=spec["checkpoint_sha256"])
     require(len(all_seeds) == 64, "invalid complete cross-task denominator")
     return {"status": "passed", "original_state_episodes": 64,
-            "controller_arm_episode_executions": 320,
+            "controller_arm_trials_including_strict_refusals": 320,
             "tasks": result,
             "external_adoption_or_third_party_reproduction": False,
             "source_scope": "log-extracted author-operated PhysX replay; no real robot or unknown-ABI discovery"}
