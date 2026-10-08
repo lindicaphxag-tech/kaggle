@@ -56,24 +56,21 @@ class LatticeRepair3d(nn.Module):
             persistent=True,
         )
 
-    def _grid(self, x: torch.Tensor) -> torch.Tensor:
-        if x.ndim != 5:
-            raise ValueError("LatticeRepair3d expects NCDHW tensors")
+    def _source_coordinates(self, x: torch.Tensor) -> torch.Tensor:
+        """Compute physical-plan source indices in float64 before sampling."""
         d, h, w = self.target_shape
-        device = x.device
-        calc_dtype = torch.float64
-
         td, th, tw = torch.meshgrid(
-            torch.arange(d, device=device, dtype=calc_dtype),
-            torch.arange(h, device=device, dtype=calc_dtype),
-            torch.arange(w, device=device, dtype=calc_dtype),
+            torch.arange(d, device=x.device, dtype=torch.float64),
+            torch.arange(h, device=x.device, dtype=torch.float64),
+            torch.arange(w, device=x.device, dtype=torch.float64),
             indexing="ij",
         )
-        ones = torch.ones_like(td)
-        target = torch.stack((td, th, tw, ones), dim=-1)
-        mapping = self.target_to_source_index.to(device=device, dtype=calc_dtype)
-        source = torch.einsum("ij,dhwj->dhwi", mapping, target)[..., :3]
+        target = torch.stack((td, th, tw, torch.ones_like(td)), dim=-1)
+        mapping = self.target_to_source_index.to(device=x.device, dtype=torch.float64)
+        return torch.einsum("ij,dhwj->dhwi", mapping, target)[..., :3]
 
+    def _grid(self, x: torch.Tensor) -> torch.Tensor:
+        source = self._source_coordinates(x)
         sd, sh, sw = x.shape[-3:]
 
         def normalize(coord: torch.Tensor, size: int) -> torch.Tensor:
@@ -81,16 +78,31 @@ class LatticeRepair3d(nn.Module):
                 return torch.zeros_like(coord)
             return 2.0 * coord / float(size - 1) - 1.0
 
-        # grid_sample expects x,y,z order, i.e. W,H,D.
         grid = torch.stack(
-            (
-                normalize(source[..., 2], sw),
-                normalize(source[..., 1], sh),
-                normalize(source[..., 0], sd),
-            ),
+            (normalize(source[..., 2], sw),
+             normalize(source[..., 1], sh),
+             normalize(source[..., 0], sd)),
             dim=-1,
         )
-        return grid.to(dtype=torch.float32).unsqueeze(0).expand(x.shape[0], -1, -1, -1, -1)
+        # grid_sample requires the grid's scalar dtype to match input dtype.
+        # For int/bool labels use the lossless gather path below instead.
+        return grid.to(dtype=x.dtype).unsqueeze(0).expand(x.shape[0], -1, -1, -1, -1)
+
+    def _nearest_discrete(self, x: torch.Tensor) -> torch.Tensor:
+        """Nearest transport for integer/bool labels without any float value cast.
+
+        Source coordinate math uses float64, but *pixel values* stay in their
+        original discrete dtype, including int64 labels beyond 2**53.
+        """
+        coords = self._source_coordinates(x)
+        indices = torch.round(coords).to(torch.int64)
+        sd, sh, sw = self.source_shape
+        # A plan is already domain-checked at construction; clamp only tiny
+        # machine-precision excursions at an otherwise valid boundary.
+        zi = indices[..., 0].clamp(0, sd - 1)
+        yi = indices[..., 1].clamp(0, sh - 1)
+        xi = indices[..., 2].clamp(0, sw - 1)
+        return x[:, :, zi, yi, xi]
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         if x.ndim != 5:
@@ -114,24 +126,18 @@ class LatticeRepair3d(nn.Module):
         if self.kind == "resample":
             if self.interpolation not in {"trilinear", "nearest"}:
                 raise RuntimeError(f"unsupported interpolation: {self.interpolation!r}")
+            if not torch.is_floating_point(x):
+                if self.interpolation != "nearest":
+                    raise RuntimeError("discrete tensors require nearest interpolation")
+                return self._nearest_discrete(x)
             grid = self._grid(x)
             mode = "bilinear" if self.interpolation == "trilinear" else "nearest"
-
-            original_dtype = x.dtype
-            needs_cast = not torch.is_floating_point(x)
-            sample = x.to(torch.float32) if needs_cast else x
-            out = F.grid_sample(
-                sample,
+            return F.grid_sample(
+                x,
                 grid,
                 mode=mode,
                 padding_mode="zeros",
                 align_corners=True,
             )
-            if needs_cast:
-                if mode == "nearest":
-                    out = out.round().to(original_dtype)
-                else:
-                    raise RuntimeError("non-floating tensors require nearest interpolation")
-            return out
 
         raise RuntimeError(f"unknown repair kind: {self.kind!r}")

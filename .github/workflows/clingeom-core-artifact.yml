@@ -91,11 +91,26 @@ jobs:
             research/medical_geometry/test_torch_fx_geometry.py \
             research/medical_geometry/test_torch_fx_bundle.py \
             research/medical_geometry/test_torch_repair.py \
+            research/medical_geometry/test_torch_repair_dtype.py \
             research/medical_geometry/test_torch_repair_certificate.py \
             research/medical_geometry/test_fx_geometry.py \
             research/medical_geometry/test_fx_rewrite.py \
             research/medical_geometry/test_fx_postcondition.py \
             research/medical_geometry/test_interpolation_fx_gate.py
+      - name: Prove preservation of large segmentation-label identifiers
+        run: |
+          PYTHONPATH=. python research/medical_geometry/benchmark_lossless_labels.py | tee lossless-label-report.json
+          {
+            echo '### ClinGeom categorical transport: float32 baseline vs lossless path'
+            echo '```json'
+            cat lossless-label-report.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload label-transport negative control
+        uses: actions/upload-artifact@v4
+        with:
+          name: clingeom-lossless-label-evidence
+          path: lossless-label-report.json
       - name: Produce channel-fiber evidence
         run: |
           PYTHONPATH=. python research/medical_geometry/benchmark_channel_fibers.py | tee channel-fiber-report.json
