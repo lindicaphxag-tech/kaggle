@@ -103,3 +103,26 @@ transforms; repair every eligible branch; minimum-cut pre-mix repair; and
 forbidden post-mix-only recovery. Use identical **pretrained** models and
 independently labeled patient volumes, with Dice/HD95 in common world
 coordinates, error bounds, latency, memory, and refusals reported together.
+
+## Live PyTorch FX dependency graph (not just a hand-drawn DAG)
+
+The optional `repair_placement_fx.py` adapter accepts a **real**
+`torch.fx.GraphModule` and takes data-flow edges from traced node-use
+relations, preserving branched joins and skip paths. The executable
+`test_repair_placement_fx.py` uses a model sampling alternating 3-D voxel
+phases with `x[:, :, 0::2, ::2, ::2]` and `x[:, :, 1::2, ::2, ::2]`,
+concatenates their channels, and runs real `Conv3d(2, 1, 1)`.
+
+With separately admitted costs 3, 3 and 5, the planner chooses the
+common `cat` site (5); increasing that site's cost to 7 chooses both
+branch sites (6). The actual PyTorch model executes, but the test does
+**not** yet inject or execute a ClinGeom physical repair inside the model.
+
+The adapter does not infer that a convolution is intrinsically irreversible
+for every semantic target, and never automatically approves a `cat` site.
+External `LatticeBundle` admission and numerical authorization remain
+mandatory before inserting real patient-space transport in an FX graph.
+
+Run `python -m pytest -q research/medical_geometry/test_repair_placement_fx.py`
+on CPU with PyTorch installed. GitHub CI tests this alongside the pure
+planner's cross-Python-version exhaustive oracle.
