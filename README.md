@@ -15,6 +15,17 @@ They are deliberately kept separate in claims: public self-authored artifacts ar
 compensating physical semantics, what is the **minimum admissible evidence**
 needed to authorize one concrete implementation-bound repair?
 
+- [**NEW: precommitted 64-state frozen-policy transfer across PullCube and a new StackCube cohort**](research/semrepair/policy-transfer/REVIEWER_PACKET.md):
+  [real PhysX CPU run and complete original 64-state audit](https://github.com/lindicaphxag-tech/ManiSkill/actions/runs/37815142810).
+  **Stateful bounded adapter vs identical stateless ablation: PullCube 31/32 vs
+  14/32; StackCube 30/32 vs 0/32**. Source-policy competence and the two
+  predeclared memory-gain thresholds both pass. Every one of the
+  **64 original state episodes × five arms** is archived
+  [per-state](research/semrepair/policy-transfer/prospective_pull_stack_64.json)
+  and can be re-counted by a [dependency-free auditor](research/semrepair/policy-transfer/audit_prospective_64.py).
+  StackCube was previously studied on a different exploratory cohort;
+  these are new seeds, **not** a previously unseen task family. All evidence
+  remains author-operated, not an independently adopted upstream system.
 - [**Flagship reviewer packet: Frozen Robot Policy Transfer — 96 real simulator episodes and a separate 32-demo causal-factor replication**](research/semrepair/policy-transfer/REVIEWER_PACKET.md).
   Directly inspect mechanism, predeclared versus exploratory data, exact
   source-seed-paired statistics, original CI links, and negative results.
