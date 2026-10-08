@@ -1,0 +1,36 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "aalquwayfili",
+      "body": "### Describe the bug\n\nWhen one environment returns an integer info value and another returns a float for the same key, `SyncVectorEnv` can silently truncate the float. For values `0` and `0.5`, the batched result is `[0, 0]`. Reversing the environment order produces `[0.5, 0.]`.\n\nThis happens on both `reset()` and `step()`, and also reproduces with `AsyncVectorEnv`. I would expect batching to retain `0.5`, independently of environment order.\n\n### Code example\n\n```python\nfrom functools import partial\n\nimport gymnasium as gym\nimport numpy as np\n\n\nclass MetricEnv(gym.Env):\n    observation_space = gym.spaces.Box(0, 1, shape=(1,), dtype=np.float32)\n    action_space = gym.spaces.Discrete(1)\n\n    def __init__(self, metric):\n        self.metric = metric\n\n    def reset(self, *, seed=None, options=None):\n        super().reset(seed=seed)\n        return np.zeros(1, dtype=np.float32), {\"metric\": self.metric}\n\n    def step(self, action):\n        return np.zeros(1, dtype=np.float32), 0.0, False, False, {\"metric\": self.metric}\n\n\nfor values in ((0, 0.5), (0.5, 0)):\n    env = gym.vector.SyncVectorEnv([partial(MetricEnv, v) for v in values])\n    try:\n        print(\"input:\", values)\n        print(\"reset:\", env.reset(seed=0)[1][\"metric\"])\n        print(\"step: \", env.step(np.array([0, 0]))[4][\"metric\"])\n    finally:\n        env.close()\n```\n\nOutput:\n\n```text\ninput: (0, 0.5)\nreset: [0 0]\nstep:  [0 0]\ninput: (0.5, 0)\nreset: [0.5 0. ]\nstep:  [0.5 0. ]\n```\n\n### System info\n\n- Gymnasium 1.4.0, imported from source at `2637f8c98edfc360453fe3202cc35bef7806d84f`\n- Python 3.13.9, NumPy 2.2.6\n- Ubuntu 22.04.5 LTS\n\n### Additional context\n\nBoth individual environments pass `check_env` with render and close checks skipped. They return fresh observation and info objects.\n\n[`VectorEnv._add_info`](https://github.com/Farama-Foundation/Gymnasium/blob/2637f8c98edfc360453fe3202cc35bef7806d84f/gymnasium/vector/vector_env.py#L314-L337) chooses the array dtype from the first value and assigns subsequent values into it. I did not find a documented requirement that each info key have the same numeric dtype across sub-environments. Is dtype promotion intended here, or should homogeneous per-key dtypes be an explicit, checked constraint?\n\n### Checklist\n\n- [x] I have checked that there is no similar issue in the repo.\n",
+      "created_at": "2026-10-08T17:08:20Z",
+      "html_url": "https://github.com/Farama-Foundation/Gymnasium/issues/1763",
+      "id": "Farama-Foundation/Gymnasium#1763",
+      "issue_number": 1763,
+      "labels": [],
+      "repository": "Farama-Foundation/Gymnasium",
+      "surface_sha256": "48de1385c9b3504939716ddcbe371ecdb503a225917ed2f52c1ea9a082e1c19b",
+      "title": "[Bug Report] Vector info silently truncates numeric values depending on environment order"
+    },
+    {
+      "author_login": "alexis779",
+      "body": "## Description\n\n`Rigid.coup_friction` defaults to `0.1`. That coefficient is what the couplers use for the rigid side of a contact, and it replaces the sliding friction the geom already resolved (material `friction`, otherwise the asset, otherwise `1`).\n\nMuJoCo's geom and flex sliding defaults are both `1` ([`mjs_defaultGeom`](https://github.com/google-deepmind/mujoco/blob/5007b25ccc7f7ca78c02bb2eb6aafd2b7dbd6879/src/user/user_init.c#L118-L134) and [`mjs_defaultFlex`](https://github.com/google-deepmind/mujoco/blob/5007b25ccc7f7ca78c02bb2eb6aafd2b7dbd6879/src/user/user_init.c#L221-L230) in [`src/user/user_init.c`](https://github.com/google-deepmind/mujoco/blob/5007b25ccc7f7ca78c02bb2eb6aafd2b7dbd6879/src/user/user_init.c)). A soft grasp that leaves `coup_friction` unset therefore grips at `0.1` while the same surface's rigid contacts use the authored friction. The soft-ball comparison needs `0.5` to hold, and the default `0.1` slips.\n\n## Expected behavior\n\nLeave `coup_friction` unset by default. Each geom then uses its own sliding friction. An explicit `coup_friction` still overrides that, for a caller who wants coupling to grip differently from rigid-rigid contact.\n\nIPC stores one coefficient per entity, so an unset value is accepted only when every geom of that entity resolves to the same sliding friction.",
+      "created_at": "2026-10-08T18:15:43Z",
+      "html_url": "https://github.com/Genesis-Embodied-AI/genesis-world/issues/3506",
+      "id": "Genesis-Embodied-AI/genesis-world#3506",
+      "issue_number": 3506,
+      "labels": [],
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "surface_sha256": "060211e65965a2bf50078b1381993a9ab330c59529a4355e5257768962c22e2f",
+      "title": "Unset coup_friction should follow each geom's sliding friction."
+    }
+  ],
+  "post_activation_issue_identities_observed": 40,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-08T21:17:33Z",
+  "schema_version": 1
+}
