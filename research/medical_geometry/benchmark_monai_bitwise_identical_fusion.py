@@ -41,7 +41,10 @@ def run():
         beforeB=block(counter)
         afterA=mix(beforeA)
         afterB=mix(beforeB)
-    assert torch.equal(afterA,afterB), ("binary32 adversarial collision not exact")
+    # Bit-level reinterpretation also rejects +0 versus -0, which plain
+    # float equality considers equal. Prove byte-identical IEEE-754 output.
+    bitwise_equal = torch.equal(afterA.view(torch.int32), afterB.view(torch.int32))
+    assert bitwise_equal, "binary32 adversarial collision not bitwise exact"
     assert torch.count_nonzero(afterB)==0
     bundle=compile_fx_bundle_geometry(
         block,input_shape=(8,8,8),input_channels=2
@@ -60,7 +63,7 @@ def run():
         "external_runtime":"pinned MONAI FactorizedReduceBlock + PyTorch dense 1x1 Conv3d",
         "tested_dtype":"torch.float32",
         "patient_spacing_mm":s,
-        "post_fusion_tensors_bitwise_equal":bool(torch.equal(afterA,afterB)),
+        "post_fusion_tensors_bitwise_equal":bool(bitwise_equal),
         "post_fusion_max_abs_difference":float((afterA-afterB).abs().max()),
         "correct_patient_target_difference":s,
         "minimax_lower_bound_for_any_post_fusion_only_estimator":s/2,
