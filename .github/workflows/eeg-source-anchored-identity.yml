@@ -1,0 +1,60 @@
+name: Source-anchored EEG identity authorization — real PhysioNet pilot
+
+on:
+  pull_request:
+    paths:
+      - "research/electrode_identity/**"
+      - ".github/workflows/eeg-source-anchored-identity.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  real-eeg-source-anchor-witness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install fixed public EEG source and optimization dependencies
+        run: |
+          python -m pip install "numpy==1.26.4" "scipy==1.13.1" "mne==1.9.0" "pytest==8.4.1"
+      - name: Refute channel-assignment overclaim with five deterministic tests
+        run: |
+          python -m pytest -q research/electrode_identity/test_anchor_identity.py
+      - name: Real PhysioNet EEGBCI source, blinded corruptions and full negative cases
+        run: |
+          python -m research.electrode_identity.public_eeg_pilot \
+            --cache /tmp/physionet-source-recordings \
+            --output research_evidence/eeg_anchor_identifiability_public.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path("research_evidence/eeg_anchor_identifiability_public.json").read_text())
+          assert r["n_independent_subjects"]==2
+          assert r["n_subject_condition_injection_cells"]==16
+          assert len(r["original_file_hashes"])==4
+          assert all(len(a["sha256"])==64 for a in r["original_file_hashes"].values())
+          assert all(a["decision"] in ("refuse","retain_identity","authorize_repair") for a in r["cases"])
+          assert r["actual_wrong_electrode_hardware_events"] is False
+          assert r["original_pretrained_neurorvq_executed"] is False
+          assert r["safety_or_clinical_claim"] is False
+          print("PASS actual independent EEG source files and all sixteen predeclared conditions; no requirement to claim improved detection.")
+          PY
+          {
+            echo "## Actual EEG PhysioNet source-anchored identity check"
+            echo "Two subjects, eyes-open/eyes-closed state-shift and same-run time-disjoint; 4 controlled metadata errors/condition. No actual electrode miswiring or NeuroRVQ inference."
+            echo '~~~json'
+            cat research_evidence/eeg_anchor_identifiability_public.json
+            echo '~~~'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Publish reproducible source hashes and decisions only, never raw biosignals
+        uses: actions/upload-artifact@v4
+        with:
+          name: EEG-2subjects-anchor-identity-prospective-pilot
+          path: research_evidence/eeg_anchor_identifiability_public.json
+          if-no-files-found: error
+          retention-days: 90
