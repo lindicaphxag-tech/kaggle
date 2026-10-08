@@ -15,6 +15,44 @@ They are deliberately kept separate in claims: public self-authored artifacts ar
 
 ## SemRepair — start here
 
+### Representative result: four frozen manipulation policies, stateful controller action semantics
+
+The strongest completed **real closed-loop** evidence is
+[**Stateful Action-ABI Transport for Frozen Robot Policies**](https://github.com/lindicaphxag-tech/ManiSkill/blob/main/research/frozen_policy_transfer/STATEFUL_ACTION_ABI_FLAGSHIP.md).
+It uses four **different published PPO checkpoints** and official ManiSkill
+PhysX CPU task success, not demonstration save rate. Each task has **32 paired
+source states** (128 original task states; these are not 128 independent policy
+families). Each target arm executes without model retraining.
+
+| Native task | Frozen source | Naive direct copy | Stateful bounded adapter | Matched memory-blind |
+|---|---:|---:|---:|---:|
+| PickCube | 31/32 | 4/32 | **31/32** | 4/32 |
+| PushCube | 29/32 | 21/32 | **29/32** | 20/32 |
+| PullCube | 31/32 | 14/32 | **31/32** | 14/32 |
+| StackCube | 28/32 | 0/32 | **30/32** | 0/32 |
+
+The controller stores a **previous commanded target pose** that the source
+policy does not encode in its action tensor. The adapter reconstructs the
+physical source goal, reads the live target-controller memory, and computes
+a bounded destination command. **Projection is explicitly `NOT_EXACT`**:
+successful task execution is not a safety guarantee or exact policy equivalence.
+
+The strongest *prospectively frozen* extension is PullCube and a new
+StackCube seed cohort (64 original task states):
+[original PhysX CI + full-source audit](https://github.com/lindicaphxag-tech/ManiSkill/actions/runs/37815142810),
+[per-state records and hash-bound verifier](research/semrepair/policy-transfer/REVIEWER_PACKET.md).
+PickCube includes a separate frozen memory-ablation cohort; PushCube is
+exploratory. All evidence remains contributor-operated, under **one Panda
+controller-family mismatch**. Neither independent outside reproduction nor
+another embodiment has been established.
+
+**Why this is different from the method hypothesis:** These real results
+support a *known* stateful controller chart translation, not yet automatic
+**discovery of unknown** action semantics. The [separate source-bound
+PegInsertionSide 2×2 contrast and exact-repair infeasibility evidence](research/semrepair/ROBOT_ACTION_CONTRACT_FLAGSHIP.md)
+motivates the next **evidence-conditioned authorization** question. It is
+not an additional claim of policy-success gain.
+
 **Flagship research question:** When robot interfaces have hidden or mutually
 compensating physical semantics, what is the **minimum admissible evidence**
 needed to authorize one concrete implementation-bound repair?
