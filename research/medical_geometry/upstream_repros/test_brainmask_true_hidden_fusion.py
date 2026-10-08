@@ -55,3 +55,24 @@ def test_channel_semantics_not_implied_by_spatial_shape_agreement():
     # feature values equivalent across orientations: an explicit nonclaim.
     assert x.shape == y.shape
     assert not np.array_equal(x, y)
+
+
+def test_conv1x1_prehead_average_equals_same_frozen_head_logit_average():
+    rng = np.random.default_rng(998)
+    feats = rng.normal(size=(3, 4, 5, 6, 32)).astype(np.float64)
+    weights = rng.normal(size=(32,))
+    bias = -0.37
+    aligned_mixed = np.mean(feats, axis=0)
+    before_head = np.einsum("ijkc,c->ijk", aligned_mixed, weights) + bias
+    each_head = np.einsum("nijkc,c->nijk", feats, weights) + bias
+    after_head = np.mean(each_head, axis=0)
+    np.testing.assert_allclose(before_head, after_head, rtol=1e-13, atol=1e-13)
+
+
+def test_logit_mean_and_probability_mean_can_reverse_final_labels():
+    logits = np.array([8.0, -3.0, -3.0], dtype=np.float64)
+    logit_ensemble = 1 / (1 + np.exp(-np.mean(logits)))
+    prob_ensemble = np.mean(1 / (1 + np.exp(-logits)))
+    assert logit_ensemble > 0.5
+    assert prob_ensemble < 0.5
+    # This difference does not require learned-channel semantics at all.
