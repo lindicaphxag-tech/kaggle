@@ -116,3 +116,44 @@ class ProvenanceQueryPlanner:
                 return p,tuple(seen)
             row=p.next_observed_row
             seen.append((row,mapping[row]))
+
+
+class DecisionTableQueryPlanner(ProvenanceQueryPlanner):
+    """Model-agnostic minimax query policy from a complete frozen-logit table.
+
+    The provided table MUST include every within-group identity assignment,
+    using the exact same frozen nonlinear or linear model and preprocessing.
+    This does not certify a task label, hardware identity or out-of-set mapping.
+    """
+
+    def __init__(self, mappings, decision_margins, groups, *, tol=1e-10, max_hypotheses=720):
+        mapping=tuple(tuple(int(j) for j in p) for p in mappings)
+        margins=tuple(float(x) for x in decision_margins)
+        if not mapping or len(set(mapping))!=len(mapping) or len(mapping)!=len(margins):
+            raise ValueError("Missing or duplicate identity hypothesis")
+        n=len(mapping[0])
+        if any(len(p)!=n or set(p)!=set(range(n)) for p in mapping):
+            raise ValueError("Every hypothesis must be a full channel bijection")
+        groups=tuple(tuple(int(j) for j in g) for g in groups)
+        covered=set()
+        for g in groups:
+            if len(g)<2 or len(set(g))!=len(g) or covered.intersection(g) or any(j<0 or j>=n for j in g):
+                raise ValueError("Invalid disjoint channel uncertainty groups")
+            covered.update(g)
+        if math.prod(math.factorial(len(g)) for g in groups)>max_hypotheses:
+            raise ValueError("Hypothesis budget exceeded; fail closed")
+        expected=set()
+        for assigns in product(*(permutations(g) for g in groups)):
+            p=list(range(n))
+            for g,assignment in zip(groups,assigns):
+                for row,identity in zip(g,assignment):
+                    p[row]=identity
+            expected.add(tuple(p))
+        if set(mapping)!=expected:
+            raise ValueError("Incomplete or out-of-model decision table")
+        if not np.isfinite(margins).all() or tol<0:
+            raise ValueError("Untrusted or nonfinite model decision outputs")
+        self.mappings=mapping
+        self.margins=margins
+        self.rows=tuple(sorted(covered))
+        self.tol=tol
