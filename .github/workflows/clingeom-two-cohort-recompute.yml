@@ -1,0 +1,41 @@
+name: ClinGeom independent archived twelve-patient recomputation
+on:
+  pull_request:
+    paths:
+      - 'research/medical_geometry/audit_two_cohorts_from_artifacts.py'
+      - '.github/workflows/clingeom-two-cohort-recompute.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  recompute-source-results:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve the original six-subject SOURCE result (never MRI)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p first
+          gh run download 37827612217 -R lindicaphxag-tech/kaggle \
+            -n ClinGeom-6patient-prospective-gated-t1-metric-audit -D first
+      - name: Retrieve next-six predeclared SOURCE result (never MRI)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p next
+          gh run download 37975340905 -R lindicaphxag-tech/kaggle \
+            -n ClinGeom-next6-patient-predeclared-replication-score -D next
+      - name: Independently verify raw hashes and recalculate patient-macro
+        run: |
+          python research/medical_geometry/audit_two_cohorts_from_artifacts.py \
+            first/annotated_6subject_frozen_validation.json \
+            next/annotated_next6_frozen_validation.json \
+            --out independent_12_patient_audit.json
+      - name: Publish only pseudonymous aggregate provenance
+        uses: actions/upload-artifact@v4
+        with:
+          name: ClinGeom-independent-recomputed-12-subject-audit
+          path: independent_12_patient_audit.json
+          retention-days: 60
