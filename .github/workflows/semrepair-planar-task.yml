@@ -6,6 +6,8 @@ on:
       - 'research/semrepair/test_native_planar_task_repair.py'
       - 'research/semrepair/observable_interface_factorization.py'
       - 'research/semrepair/test_observable_interface_factorization.py'
+      - 'research/semrepair/deployment_validity_shield.py'
+      - 'research/semrepair/test_deployment_validity_shield.py'
       - '.github/workflows/semrepair-planar-task.yml'
   workflow_dispatch:
 permissions:
@@ -35,6 +37,18 @@ jobs:
           for label,value in r['results'].items():
               print(label,value)
           PY
+      - name: Falsify unsafe 3-probe linearity and test conditional deployment envelope
+        run: |
+          python -m unittest -v research.semrepair.test_deployment_validity_shield
+          python - <<'PY'
+          import json
+          from research.semrepair.deployment_validity_shield import nonlinear_probe_challenge
+          result=nonlinear_probe_challenge()
+          with open('nonlinear_validity_raw.json','w') as f:
+              json.dump(result,f,indent=2,sort_keys=True)
+          print('three probe false accepts:',result['legacy_false_linear_acceptances'])
+          print('additional probe refusals:',result['extra_probe_detected_nonlinear'])
+          PY
       - name: Verify raw denominator and report compact actual outcomes
         run: |
           python - <<'PY'
@@ -53,4 +67,5 @@ jobs:
           path: |
             planar_task_raw.json
             blind_factorization_raw.json
+            nonlinear_validity_raw.json
           retention-days: 90
