@@ -270,3 +270,98 @@ def finite_probe_interpolation_counterexample(
         "novel_mathematical_priority":False,
         "claim_scope":"symbolic finite-probe impossibility under unconstrained function class",
     }
+
+
+def _interval_max_norm(center:Mat, target:Mat, radii_by_column:Vec) -> tuple[float,float]:
+    """Rigorous lower/upper bounds on max_ij |true_ij-target_ij|."""
+    lower=0.
+    upper=0.
+    for i in range(2):
+        for j in range(2):
+            deviation=abs(center[i][j]-target[i][j])
+            rad=radii_by_column[j]
+            lower=max(lower,max(0.,deviation-rad))
+            upper=max(upper,deviation+rad)
+    return lower,upper
+
+
+def _certified_invertible_2x2(P:Mat, rad:Vec)->dict:
+    """Bound determinant error using independent component interval radii.
+
+    For each matrix column j, |Delta_ij|<=rad[j]. For det=ad-bc
+    the conservative error budget is sum of first-order terms plus two
+    cross-products. If det_hat beats this, every compatible matrix is
+    invertible (but no condition-number guarantee is claimed).
+    """
+    a,b=P[0];c,d=P[1];r0,r1=rad
+    estimate=a*d-b*c
+    uncertainty=(abs(a)+abs(c))*r1+(abs(b)+abs(d))*r0+2*r0*r1
+    return {"estimate":estimate,"maximum_determinant_error":uncertainty,
+            "certified":abs(estimate)>uncertainty}
+
+
+def bounded_noise_patch_contract(
+    training: Sequence[TapSample],validation: Sequence[TapSample], *,
+    per_coordinate_error_bound:float, declared_effect_tolerance:float=0.025,
+) -> dict:
+    """Conditional classification of the *observable* two-interface map.
+
+    Unlike heuristic exact-matrix classification, this certifies whether
+    P-I and Q-P have max-entry norm <=tau or >tau for EVERY admissible
+    linear model consistent with the noisy training readings.
+
+    Q maps upstream requests to controller output. Q-P = (C-I)P.
+    The downstream 'effect mismatch' metric is NOT ||C-I|| and is meaningful
+    as an identity test only when P is invertible, which we separately check.
+    This is NOT a source-bound legal permission to patch code.
+    """
+    if (not isfinite(per_coordinate_error_bound) or per_coordinate_error_bound<0
+        or not isfinite(declared_effect_tolerance) or declared_effect_tolerance<=0):
+        raise ValueError("invalid error or map margin")
+    check=validate_numeric_model(
+        training,validation,tap_noise_bound=per_coordinate_error_bound)
+    if check["decision"]!="FINITE_PROBES_COMPATIBLE_ONLY":
+        return {"decision":check["decision"],"candidate_patch":None}
+    P,Q,Uinv=_infer_linear_tap_maps(training)
+    eps=per_coordinate_error_bound
+    # Since each 2-vector column measurement error is bounded coordinatewise
+    # by eps, the columns of E@U^-1 have scalar radius:
+    column_radii=tuple(eps*(abs(Uinv[0][j])+abs(Uinv[1][j]))
+                       for j in range(2))
+    invertibility=_certified_invertible_2x2(P,column_radii)
+    if not invertibility["certified"]:
+        return {"decision":"REFUSE_NOISY_RANK_AMBIGUITY","candidate_patch":None,
+                "producer_determinant_bound":invertibility}
+    producer_interval=_interval_max_norm(P,I,column_radii)
+    D=tuple(tuple(Q[i][j]-P[i][j] for j in range(2)) for i in range(2))
+    downstream_interval=_interval_max_norm(
+        D,((0.,0.),(0.,0.)),
+        tuple(2*r for r in column_radii))
+    def classify(interval):
+        low,high=interval
+        return "HEALTHY" if high <= declared_effect_tolerance else \
+               "FAULT" if low > declared_effect_tolerance else "UNKNOWN"
+    upstream=classify(producer_interval)
+    downstream=classify(downstream_interval)
+    if "UNKNOWN" in (upstream,downstream):
+        return {"decision":"REFUSE_INSUFFICIENT_PRECISION","candidate_patch":None,
+                "producer_contract":upstream,"downstream_effect_contract":downstream,
+                "producer_interval":producer_interval,
+                "downstream_effect_interval":downstream_interval}
+    patch=("noop" if upstream=="HEALTHY" and downstream=="HEALTHY" else
+           "producer-only" if upstream=="FAULT" and downstream=="HEALTHY" else
+           "controller-only" if upstream=="HEALTHY" else "atomic")
+    return {
+        "decision":"NOISY_LINEAR_PATCH_CANDIDATE_NOT_AUTHORIZED",
+        "candidate_patch":patch,"producer_contract":upstream,
+        "downstream_effect_contract":downstream,
+        "producer_interval":producer_interval,
+        "downstream_effect_interval":downstream_interval,
+        "producer_determinant_bound":invertibility,
+        "effect_tolerance":declared_effect_tolerance,
+        "error_bound":per_coordinate_error_bound,
+        "global_nonlinear_validity_certified":False,
+        "independent_source_verified":False,
+        "proof_scope":"deterministic coordinatewise tap noise and assumed globally linear ABI; "
+                      "every admissible map agrees on the two observable tolerance decisions",
+    }
