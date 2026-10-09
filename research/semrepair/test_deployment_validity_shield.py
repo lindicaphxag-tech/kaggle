@@ -7,7 +7,7 @@ from research.semrepair.deployment_validity_shield import (
     validate_numeric_model, requested_patch_if_finite_compatible,
     cartesian_cover_radius, conditional_lipschitz_envelope,
     nonlinear_probe_challenge, cubic_ambush,
-    finite_probe_interpolation_counterexample,
+    finite_probe_interpolation_counterexample, bounded_noise_patch_contract,
 )
 
 
@@ -92,6 +92,55 @@ class DeploymentValidityTests(unittest.TestCase):
     def test_interpolation_witness_rejects_queried_location(self):
         with self.assertRaises(ValueError):
             finite_probe_interpolation_counterexample([PROBE_E1],evaluation=PROBE_E1)
+
+    def test_noise_certified_patch_categories_with_native_simulator(self):
+        SWAP=((0.,1.),(1.,0.))
+        NEG=((-1.,0.),(0.,-1.))
+        configurations=[
+            (I,I,"noop"), (SWAP,I,"producer-only"),
+            (I,NEG,"controller-only"), (SWAP,SWAP,"atomic"),
+        ]
+        for p,c,expected in configurations:
+            training=[nominal_probe(p,c,u) for u in (PROBE_E1,PROBE_E2)]
+            validation=[nominal_probe(p,c,u) for u in (CHECK,)+EXTENDED_PROBES]
+            r=bounded_noise_patch_contract(training,validation,
+                                           per_coordinate_error_bound=0.0005)
+            self.assertEqual(r["decision"],"NOISY_LINEAR_PATCH_CANDIDATE_NOT_AUTHORIZED")
+            self.assertEqual(r["candidate_patch"],expected)
+            self.assertFalse(r["independent_source_verified"])
+
+    def test_adversarial_coordinate_noise_within_declared_bound(self):
+        eps=.00025
+        def noisy(u,p,c,sign):
+            clean=nominal_probe(p,c,u)
+            return TapSample(u,tuple(v+sign*eps for v in clean.producer),
+                             tuple(v-sign*eps for v in clean.controller))
+        a,b=PROBE_E1,PROBE_E2
+        training=[noisy(a,I,I,1),noisy(b,I,I,-1)]
+        valid=[noisy(CHECK,I,I,1),noisy((1.2,0.),I,I,-1)]
+        r=bounded_noise_patch_contract(training,valid,per_coordinate_error_bound=eps)
+        self.assertEqual(r["candidate_patch"],"noop")
+
+    def test_noisy_near_identity_must_abstain(self):
+        training=[nominal_probe(I,I,u) for u in (PROBE_E1,PROBE_E2)]
+        result=bounded_noise_patch_contract(training,[nominal_probe(I,I,CHECK)],
+                         per_coordinate_error_bound=.03)
+        self.assertEqual(result["decision"],"REFUSE_INSUFFICIENT_PRECISION")
+
+    def test_noisy_near_singular_producer_must_abstain(self):
+        weak=((1.e-5,0.),(0.,1.))
+        training=[nominal_probe(weak,I,u) for u in (PROBE_E1,PROBE_E2)]
+        result=bounded_noise_patch_contract(training,[nominal_probe(weak,I,CHECK)],
+                         per_coordinate_error_bound=.0001)
+        self.assertEqual(result["decision"],"REFUSE_NOISY_RANK_AMBIGUITY")
+
+    def test_nonlinear_alias_is_rejected_before_noisy_classification(self):
+        train=[nonlinear_tap(u,strength=.05,axis=0) for u in (PROBE_E1,PROBE_E2)]
+        validation=[nonlinear_tap(u,strength=.05,axis=0)
+                    for u in (CHECK,)+EXTENDED_PROBES]
+        result=bounded_noise_patch_contract(train,validation,
+                                            per_coordinate_error_bound=.0001)
+        self.assertEqual(result["decision"],"REFUSE_LINEAR_MODEL_FALSIFIED")
 
     def test_linear_classifier_also_requires_predeclared_fault_model(self):
         t=[nominal_probe(I,I,u) for u in (PROBE_E1,PROBE_E2)]
