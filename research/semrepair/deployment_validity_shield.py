@@ -400,3 +400,59 @@ def matched_seven_probe_baseline_challenge() -> dict:
         "no_algorithmic_superiority_claim":"extremal against generic equal-budget comparator has to be tested, never assumed",
         "no_independent_test_family":True,
     }
+
+
+CORNER_PROBES: tuple[Vec,...] = (
+    (1.2,1.2),(-1.2,-1.2),(1.2,-1.2),(-1.2,1.2),
+)
+
+
+def cross_axis_alias_tap(u:Vec, *, coefficient:float)->TapSample:
+    """Native MuJoCo readout of a two-axis interaction invisible on axis probes.
+
+    Each legacy or axis-only probe satisfies either x=0, y=0, x=.31
+    or y=-.27, causing the polynomial cross-interaction to vanish.
+    Corner probes have BOTH axes nonzero and break that alias.
+    """
+    if not isfinite(coefficient) or coefficient<0:
+        raise ValueError("invalid interaction strength")
+    import mujoco
+    from .native_planar_task_repair import actual_mujoco_model
+    x,y=u
+    p=(x+coefficient*x*y*(x-.31)*(y+.27),y)
+    model=actual_mujoco_model()
+    data=mujoco.MjData(model)
+    data.ctrl[:]=p
+    mujoco.mj_step(model,data)
+    return TapSample(u,p,(float(data.ctrl[0]),float(data.ctrl[1])))
+
+
+def cross_axis_equal_cost_falsification()->dict:
+    """A SECOND fault family attacks the previously added axial probe layout.
+
+    Demonstrates the limitation *before* upgrading probe coverage; it does
+    not imply optimized active probing against independent physical sources.
+    """
+    generic=((- .43,.78),(.81,-.91),(-1.03,.22),(.16,1.06))
+    results=[]
+    for strength in (.01,.025,.05,.1,.25,.5):
+        train=[cross_axis_alias_tap(u,coefficient=strength)
+               for u in (PROBE_E1,PROBE_E2)]
+        row={"strength":strength}
+        for label,extra in (("three",()),("axial_seven",EXTENDED_PROBES),
+                            ("generic_seven",generic),("corner_seven",CORNER_PROBES)):
+            validation=[cross_axis_alias_tap(u,coefficient=strength)
+                        for u in (CHECK,)+extra]
+            row[label]=validate_numeric_model(train,validation)["decision"]
+        results.append(row)
+    detected={name:sum(row[name]=="REFUSE_LINEAR_MODEL_FALSIFIED" for row in results)
+              for name in ("three","axial_seven","generic_seven","corner_seven")}
+    assert detected=={"three":0,"axial_seven":0,"generic_seven":6,"corner_seven":6}
+    return {"protocol":"cross-axis-off-support-nonlinear-interface-first-score",
+            "constructed_conditions":len(results),
+            "detection_counts":detected,
+            "costs":{"three":3,"axial_seven":7,"generic_seven":7,"corner_seven":7},
+            "rows":results,
+            "limitation":"author-generated polynomial vanishes at all original and axis-only probes, "
+                         "one MuJoCo 2DOF plant and no learned policy; corner probes TIE a generic same-budget baseline",
+    }
