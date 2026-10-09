@@ -1,0 +1,88 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 6,
+  "new_candidates": [
+    {
+      "author_login": "jkterry1",
+      "body": "Could someone please create a PR adding a gif showing a reasonably learned policy for mujoco's humanoid stand up?",
+      "created_at": "2026-10-09T07:53:19Z",
+      "html_url": "https://github.com/Farama-Foundation/Gymnasium/issues/1766",
+      "id": "Farama-Foundation/Gymnasium#1766",
+      "issue_number": 1766,
+      "labels": [],
+      "repository": "Farama-Foundation/Gymnasium",
+      "surface_sha256": "97530b3c7fb1707524122bca36ec116fc4f3ae638becb0379c790940f97237af",
+      "title": "Humanoid Stand Up Gif"
+    },
+    {
+      "author_login": "nblauch",
+      "body": "### Describe the bug\n\nBoth IsaacRTX and standalone OVRTX silently return 120 entirely black views out of 176 fixed pinhole cameras, while simulation continues and exits successfully. Both use stock Isaac Lab cameras/renderers and Newton MJWarp physics. The failure persists through 30 frames, including ten measured frames after 20 warmup frames.\n\nThe renderer's named \u201cPath Tracing sample buffer\u201d is allocated successfully at 4\u2009448\u2009808\u2009000 bytes, then bound through a descriptor exceeding the device's reported 4\u2009294\u2009967\u2009295-byte limit. This occurs with ample VRAM. Evidence points to the shared RTX implementation; please route to the appropriate renderer owners.\n\n### Steps to reproduce\n\nDownload the [reproduction script and README](https://gist.github.com/nblauch/445e11b5f3312fe3ad7c024c7f37156e) and run:\n\n```sh\npython repro_tiled_rgb.py --renderer ovrtx --envs 176 --spp 5 --output ovrtx-result\npython repro_tiled_rgb.py --renderer isaac_rtx --envs 176 --spp 5 --output isaacrtx-result\n```\n\nThe scene contains only procedural cubes, a dome light, and identical pinhole cameras: no external assets, custom sensor/renderer, or policy. Each view is 582 \u00d7 300 pixels; the actual atlas is 8\u2009148 \u00d7 3\u2009900, including unused tile slots. Both use five ordinary samples per pixel and NewtonMJWarpManager.\n\n| Renderer | Descriptor intervention | Black views, frames 20\u201329 |\n| --- | --- | ---: |\n| IsaacRTX | None | 120 / 176 |\n| IsaacRTX | Diagnostic clamp only | 0 / 176; all cubes visible |\n| OVRTX | None | 120 / 176 |\n| OVRTX | Diagnostic clamp only | 0 / 176; all cubes visible |\n\nContact sheets rearrange the 176 views into 20 columns; the native atlas has 14 \u00d7 13 slots. Click images for detail.\n\n| Renderer | Original descriptor | Diagnostic clamp |\n| --- | --- | --- |\n| IsaacRTX | ![IsaacRTX: black views and corrupted colors](https://github.com/user-attachments/assets/68bd04a1-2276-4e6d-9979-4f2164a2c4dc) | ![IsaacRTX: all centered cubes visible](https://github.com/user-attachments/assets/fd27c7a2-a500-4f2f-b80a-5e3de1bdee66) |\n| OVRTX | ![OVRTX: black views and corrupted colors](https://github.com/user-attachments/assets/aaf506b9-d0a7-46dc-9106-e166eb47645f) | ![OVRTX: all centered cubes visible](https://github.com/user-attachments/assets/43ea0ad4-fb2c-4c32-9a8f-9d8d477173c5) |\n\n### System Info\n\n- Isaac Lab: clean `1e520e9d5cb44f54b70190f704f9d3dd634fa60f`.\n- Isaac Sim: 6.1.0.0; Kit: 110.3.0+feature.371399.00c488ae.gl.\n- OVRTX: 0.5.0.377615; OVStage: 0.2.0.377349.\n- Newton: 1.6.0, MJWarp solver; Warp: 1.17.0.\n- Ubuntu 24.04.1 LTS; NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 96 GB; driver 580.173.02.\n- PyTorch: 2.12.0+cu130; its CUDA build version is 13.0.\n\n### Additional context\n\nAll four runs use byte-identical source; within each backend the recorded runtime settings and poses are also identical. Every run retains the full allocation. IsaacRTX requests 165 oversized descriptor writes; OVRTX requests 405. The intervention changes all offending ranges to 4\u2009294\u2009967\u2009280 bytes. Baseline tracing records calls without modifying them.\n\nIsaacRTX settings confirm adaptive disocclusion off, DLAA on, and denoising on. OVRTX confirms five samples/pixel and denoising; it lacks the same exposed adaptive control, so actual native allocation is the matching criterion.\n\nThat clamp is a causal experiment, **not a production fix**: restored images do not prove valid addressing outside the advertised range. [VUID 00333](https://docs.vulkan.org/refpages/latest/refpages/source/VkWriteDescriptorSet.html) prohibits the oversized range without `shader64BitIndexing`. Neither local Blackwell nor Ada advertises the relevant extension on this driver. The existing limit is already the maximum `uint32_t`; using [64-bit indexing](https://docs.vulkan.org/features/latest/features/proposals/VK_EXT_shader_64bit_indexing.html) requires platform support and shader/pipeline changes, not just raising a setting.\n\nRelated [PR #7740](https://github.com/isaac-sim/IsaacLab/pull/7740) concerns incorrect views above 4\u2009096 tiles. Here only 176 are needed; earlier one-camera/full-atlas controls also failed.\n\n### Checklist\n\n- [x] I have checked that there is no similar issue in the repo (**required**). Related PR #7740 is noted above; no matching descriptor-range report was found.\n- [ ] I have checked that the issue is not in running Isaac Sim itself and is related to the repo. Intentionally unchecked: native-renderer ownership/routing is requested.\n\n### Acceptance Criteria\n\n- [ ] Reject unsupported effective descriptor ranges before dispatch and propagate a fatal, actionable error naming the resource, requested bytes, device limit, native atlas, and sample settings. Validate the binding, not every allocation over 4 GiB.\n- [ ] Support larger workloads through valid split bindings/indexing or supported large-buffer addressing, with below/above-limit image regressions for both backends.\n- [ ] Prevent silent corrupted RGB observations. [Vulkan does not require driver validation](https://docs.vulkan.org/guide/latest/validation_overview.html), so the production guard belongs in the renderer.\n",
+      "created_at": "2026-10-09T03:25:12Z",
+      "html_url": "https://github.com/isaac-sim/IsaacLab/issues/8412",
+      "id": "isaac-sim/IsaacLab#8412",
+      "issue_number": 8412,
+      "labels": [],
+      "repository": "isaac-sim/IsaacLab",
+      "surface_sha256": "5ad6631bd117bfd8e561fd16671f5cd41bad13f10f064963a1d06ae389013e44",
+      "title": "[Bug Report] RTX returns black camera tiles after exceeding the Vulkan storage-descriptor range"
+    },
+    {
+      "author_login": "NeoZng",
+      "body": "### Describe the bug\n\n`UR10e_ROBOTIQ_2F_85_CFG` (`ur10e.usd` with the `Gripper` variant `Robotiq_2f_85`) contains two rigid bodies with the same name:\n\n- `/base_link`, the arm base;\n- `/ee_link/Robotiq_2F_85/base_link`, the gripper base, defined in `Robots/Robotiq/2F-85/payloads/Robotiq_2F_85_base.usda`.\n\nThe two backends name them differently:\n\n- PhysX: the tensor API renames later duplicates, so `body_names` has `base_link` (index 0, arm) and `base_link_0` (index 7, gripper).\n- Newton: body names are the last path segment, so `body_names` has `base_link` twice (indices 0 and 7).\n\nAs a result:\n\n- `find_bodies(\"base_link\")` selects only the arm base on PhysX, but both bodies on Newton. `find_bodies(\"base_link_0\")` works on PhysX and raises on Newton.\n- With `body_ordering=\"physx\"`, `sim.reset()` fails on Newton:\n  `ValueError: Duplicate backend body names are not supported: (...)`.\n- With `body_ordering=\"mjwarp\"`, `sim.reset()` fails on PhysX, because the emulated MJWarp names have no `base_link_0`:\n  `NotImplementedError: Unable to resolve 'mjwarp' body ordering for active backend 'physx'. ... body names are not a complete permutation (missing=['base_link_0'], extra=[]).`\n\n`UR10e_ROBOTIQ_GRIPPER_CFG` (2F-140) does not have this problem: its gripper base is named `robotiq_base_link`, and both backends report the same 16 unique names.\n\n### Steps to reproduce\n\nSpawn the cfg with 2 environments on each backend, then call `sim.reset()`:\n\n```python\nfrom dataclasses import replace\n\nfrom isaaclab.assets import Articulation\nfrom isaaclab.sim import SimulationCfg\nfrom isaaclab_assets.robots.universal_robots import UR10e_ROBOTIQ_2F_85_CFG\nfrom isaaclab_newton.physics import MJWarpSolverCfg, NewtonCfg\nfrom isaaclab_physx.physics import PhysxCfg\n\nsim_cfg = SimulationCfg(physics=PhysxCfg())\n# sim_cfg = SimulationCfg(physics=NewtonCfg(solver_cfg=MJWarpSolverCfg(njmax=400, nconmax=200), num_substeps=1))\n\ncfg = replace(UR10e_ROBOTIQ_2F_85_CFG, prim_path=\"/World/Env_[^/]*/Robot\")\n# cfg = replace(cfg, body_ordering=\"physx\")  # on Newton\n# cfg = replace(cfg, body_ordering=\"mjwarp\")  # on PhysX\nrobot = Articulation(cfg)\n# ... replicate, sim.reset()\nprint(robot.body_names)\nprint(robot.find_bodies(\"base_link\"))\nprint(robot.find_bodies(\"base_link_0\"))\n```\n\nOutput:\n\n```\nPhysX:\n  body_names: ['base_link', 'shoulder_link', ..., 'wrist_3_link', 'base_link_0', 'left_outer_knuckle', ...]  (16 bodies, 16 unique)\n  find_bodies(\"base_link\"): ([0], ['base_link'])\n  find_bodies(\"base_link_0\"): ([7], ['base_link_0'])\n\nNewton:\n  body_names: ['base_link', 'shoulder_link', ..., 'wrist_3_link', 'base_link', 'left_outer_knuckle', ...]  (16 bodies, 15 unique)\n  find_bodies(\"base_link\"): ([0, 7], ['base_link', 'base_link'])\n  find_bodies(\"base_link_0\"): ValueError: Not all regular expressions are matched!\n\nNewton with body_ordering=\"physx\", in sim.reset():\n  ValueError: Duplicate backend body names are not supported: ('base_link', 'shoulder_link', ..., 'wrist_3_link', 'base_link', 'left_outer_knuckle', ...).\n\nPhysX with body_ordering=\"mjwarp\", in sim.reset():\n  NotImplementedError: Unable to resolve 'mjwarp' body ordering for active backend 'physx'. ... Attempted resolutions: mjwarp_usd_builder: body names are not a complete permutation (missing=['base_link_0'], extra=[]).\n```\n\n### System Info\n\n- Commit: develop 402c0f2d00\n- Isaac Sim Version: 6.1.0-rc.26 (assets from `Assets/Isaac/6.2`)\n- Newton: 1.7.0.dev0 (5ea82eef, as pinned by develop)\n- OS: Ubuntu 24.04\n- GPU: RTX PRO 5000 Blackwell\n- CUDA: 13.0\n- GPU Driver: 580.126.20\n\n### Additional context\n\nPossible fixes:\n\n- Give the gripper base a unique name in the asset, for example `robotiq_base_link` as in the 2F-140. The 2F-85 asset is shared, so the Franka `Robotiq_2F_85` variant (`FRANKA_ROBOTIQ_GRIPPER_CFG`) would change too. Nothing in this repository refers to `base_link_0` or to the gripper base by name.\n- Make body names unique wherever Isaac Lab takes them from Newton, as the PhysX tensor API does (`_0`, `_1`, ... appended in link order). This covers the Newton backend and the emulated `\"physx\"` and `\"mjwarp\"` names. To give the same name to the same body everywhere, the suffixes would have to follow PhysX's link order.\n\nThe only user of this cfg in this repository, the 2F-85 gear-assembly task, runs on PhysX only, looks up `wrist_3_link` and sets no ordering, so it is not affected today.\n\n### Checklist\n\n- [x] I have checked that there is no similar issue in the repo (**required**)\n- [x] I have checked that the issue is not in running Isaac Sim itself and is related to the repo\n\n### Acceptance Criteria\n\n- [ ] All bodies of `UR10e_ROBOTIQ_2F_85_CFG` have unique names, and the names are the same on PhysX and Newton.\n- [ ] `UR10e_ROBOTIQ_2F_85_CFG` initializes with `body_ordering=\"physx\"` on Newton and with `body_ordering=\"mjwarp\"` on PhysX.\n",
+      "created_at": "2026-10-09T06:14:41Z",
+      "html_url": "https://github.com/isaac-sim/IsaacLab/issues/8416",
+      "id": "isaac-sim/IsaacLab#8416",
+      "issue_number": 8416,
+      "labels": [],
+      "repository": "isaac-sim/IsaacLab",
+      "surface_sha256": "51df1e230b3444c7621844ed5a5a47f1d847ff38bb9c85e3c1558c5bd5399d95",
+      "title": "[Bug Report] `UR10e_ROBOTIQ_2F_85_CFG` has two bodies named `base_link`, so body names differ between PhysX and Newton"
+    },
+    {
+      "author_login": "github-actions[bot]",
+      "body": "An automated scheduled build failed on `master`: https://github.com/ros-controls/ros2_control/actions/runs/37879299509\n",
+      "created_at": "2026-10-09T04:22:06Z",
+      "html_url": "https://github.com/ros-controls/ros2_control/issues/3676",
+      "id": "ros-controls/ros2_control#3676",
+      "issue_number": 3676,
+      "labels": [
+        "CI"
+      ],
+      "repository": "ros-controls/ros2_control",
+      "surface_sha256": "c628e4f781525762a860ffa75645b99544734a9bfcc6a827f63e141488bd485c",
+      "title": "CI build job rolling/source failed!"
+    },
+    {
+      "author_login": "github-actions[bot]",
+      "body": "An automated scheduled build failed on `master`: https://github.com/ros-controls/ros2_controllers/actions/runs/37879385612\n",
+      "created_at": "2026-10-09T04:22:18Z",
+      "html_url": "https://github.com/ros-controls/ros2_controllers/issues/2693",
+      "id": "ros-controls/ros2_controllers#2693",
+      "issue_number": 2693,
+      "labels": [
+        "CI"
+      ],
+      "repository": "ros-controls/ros2_controllers",
+      "surface_sha256": "036b30dae99bea3e8283f83bf9bf3e3f65982b1eeb45c6ea0ac03613a8429ec4",
+      "title": "CI build job rolling/source failed!"
+    },
+    {
+      "author_login": "D-K-E",
+      "body": "The [executors.py](https://github.com/ros2/rclpy/blob/foxy/rclpy/rclpy/executors.py) contain method annotations. But method signatures don't match what is happening. For example:\n```\n    def shutdown(self, timeout_sec: float = None) -> bool:\n        \"\"\"\n        Stop executing callbacks and wait for their completion.\n```\nHere timeout_sec is `Optional[float] = None`, but it is shown as `float`. There are a bunch of small mismatches like this.",
+      "created_at": "2026-10-09T05:39:33Z",
+      "html_url": "https://github.com/ros2/rclpy/issues/1742",
+      "id": "ros2/rclpy#1742",
+      "issue_number": 1742,
+      "labels": [],
+      "repository": "ros2/rclpy",
+      "surface_sha256": "57183e79df8ecca66cf8e41d6d4c8b870b6c91f523938839bded75d6c69a7a6f",
+      "title": "executor annotations have mismatches"
+    }
+  ],
+  "post_activation_issue_identities_observed": 48,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-09T08:00:16Z",
+  "schema_version": 1
+}

@@ -585,35 +585,47 @@
     },
     {
       "created_at": "2026-10-08T17:08:20Z",
+      "expiry_recorded_at": "2026-10-09T07:58:29Z",
+      "expiry_sha256": "5cd9ad01e0c00bf43e1bfcf6164e0a96491ca3afcad51c79e36cb466c25618f1",
+      "expiry_source": "expirations/Farama-Foundation__Gymnasium__1763.json",
       "first_frozen_at": "2026-10-08T21:17:33Z",
       "id": "Farama-Foundation/Gymnasium#1763",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 1763,
       "prediction_deadline_at": "2026-10-09T03:17:33Z",
       "repository": "Farama-Foundation/Gymnasium",
       "source": "inbox/FIRST_SEEN_20261008T211733Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "48de1385c9b3504939716ddcbe371ecdb503a225917ed2f52c1ea9a082e1c19b"
     },
     {
       "created_at": "2026-10-08T18:15:43Z",
+      "expiry_recorded_at": "2026-10-09T07:58:29Z",
+      "expiry_sha256": "7ddec66bd1e13e8ae73a295993f1aac37b6a57b334fed9643da434fb1c8650aa",
+      "expiry_source": "expirations/Genesis-Embodied-AI__genesis-world__3506.json",
       "first_frozen_at": "2026-10-08T21:17:33Z",
       "id": "Genesis-Embodied-AI/genesis-world#3506",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3506,
       "prediction_deadline_at": "2026-10-09T03:17:33Z",
       "repository": "Genesis-Embodied-AI/genesis-world",
       "source": "inbox/FIRST_SEEN_20261008T211733Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "060211e65965a2bf50078b1381993a9ab330c59529a4355e5257768962c22e2f"
     },
     {
       "created_at": "2026-10-08T22:32:28Z",
+      "expiry_recorded_at": "2026-10-09T07:58:29Z",
+      "expiry_sha256": "40c454a9afc4d86e1e7741fee818f053abaf70e4e311905840222c17b03f20d3",
+      "expiry_source": "expirations/ros-navigation__navigation2__6632.json",
       "first_frozen_at": "2026-10-09T01:26:13Z",
       "id": "ros-navigation/navigation2#6632",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 6632,
       "prediction_deadline_at": "2026-10-09T07:26:13Z",
       "repository": "ros-navigation/navigation2",
       "source": "inbox/FIRST_SEEN_20261009T012613Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "41273d49242ca6188cd38ccd1d39bcd5cf4fa5dbe356c0c2e8acebbca98ca182"
     },
     {
@@ -626,6 +638,72 @@
       "source": "inbox/FIRST_SEEN_20261009T020413Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "912f79563cb87218daeb0f224678d51c9de21f9c1e677c8a2430f8b76a115bec"
+    },
+    {
+      "created_at": "2026-10-09T07:53:19Z",
+      "first_frozen_at": "2026-10-09T08:00:16Z",
+      "id": "Farama-Foundation/Gymnasium#1766",
+      "issue_number": 1766,
+      "prediction_deadline_at": "2026-10-09T14:00:16Z",
+      "repository": "Farama-Foundation/Gymnasium",
+      "source": "inbox/FIRST_SEEN_20261009T080016Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "97530b3c7fb1707524122bca36ec116fc4f3ae638becb0379c790940f97237af"
+    },
+    {
+      "created_at": "2026-10-09T03:25:12Z",
+      "first_frozen_at": "2026-10-09T08:00:16Z",
+      "id": "isaac-sim/IsaacLab#8412",
+      "issue_number": 8412,
+      "prediction_deadline_at": "2026-10-09T14:00:16Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261009T080016Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "5ad6631bd117bfd8e561fd16671f5cd41bad13f10f064963a1d06ae389013e44"
+    },
+    {
+      "created_at": "2026-10-09T06:14:41Z",
+      "first_frozen_at": "2026-10-09T08:00:16Z",
+      "id": "isaac-sim/IsaacLab#8416",
+      "issue_number": 8416,
+      "prediction_deadline_at": "2026-10-09T14:00:16Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261009T080016Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "51df1e230b3444c7621844ed5a5a47f1d847ff38bb9c85e3c1558c5bd5399d95"
+    },
+    {
+      "created_at": "2026-10-09T04:22:06Z",
+      "first_frozen_at": "2026-10-09T08:00:16Z",
+      "id": "ros-controls/ros2_control#3676",
+      "issue_number": 3676,
+      "prediction_deadline_at": "2026-10-09T14:00:16Z",
+      "repository": "ros-controls/ros2_control",
+      "source": "inbox/FIRST_SEEN_20261009T080016Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "c628e4f781525762a860ffa75645b99544734a9bfcc6a827f63e141488bd485c"
+    },
+    {
+      "created_at": "2026-10-09T04:22:18Z",
+      "first_frozen_at": "2026-10-09T08:00:16Z",
+      "id": "ros-controls/ros2_controllers#2693",
+      "issue_number": 2693,
+      "prediction_deadline_at": "2026-10-09T14:00:16Z",
+      "repository": "ros-controls/ros2_controllers",
+      "source": "inbox/FIRST_SEEN_20261009T080016Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "036b30dae99bea3e8283f83bf9bf3e3f65982b1eeb45c6ea0ac03613a8429ec4"
+    },
+    {
+      "created_at": "2026-10-09T05:39:33Z",
+      "first_frozen_at": "2026-10-09T08:00:16Z",
+      "id": "ros2/rclpy#1742",
+      "issue_number": 1742,
+      "prediction_deadline_at": "2026-10-09T14:00:16Z",
+      "repository": "ros2/rclpy",
+      "source": "inbox/FIRST_SEEN_20261009T080016Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "57183e79df8ecca66cf8e41d6d4c8b870b6c91f523938839bded75d6c69a7a6f"
     }
   ]
 }
