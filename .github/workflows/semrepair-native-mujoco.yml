@@ -86,5 +86,15 @@ jobs:
           name: open-catalog-selective-risk-python-${{ matrix.python }}
           path: open_catalog_selective_risk_result.json
           retention-days: 60
+      - name: High-amplitude actuator saturation transfer falsification
+        run: |
+          python -m unittest -v research.semrepair.test_saturation_transfer_challenge
+          python -m research.semrepair.saturation_transfer_challenge > saturation_transfer_result.json
+          python -c "import json; r=json.load(open('saturation_transfer_result.json')); assert r['stress_wrong_patch_trajectory_divergence_cells']==3 and r['stress_true_patch_trajectory_closure_cells']==3; print(r['protocol'], r['input_sha256'])"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: saturation-transfer-physics-python-${{ matrix.python }}
+          path: saturation_transfer_result.json
+          retention-days: 60
       - name: Independent exact-rational oracle
         run: python research/semrepair/independent_oracle.py
