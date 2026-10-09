@@ -117,6 +117,17 @@ def audit_artifacts(paths: tuple[Path,Path]) -> dict:
         "correlated_roi_count":len(subjects)*3,
         "patient_mean_dice":{arm:mean(vals) for arm,vals in results.items()},
         "gate_minus_native_paired_patient_dice_mean":mean(deltas),
+        "gate_minus_naive_probability_fusion_patient_dice_mean":mean(
+            [gate-weak for gate,weak in zip(
+                results["reliability_gated_fusion"],
+                results["standard_probability_ensemble"])]),
+        "effect_interpretation_hierarchy":{
+            "strong_valid_comparator":"native_axial",
+            "intentionally_weak_counterexample":"standard_probability_ensemble",
+            "better_than_strong_valid_comparator":bool(mean(deltas)>0),
+            "submission_efficacy_promotion":bool(mean(deltas)>0),
+            "do_not_claim":"rescuing a broken/weak naive fusion baseline is not improvement over valid canonical-first"
+        },
         "exploratory_patient_stratified_ci":stratified_patient_bootstrap(
             (tuple(deltas[:6]),tuple(deltas[6:]))),
         "gate_minus_native_paired_patient_hd95_mm_mean":mean(paired_hd),
