@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from hashlib import sha256
 import os
+import stat
 
 from .bound_repair_authority import RepairAuthority
 
@@ -30,18 +31,47 @@ class AuthorityFiles:
         )
 
 
+
+def _digest_no_follow(path: Path) -> str:
+    """Hash from ONE opened FD, refusing a replaced symlink or FIFO.
+
+    This eliminates check-then-read symlink substitution; hashing itself
+    cannot prevent modification after the FD closes and before execution.
+    """
+    if not hasattr(os, "O_NOFOLLOW"):
+        raise OSError("secure no-follow open is unavailable on this platform")
+    flags = os.O_RDONLY | os.O_NOFOLLOW | getattr(os,"O_CLOEXEC",0) | getattr(os,"O_NONBLOCK",0)
+    fd = os.open(os.fspath(path), flags)
+    try:
+        first = os.fstat(fd)
+        if not stat.S_ISREG(first.st_mode):
+            raise ValueError("non-regular patch/evidence artifact")
+        digest=sha256()
+        while True:
+            part=os.read(fd,1024*1024)
+            if not part:
+                break
+            digest.update(part)
+        second=os.fstat(fd)
+        first_state=(first.st_dev,first.st_ino,first.st_size,first.st_mtime_ns,first.st_ctime_ns)
+        second_state=(second.st_dev,second.st_ino,second.st_size,second.st_mtime_ns,second.st_ctime_ns)
+        if first_state!=second_state:
+            raise ValueError("artifact changed while hashing")
+        return digest.hexdigest()
+    finally:
+        os.close(fd)
+
 def attest_current_artifacts(authority: RepairAuthority, files: AuthorityFiles) -> dict:
     """Fail closed if any artifact or digest is not an actual frozen byte object."""
     observed = {}
     failures = []
     for attr, path in files.items():
         path = Path(path)
-        # Symlinks can change target after the caller selects paths. Prefer a
-        # pinned immutable checkout/content-addressed snapshot for the study.
-        if path.is_symlink() or not path.is_file():
-            failures.append(attr + ":missing_or_symlink")
+        try:
+            observed[attr] = _digest_no_follow(path)
+        except (OSError, ValueError) as exc:
+            failures.append(attr + ":unreadable_symlink_or_nonregular")
             continue
-        observed[attr] = sha256(path.read_bytes()).hexdigest()
         if observed[attr] != getattr(authority, attr):
             failures.append(attr + ":sha256_mismatch")
     return {
