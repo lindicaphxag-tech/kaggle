@@ -42,12 +42,15 @@ jobs:
           python -m unittest -v research.semrepair.test_deployment_validity_shield
           python - <<'PY'
           import json
-          from research.semrepair.deployment_validity_shield import nonlinear_probe_challenge
-          result=nonlinear_probe_challenge()
+          from research.semrepair.deployment_validity_shield import nonlinear_probe_challenge, matched_seven_probe_baseline_challenge, cross_axis_equal_cost_falsification
+          result={'coordinate_cubic':nonlinear_probe_challenge(),
+                  'matched_readout_budget':matched_seven_probe_baseline_challenge(),
+                  'cross_axis_falsification':cross_axis_equal_cost_falsification()}
           with open('nonlinear_validity_raw.json','w') as f:
               json.dump(result,f,indent=2,sort_keys=True)
-          print('three probe false accepts:',result['legacy_false_linear_acceptances'])
-          print('additional probe refusals:',result['extra_probe_detected_nonlinear'])
+          print('coordinate cubic:',result['coordinate_cubic']['legacy_false_linear_acceptances'],result['coordinate_cubic']['extra_probe_detected_nonlinear'])
+          print('same budget:',result['matched_readout_budget']['detection_counts'])
+          print('cross axis:',result['cross_axis_falsification']['detection_counts'])
           PY
       - name: Verify raw denominator and report compact actual outcomes
         run: |
