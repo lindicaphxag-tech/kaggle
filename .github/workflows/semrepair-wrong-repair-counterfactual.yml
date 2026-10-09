@@ -1,0 +1,42 @@
+name: SemRepair physical wrong-interface counterfactual
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/mujoco_wrong_repair_counterfactual.py'
+      - 'research/semrepair/test_mujoco_wrong_repair_counterfactual.py'
+      - '.github/workflows/semrepair-wrong-repair-counterfactual.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-mujoco-physics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install mujoco==3.3.7
+      - name: Physically replay 24 predeclared excitation sequences and counterfactual repair identities
+        run: python -m research.semrepair.mujoco_wrong_repair_counterfactual --out evidence/semrepair_wrong_interface_physics.json
+      - name: Verify original physics evidence identity and that failure cases remain represented
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('evidence/semrepair_wrong_interface_physics.json')
+          r=json.loads(p.read_text())
+          assert r['paired_fault_sequence_cells']==72
+          assert len(r['results'])==72
+          assert r['unauthorized_patches_with_matching_nominal_trajectory']==72
+          assert r['max_wrong_interface_repair_error']<2e-8
+          assert r['min_original_fault_error']>1e-4
+          print('Independent signed paired-cell check: PASS')
+          PY
+      - name: Immutable report checksum (copy into paper evidence ledger)
+        run: sha256sum evidence/semrepair_wrong_interface_physics.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: semrepair-native-wrong-interface-physics
+          path: evidence/semrepair_wrong_interface_physics.json
+          retention-days: 30
