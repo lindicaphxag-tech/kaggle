@@ -238,7 +238,7 @@ def run_cross_controller_benchmark()->dict:
         "diagnosis":diagnostic_rows,"summary":stats,"raw":records,
         "limitation":"both controllers authored in this project, one physical articulated robot model, "
                      "same predeclared transformation family and honest low-amplitude taps; "
-                     "no pretrained VLA, independent manufacturer, or real patch execution"}
+                     "no pretrained VLA, independent manufacturer, or real patch execution"
     }
 
 
