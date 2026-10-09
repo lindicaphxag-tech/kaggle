@@ -150,3 +150,95 @@ def exact_binary_flip_assay() -> dict:
             "unsafe_1_channel_guess": naive, "selective_2_channel": two,
             "design": minimum,
             "limitation": "finite digital fixture only; not real authenticated issuers or robot task success"}
+
+
+def _failure_domains(channels: Sequence[Channel], domain_by_channel: Mapping[str, str]) -> dict[str, tuple[Channel, ...]]:
+    """All readings from the same issuer root count as ONE corruptible unit."""
+    if set(domain_by_channel) != {c.name for c in channels}:
+        raise ValueError("every selected channel requires an explicit failure domain")
+    groups: dict[str, list[Channel]] = {}
+    for c in channels:
+        domain = domain_by_channel[c.name]
+        if not isinstance(domain, str) or not domain:
+            raise ValueError("empty or invalid failure-domain identity")
+        groups.setdefault(domain, []).append(c)
+    return {key: tuple(value) for key, value in groups.items()}
+
+
+def group_authority_distance(
+    authority: Mapping[str, str], channels: Sequence[Channel],
+    domain_by_channel: Mapping[str, str],
+) -> dict[tuple[str, str], int]:
+    """Count distinct differing issuer roots instead of number of digest strings."""
+    groups = _failure_domains(channels, domain_by_channel)
+    worlds = tuple(sorted(authority))
+    return {(a, b): sum(
+        any(c.signatures[a] != c.signatures[b] for c in members)
+        for members in groups.values())
+        for a, b in combinations(worlds, 2) if authority[a] != authority[b]}
+
+
+def exact_group_robust_channel_design(
+    *, authority: Mapping[str, str], channels: Sequence[Channel],
+    domain_by_channel: Mapping[str, str], corruption_budget: int,
+) -> dict:
+    """Minimize exact cost under up to f compromised independent issuer roots.
+
+    Distinct strings do not establish trust-root independence; the caller must
+    verify issuer identity separately from this finite mathematical model.
+    """
+    _validate(authority, channels, corruption_budget)
+    _failure_domains(channels, domain_by_channel)
+    eligible = tuple(sorted((c for c in channels if c.eligible), key=lambda c: c.name))
+    assignments = {c.name: domain_by_channel[c.name] for c in eligible}
+    threshold = 2 * corruption_budget + 1
+    full = group_authority_distance(authority, eligible, assignments)
+    impossible = [list(pair) for pair, d in full.items() if d < threshold]
+    if impossible:
+        return {"feasible": False, "corruption_budget": corruption_budget,
+                "required_independent_groups": threshold,
+                "unresolvable_pairs": impossible,
+                "reason": "shared issuer roots provide insufficient independent repair evidence"}
+    best = None
+    for count in range(len(eligible) + 1):
+        for subset in combinations(eligible, count):
+            labels = {c.name: assignments[c.name] for c in subset}
+            d = group_authority_distance(authority, subset, labels)
+            if any(x < threshold for x in d.values()):
+                continue
+            candidate = (sum((c.cost for c in subset), Fraction(0)),
+                         len(subset), tuple(c.name for c in subset), subset, d, labels)
+            if best is None or candidate[:3] < best[:3]:
+                best = candidate
+    assert best is not None
+    return {"feasible": True, "selected_channels": list(best[2]),
+            "selected_failure_domains": sorted(set(best[5].values())),
+            "cost_exact": str(best[0]), "corruption_budget": corruption_budget,
+            "minimum_cross_authority_group_distance": min(best[4].values()) if best[4] else None,
+            "claim_scope": "explicit independent issuer-group corruption model only"}
+
+
+def group_selective_authorize(
+    *, observed: Mapping[str, Hashable], authority: Mapping[str, str],
+    channels: Sequence[Channel], domain_by_channel: Mapping[str, str],
+    corruption_budget: int,
+) -> dict:
+    """Only authorize when every <=f mismatched failure-domain hypothesis agrees."""
+    _validate(authority, channels, corruption_budget)
+    if any(not c.eligible for c in channels):
+        raise ValueError("ineligible evidence channel selected")
+    groups = _failure_domains(channels, domain_by_channel)
+    if set(observed) != {c.name for c in channels}:
+        raise ValueError("observation and selected channel names differ")
+    compatible = sorted(w for w in authority if sum(
+        any(observed[c.name] != c.signatures[w] for c in members)
+        for members in groups.values()) <= corruption_budget)
+    repair_classes = sorted({authority[w] for w in compatible})
+    if len(repair_classes) != 1:
+        decision = "REFUSE_AMBIGUOUS_AUTHORITY" if compatible else "REFUSE_OUTSIDE_ASSUMPTIONS"
+        repair = None
+    else:
+        decision, repair = "AUTHORIZE", repair_classes[0]
+    return {"decision": decision, "repair": repair,
+            "compatible_worlds": compatible,
+            "assumed_corruptible_failure_domains": corruption_budget}
