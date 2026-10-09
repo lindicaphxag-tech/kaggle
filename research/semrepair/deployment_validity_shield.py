@@ -229,3 +229,44 @@ def nonlinear_probe_challenge() -> dict:
             "rows":comparisons,"nominal_probe_count":3,"extended_probe_count":7,
             "claim_scope":"adversarially selected cubic polynomial roots deliberately pass the old taps; "
                           "greater probe cost, bounded crafted family, no independent generalization or true source authentication"}
+
+
+def finite_probe_interpolation_counterexample(
+    probe_inputs: Sequence[Vec], *, evaluation: Vec=(2.,.4),
+    coefficient: float=.1,
+) -> dict:
+    """Construct a nonlinear interface *identical* at EVERY selected probe.
+
+    For any finite set of commands, let roots be its unique x coordinates and
+    perturb producer x by coefficient * product(x-root). This polynomial is zero
+    at every observed input. Off-support divergence requires an evaluation x
+    coordinate absent from those roots. Therefore finite taps alone can NEVER
+    prove an arbitrary nonlinear ABI globally correct. Elementary polynomial
+    interpolation, not a new theorem.
+    """
+    if not probe_inputs or not isfinite(coefficient) or coefficient==0 or \
+       any(len(u)!=2 or not all(isfinite(z) for z in u) for u in probe_inputs):
+        raise ValueError("invalid finite nonempty probe list")
+    if len(evaluation)!=2 or not all(isfinite(z) for z in evaluation):
+        raise ValueError("invalid held-out command")
+    roots=sorted({u[0] for u in probe_inputs})
+    if evaluation[0] in roots:
+        raise ValueError("evaluation x coordinate must be unqueried")
+    def phi(u:Vec)->Vec:
+        product=coefficient
+        for root in roots:
+            product*=u[0]-root
+        return (u[0]+product,u[1])
+    max_training=max(max_diff(phi(u),u) for u in probe_inputs)
+    difference=max_diff(phi(evaluation),evaluation)
+    if max_training>1e-10 or difference<=0:
+        raise AssertionError("constructive alias or divergence invalid")
+    return {
+        "distinct_x_roots":roots,"probed_commands":len(probe_inputs),
+        "maximum_training_discrepancy":max_training,
+        "unqueried_command":list(evaluation),
+        "unqueried_discrepancy":difference,
+        "lesson":"any fixed finite tap set may be fooled by an unconstrained nonlinear source",
+        "novel_mathematical_priority":False,
+        "claim_scope":"symbolic finite-probe impossibility under unconstrained function class",
+    }
