@@ -36,3 +36,9 @@ Existing genuine dynamics: the gear-fault and foreign-owned motor use exactly id
 - Measured wrong repairs, correct repairs, abstentions, end-effector/physical recovery AND task-level policy success reported separately.
 - Robust spoof/replay and compromised measurement-source controls; HMAC issuer trust boundaries cannot be hidden or counted as algorithmic superiority.
 - Frozen experiment protocol and independent execution. No model-family overlap or post-outcome world tuning. As of this note, NO paper submission, NO external review, NO hardware result.
+
+## Concrete handoff race hardening (executed regression, not robot patch deployment)
+
+The old `authorize_verified_files` API checked hashes by path, returned permission, and left downstream code free to reopen that pathname after it changed. The added `pinned_repair_payload.py` reads four **regular files through O_NOFOLLOW file descriptors**, checks size / modification metadata and exact SHA-256, then passes the **same immutable bytes** to a consumer callback. No file path is re-resolved by the bridge. An adversarial regression mutates the original patch filename after authorization but the callback still receives only the previously verified bytes; pre-read tampering and symlink substitution fail closed. This prevents one illustrative *within-process verifier-to-consumer* TOCTOU substitution, not patch installation, sandboxing or kernel-level enforcement.
+
+[Dedicated three-version CI #37993740648](https://github.com/lindicaphxag-tech/kaggle/actions/runs/37993740648) **passed**. The consumer, HMAC signer, operating system, and physical actuator remain separate trust assumptions. A truly compromised consumer can ignore the verified buffers or invoke another file, which this experiment does not prevent.
