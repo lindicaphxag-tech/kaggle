@@ -20,9 +20,9 @@ from .mujoco_wrong_repair_counterfactual import unauthorized_compensating_repair
 
 ACTUATOR_CONTROL_LIMIT = 10.0
 LOW_COMMANDS = (0.2, -0.7, 0.1, 0.75, -0.25, 0.0)
-HIGH_COMMANDS = (8.0, -8.0, 6.0, -6.0, 7.0, -7.0)
+HIGH_COMMANDS = (13.0, -13.0, 8.0, -8.0, 12.0, -12.0)
 STRESS_AMPLITUDES = (0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0,
-                     4.0, 5.0, 6.0, 7.0, 8.0, 9.0)
+                     4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 11.0, 13.0, 15.0)
 ERROR_MATCH_TOL = 2e-8
 ERROR_DIVERGE_TOL = 1e-5
 
