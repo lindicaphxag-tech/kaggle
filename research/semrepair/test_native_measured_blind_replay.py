@@ -9,6 +9,7 @@ class Tests(unittest.TestCase):
         r=study()
         self.assertEqual(r["measured_world_excitation_cells"], 12)
         self.assertEqual(r["full_tap"]["authorized"],12)
+        self.assertEqual(r["average_measured_probe_cost"], "4")
         self.assertEqual(r["full_tap"]["wrong_authorizations"],0)
         self.assertLess(r["external_only"]["authorized"],12)
         self.assertLess(r["risk_without_force_tap"]["authorized"],12)
