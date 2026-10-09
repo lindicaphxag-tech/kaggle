@@ -1,0 +1,13 @@
+{
+  "case_id": "ros-controls/ros2_control#3676",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-10-09T15:32:50Z",
+  "expiry_sha256": "e8b1ed2db1183a8303c9477f88ecb9455c998ba301dc4aff5e39754241291aaf",
+  "first_frozen_at": "2026-10-09T08:00:16Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-10-09T14:00:16Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "c628e4f781525762a860ffa75645b99544734a9bfcc6a827f63e141488bd485c"
+}
