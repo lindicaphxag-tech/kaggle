@@ -37,8 +37,8 @@ SEED=20261010
 N_TARGETS=16
 CASES=(
     # A single incorrect software boundary should be repaired at that owner.
-    ("producer-swap-only", SWAP, IDENTITY, "producer"),
-    ("controller-sign-only", IDENTITY, NEGATE, "controller"),
+    ("producer-swap-only", SWAP, IDENTITY, "producer-only"),
+    ("controller-sign-only", IDENTITY, NEGATE, "controller-only"),
     # Each pair composes to physical identity and is *not* safe to half-fix.
     ("compensated-swap", SWAP, SWAP, "atomic"),
     ("compensated-rotation", ROT_POS, ROT_NEG, "atomic"),
