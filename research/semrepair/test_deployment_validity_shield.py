@@ -7,6 +7,7 @@ from research.semrepair.deployment_validity_shield import (
     validate_numeric_model, requested_patch_if_finite_compatible,
     cartesian_cover_radius, conditional_lipschitz_envelope,
     nonlinear_probe_challenge, cubic_ambush,
+    finite_probe_interpolation_counterexample,
 )
 
 
@@ -79,6 +80,18 @@ class DeploymentValidityTests(unittest.TestCase):
                     externally_verified_lipschitz=2.,tolerance=.1)
         self.assertFalse(refuses["certified"])
         self.assertAlmostEqual(refuses["upper_residual"],1.)
+
+    def test_even_all_seven_probes_cannot_globally_certify_arbitrary_nonlinearity(self):
+        inputs=(PROBE_E1,PROBE_E2,CHECK)+EXTENDED_PROBES
+        witness=finite_probe_interpolation_counterexample(inputs,evaluation=(2.,.4))
+        self.assertEqual(witness["probed_commands"],7)
+        self.assertEqual(witness["maximum_training_discrepancy"],0.)
+        self.assertGreater(witness["unqueried_discrepancy"],1.)
+        self.assertFalse(witness["novel_mathematical_priority"])
+
+    def test_interpolation_witness_rejects_queried_location(self):
+        with self.assertRaises(ValueError):
+            finite_probe_interpolation_counterexample([PROBE_E1],evaluation=PROBE_E1)
 
     def test_linear_classifier_also_requires_predeclared_fault_model(self):
         t=[nominal_probe(I,I,u) for u in (PROBE_E1,PROBE_E2)]
