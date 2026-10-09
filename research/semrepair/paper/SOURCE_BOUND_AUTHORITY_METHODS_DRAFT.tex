@@ -1,0 +1,89 @@
+% Standalone scientific methods fragment, NOT a submitted or accepted paper.
+% The weighted conflict-edge cover is classical decision-region active learning,
+% not claimed as a newly invented combinatorial problem.
+\section{Source-Conditioned Authority Identification}\label{sec:authority}
+
+\paragraph{A repair label is not a physical state label.}
+Let $\mathcal H$ be a finite set of source-implementation/physical-world
+hypotheses, $O:\mathcal H\to\mathcal O$ the entire available sensor
+transcript (possibly including adaptively selected probes), and
+$A:\mathcal H\to\mathcal R$ the \emph{permitted concrete repair interface}.
+Two worlds may have the same physical response yet require different
+software ownership or dependency repairs. A policy
+$\pi:\mathcal O\to\mathcal R\cup\{\bot\}$ either proposes a repair or refuses,
+where $\bot$ explicitly denotes abstention.
+
+\paragraph{Proposition 1 (observation-only authority impossibility).}
+There exists an observation-only, always-authorizing rule that is correct
+on every $h\in\mathcal H$ if and only if
+\begin{equation}
+\label{eq:decision-fiber}
+\forall h,h'\in\mathcal H,\quad
+O(h)=O(h')\implies A(h)=A(h').
+\end{equation}
+\emph{Proof.} If (\ref{eq:decision-fiber}) fails, a single observation
+must be assigned two different repairs, a contradiction. Conversely,
+if it holds, assign each nonempty observation fiber its unique repair.
+$\square$
+Consequently, a collision with two equally probable, different-authority
+worlds incurs at least 50\% wrong repairs under any \emph{non-abstaining}
+observation-only rule restricted to that collision. This is a finite-model
+decision ambiguity statement, not an empirical population-risk bound.
+
+\paragraph{Source-bound repair fields.}
+Assume external trustworthy fields $g_j(h)$ are available at declared
+costs $c_j\ge 0$ after source verification. For all sensor-aliased
+world pairs requiring different repairs, define the conflict graph
+\[
+E=\{(h,h'):O(h)=O(h'),\ A(h)\ne A(h')\}.
+\]
+A minimal static authority-separating evidence set solves
+\begin{align}
+\min_{z\in\{0,1\}^{m}}&\quad \sum_{j=1}^m c_jz_j,\\
+\textrm{s.t.}&\quad
+\sum_{j:g_j(h)\ne g_j(h')}z_j\ge 1
+\qquad \forall(h,h')\in E. \label{eq:provenance-cover}
+\end{align}
+Only \emph{verified} source fields may appear in the sum. The optimum
+can differ from that of the stronger \emph{full system identity}
+problem, obtained by requiring separation of all unequal world pairs
+rather than only conflicts in $E$. This is a weighted set-cover
+instance; active decision-region determination and diagnosis cost
+optimization were already studied by Javdani et al.\ (AISTATS 2014)
+and Cicalese et al.\ (ICML 2014). Our hypothesis is that
+\emph{source verification and physical repair-effect testing} together
+make this distinction operational in open-world robot control.
+
+\paragraph{What the completed native MuJoCo experiment establishes.}
+The frozen three-waveform, four-known-plus-four-unknown model has 24
+dependent world-waveform conditions. The sensor-only closed-catalog
+policy authorizes 15, 3 of which use the wrong source-bound repair,
+and refuses 9. Requiring a \emph{hypothetically trustworthy} source
+manifest authorizes 12 correctly and refuses 12, avoiding all three
+observed wrong-authority decisions \emph{at a lower authorized
+coverage}. A separate three-hypothesis illustrative source-version
+case has optimal static authority-separating evidence cost 1 and
+full-version identity cost 2 in \emph{hand-specified relative units}.
+The continuous physical trajectories were genuinely stepped by
+MuJoCo; the source IDs, repair rules, probe menus and costs were
+constructed by the authors.
+
+\paragraph{Nonnegotiable limitations and falsification.}
+Equations~(\ref{eq:decision-fiber})--(\ref{eq:provenance-cover}) do
+not solve unknown-source software attestation. If a foreign device
+can impersonate a trusted issuer or the measurement agent is
+compromised, the supposed verified fields provide no protection.
+HMAC challenge-response tests are only controlled threat-model
+checks with test fixture secrets, not secure boot or hardware
+attestation. This finite test is not independent real-robot transfer,
+not an improvement over the exact optimal classical active-diagnosis
+expected probe cost (both cost 4 under the original frozen panel),
+and not proof of task-level success or statistical safety.
+The decisive experiment is a second independently implemented
+controller family with externally frozen repair effects, probe
+authorization contracts, source attestations, known/unknown
+case splits and equal-budget decision-region baselines.
+
+% Independent primary evidence:
+% https://github.com/lindicaphxag-tech/kaggle/actions/runs/37993090103
+% https://github.com/lindicaphxag-tech/kaggle/actions/runs/37994865005
