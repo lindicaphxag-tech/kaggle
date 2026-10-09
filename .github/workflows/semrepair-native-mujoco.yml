@@ -41,5 +41,14 @@ jobs:
           name: measured-authority-python-${{ matrix.python }}
           path: measured_authority_result.json
           retention-days: 30
+      - name: Attacked actuator-force observation, incorrect repair witness and fail-closed policy
+        run: |
+          python -m unittest -v research.semrepair.test_native_tap_integrity_attack
+          python -m research.semrepair.native_tap_integrity_attack | tee tap_integrity_attack.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tap-integrity-counterexample-python-${{ matrix.python }}
+          path: tap_integrity_attack.json
+          retention-days: 45
       - name: Independent exact-rational oracle
         run: python research/semrepair/independent_oracle.py
