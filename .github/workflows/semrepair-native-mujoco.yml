@@ -50,5 +50,14 @@ jobs:
           name: tap-integrity-counterexample-python-${{ matrix.python }}
           path: tap_integrity_attack.json
           retention-days: 45
+      - name: Open-catalog source-semantic impossibility with real unseen MuJoCo servos
+        run: |
+          python -m unittest -v research.semrepair.test_open_catalog_source_gap
+          python -m research.semrepair.open_catalog_source_gap | tee open_catalog_source_gap.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: open-catalog-native-mujoco-python-${{ matrix.python }}
+          path: open_catalog_source_gap.json
+          retention-days: 60
       - name: Independent exact-rational oracle
         run: python research/semrepair/independent_oracle.py
