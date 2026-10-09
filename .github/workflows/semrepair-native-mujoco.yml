@@ -35,7 +35,7 @@ jobs:
       - name: Held-excitation MuJoCo physical blind-authority comparison
         run: |
           python -m unittest -v research.semrepair.test_native_measured_blind_replay
-          python -m research.semrepair.native_measured_blind_replay > measured_authority_result.json
+          python -m research.semrepair.native_measured_blind_replay | tee measured_authority_result.json
       - uses: actions/upload-artifact@v4
         with:
           name: measured-authority-python-${{ matrix.python }}
