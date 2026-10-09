@@ -77,5 +77,14 @@ jobs:
           name: minimum-provenance-native-mujoco-python-${{ matrix.python }}
           path: minimum_provenance_certificate.json
           retention-days: 60
+      - name: Account for wrong repairs, refusals and coverage in 24 native MuJoCo conditions
+        run: |
+          python -m unittest -v research.semrepair.test_open_catalog_risk_coverage
+          python -m research.semrepair.open_catalog_risk_coverage | tee open_catalog_selective_risk_result.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: open-catalog-selective-risk-python-${{ matrix.python }}
+          path: open_catalog_selective_risk_result.json
+          retention-days: 60
       - name: Independent exact-rational oracle
         run: python research/semrepair/independent_oracle.py
