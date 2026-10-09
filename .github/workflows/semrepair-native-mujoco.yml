@@ -86,6 +86,8 @@ jobs:
           name: open-catalog-selective-risk-python-${{ matrix.python }}
           path: open_catalog_selective_risk_result.json
           retention-days: 60
+      - name: Exact physical actuator envelope with source-bound repair admissibility
+        run: python -m unittest -v research.semrepair.test_physical_repair_envelope
       - name: High-amplitude actuator saturation transfer falsification
         run: |
           python -m unittest -v research.semrepair.test_saturation_transfer_challenge
