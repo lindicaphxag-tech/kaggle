@@ -615,6 +615,17 @@
       "source": "inbox/FIRST_SEEN_20261009T012613Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "41273d49242ca6188cd38ccd1d39bcd5cf4fa5dbe356c0c2e8acebbca98ca182"
+    },
+    {
+      "created_at": "2026-10-09T01:47:21Z",
+      "first_frozen_at": "2026-10-09T02:04:13Z",
+      "id": "ARISE-Initiative/robosuite#835",
+      "issue_number": 835,
+      "prediction_deadline_at": "2026-10-09T08:04:13Z",
+      "repository": "ARISE-Initiative/robosuite",
+      "source": "inbox/FIRST_SEEN_20261009T020413Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "912f79563cb87218daeb0f224678d51c9de21f9c1e677c8a2430f8b76a115bec"
     }
   ]
 }

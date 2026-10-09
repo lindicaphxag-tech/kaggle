@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "cling0809",
+      "body": "### System info\n\n- robosuite 1.5.2 (also checked current `master` \u2014 same behavior), mujoco 3.9.0, Python 3.12.3, Ubuntu (headless container; no renderers used).\n\n### Summary\n\nWhen an environment is constructed **without** `seed=` (a plain `robosuite.make(...)` call), objects configured with a size range sample their size **at construction time** from a **fresh, unseeded** generator (`np.random.default_rng()`) \u2014 not from the global numpy RNG, and not from anything the user can seed afterwards. Each OS process therefore gets a *different* object: for Lift, a cube with a different size (and a different mass, since density is fixed).\n\nEffect: two processes running the identical script and config produce **different simulations**, even with `np.random.seed(...)`, `torch.manual_seed(...)`, `env.reset(seed=...)`, `PYTHONHASHSEED`, and single-threaded BLAS/MuJoCo all fixed. The simulation is bit-exact **within** a process but drifts between processes at the ~1e-3 level \u2014 which looks like solver/threading nondeterminism and is very hard to attribute without diffing `sim.model` arrays field by field.\n\n### Root cause\n\n- `robosuite/environments/manipulation/lift.py:311` \u2014 the cube is created with `rng=self.rng` and `size_min=[0.020]*3, size_max=[0.022]*3` (same pattern for the placement sampler at `:335`).\n- `robosuite/environments/base.py:141` \u2014 `self.rng = np.random.default_rng(seed)`, with `seed=None` unless the caller passes `seed=` to `make()`.\n- `models/objects/primitive/box.py:32` \u2192 `utils/mjcf_utils.py:470` `get_size(...)`: falls back to a **fresh** `np.random.default_rng()` when `rng` is `None`.\n- Same in-tree pattern (same class of issue): `Stack` (two cubes, `stack.py:359,366`), `TwoArmPegInHole` (`two_arm_peg_in_hole.py:350`).\n\n### Reproduction\n\nTwo separate processes, identical script:\n\n```python\nimport numpy as np\nnp.random.seed(123)          # also try torch.manual_seed / env.reset(seed=...) \u2014 none of them cover this draw\nimport robosuite, mujoco\nenv = robosuite.make(\"Lift\", robots=\"Panda\", has_renderer=False,\n                     has_offscreen_renderer=False, use_camera_obs=False,\n                     control_freq=20, horizon=150)\nm = env.sim.model._model\nfor i in range(m.ngeom):\n    n = mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_GEOM, i) or \"\"\n    if n.startswith(\"cube_g0\"):\n        print(n, m.geom_size[i])\n```\n\nObserved (two runs, with the global numpy seed fixed at 123):\n\n```\ncube_g0 [0.021037761108306515 0.021220020200137853 0.021819641399582198]\ncube_g0 [0.0214688297753391  0.02042359064166031  0.021438564895849391]\n```\n\nA full `sim.model` diff confirms this is the only cross-process difference: aside from `cube_main`'s mass and the two cube geoms' sizes, all other model arrays (26 bodies / 90 geoms) are bit-identical across processes.\n\n### Expected behavior\n\nEither (a) object-size draws follow the controllable seeding contract (e.g. the global numpy seed, as the guidance in #347 / #600 implies), or (b) the docs clearly state that `seed=` must be passed to the environment constructor for reproducible object sizes, and that global seeds do **not** control this draw.\n\n### Suggested fix\n\n`robosuite.make(..., seed=0)` does fix it \u2014 we verified that 4 independent processes then produce bit-identical per-episode metrics for a full evaluation protocol. Ideally the construction-time size draws would route through a controllable seed (or be sampled lazily at reset from the reset RNG); at minimum this deserves a note in the `make()` docstring / reproducibility docs.\n\n(Found while debugging cross-run reproducibility of a robosuite-based evaluation pipeline. Happy to provide the full diagnostic scripts or open a PR if useful.)\n",
+      "created_at": "2026-10-09T01:47:21Z",
+      "html_url": "https://github.com/ARISE-Initiative/robosuite/issues/835",
+      "id": "ARISE-Initiative/robosuite#835",
+      "issue_number": 835,
+      "labels": [],
+      "repository": "ARISE-Initiative/robosuite",
+      "surface_sha256": "912f79563cb87218daeb0f224678d51c9de21f9c1e677c8a2430f8b76a115bec",
+      "title": "Non-reproducible across processes: object sizes sampled from unseeded RNG at env construction (Lift cube; Stack; TwoArmPegInHole)"
+    }
+  ],
+  "post_activation_issue_identities_observed": 42,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-09T02:04:13Z",
+  "schema_version": 1
+}
