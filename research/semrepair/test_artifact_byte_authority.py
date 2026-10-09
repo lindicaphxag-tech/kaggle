@@ -54,5 +54,27 @@ class Tests(unittest.TestCase):
         self.assertFalse(out["accepted"])
 
 
+    def test_symlink_with_correct_expected_bytes_refused(self):
+        real = self.files.patch.with_name("real-patch.txt")
+        real.write_bytes(self.files.patch.read_bytes())
+        self.files.patch.unlink()
+        self.files.patch.symlink_to(real)
+        report = attest_current_artifacts(self.auth, self.files)
+        self.assertFalse(report["valid"])
+        self.assertTrue(any("patch_sha256:unreadable_symlink" in x
+                            for x in report["failures"]))
+
+    def test_named_pipe_refused_without_blocking(self):
+        import os
+        if not hasattr(os, "mkfifo"):
+            self.skipTest("POSIX-only regular-file safety check")
+        self.files.evidence.unlink()
+        os.mkfifo(self.files.evidence)
+        report = attest_current_artifacts(self.auth, self.files)
+        self.assertFalse(report["valid"])
+        self.assertTrue(any("evidence_sha256:unreadable_symlink" in x
+                            for x in report["failures"]))
+
+
 if __name__ == "__main__":
     unittest.main()
