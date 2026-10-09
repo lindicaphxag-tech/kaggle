@@ -119,7 +119,7 @@ def run_clipped_task_assay()->dict:
         "summary":summary,"rows":rows,
         "limitation":"one manually specified articulated arm with two manually written controllers; "
                      "source repair is a simulator mapping swap and oracle blackbox is per-step torque-optimal, "
-                     "not globally optimal for terminal reach success"}
+                     "not globally optimal for terminal reach success"
     }
 
 
