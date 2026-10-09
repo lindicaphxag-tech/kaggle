@@ -9,6 +9,7 @@ from research.semrepair.deployment_validity_shield import (
     nonlinear_probe_challenge, cubic_ambush,
     finite_probe_interpolation_counterexample, bounded_noise_patch_contract,
     matched_seven_probe_baseline_challenge,
+    cross_axis_equal_cost_falsification,
 )
 
 
@@ -151,6 +152,15 @@ class DeploymentValidityTests(unittest.TestCase):
         self.assertEqual(r["detection_counts"]["generic_7"],12)
         self.assertEqual(r["probe_budgets"]["extremal_7"],
                          r["probe_budgets"]["generic_7"])
+
+    def test_cross_axis_fault_defeats_axis_only_probe_expansion(self):
+        r=cross_axis_equal_cost_falsification()
+        self.assertEqual(r["constructed_conditions"],6)
+        self.assertEqual(r["detection_counts"]["three"],0)
+        self.assertEqual(r["detection_counts"]["axial_seven"],0)
+        self.assertEqual(r["detection_counts"]["generic_seven"],6)
+        self.assertEqual(r["detection_counts"]["corner_seven"],6)
+        self.assertEqual(r["costs"]["corner_seven"],r["costs"]["generic_seven"])
 
     def test_linear_classifier_also_requires_predeclared_fault_model(self):
         t=[nominal_probe(I,I,u) for u in (PROBE_E1,PROBE_E2)]
