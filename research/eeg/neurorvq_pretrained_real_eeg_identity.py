@@ -53,8 +53,8 @@ def extract_real_windows(cache):
     events,_=mne.events_from_annotations(raw,event_id={"T1":1,"T2":2},verbose=False)
     ep=mne.Epochs(raw,events,event_id={"T1":1,"T2":2},tmin=0.0,tmax=2.995,
                   baseline=None,preload=True,verbose=False)
-    x=ep.get_data(units="uV")[:24].astype("float32")
-    if x.shape != (24,4,600):
+    x=ep.get_data(units="uV").astype("float32")
+    if x.ndim!=3 or x.shape[0]<6 or x.shape[1:] != (4,600):
         raise RuntimeError(f"Bad raw EEG window geometry {x.shape}")
     x=np.clip(x,-500,500)
     if not np.isfinite(x).all():
