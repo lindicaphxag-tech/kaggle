@@ -11,6 +11,7 @@ from json import loads,dumps
 from math import isfinite
 from pathlib import Path
 from statistics import mean
+from random import Random
 
 HASHES=(
     "3e9c5fff2928543cb3ce04d4c951327bb1447ed626a45625fcf085cc18feba81",
@@ -22,6 +23,37 @@ FROZEN=("dataset_revision","source_train_checkpoint_git_blob",
         "reliability_gate_frozen_thresholds","roi_edge",
         "roi_offsets_axis0","image_normalization")
 
+
+
+def stratified_patient_bootstrap(
+    cohort_deltas: tuple[tuple[float,...],tuple[float,...]], *,
+    repetitions: int=10000, seed: int=20261010
+) -> dict:
+    """Exploratory percentile CI; resample PATIENTS within original cohorts.
+
+    Both cohorts share site/checkpoint and were selected by the same authors:
+    this is not an external clinical confirmation interval.
+    """
+    if repetitions<1000 or any(len(g)!=6 for g in cohort_deltas):
+        raise ValueError("two exactly-six-patient cohorts required")
+    if any(not isfinite(v) for group in cohort_deltas for v in group):
+        raise ValueError("invalid patient effect")
+    rnd=Random(seed)
+    measurements=[]
+    for _ in range(repetitions):
+        two_means=[]
+        for group in cohort_deltas:
+            two_means.append(sum(group[rnd.randrange(6)] for _ in range(6))/6)
+        measurements.append(sum(two_means)/2)
+    measurements.sort()
+    lo=measurements[int(.025*repetitions)]
+    hi=measurements[int(.975*repetitions)-1]
+    return {
+        "descriptive_95_percentile_patient_bootstrap":[lo,hi],
+        "resampling_unit":"source patient within each 6-patient batch",
+        "seed":seed,"replicates":repetitions,
+        "caveat":"one dataset/checkpoint; authors selected both cohorts; exploratory, not confidence guarantee for new sites",
+    }
 
 def audit_artifacts(paths: tuple[Path,Path]) -> dict:
     documents=[]
@@ -85,6 +117,8 @@ def audit_artifacts(paths: tuple[Path,Path]) -> dict:
         "correlated_roi_count":len(subjects)*3,
         "patient_mean_dice":{arm:mean(vals) for arm,vals in results.items()},
         "gate_minus_native_paired_patient_dice_mean":mean(deltas),
+        "exploratory_patient_stratified_ci":stratified_patient_bootstrap(
+            (tuple(deltas[:6]),tuple(deltas[6:]))),
         "gate_minus_native_paired_patient_hd95_mm_mean":mean(paired_hd),
         "patient_gate_better":sum(d>0 for d in deltas),
         "patient_gate_worse":sum(d<0 for d in deltas),
