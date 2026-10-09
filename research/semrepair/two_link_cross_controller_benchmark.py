@@ -54,6 +54,7 @@ CONTROLLERS=("joint-space-pd","cartesian-jacobian")
 def make_model():
     xml=f"""
     <mujoco model="semrepair-two-link-articulated">
+      <compiler angle="radian"/>
       <option timestep="{DT}" gravity="0 0 0" integrator="Euler"/>
       <worldbody>
         <body name="upper-arm" pos="0 0 0">
@@ -79,6 +80,12 @@ def make_model():
     </mujoco>"""
     model=mujoco.MjModel.from_xml_string(xml)
     assert model.nv==2 and model.nu==2
+    # MJCF defaults to angle=degree. The solver targets are in radians.
+    # Without this guard [-2.8,2.8] becomes merely +/-0.0489 rad,
+    # making a healthy controller fail due to hidden limit violation.
+    if not (model.jnt_range[0][0]<-2.5 and model.jnt_range[0][1]>2.5 and
+            model.jnt_range[1][0]<-2.4 and model.jnt_range[1][1]>2.4):
+        raise AssertionError("MuJoCo joint limit units must be radians")
     return model
 
 
