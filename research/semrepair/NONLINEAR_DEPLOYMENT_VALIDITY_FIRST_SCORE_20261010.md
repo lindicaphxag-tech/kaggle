@@ -32,3 +32,12 @@
 The general research challenge is **source-bound repair authority conditional on observation support, evidence integrity and true deploy-time action range**, not a new polynomial/linear algebra theorem. ICML 2026 Yan et al. VLA-FixBench (https://proceedings.mlr.press/v306/yan26r.html) evaluates 20 VLMs over faults and robot recovery in LIBERO and real platforms; our present hardware and pretrained-policy evidence remains weaker. The strongest next experiment must be freeze-then-test on an external policy/controller/plant with matched access, risk and probe budget, and report task success, unsafe acceptance, conservative refusals, and independent source-family uncertainty.
 
 **Current publication gate:** method correctness strengthened, key old interpretation falsified; RAS/RA-L/T-RO or CCF-level ready status NOT established.
+
+
+## Second falsification, recorded after the first 12 cases (not hidden test)
+
+The first extra four probes were axis-aligned and the same-budget generic comparator matched 12/12 on deliberately constructed single-axis cubic faults. A **new, separate cross-axis interaction** was then constructed: producer-x perturbation proportional to x*y*(x-0.31)*(y+0.27). It vanishes at the original training/holdout points AND at every extra axis-only probe, but differs at paired nonzero x/y inputs.
+
+In native MuJoCo, across **six dependent coefficients**, three historic probes detected 0/6; seven axis-aligned probes detected 0/6; the seven-probe fixed generic baseline detected 6/6; and a seven-probe diagonal corner layout detected 6/6. This is a demonstration that the first proposed probe selection was incomplete, **not** out-of-distribution manufacturer transfer or unique new active learning. The corner method is tied with generic at equal budget on this designed family. New public successful CI with **17 tests** and raw data: https://github.com/lindicaphxag-tech/kaggle/actions/runs/38003533144 .
+
+Hence combined constructed challenges include 12 axis-cubic and 6 cross-axis parameter conditions. They were authored sequentially as adversarial mechanisms and must not be pooled into a preregistered independent test set or turned into a 100% universal detection claim. A truly frozen external controller family and independent probe selection design remain mandatory.
