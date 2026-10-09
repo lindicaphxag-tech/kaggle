@@ -4,6 +4,8 @@ on:
     paths:
       - 'research/semrepair/blind_authority_runner.py'
       - 'research/semrepair/test_blind_authority_runner.py'
+      - 'research/semrepair/bound_repair_authority.py'
+      - 'research/semrepair/test_bound_repair_authority.py'
       - 'research/medical_geometry/patient_evidence_audit.py'
       - 'research/medical_geometry/test_patient_evidence_audit.py'
       - '.github/workflows/semrepair-clingeom-independent-gates.yml'
@@ -24,5 +26,7 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Hidden-world authority refusal tests
         run: python -m unittest discover -v -s research/semrepair -p test_blind_authority_runner.py
+      - name: Digest-bound repair authorization and refusal
+        run: python -m unittest discover -v -s research/semrepair -p test_bound_repair_authority.py
       - name: Patient-level medical geometry audit tests
         run: python -m unittest discover -v -s research/medical_geometry -p test_patient_evidence_audit.py
