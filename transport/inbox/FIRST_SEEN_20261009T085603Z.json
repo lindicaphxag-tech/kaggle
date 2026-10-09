@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "jkterry1",
+      "body": "Please cut a new release with Python 3.14 support",
+      "created_at": "2026-10-09T08:35:42Z",
+      "html_url": "https://github.com/Farama-Foundation/Gymnasium-Robotics/issues/345",
+      "id": "Farama-Foundation/Gymnasium-Robotics#345",
+      "issue_number": 345,
+      "labels": [],
+      "repository": "Farama-Foundation/Gymnasium-Robotics",
+      "surface_sha256": "4a366241e1ea2fa6178aea31e7bd6466df56de933f0a594cab36230ee9db9d1e",
+      "title": "New Release"
+    }
+  ],
+  "post_activation_issue_identities_observed": 49,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-09T08:56:03Z",
+  "schema_version": 1
+}

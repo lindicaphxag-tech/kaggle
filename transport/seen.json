@@ -630,13 +630,17 @@
     },
     {
       "created_at": "2026-10-09T01:47:21Z",
+      "expiry_recorded_at": "2026-10-09T08:54:43Z",
+      "expiry_sha256": "f2beb9596e9767774579b2af9431b66cf65493b0178fd85a0e616cf0fde610b0",
+      "expiry_source": "expirations/ARISE-Initiative__robosuite__835.json",
       "first_frozen_at": "2026-10-09T02:04:13Z",
       "id": "ARISE-Initiative/robosuite#835",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 835,
       "prediction_deadline_at": "2026-10-09T08:04:13Z",
       "repository": "ARISE-Initiative/robosuite",
       "source": "inbox/FIRST_SEEN_20261009T020413Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "912f79563cb87218daeb0f224678d51c9de21f9c1e677c8a2430f8b76a115bec"
     },
     {
@@ -704,6 +708,17 @@
       "source": "inbox/FIRST_SEEN_20261009T080016Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "57183e79df8ecca66cf8e41d6d4c8b870b6c91f523938839bded75d6c69a7a6f"
+    },
+    {
+      "created_at": "2026-10-09T08:35:42Z",
+      "first_frozen_at": "2026-10-09T08:56:03Z",
+      "id": "Farama-Foundation/Gymnasium-Robotics#345",
+      "issue_number": 345,
+      "prediction_deadline_at": "2026-10-09T14:56:03Z",
+      "repository": "Farama-Foundation/Gymnasium-Robotics",
+      "source": "inbox/FIRST_SEEN_20261009T085603Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "4a366241e1ea2fa6178aea31e7bd6466df56de933f0a594cab36230ee9db9d1e"
     }
   ]
 }
