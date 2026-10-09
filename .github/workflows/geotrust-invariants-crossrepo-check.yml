@@ -1,0 +1,42 @@
+name: Public external-runner GeoTrust and Invariants cross-check
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/geotrust-invariants-crossrepo-check.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check-public-research-source:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.10','3.12','3.13']
+    steps:
+      - name: Clone public research-head commit from separate repository
+        uses: actions/checkout@v4
+        with:
+          repository: lindicaphxag-tech/lindicaphxag-tech
+          ref: research/six-line-submission-gates-20261010
+          path: research_source
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install pytest
+      - name: Print exact tested public revision
+        run: git -C research_source rev-parse HEAD
+      - name: Independent-patient reliability lower/upper evidence tests
+        env:
+          PYTHONPATH: research_source
+        run: |
+          python -m pytest -q research_source/research/geotrust/test_selective_authority_v0_4.py
+          python -m pytest -q research_source/research/geotrust/test_paired_benefit_gate.py
+          python -m pytest -q research_source/research/geotrust/test_frozen_c0_confirmation.py
+      - name: Repo-macro budgeted witness scoring tests
+        env:
+          PYTHONPATH: research_source
+        run: |
+          python -m unittest -v research.semantic_invariants.test_reviewer_budget_score
+          python -m unittest -v research.semantic_invariants.test_causal_adjudication_gate
