@@ -68,5 +68,14 @@ jobs:
           name: source-bound-challenge-python-${{ matrix.python }}
           path: source_attested_tap_result.json
           retention-days: 60
+      - name: Minimum provenance evidence versus full model identity on measured MuJoCo aliases
+        run: |
+          python -m unittest -v research.semrepair.test_minimal_trusted_evidence
+          python -m research.semrepair.minimal_trusted_evidence | tee minimum_provenance_certificate.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: minimum-provenance-native-mujoco-python-${{ matrix.python }}
+          path: minimum_provenance_certificate.json
+          retention-days: 60
       - name: Independent exact-rational oracle
         run: python research/semrepair/independent_oracle.py
