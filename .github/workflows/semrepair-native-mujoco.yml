@@ -32,5 +32,14 @@ jobs:
         run: python -m pip install mujoco==3.3.7
       - name: Native physical worlds, tap synthesis and repair closure
         run: python research/semrepair/mujoco_native_authority.py
+      - name: Held-excitation MuJoCo physical blind-authority comparison
+        run: |
+          python -m unittest -v research.semrepair.test_native_measured_blind_replay
+          python -m research.semrepair.native_measured_blind_replay > measured_authority_result.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: measured-authority-python-${{ matrix.python }}
+          path: measured_authority_result.json
+          retention-days: 30
       - name: Independent exact-rational oracle
         run: python research/semrepair/independent_oracle.py
