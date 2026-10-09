@@ -129,7 +129,11 @@ def decide_from_sensor_traces(
             return {"answer":"REFUSE","reason":"source_not_in_catalog",
                     "taps":calls}
     for channel,_,_ in CHANNELS:
-        if len({authority[w] for w in hypotheses})==1:
+        # Early stop is conditionally optimal only under a *closed* catalog.
+        # With asserted source identity, still run the actual sensor residual
+        # checks: a correct software digest cannot exclude a changed physical
+        # actuator or a wrong control-coupling parameter.
+        if len({authority[w] for w in hypotheses})==1 and not enforce_source_provenance:
             break
         reference=signature(measured[channel])
         hypotheses={w for w in hypotheses
