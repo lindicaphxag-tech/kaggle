@@ -9,6 +9,8 @@ import json
 from dataclasses import asdict, dataclass
 from fractions import Fraction
 
+from .independent_oracle import Probe as ExactProbe, optimum as exact_uniform_prior_optimum
+
 from .mujoco_native_authority import (
     WORLDS, rollout, corrected, signature, max_error,
     MEASUREMENT_HALF_WIDTH, EFFECT_TOL,
@@ -101,12 +103,37 @@ def study():
             "max_probe_cost":str(max(Fraction(x.cost) for x in trials)),
         }
     stats = {name:summary(rows) for name,rows in variants.items()}
+    # Reviewer-critical matched strongest finite active-diagnosis comparator:
+    # build exact outcome partitions from ACTUAL MuJoCo measurements and solve
+    # the optimal uniform-prior expected-cost problem for each forcing regime.
+    # Equal performance is NOT an improvement over this oracle baseline.
+    exact_optima = []
+    for i, commands in enumerate(HELD_EXCITATIONS):
+        simulator_templates = {w.name:rollout(w,commands) for w in WORLDS}
+        library = tuple(ExactProbe(
+            channel, cost,
+            tuple((w.name,signature(simulator_templates[w.name][channel]))
+                  for w in WORLDS), risk,
+        ) for channel,cost,risk in CHANNELS)
+        cost = exact_uniform_prior_optimum(
+            tuple(w.name for w in WORLDS), library,
+            {w.name:w.authority for w in WORLDS},
+        )
+        measured = sum(
+            Fraction(x.cost) for x in variants["full_tap"] if x.wave==i
+        ) / len(WORLDS)
+        if cost is None or measured != cost:
+            raise AssertionError("measured probe cost exceeds or contradicts exact oracle")
+        exact_optima.append(str(cost))
     if stats["full_tap"]["authorized"]!=len(HELD_EXCITATIONS)*len(WORLDS):
         raise AssertionError("candidate signatures remain ambiguous")
     return {
         "protocol":"closed_world_native_mujoco_held_excitation_v1",
         "measured_world_excitation_cells":len(variants["full_tap"]),
         "full_tap":stats["full_tap"],
+        "matched_best_uniform_prior_expected_probe_cost_exact":exact_optima,
+        "average_measured_probe_cost":str(sum(Fraction(x.cost) for x in variants["full_tap"])/len(variants["full_tap"])),
+        "advantage_over_exact_active_diagnosis":False,
         "external_only":stats["external_only"],
         "risk_without_force_tap":stats["risk_without_force_tap"],
         "per_case":[asdict(x) for x in variants["full_tap"]],
