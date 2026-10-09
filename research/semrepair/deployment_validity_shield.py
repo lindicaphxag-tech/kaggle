@@ -365,3 +365,38 @@ def bounded_noise_patch_contract(
         "proof_scope":"deterministic coordinatewise tap noise and assumed globally linear ABI; "
                       "every admissible map agrees on the two observable tolerance decisions",
     }
+
+
+def matched_seven_probe_baseline_challenge() -> dict:
+    """Fair readout-count control: predeclared random-style vs extremal probes.
+
+    Same two fitting taps, same fixed old holdout and four extra actual native
+    simulator taps for BOTH methods. Their performance may tie. It is invalid
+    to call the seven-versus-three comparison an algorithmic gain at fixed cost.
+    """
+    RANDOM_FOUR: tuple[Vec,...] = (
+        (-.43,.78),(.81,-.91),(-1.03,.22),(.16,1.06),
+    )
+    n=0
+    counts={"extremal_7":0,"generic_7":0,"historical_3":0}
+    for axis in (0,1):
+        for strength in (.01,.025,.05,.1,.25,.5):
+            n+=1
+            fit=[nonlinear_tap(u,strength=strength,axis=axis)
+                 for u in (PROBE_E1,PROBE_E2)]
+            for name,extra in (("historical_3",()),("extremal_7",EXTENDED_PROBES),
+                               ("generic_7",RANDOM_FOUR)):
+                validation=[nonlinear_tap(u,strength=strength,axis=axis)
+                            for u in (CHECK,)+extra]
+                outcome=validate_numeric_model(fit,validation)
+                counts[name]+=outcome["decision"]=="REFUSE_LINEAR_MODEL_FALSIFIED"
+    assert counts["historical_3"]==0
+    return {
+        "constructed_nonlinear_parameter_cases":n,
+        "detection_counts":counts,
+        "probe_budgets":{"historical_3":3,"extremal_7":7,"generic_7":7},
+        "generic_probe_coordinates":[list(v) for v in RANDOM_FOUR],
+        "strong_baseline_scope":"same real MuJoCo numeric readouts, exactly same seven probes total",
+        "no_algorithmic_superiority_claim":"extremal against generic equal-budget comparator has to be tested, never assumed",
+        "no_independent_test_family":True,
+    }
