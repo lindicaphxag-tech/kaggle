@@ -38,6 +38,7 @@ Both corrections produce the **same nominal motion**, but only one has the decla
 ### Publication red flags
 
 - All 72 cells share **three** known parameterized worlds from **one** synthetic model family, which were designed to possess these scale symmetries. They are repeated excitations, not independent scientific replications of the central structural equivalence.
+- **Exact dependence found by auditing the raw JSON:** within each of the 24 command-sequence groups, all three fault worlds have *bitwise identical recorded original trajectory L-infinity errors*. Thus the table represents 24 numerically distinct excitation outcomes, each replicated over three semantically distinct but dynamically equivalent fault parameterizations. No model-level binomial inference from 72 should be reported.
 - Exact zero reflects the fixed algebraic compensation and the chosen trace measurement. It does not establish numerical equality for all robotics APIs or production controllers.
 - The experiment does **not** show correct source localization by a method with source hidden from the algorithm. The worlds' semantic labels are provided to the experiment harness.
 - The result does not demonstrate active probe efficiency, cross-framework repair acceptance, independently chosen counterexamples, clinical effectiveness, or new upstream maintainer adoption.
