@@ -23,6 +23,7 @@ CHANNELS=("C3","C4","Cz","F3")
 SOURCE_RUN=4
 MODEL_REPO="braindecode/neurorvq-eeg-pretrained"
 LIBRARY_SHA="a619f4b38333de6060811ffb8a5a4b1104551ff9"
+EXPECTED_PRETRAINED_SHA="1678a36cd1cdf6c81e097f4b635f87519c0ec366"
 
 
 def sha256(path):
@@ -52,8 +53,8 @@ def extract_real_windows(cache):
     events,_=mne.events_from_annotations(raw,event_id={"T1":1,"T2":2},verbose=False)
     ep=mne.Epochs(raw,events,event_id={"T1":1,"T2":2},tmin=0.0,tmax=2.995,
                   baseline=None,preload=True,verbose=False)
-    x=ep.get_data(units="uV")[:6].astype("float32")
-    if x.shape != (6,4,600):
+    x=ep.get_data(units="uV")[:24].astype("float32")
+    if x.shape != (24,4,600):
         raise RuntimeError(f"Bad raw EEG window geometry {x.shape}")
     x=np.clip(x,-500,500)
     if not np.isfinite(x).all():
@@ -70,6 +71,25 @@ def feature_array(model,signal):
     if not np.isfinite(out).all():
         raise ValueError("Invalid frozen encoder features")
     return out
+
+
+def token_array(model,signal):
+    """Frozen pretrained token sequence *before* the classifier head and fc_norm."""
+    with torch.inference_mode():
+        z=model._features(torch.from_numpy(np.array(signal,copy=True)))
+    out=z.detach().cpu().numpy()
+    if not np.isfinite(out).all():
+        raise ValueError("Invalid frozen token encoder output")
+    return out
+
+
+def align_channel_token_blocks(flattened,permutation,n_patches):
+    x=np.asarray(flattened,dtype=float)
+    p=np.asarray(permutation,dtype=int)
+    n=len(p)
+    if x.ndim!=2 or x.shape[1]%(n*n_patches) or sorted(p.tolist())!=list(range(n)):
+        raise ValueError("Channel-major token geometry or permutation invalid")
+    return x.reshape(len(x),n,n_patches,-1)[:,np.argsort(p),:,:].reshape(len(x),-1)
 
 
 def assess(ref,wrong,restored,eps=1e-5):
@@ -103,6 +123,8 @@ def main():
     from huggingface_hub import HfApi
     info=HfApi().model_info(MODEL_REPO)
     repo_revision=str(info.sha)
+    if repo_revision != EXPECTED_PRETRAINED_SHA:
+        raise ValueError("Pretrained checkpoint revision changed; fail closed before inference")
     torch.manual_seed(314159)
     model=NeuroRVQ.from_pretrained(
         MODEL_REPO,n_outputs=2,n_chans=4,n_times=600,sfreq=200,
@@ -115,6 +137,34 @@ def main():
     wrong=feature_array(model,x[:,permutation,:])
     restored=feature_array(model,x[:,permutation,:][:,np.argsort(permutation),:])
     result=assess(original,wrong,restored)
+
+    # Mechanism control: isolate pretrained *spatial slot misbinding* from
+    # trivial channel-major token order. The model and checkpoint are frozen.
+    original_token=token_array(model,x)
+    wrong_token=token_array(model,x[:,permutation,:])
+    old_ix=model.spatial_embedding_ix.detach().clone()
+    try:
+        with torch.no_grad():
+            model.spatial_embedding_ix.copy_(old_ix[permutation])
+        metadata_correct_token=token_array(model,x[:,permutation,:])
+    finally:
+        with torch.no_grad():
+            model.spatial_embedding_ix.copy_(old_ix)
+    wrong_aligned=align_channel_token_blocks(wrong_token,permutation,model.num_patches)
+    metadata_aligned=align_channel_token_blocks(metadata_correct_token,permutation,model.num_patches)
+    norm=np.maximum(np.linalg.norm(original_token,axis=1),1e-12)
+    semantic_drift=np.linalg.norm(wrong_aligned-original_token,axis=1)/norm
+    consistent_drift=np.linalg.norm(metadata_aligned-original_token,axis=1)/norm
+    result["slot_binding_control"]={
+        "preclassifier_token_dim":int(original_token.shape[1]),
+        "median_relative_drift_wrong_metadata":float(np.median(semantic_drift)),
+        "median_relative_drift_consistent_metadata":float(np.median(consistent_drift)),
+        "max_abs_error_consistent_metadata":float(np.max(np.abs(metadata_aligned-original_token))),
+        "wrong_vs_consistent_by_trial":[
+            {"wrong":float(w),"consistent":float(c)}
+            for w,c in zip(semantic_drift,consistent_drift)],
+        "interpretation":"Spatial-slot difference after canonical token reindexing, not downstream label accuracy",
+    }
     result.update({
         "raw_edf_sha256":edf_hash,
         "original_edf_name":Path(path).name,
@@ -123,6 +173,7 @@ def main():
         "channels":CHANNELS,
         "wrong_permutation":permutation.tolist(),
         "model":MODEL_REPO,
+        "electrode_binding_control":"wrong EEG order vs same-order corrected spatial metadata; token channel blocks normalized to original ordering",
         "hf_checkpoint_repo_revision":repo_revision,
         "library_source_revision":LIBRARY_SHA,
         "braindecode_version":getattr(braindecode,"__version__",None),
@@ -144,6 +195,8 @@ def main():
         "median_relative_drift":result["median_relative_drift"],
         "max_relative_drift":result["max_relative_drift"],
         "restored_max_abs_error":result["restored_max_abs_error"],
+        "token_wrong_metadata_median":result["slot_binding_control"]["median_relative_drift_wrong_metadata"],
+        "token_consistent_metadata_median":result["slot_binding_control"]["median_relative_drift_consistent_metadata"],
         "checkpoint_revision":repo_revision,
     }))
 
