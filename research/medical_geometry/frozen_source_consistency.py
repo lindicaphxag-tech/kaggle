@@ -26,7 +26,7 @@ def verify_frozen_negative_source(path: Path = FROZEN_REPORT) -> dict:
         raise AssertionError("original source no longer supports all-negative patient deltas")
     mean_delta = mean(values)
     a = re.search(r"\| \*\*Canonical-RAS unpermuted first-view.*?\| \*\*(0\.\d+)\*\*", text)
-    b = re.search(r"\| Label-free operator/view-risk gated probability fusion.*?\| (0\.\d+)", text)
+    b = re.search(r"\|\s*\*{0,2}Label-free operator/view-risk gated probability fusion.*?\|\s*\*{0,2}(0\.\d+)", text)
     if not a or not b:
         raise ValueError("strong original first-view comparison omitted")
     source_gap = float(b.group(1)) - float(a.group(1))
