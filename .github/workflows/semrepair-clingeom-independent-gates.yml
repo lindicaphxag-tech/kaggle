@@ -10,6 +10,8 @@ on:
       - 'research/semrepair/test_artifact_byte_authority.py'
       - 'research/semrepair/pinned_repair_payload.py'
       - 'research/semrepair/test_pinned_repair_payload.py'
+      - 'research/semrepair/tamper_resilient_authority.py'
+      - 'research/semrepair/test_tamper_resilient_authority.py'
       - 'research/semrepair/provenance_bound_authorizer.py'
       - 'research/semrepair/test_provenance_bound_authorizer.py'
       - 'research/semrepair/bound_repair_authority.py'
@@ -48,6 +50,8 @@ jobs:
         run: python -m unittest -v research.semrepair.test_provenance_bound_authorizer
       - name: Verify immutable snapshot handoff under path replacement attacks
         run: python -m unittest -v research.semrepair.test_pinned_repair_payload
+      - name: Exhaustive bounded-evidence substitution and selective repair-authority oracle
+        run: python -m unittest -v research.semrepair.test_tamper_resilient_authority
       - name: Patient-level medical geometry audit tests
         run: python -m unittest discover -v -s research/medical_geometry -p test_patient_evidence_audit.py
       - name: Validate original six-patient real MRI source report against signed table
