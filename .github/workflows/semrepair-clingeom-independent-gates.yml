@@ -10,6 +10,8 @@ on:
       - 'research/semrepair/test_bound_repair_authority.py'
       - 'research/medical_geometry/patient_evidence_audit.py'
       - 'research/medical_geometry/test_patient_evidence_audit.py'
+      - 'research/medical_geometry/paired_negative_analysis.py'
+      - 'research/medical_geometry/test_paired_negative_analysis.py'
       - '.github/workflows/semrepair-clingeom-independent-gates.yml'
   workflow_dispatch:
 permissions:
@@ -34,3 +36,5 @@ jobs:
         run: python -m unittest -v research.semrepair.test_adversarial_stopping_assay
       - name: Patient-level medical geometry audit tests
         run: python -m unittest discover -v -s research/medical_geometry -p test_patient_evidence_audit.py
+      - name: ClinGeom six-patient exploratory negative-result analysis
+        run: python -m unittest -v research.medical_geometry.test_paired_negative_analysis
