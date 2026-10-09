@@ -1,0 +1,40 @@
+name: SemRepair exact clipped-action reachable set with native articulated arm
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/internal_saturation_reachability.py'
+      - 'research/semrepair/test_internal_saturation_reachability.py'
+      - 'research/semrepair/two_link_cross_controller_benchmark.py'
+      - '.github/workflows/semrepair-saturation-reachability.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact-reachable-set:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install mujoco==3.3.7
+      - name: Physical joint impulse and omniscient best precompensation
+        run: |
+          python -m unittest -v research.semrepair.test_internal_saturation_reachability
+          python -m research.semrepair.internal_saturation_reachability > reachable_set_raw.json
+      - name: Publish original denominator and exact mismatch witness
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('reachable_set_raw.json'))
+          print('CASES',r['grid_conditions_not_independent'])
+          print('BLACKBOX IMPOSSIBLE',r['unreachable_target_count_even_for_omniscient_blackbox'])
+          print('MAX BLACKBOX FORCE GAP',r['max_omniscient_blackbox_torque_error'])
+          print('MAX BLACKBOX REAL MUJOCO JOINT RESPONSE GAP',r['max_blackbox_first_step_joint_velocity_gap'])
+          print('MAX CORRECT SOURCE REPAIR RESPONSE GAP',r['max_source_repair_joint_velocity_gap'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: semrepair-clipped-actuator-full-raw
+          path: reachable_set_raw.json
+          retention-days: 90
