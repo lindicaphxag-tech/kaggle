@@ -17,6 +17,10 @@ class CrossControllerBenchTests(unittest.TestCase):
         self.assertEqual(model.nq,2)
         self.assertEqual(model.nu,2)
         self.assertEqual(model.nv,2)
+        self.assertLess(model.jnt_range[0][0],-2.5)
+        self.assertGreater(model.jnt_range[0][1],2.5)
+        self.assertLess(model.jnt_range[1][0],-2.4)
+        self.assertGreater(model.jnt_range[1][1],2.4)
         self.assertEqual(mujoco.mj_id2name(model,mujoco.mjtObj.mjOBJ_JOINT,0),"shoulder")
         self.assertEqual(mujoco.mj_id2name(model,mujoco.mjtObj.mjOBJ_JOINT,1),"elbow")
 
