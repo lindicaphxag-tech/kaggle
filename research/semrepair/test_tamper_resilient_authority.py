@@ -6,6 +6,7 @@ from fractions import Fraction as F
 from research.semrepair.tamper_resilient_authority import (
     Channel, authority_distance, exact_robust_channel_design,
     selective_authorize, exact_binary_flip_assay,
+    exact_group_robust_channel_design, group_selective_authorize,
 )
 
 
@@ -92,6 +93,53 @@ class AuthorityByzantineEvidenceTests(unittest.TestCase):
         self.assertRaises(ValueError, exact_robust_channel_design,
                           authority=self.authority, channels=(Channel("bad", F(-1), {"a":0,"b":1}),),
                           corruption_budget=0)
+
+
+    def test_one_issuer_three_hashes_are_not_three_witnesses(self):
+        domains={c.name:"single-issuer" for c in self.c}
+        r=exact_group_robust_channel_design(
+            authority=self.authority,channels=self.c,
+            domain_by_channel=domains,corruption_budget=1)
+        self.assertFalse(r["feasible"])
+        self.assertEqual(r["unresolvable_pairs"],[["a","b"]])
+        naive=exact_robust_channel_design(
+            authority=self.authority,channels=self.c,corruption_budget=1)
+        self.assertTrue(naive["feasible"])
+
+    def test_three_independent_issuers_resolve_one_corrupted_group(self):
+        domains={c.name:c.name for c in self.c}
+        r=exact_group_robust_channel_design(
+            authority=self.authority,channels=self.c,
+            domain_by_channel=domains,corruption_budget=1)
+        self.assertTrue(r["feasible"])
+        self.assertEqual(r["cost_exact"],"3")
+        self.assertEqual(len(r["selected_failure_domains"]),3)
+        for true, symbol in (("a","a"),("b","b")):
+            for index in range(3):
+                observed={c.name:("b" if symbol=="a" else "a") if i==index else symbol
+                          for i,c in enumerate(self.c)}
+                actual=group_selective_authorize(observed=observed,
+                    authority=self.authority,channels=self.c,
+                    domain_by_channel=domains,corruption_budget=1)
+                self.assertEqual(actual["decision"],"AUTHORIZE")
+                self.assertEqual(actual["repair"],self.authority[true])
+
+    def test_correlated_two_fields_count_as_one_root(self):
+        domains={"s0":"issuer-A","s1":"issuer-A","s2":"issuer-B"}
+        r=exact_group_robust_channel_design(
+            authority=self.authority,channels=self.c,
+            domain_by_channel=domains,corruption_budget=1)
+        self.assertFalse(r["feasible"])
+        observed={"s0":"b","s1":"b","s2":"a"}
+        decoded=group_selective_authorize(observed=observed,
+            authority=self.authority,channels=self.c,
+            domain_by_channel=domains,corruption_budget=1)
+        self.assertEqual(decoded["decision"],"REFUSE_AMBIGUOUS_AUTHORITY")
+
+    def test_domain_manifest_required(self):
+        self.assertRaises(ValueError, exact_group_robust_channel_design,
+                          authority=self.authority,channels=self.c,
+                          domain_by_channel={"s0":"issuer"},corruption_budget=1)
 
 
 if __name__=="__main__":
