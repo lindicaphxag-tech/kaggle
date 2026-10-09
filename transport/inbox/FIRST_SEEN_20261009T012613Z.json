@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "Sunart24",
+      "body": "## Feature request\n\n#### Feature description\n\nTwo gaps around `APPROACH` polygons:\n\n1. **`time_before_collision` is not in `Polygon::updateParametersCallback`.** `enabled`,\n   `min_points`, `trigger_consecutive_points` and `release_consecutive_points` are;\n   the approach horizon still requires a restart. Setting it is silently accepted \u2014 the\n   callback ignores unknown names and returns `result.successful = true`.\n\n2. **`polygon_pub_topic` publishes the declared outline, not the swept region.** The area\n   actually tested extends forward over `time_before_collision` and grows with commanded\n   speed, so what you see in RViz is not what triggers. We have a local patch publishing the\n   swept polygons as a `MarkerArray`, one per simulation step, and would like to upstream it.\n\n#### Implementation considerations\n\n- Non-positive values must be rejected (`result.successful = false`):\n  `collision_monitor_node.cpp` divides by `getTimeBeforeCollision()`.\n- `time_before_collision_` and `simulation_time_step_` are only declared for `APPROACH`;\n  other polygons should be left alone or told so explicitly.\n- `updateParametersCallback` takes `mutex_`, `getCollisionTime()` does not. Already true for\n  `min_points_` and the counters, so no new race \u2014 but worth confirming whether the read path\n  is meant to be lock-free.\n- The swept markers come for free in `getCollisionTime()`, where the projected poses already\n  exist; behind a per-polygon flag.\n\nHappy to submit both as separate PRs with tests.\n",
+      "created_at": "2026-10-08T22:32:28Z",
+      "html_url": "https://github.com/ros-navigation/navigation2/issues/6632",
+      "id": "ros-navigation/navigation2#6632",
+      "issue_number": 6632,
+      "labels": [],
+      "repository": "ros-navigation/navigation2",
+      "surface_sha256": "41273d49242ca6188cd38ccd1d39bcd5cf4fa5dbe356c0c2e8acebbca98ca182",
+      "title": "Collision monitor - approach polygon dynamic parameters and visual help"
+    }
+  ],
+  "post_activation_issue_identities_observed": 41,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-09T01:26:13Z",
+  "schema_version": 1
+}
