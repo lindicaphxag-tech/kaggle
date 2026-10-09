@@ -171,6 +171,9 @@ def run_episode(model, *, controller_policy, goal_angles, producer:Mat,
         total_abs_ctrl+=sum(abs(a) for a in actual)
         total_saturated+=int(any(abs(v)>=12.-1e-8 for v in actual))
         mujoco.mj_step(model,data)
+    # mj_step integrates qpos at the end; force an exact pose refresh so the
+    # terminal tip state belongs to the FINAL, not the previous, timestep.
+    mujoco.mj_forward(model,data)
     tip=tuple(float(z) for z in data.site_xpos[site][:2])
     goal=tip_xy(goal_angles)
     err=dist(tip,goal)
