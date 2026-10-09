@@ -4,6 +4,8 @@ on:
     paths:
       - 'research/semrepair/internal_saturation_reachability.py'
       - 'research/semrepair/test_internal_saturation_reachability.py'
+      - 'research/semrepair/authority_action_envelope_planner.py'
+      - 'research/semrepair/test_authority_action_envelope_planner.py'
       - 'research/semrepair/two_link_cross_controller_benchmark.py'
       - '.github/workflows/semrepair-saturation-reachability.yml'
   workflow_dispatch:
@@ -22,6 +24,10 @@ jobs:
         run: |
           python -m unittest -v research.semrepair.test_internal_saturation_reachability
           python -m research.semrepair.internal_saturation_reachability > reachable_set_raw.json
+      - name: Authority-aware full action-envelope repair certificate tests
+        run: |
+          python -m unittest -v research.semrepair.test_authority_action_envelope_planner
+          python -m research.semrepair.authority_action_envelope_planner > authorized_action_envelope.json
       - name: Publish original denominator and exact mismatch witness
         run: |
           python - <<'PY'
@@ -36,5 +42,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: semrepair-clipped-actuator-full-raw
-          path: reachable_set_raw.json
+          path: |
+            reachable_set_raw.json
+            authorized_action_envelope.json
           retention-days: 90
