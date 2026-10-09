@@ -106,8 +106,20 @@ def identify_repair_from_numeric_taps(train: Sequence[TapSample],
 def nominal_probe(world_producer:Mat, world_controller:Mat, request:Vec)->TapSample:
     # Called by the evaluator. The solver receives this numeric sample only,
     # not the hidden two matrices or symbolic world ID.
+    import mujoco
+    from .native_planar_task_repair import actual_mujoco_model
     observed_producer=mv(world_producer,request)
-    observed_controller=mv(world_controller,observed_producer)
+    requested_controller=mv(world_controller,observed_producer)
+    model=actual_mujoco_model()
+    data=mujoco.MjData(model)
+    data.ctrl[:]=requested_controller
+    mujoco.mj_step(model,data)
+    # Read the actual executed MuJoCo actuation boundary under unsaturated
+    # probing. The producer interface tap is runtime adapter telemetry.
+    observed_controller=(float(data.ctrl[0]),float(data.ctrl[1]))
+    force=(float(data.qfrc_actuator[0]),float(data.qfrc_actuator[1]))
+    if max_diff(force,observed_controller)>1e-10:
+        raise AssertionError("MuJoCo actuator force differs from nominal tap")
     return TapSample(request,observed_producer,observed_controller)
 
 
