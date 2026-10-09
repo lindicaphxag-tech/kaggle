@@ -59,5 +59,14 @@ jobs:
           name: open-catalog-native-mujoco-python-${{ matrix.python }}
           path: open_catalog_source_gap.json
           retention-days: 60
+      - name: Source-bound, challenge-response authentic MuJoCo sensor transcript checks
+        run: |
+          python -m unittest -v research.semrepair.test_source_attested_tap_experiment
+          python -m research.semrepair.source_attested_tap_experiment | tee source_attested_tap_result.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: source-bound-challenge-python-${{ matrix.python }}
+          path: source_attested_tap_result.json
+          retention-days: 60
       - name: Independent exact-rational oracle
         run: python research/semrepair/independent_oracle.py
