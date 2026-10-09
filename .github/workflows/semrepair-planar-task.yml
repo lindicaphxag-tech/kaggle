@@ -4,6 +4,8 @@ on:
     paths:
       - 'research/semrepair/native_planar_task_repair.py'
       - 'research/semrepair/test_native_planar_task_repair.py'
+      - 'research/semrepair/observable_interface_factorization.py'
+      - 'research/semrepair/test_observable_interface_factorization.py'
       - '.github/workflows/semrepair-planar-task.yml'
   workflow_dispatch:
 permissions:
@@ -22,6 +24,17 @@ jobs:
         run: |
           python -m unittest -v research.semrepair.test_native_planar_task_repair
           python -m research.semrepair.native_planar_task_repair > planar_task_raw.json
+      - name: Blind structural ABI recovery from two probes and unseen shear controller
+        run: |
+          python -m unittest -v research.semrepair.test_observable_interface_factorization
+          python - <<'PY'
+          import json
+          from research.semrepair.observable_interface_factorization import blind_closed_loop_planar_assay
+          r=blind_closed_loop_planar_assay()
+          with open('blind_factorization_raw.json','w') as f: json.dump(r,f,indent=2,sort_keys=True)
+          for label,value in r['results'].items():
+              print(label,value)
+          PY
       - name: Verify raw denominator and report compact actual outcomes
         run: |
           python - <<'PY'
@@ -37,5 +50,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: semrepair-native-planar-task-raw
-          path: planar_task_raw.json
+          path: |
+            planar_task_raw.json
+            blind_factorization_raw.json
           retention-days: 90
