@@ -14,6 +14,8 @@ on:
       - 'research/medical_geometry/test_patient_evidence_audit.py'
       - 'research/medical_geometry/paired_negative_analysis.py'
       - 'research/medical_geometry/test_paired_negative_analysis.py'
+      - 'research/medical_geometry/frozen_source_consistency.py'
+      - 'research/medical_geometry/test_frozen_source_consistency.py'
       - '.github/workflows/semrepair-clingeom-independent-gates.yml'
   workflow_dispatch:
 permissions:
@@ -40,5 +42,7 @@ jobs:
         run: python -m unittest -v research.semrepair.test_artifact_byte_authority
       - name: Patient-level medical geometry audit tests
         run: python -m unittest discover -v -s research/medical_geometry -p test_patient_evidence_audit.py
+      - name: Validate original six-patient real MRI source report against signed table
+        run: python -m unittest -v research.medical_geometry.test_frozen_source_consistency
       - name: ClinGeom six-patient exploratory negative-result analysis
         run: python -m unittest -v research.medical_geometry.test_paired_negative_analysis
