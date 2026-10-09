@@ -8,6 +8,7 @@ from research.semrepair.deployment_validity_shield import (
     cartesian_cover_radius, conditional_lipschitz_envelope,
     nonlinear_probe_challenge, cubic_ambush,
     finite_probe_interpolation_counterexample, bounded_noise_patch_contract,
+    matched_seven_probe_baseline_challenge,
 )
 
 
@@ -141,6 +142,15 @@ class DeploymentValidityTests(unittest.TestCase):
         result=bounded_noise_patch_contract(train,validation,
                                             per_coordinate_error_bound=.0001)
         self.assertEqual(result["decision"],"REFUSE_LINEAR_MODEL_FALSIFIED")
+
+    def test_equal_cost_generic_probe_control_must_be_reported(self):
+        r=matched_seven_probe_baseline_challenge()
+        self.assertEqual(r["constructed_nonlinear_parameter_cases"],12)
+        self.assertEqual(r["detection_counts"]["historical_3"],0)
+        self.assertEqual(r["detection_counts"]["extremal_7"],12)
+        self.assertEqual(r["detection_counts"]["generic_7"],12)
+        self.assertEqual(r["probe_budgets"]["extremal_7"],
+                         r["probe_budgets"]["generic_7"])
 
     def test_linear_classifier_also_requires_predeclared_fault_model(self):
         t=[nominal_probe(I,I,u) for u in (PROBE_E1,PROBE_E2)]
