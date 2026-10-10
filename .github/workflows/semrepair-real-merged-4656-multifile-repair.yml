@@ -1,0 +1,49 @@
+name: SemRepair real LeRobot 4656 both temporal source files 12 program repair overfitting proof
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/real_merged_lerobot_4656_multifile_patch_search.py'
+      - 'research/semrepair/test_real_merged_lerobot_4656_multifile_patch_search.py'
+      - '.github/workflows/semrepair-real-merged-4656-multifile-repair.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-publisher-multifile-temporal-source-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install exact real LeRobot published source torch runtime
+        run: python -m pip install "torch==2.7.1"
+      - name: Verify all twelve original LeRobot two-file source patch variants and actual publisher code
+        run: |
+          python -m unittest -v research.semrepair.test_real_merged_lerobot_stacked_state_synthesis
+          python -m unittest -v research.semrepair.test_real_merged_lerobot_4656_multifile_patch_search
+      - name: Export full original publisher source AST candidate matrix
+        run: python -m research.semrepair.real_merged_lerobot_4656_multifile_patch_search > real_LeRobot_4656_12_multifile_temporal_repair_variants.json
+      - name: Separate incomplete roundtrip tests from full model-conditioned state and epoch contracts
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('real_LeRobot_4656_12_multifile_temporal_repair_variants.json'))
+          for k in ('typed_two_file_candidate_program_count',
+                    'single_roundtrip_test_plausible_program_count',
+                    'weak_plausible_but_semantically_invalid_program_count',
+                    'full_crosscomponent_semantics_valid_count',
+                    'minimum_cost_full_semantics_candidate'):
+              print(k,r[k])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semrepair-true-publisher-4656-12-twofile-source-repairs-complete
+          path: real_LeRobot_4656_12_multifile_temporal_repair_variants.json
+          if-no-files-found: warn
+          retention-days: 90
