@@ -62,15 +62,19 @@ jobs:
       - name: Run pinned MONAI loss dtype native counterfactual (development only)
         run: python research/pcpr/run_native_monai_9103.py
       - name: First-score 48 untouched PRs across 47 repositories (native operator only)
-        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        if: github.event_name == 'workflow_dispatch'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python research/pcpr/run_v07_frozen_48_pr.py
       - name: First-score 64 untouched PRs with v0.8 native symbolic source interpreter
-        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        if: github.event_name == 'workflow_dispatch'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python research/pcpr/run_v08_new_64_holdout.py
+      - name: Run SHA-pinned spikingjelly symbolic native development case
+        run: python research/pcpr/run_v08_spikingjelly_pinned_dev.py
+      - name: Run SHA-pinned TorchJD cross-expression native development case
+        run: python research/pcpr/run_v09_torchjd_original_dev.py
       - name: Preserve case-level source provenance
         uses: actions/upload-artifact@v4
         with:
@@ -89,6 +93,8 @@ jobs:
             pcpr_monai_9103_native_counterfactual.json
             pcpr_v07_48_pr_frozen_native_first_score.json
             pcpr_v08_new_64_frozen_first_score.json
+            pcpr_v08_spikingjelly_pinned_dev.json
+            pcpr_v09_torchjd_821_original_source.json
             pcpr_kornia_native_package_evidence.json
             pcpr_kornia_so2_native.json
           if-no-files-found: error
