@@ -41,8 +41,31 @@ jobs:
                     'sign_p_bonferroni',data['bonferroni_adjusted_p_for_five_fixed_levels'],
                     'positive/negative/tie',data['source_better'],data['source_worse'],data['exact_ties'])
           PY
+      - name: Retrieve independently published medium policy unchanged-parameters replication
+        uses: actions/download-artifact@v4
+        with:
+          repository: lindicaphxag-tech/kaggle
+          run-id: 38007987369
+          github-token: ${{ github.token }}
+          name: semrepair-published-SAC-medium-32seed-960raw
+          path: second-policy
+      - name: Recompute independent medium-checkpoint paired statistics
+        run: |
+          python -m research.semrepair.paired_external_sac_audit second-policy/medium_replication_raw.json > paired_medium_audit.json
+          python - <<'PY'
+          import json
+          r=json.load(open('paired_medium_audit.json'))
+          print('MEDIUM_RAW_SHA256',r['raw_sha256'])
+          for name,v in sorted(r['comparisons_by_severity'].items()):
+              print('MEDIUM',name,'mean',round(v['mean_official_reward_gain'],6),
+                    'bootstrap',v['paired_seed_bootstrap_95pct_descriptive'],
+                    'sign_p_five_comparisons',v['bonferroni_adjusted_p_for_five_fixed_levels'],
+                    'better/worse/tied',v['source_better'],v['source_worse'],v['exact_ties'])
+          PY
       - uses: actions/upload-artifact@v4
         with:
-          name: semrepair-external-sac-expert-paired-seed-audit
-          path: paired_seed_audit.json
+          name: semrepair-external-two-checkpoint-paired-audits
+          path: |
+            paired_seed_audit.json
+            paired_medium_audit.json
           retention-days: 90
