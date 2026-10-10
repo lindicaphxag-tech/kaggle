@@ -1,0 +1,1 @@
+Execution-only trigger for BNCI2015_001. Frozen scientific runner/protocol identity is asserted by workflow before data execution.
