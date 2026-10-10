@@ -37,7 +37,7 @@ COST_CURRENT=0.
 def run_temporal_source_evidence_benchmark():
     _,to_abs,external_source_sha=load_actual_upstream_function_pair()
     rng=random.Random(20261010)
-    samples=[]
+    outputs=[]
     for pair in range(WORLD_PAIRS):
         current=[rng.uniform(-.4,.4) for _ in range(ACTION_CHANNELS)]
         offset=[rng.uniform(.04,.28)*rng.choice((-1,1))
@@ -55,7 +55,6 @@ def run_temporal_source_evidence_benchmark():
         # outputs. No reference to hand-written q_rel + anchor formulas.
         radius=max(abs(x) for x in offset[:6])
         assert radius > TOLERANCE
-        outputs=[]
         for branch,actual in enumerate(alternatives):
             desired=to_abs(relative,actual,MASK)
             current_only=to_abs(relative,now,MASK)
