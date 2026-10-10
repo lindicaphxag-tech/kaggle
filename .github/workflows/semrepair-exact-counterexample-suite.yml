@@ -4,6 +4,7 @@ on:
     paths:
       - 'research/semrepair/minimum_counterexample_probe_cover.py'
       - 'research/semrepair/test_minimum_counterexample_probe_cover.py'
+      - 'research/semrepair/benchmark_counterexample_scaling.py'
       - '.github/workflows/semrepair-exact-counterexample-suite.yml'
   workflow_dispatch:
 permissions:
@@ -32,8 +33,22 @@ jobs:
                       'source_code_executed_in_this_stdlib_only_test'):
               print(key,r[key])
           PY
+      - name: Explicit CPU search complexity and search-time scalability (synthetic incidence only)
+        run: |
+          python -m research.semrepair.benchmark_counterexample_scaling > mincost_probe_CPU_scaling.json
+          python - <<'PY'
+          import json
+          r=json.load(open("mincost_probe_CPU_scaling.json"))
+          for x in r["rows"]:
+              print("CPU",x["incorrect_candidate_count"],x["synthetic_probe_bank_size"],
+                    "min_cost",x["exact_minimum_declared_cost"],
+                    "median_ms",x["median_wall_milliseconds_three_runs"],
+                    "DP_states",x["reachable_bitmask_DP_states"])
+          PY
       - uses: actions/upload-artifact@v4
         with:
           name: semrepair-minimum-source-counterexample-cost-certificate
-          path: minimum_counterexample_suite.json
+          path: |
+            minimum_counterexample_suite.json
+            mincost_probe_CPU_scaling.json
           retention-days: 90
