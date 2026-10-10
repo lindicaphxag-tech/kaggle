@@ -48,7 +48,7 @@ from .observable_interface_factorization import (
 ENV="Pusher-v5"
 POLICY_REPO="farama-minari/Pusher-v5-SAC-expert"
 POLICY_COMMIT="3e103602f3fba3500ee6f21d762c0ff3e94892ff"
-POLICY_FILE="pusher-v5-sac-expert.zip"
+POLICY_FILE="pusher-v5-SAC-expert.zip"
 PUBLISHED_LFS_SHA256="6a2a51ddc1f2539aaa779bb7390c3022a0e42effc096962ee2bdaa1fb74f37b3"
 FIRST_TWO_ACTIONS=(0,1)
 ENV_LIMIT=2.
@@ -126,6 +126,7 @@ def _step_pusher(env,actor,seed,arm,P,C,L,reachable):
     rewards=[]
     object_dists=[]
     contact_dists=[]
+    control_rewards=[]
     action_errors=[]
     actuator_clip_count=0
     for t in range(N_STEPS):
@@ -139,7 +140,14 @@ def _step_pusher(env,actor,seed,arm,P,C,L,reachable):
         # Respect OFFICIAL reward term semantics: object-to-target distance
         # and fingertip-to-object distance, NOT Reacher-style fingertip-to-target.
         object_distance=-float(info["reward_dist"])
-        fingertip_distance=-float(info["reward_near"])
+        # Official reward_near already includes its default weight 0.5.
+        # Do not mislabel a weighted penalty as an unweighted distance.
+        fingertip_distance=-float(info["reward_near"])/.5
+        control_reward=float(info["reward_ctrl"])
+        if abs(float(reward)-(float(info["reward_dist"])+
+                              float(info["reward_near"])+control_reward))>1e-6:
+            raise AssertionError("official Pusher reward decomposition invalid")
+        control_rewards.append(control_reward)
         if object_distance<0 or fingertip_distance<0:
             raise AssertionError("official Pusher reward term outside distance domain")
         object_dists.append(object_distance)
@@ -157,6 +165,7 @@ def _step_pusher(env,actor,seed,arm,P,C,L,reachable):
         "minimum_object_goal_distance":min(object_dists),
         "mean_fingertip_object_distance":sum(contact_dists)/len(contact_dists),
         "mean_ideal_action_error":sum(action_errors)/len(action_errors),
+        "mean_official_control_reward":sum(control_rewards)/len(control_rewards),
         "inner_clip_events_at_current_policy_states":actuator_clip_count,
     }
 
@@ -191,6 +200,7 @@ def run_external_pusher():
                     "mean_final_object_goal_distance":sum(r["final_object_goal_distance"] for r in v)/len(v),
                     "mean_fingertip_object_distance":sum(r["mean_fingertip_object_distance"] for r in v)/len(v),
                     "mean_action_error":sum(r["mean_ideal_action_error"] for r in v)/len(v),
+                    "mean_official_control_reward":sum(r["mean_official_control_reward"] for r in v)/len(v),
                     "total_inner_clip_events":sum(r["inner_clip_events_at_current_policy_states"] for r in v),
                 }
     if len(rows)!=len(SEEDS)*len(SCENARIOS)*len(ARMS):
