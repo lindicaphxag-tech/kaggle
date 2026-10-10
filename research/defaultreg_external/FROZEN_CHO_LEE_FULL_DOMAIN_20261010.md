@@ -172,3 +172,31 @@ The path allows the external cohorts to test whether small source covariance-
 fidelity regret can coexist with materially different unseen-participant
 decoding conclusions. It may falsify the proposed decision-fragility
 mechanism. It cannot be used to replace H2/H3 methods after outcome inspection.
+
+
+## Preflight structural channel amendment: common-20 montage
+
+Before any Cho2017/Lee2019 target AUC was opened, the first Lee2019 execution
+failed during MOABB channel picking with:
+
+`Missing channels from ch_names required by include: ['FCz']`.
+
+This is a structural dataset-availability failure before covariance features,
+source selection, target scoring or AUC evaluation. To preserve a genuinely
+matched cross-dataset protocol, the canonical external analysis therefore
+uses the intersection of the previously frozen montage with Lee2019
+availability:
+
+FC5, FC3, FC1, FC2, FC4, FC6,
+C5, C3, C1, Cz, C2, C4, C6,
+CP5, CP3, CP1, CPz, CP2, CP4, CP6.
+
+That is the original 21-channel set with **FCz removed only**, yielding
+20 channels and 210 tangent coordinates. The same 20-channel montage is
+applied to BOTH Cho2017 and Lee2019_MI. No channel is selected from
+classification performance.
+
+Any 21-channel Cho job that may finish from an earlier infrastructure attempt
+is superseded by this amendment and must not be admitted as confirmatory
+evidence. The amendment is motivated solely by Lee2019 channel availability,
+not by any target outcome.
