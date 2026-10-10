@@ -1,0 +1,98 @@
+name: Source-exact independent JAX numerical PR validation
+
+on:
+  push:
+    branches:
+      - ci/upstream-jax-flagship-review-20261011
+    paths:
+      - .github/workflows/upstream-jax-flagship-review.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  student-t-large-df:
+    name: JAX 41227 Student-t numerical review
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout immutable JAX PR 41227 head
+        uses: actions/checkout@v4
+        with:
+          repository: jax-ml/jax
+          ref: 877fdb22ddb3a7f9c68df73571a42541cbd30f7f
+          path: jax
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install exact source and JAX test prerequisites
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ./jax
+          python -m pip install -r jax/build/test-requirements.txt
+      - name: Run reviewer-requested focused regression
+        run: |
+          python -m pytest -q jax/tests/scipy_stats_test.py -k TLogPdfLargeDf
+      - name: Record immutable identity and environment
+        if: always()
+        run: |
+          {
+            echo "upstream=jax-ml/jax"
+            echo "pr=41227"
+            echo "source_commit=$(git -C jax rev-parse HEAD)"
+            echo "test=tests/scipy_stats_test.py -k TLogPdfLargeDf"
+            echo "python=$(python --version)"
+            python -m pip show jax jaxlib numpy scipy | grep -E '^(Name|Version):'
+          } > jax-41227-validation-receipt.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jax-41227-source-exact-review-receipt
+          path: jax-41227-validation-receipt.txt
+          if-no-files-found: error
+          retention-days: 90
+
+  poisson-large-rate:
+    name: JAX 41228 large-rate Poisson numeric review
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout immutable JAX PR 41228 head
+        uses: actions/checkout@v4
+        with:
+          repository: jax-ml/jax
+          ref: 0c98448116cf7a005ae4a5c0d1aa4753d341ec24
+          path: jax
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install exact source and JAX test prerequisites
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ./jax
+          python -m pip install -r jax/build/test-requirements.txt
+      - name: Run sampler, stable-log-PMF and independent public-API regressions
+        run: |
+          python -m pytest -q jax/tests/random_lax_test.py -k 'PoissonLargeLambdaLogPmf or PoissonRejectionLogPmfMatchesScipy or StirlingTailUsesUnclampedLargeArgument or PoissonCentralDevianceAvoidsFloat32Cancellation or PoissonLogPmfTinyRateGradientsRemainFinite or PoissonLargeLambdaVariance or BinomialLargeCountTailRegression'
+          python -m pytest -q jax/tests/scipy_stats_test.py -k 'PoissonLogPmfLargeLambda or PoissonLogPmfCentralFloat32Accurate or PoissonLogPmfPublicApiTinyRateAutodiff'
+      - name: Record immutable identity and environment
+        if: always()
+        run: |
+          {
+            echo "upstream=jax-ml/jax"
+            echo "pr=41228"
+            echo "source_commit=$(git -C jax rev-parse HEAD)"
+            echo "tests=tests/random_lax_test.py + tests/scipy_stats_test.py focused Poisson cases"
+            echo "python=$(python --version)"
+            python -m pip show jax jaxlib numpy scipy | grep -E '^(Name|Version):'
+          } > jax-41228-validation-receipt.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jax-41228-source-exact-review-receipt
+          path: jax-41228-validation-receipt.txt
+          if-no-files-found: error
+          retention-days: 90
