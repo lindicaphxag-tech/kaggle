@@ -938,6 +938,17 @@
       "source": "inbox/FIRST_SEEN_20261010T130203Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "340cd3431e0c951ccf875a2b11f4b7f1155842bfb90302adca8d13865291f442"
+    },
+    {
+      "created_at": "2026-10-10T13:20:19Z",
+      "first_frozen_at": "2026-10-10T13:35:41Z",
+      "id": "gazebosim/gz-sim#4068",
+      "issue_number": 4068,
+      "prediction_deadline_at": "2026-10-10T19:35:41Z",
+      "repository": "gazebosim/gz-sim",
+      "source": "inbox/FIRST_SEEN_20261010T133541Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "d19ceac74bb22cb1743af924120c86a5357b653be307e2efb9493d198e4d930a"
     }
   ]
 }

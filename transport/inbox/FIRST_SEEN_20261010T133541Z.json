@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "traversaro",
+      "body": "gz-sim does not provide any guidance on installing plugins, indeed all the examples in https://github.com/gazebosim/gz-sim/tree/main/examples/plugin do not install the plugins, even if most downstream user would install them. The tutorial guidance is to add to `GZ_SIM_SYSTEM_PLUGIN_PATH` any install folder of the plugins.\n\nHowever, if a user does the most straightforward thing, i.e. it installs its plugin in CMake with:\n\n~~~\ninstall(TARGETS <plugintarget>)\n~~~\n\nthe plugin ends up it a operating system-specific location, i.e.  `<gz_sim_install_prefix>/lib` on *nix and  `<gz_sim_install_prefix>/bin` in Windows, that make it tricky to put the value in a .dsv file (see for example https://github.com/ros-controls/gz_ros2_control/pull/876, that does not work on Windows).\n\nTo solve this in the case in which the plugins and gazebo are installed in the same shared prefix, could it make sense for Gazebo to add `<gz_sim_install_prefix>/lib` on *nix and  `<gz_sim_install_prefix>/bin` in Windows to the locations that are used by default to look for plugins? \n\nxref:\n* https://github.com/RoboStack/ros-jazzy/issues/141#issuecomment-6097823939\n* https://github.com/conda-forge/gz-sim-feedstock/pull/151",
+      "created_at": "2026-10-10T13:20:19Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4068",
+      "id": "gazebosim/gz-sim#4068",
+      "issue_number": 4068,
+      "labels": [],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "d19ceac74bb22cb1743af924120c86a5357b653be307e2efb9493d198e4d930a",
+      "title": "Automatically look for plugins in `<gz_sim_install_prefix>/lib` on *nix and  `<gz_sim_install_prefix>/bin` in Windows"
+    }
+  ],
+  "post_activation_issue_identities_observed": 63,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-10T13:35:41Z",
+  "schema_version": 1
+}
