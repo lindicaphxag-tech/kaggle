@@ -15,8 +15,10 @@ from research.semrepair.signed_source_activation import (
 
 OLD={"producer":[[1.,3.5],[0.,1.]],
      "controller":[[1.,-3.5],[0.,1.]],"clip":.8}
+# Atomic repair corrects BOTH erroneous maps and the artificial inner
+# source limit, restoring the official native Pusher action contract [-2,2].
 NEW={"producer":[[1.,0.],[0.,1.]],
-     "controller":[[1.,0.],[0.,1.]],"clip":.8}
+     "controller":[[1.,0.],[0.,1.]],"clip":2.}
 ROBOT="Farama-Gymnasium-Pusher-v5-seven-torque"
 DEPLOYMENT=sha256(b"precommitted Pusher action [-2,2]^7 and baseline source envelope").hexdigest()
 NONCE="separate-no-replay-challenge-20261010-001"
