@@ -26,8 +26,8 @@ jobs:
           python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
       - name: Run adversarial source-scope regression tests
         run: |
-          python -m unittest -v research/pcpr/test_pcpr_source_closure.py
-          python -O -m unittest -q research/pcpr/test_pcpr_source_closure.py
+          PYTHONPATH=research/pcpr python -m unittest discover -s research/pcpr -p 'test_*.py' -v
+          PYTHONPATH=research/pcpr python -O -m unittest discover -s research/pcpr -p 'test_*.py' -q
       - name: Verify original Git blobs and execute native PyTorch field witnesses
         run: python research/pcpr/run_real_deepchem_source.py
       - name: Preserve case-level source provenance
