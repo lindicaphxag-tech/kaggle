@@ -4,11 +4,16 @@ Important: the positive percentile-bootstrap lower endpoint of max(AUC)-min(AUC)
 is NOT evidence that the *population* path span is materially positive.
 Taking max/min across many candidate lambdas introduces selection noise.
 
-This module uses participant-paired bootstrap trajectories to estimate the
-supremum deviation of the whole observed mean AUC path (NOT separate marginal
-lambda intervals). A conservative path-span sensitivity bound is
+V10 uses participant-paired bootstrap whole-path supremum deviations, not
+405 separate pointwise intervals. V11 additionally uses a sharper,
+translation-invariant path-oscillation error seminorm:
 
-    max(0, observed_span - 2 * q_{1-alpha}(sup_lambda |Abar* - Abar|)).
+    osc(e) = max_lambda(e(lambda)) - min_lambda(e(lambda))
+    sensitivity_lower = max(0, observed_span - q_{1-alpha}(osc(e*))).
+
+For any fixed curves, |span(observed) - span(true)| <= osc(observed - true).
+The bootstrap radius is only conditional post-outcome sensitivity and
+does not certify unconditional population coverage.
 
 The corresponding materiality budget holds the empirical source-regret axis
 fixed, so it is CONDITIONAL on that estimated axis. This is a post-outcome
@@ -70,34 +75,40 @@ def simultaneous_path_sensitivity(
     # participant index vector at every lambda.
     rng = np.random.default_rng(seed)
     deviations = np.empty(reps, dtype=float)
+    oscillations = np.empty(reps, dtype=float)
     for start in range(0, reps, batch_size):
         stop = min(reps, start + batch_size)
         idx = rng.integers(0, n, size=(stop - start, n))
         boot_mean = auc[idx].mean(axis=1)
-        deviations[start:stop] = np.max(
-            np.abs(boot_mean - point_auc[None, :]), axis=1
-        )
+        error_path = boot_mean - point_auc[None, :]
+        deviations[start:stop] = np.max(np.abs(error_path), axis=1)
+        oscillations[start:stop] = np.ptp(error_path, axis=1)
     radius = float(np.quantile(deviations, 1.0 - alpha))
+    osc_radius = float(np.quantile(oscillations, 1.0 - alpha))
     # If every mean AUC ordinate is within +/- radius, the span differs
     # from the estimated span by at most 2*radius.
     lower = max(0.0, point_span - 2.0 * radius)
     upper = min(1.0, point_span + 2.0 * radius)
+    oscillation_lower = max(0.0, point_span - osc_radius)
+    oscillation_upper = min(1.0, point_span + osc_radius)
 
     # The observed source regret axis is held fixed, including its argmin.
     # A tie in regret is admitted jointly by threshold comparison.
     budgets = np.unique(shifted)
     observed = None
     certified = None
-    diagnostic = []
+    oscillation_budget = None
     for budget in budgets:
         mask = shifted <= budget + 1e-12
         raw_span = float(np.ptp(point_auc[mask]))
         conservative = max(0.0, raw_span - 2.0 * radius)
-        diagnostic.append((float(budget), raw_span, conservative))
+        invariant_conservative = max(0.0, raw_span - osc_radius)
         if observed is None and raw_span >= tau - 1e-12:
             observed = float(budget)
         if certified is None and conservative >= tau - 1e-12:
             certified = float(budget)
+        if oscillation_budget is None and invariant_conservative >= tau - 1e-12:
+            oscillation_budget = float(budget)
 
     return {
         "schema": "defaultreg_postoutcome_simultaneous_path_sensitivity_v1",
@@ -110,6 +121,10 @@ def simultaneous_path_sensitivity(
         "full_path_supremum_bootstrap_radius": radius,
         "observed_max_auc_span": point_span,
         "max_span_sensitivity_bounds_nominal95": [lower, upper],
+        "translation_invariant_oscillation_radius95": osc_radius,
+        "translation_invariant_span_bounds_nominal95": [oscillation_lower, oscillation_upper],
+        "translation_invariant_lower_budget_0_02": oscillation_budget,
+        "translation_invariant_materiality_supported_conditional": oscillation_lower >= tau,
         "materiality_auc_threshold": tau,
         "observed_first_material_regret_budget": observed,
         "simultaneous_lower_bound_first_material_regret_budget": certified,
@@ -154,6 +169,8 @@ def main() -> None:
             "dataset", "observed_max_auc_span",
             "full_path_supremum_bootstrap_radius",
             "max_span_sensitivity_bounds_nominal95",
+            "translation_invariant_oscillation_radius95",
+            "translation_invariant_span_bounds_nominal95",
             "materiality_certified_under_conditional_reference",
         )
     }))
