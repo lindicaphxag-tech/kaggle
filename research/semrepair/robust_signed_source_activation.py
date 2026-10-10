@@ -42,7 +42,7 @@ PROFILE_FIELDS=frozenset({
     "protocol","actor_family","deployment_sha256",
     "replacement_source_sha256","target_epoch","deployment_action_radius",
     "producer_abs_coeff_error","controller_abs_coeff_error",
-    "max_allowed_abs_output_action_error"
+    "max_allowed_abs_output_action_error","max_authorized_internal_source_clip"
 })
 
 
@@ -93,6 +93,16 @@ def verify_calibration_and_activate(
         calibration_profile_bytes,calibration_signatures,
         trusted_calibration_roots,threshold)
     new=_validate_source_config(replacement_bytes)
+    # A calibration authority must separately and cryptographically permit
+    # increasing the software interstage clip. Merely satisfying a desired
+    # policy action envelope is NOT permission to exceed an actuator owner's
+    # real intermediate limit. This maximum is authored in the signed
+    # calibration profile and SHA-pinned by a caller-chosen trust anchor.
+    hard_clip_cap=profile["max_authorized_internal_source_clip"]
+    if type(hard_clip_cap) not in (int,float) or \
+       not math.isfinite(hard_clip_cap) or hard_clip_cap<=0 or \
+       new["clip"]>hard_clip_cap+1e-12:
+        raise ValueError("proposed source clip exceeds separately signed calibrated hard cap")
     cert=robust_repair_certificate(
         producer=new["producer"],controller=new["controller"],
         producer_abs_error_bounds=profile["producer_abs_coeff_error"],
@@ -122,6 +132,7 @@ def verify_calibration_and_activate(
         "verified_independent_calibration_signers":list(calibrator_issuers),
         "verified_calibration_profile_sha256":actual_cal_hash,
         "source_config_installed_sha256":installed["installed_bytes_sha256"],
+        "signed_hard_internal_source_clip_cap":float(hard_clip_cap),
         "source_activation":installed,
         "worst_case_envelope_certificate":cert,
         "calibration_bounds_externally_measured":False,
