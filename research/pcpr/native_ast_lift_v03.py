@@ -44,6 +44,11 @@ SAFE_BUILTINS = {k: __builtins__[k] if isinstance(__builtins__,dict)
                            "tuple","list","dict","set","sum","min","max","abs",
                            "isinstance","ValueError","TypeError","RuntimeError",
                            "super","type","slice")}
+# PyTorch internals may lazily import dependencies during a permitted tensor
+# operation. AST-level direct import/use is still refused below. This is
+# defense-in-depth only: a container/process sandbox is required for hostile
+# upstream Python and never supplied by this allowlist.
+SAFE_BUILTINS["__import__"] = __import__
 DANGEROUS_NAMES = {"eval","exec","compile","open","__import__","globals",
                    "locals","vars","getattr","setattr","delattr","breakpoint",
                    "input","help","dir"}
