@@ -62,4 +62,19 @@ class NativeLiftTests(unittest.TestCase):
  def test_shape_contract_is_actual_constructor(self):
   with self.assertRaises(ValueError):
    lift_constructor(NEW)(torch.ones(3))
+ def test_reject_import_side_effect(self):
+  with self.assertRaises(ValueError):
+   lift_function("def dangerous():\n import os\n return os.getcwd()","dangerous")
+ def test_reject_dynamic_open(self):
+  with self.assertRaises(ValueError):
+   lift_function("def dangerous():\n return open('/tmp/foo','w')","dangerous")
+ def test_reject_class_introspection(self):
+  with self.assertRaises(ValueError):
+   lift_function("def dangerous(x):\n return x.__class__.__mro__","dangerous")
+ def test_reject_eval(self):
+  with self.assertRaises(ValueError):
+   lift_function("def dangerous(x):\n return eval(x)","dangerous")
+ def test_reject_global_statement(self):
+  with self.assertRaises(ValueError):
+   lift_function("def dangerous():\n global payload\n return 3","dangerous")
 if __name__=="__main__":unittest.main()
