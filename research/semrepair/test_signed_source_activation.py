@@ -183,6 +183,50 @@ class SignedSourceActivationTests(unittest.TestCase):
             self.activate(manifest=manifest,signatures=self.signatures(manifest=manifest))
         self.assertEqual(self.path.read_bytes(),self.old)
 
+    def test_signed_clip_only_repair_preserves_both_original_source_maps(self):
+        # A compensated P/C fault need not require rewriting BOTH matrices.
+        # A trusted license may permit only safe software clip expansion,
+        # IF the source owner separately permits this internal clip magnitude.
+        replacement_cfg=copy.deepcopy(OLD)
+        replacement_cfg["clip"]=9.05  # min full 2D Pusher box need: 2*(1+3.5)=9
+        replacement=_canonical(replacement_cfg)
+        manifest=copy.deepcopy(self.manifest)
+        manifest["authorized_repair"]="clip-only"
+        manifest["replacement_source_sha256"]=sha256(replacement).hexdigest()
+        r=self.activate(manifest=manifest,signatures=self.signatures(manifest=manifest),
+                        replacement=replacement)
+        self.assertEqual(r["source_repair_class"],"clip-only")
+        self.assertAlmostEqual(r["semantics_max_internal_producer_drive"],9.)
+        installed=read_executable_control_config(self.path,sha256(replacement).hexdigest())
+        self.assertEqual(installed["producer"],OLD["producer"])
+        self.assertEqual(installed["controller"],OLD["controller"])
+        self.assertEqual(installed["clip"],9.05)
+
+    def test_signed_clip_only_cannot_change_controller_bytes(self):
+        bad=copy.deepcopy(OLD)
+        bad["clip"]=9.05
+        bad["controller"]=[[1.,0.],[0.,1.]]
+        replacement=_canonical(bad)
+        manifest=copy.deepcopy(self.manifest)
+        manifest["authorized_repair"]="clip-only"
+        manifest["replacement_source_sha256"]=sha256(replacement).hexdigest()
+        with self.assertRaisesRegex(ValueError,"outside signed allowed class"):
+            self.activate(manifest=manifest,signatures=self.signatures(manifest=manifest),
+                          replacement=replacement)
+        self.assertEqual(self.path.read_bytes(),self.old)
+
+    def test_too_small_signed_clip_only_repair_is_correctly_refused(self):
+        bad=copy.deepcopy(OLD)
+        bad["clip"]=8.9  # close to 9, still clips admissible requested actions
+        replacement=_canonical(bad)
+        manifest=copy.deepcopy(self.manifest)
+        manifest["authorized_repair"]="clip-only"
+        manifest["replacement_source_sha256"]=sha256(replacement).hexdigest()
+        with self.assertRaisesRegex(ValueError,"action-envelope certificate"):
+            self.activate(manifest=manifest,signatures=self.signatures(manifest=manifest),
+                          replacement=replacement)
+        self.assertEqual(self.path.read_bytes(),self.old)
+
     def test_source_tampering_before_install_refused(self):
         self.path.write_bytes(_canonical({
             "producer":[[1.,2.5],[0.,1.]],
