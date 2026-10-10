@@ -1,0 +1,56 @@
+name: DefaultReg untouched frontier metadata preflight
+on:
+  push:
+    branches:
+      - research/defaultreg-frontier-shin-gw-preflight-20261010
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  metadata-preflight:
+    strategy:
+      fail-fast: false
+      matrix:
+        dataset: [Shin2017A, GrosseWentrup2009]
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install frozen MOABB stack
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Run metadata-only preflight
+        run: |
+          python research/defaultreg_frontier/preflight_metadata_channels.py \
+            --dataset "${{ matrix.dataset }}" \
+            --out "frontier_preflight_${{ matrix.dataset }}"
+      - name: Fail closed on outcome access
+        run: |
+          DATASET="${{ matrix.dataset }}" python - <<'PY'
+          import json,os
+          d=os.environ["DATASET"]
+          x=json.load(open(f"frontier_preflight_{d}/{d}_metadata_preflight.json"))
+          assert x["status"]=="METADATA_ONLY_CHANNEL_PREFLIGHT_NO_OUTCOME"
+          for k in ("task_events_accessed","class_labels_accessed","epochs_created",
+                    "features_created","covariances_created","classifier_fit","auc_computed"):
+              assert x[k] is False,(k,x[k])
+          assert x["selected_channel_count"]>=7
+          print("PASS_METADATA_ONLY_PREFLIGHT",d,x["selected_channel_labels_canonical"])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-frontier-preflight-${{ matrix.dataset }}
+          path: |
+            research/defaultreg_frontier/FROZEN_SHIN_GW_METADATA_PREFLIGHT_20261010.md
+            frontier_preflight_${{ matrix.dataset }}/**
+          if-no-files-found: warn
+          retention-days: 90
