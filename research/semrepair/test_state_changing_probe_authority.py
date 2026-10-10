@@ -1,5 +1,6 @@
 """State-changing probe semantics: independent world replay and hard refusals."""
 import unittest
+import random
 from fractions import Fraction
 from .state_changing_probe_authority import (
     Hidden, Probe, StatefulAuthorityPlanner, witness, report
@@ -61,6 +62,63 @@ class StateChangingRepairTests(unittest.TestCase):
         plan = planner.solve(start)
         self.assertEqual(plan.worst_cost, Fraction(1))
         self.assertEqual(planner.replay_all(start, plan), (Fraction(1), 2))
+
+
+    def test_independent_exhaustive_oracle_across_100_seeded_games(self):
+        rng = random.Random(20261010)
+
+        def slow_oracle(states, remaining, depth, probes, installer):
+            if installer(states):
+                return Fraction(0)
+            if depth == 0:
+                return None
+            candidate_costs = []
+            for probe in probes:
+                if not probe.trusted or probe.exposure > remaining:
+                    continue
+                groups = {}
+                for world in states:
+                    obs, nxt = probe.step(world)
+                    groups.setdefault(obs, set()).add(nxt)
+                downstream = [
+                    slow_oracle(frozenset(groups[obs]), remaining - probe.exposure,
+                                depth - 1, probes, installer)
+                    for obs in sorted(groups)
+                ]
+                if all(x is not None for x in downstream):
+                    candidate_costs.append(probe.cost + max(downstream))
+            return min(candidate_costs) if candidate_costs else None
+
+        for case in range(100):
+            worlds = frozenset(
+                Hidden(str(k), bool(rng.randrange(2)),
+                       "p" + str(rng.randrange(2))) for k in range(3)
+            )
+            probes = []
+            for index in range(3):
+                table = {}
+                for impl in ("0", "1", "2"):
+                    for dirty in (False, True):
+                        table[(impl, dirty)] = (str(rng.randrange(3)),
+                                                bool(rng.randrange(2)))
+                def transition(w, table=table):
+                    obs, after = table[(w.implementation, w.dirty)]
+                    return obs, Hidden(w.implementation, after, w.patch_hash)
+                probes.append(Probe(
+                    "probe" + str(index), Fraction(1+rng.randrange(3)),
+                    Fraction(rng.randrange(2), 2), True, transition
+                ))
+            game = StatefulAuthorityPlanner(
+                tuple(probes), Fraction(1, 2), 3, complete_model=True)
+            solution = game.solve(worlds)
+            oracle = slow_oracle(worlds, Fraction(1, 2), 3, probes,
+                                 game.installable)
+            self.assertEqual(solution.worst_cost if solution else None, oracle,
+                             "oracle disagreement: " + str(case))
+            if solution:
+                checked_cost, checked_count = game.replay_all(worlds, solution)
+                self.assertEqual(checked_cost, oracle)
+                self.assertEqual(checked_count, len(worlds))
 
     def test_report_preserves_negative_result(self):
         result = report()
