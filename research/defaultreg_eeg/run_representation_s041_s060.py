@@ -251,6 +251,24 @@ def contrast_summary(values,name):
             "bootstrap_ci95":bootstrap_ci(d,SEED+len(name)),
             "exact_signflip_p_two_sided":p,"exact_signflip_draws":draws}
 
+
+def frozen_source_budget_mask(y,g,source_mask,fraction,seed):
+    """Deterministic participant x class source-only subsampling."""
+    if fraction not in (1.0,.75,.5,.25):
+        raise ValueError("Unfrozen source budget")
+    rng=np.random.default_rng(seed)
+    keep=np.zeros(len(y),dtype=bool)
+    for sid in SOURCE:
+        for cls in (0,1):
+            idx=np.flatnonzero(source_mask & (g==sid) & (y==cls))
+            if len(idx)<2:raise ValueError("Source participant/class cell too small")
+            n=len(idx) if fraction==1.0 else max(2,int(np.floor(len(idx)*fraction)))
+            chosen=idx if n==len(idx) else np.sort(rng.choice(idx,size=n,replace=False))
+            keep[chosen]=True
+    if set(np.unique(g[keep]))!=set(SOURCE):
+        raise ValueError("Budget intervention dropped a source participant")
+    return keep
+
 def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("--edf-root",default="edf_original")
@@ -290,6 +308,29 @@ def main():
         state=_svd_state(Xs,y[src])
         for method,lam in lambdas.items():
             target_scores[rep][method]=ridge_scores_from_state(state,Xt,float(lam))
+    # Frozen fixed-signal sample-budget intervention (secondary mechanism).
+    budget_results={}
+    for bi,fraction in enumerate((1.0,.75,.5,.25)):
+        bmask=frozen_source_budget_mask(y,g,src,fraction,SEED+70000+bi)
+        bpath=source_full_path([c[bmask] for c in C],y[bmask],g[bmask],"WIDE231")
+        Xb,Xt_b,_=transform_representation(
+            C,bmask,tgt,"WIDE231",seed=SEED+71000+bi)
+        state_b=_svd_state(Xb,y[bmask])
+        lw_b=analytic_lambda(Xb,y[bmask],"LedoitWolf")
+        oa_b=analytic_lambda(Xb,y[bmask],"OAS")
+        lambdas_b={
+          "LedoitWolf":lw_b,"OAS":oa_b,
+          "source_macro_auc":bpath["lambda_discriminability"],
+          "source_cov_nll":bpath["lambda_covariance_nll"]}
+        score_b={name:ridge_scores_from_state(state_b,Xt_b,float(lam))
+                 for name,lam in lambdas_b.items()}
+        budget_results[str(fraction)]={
+          "source_trials":int(bmask.sum()),
+          "source_trials_by_subject":{str(sid):int(np.sum(bmask&(g==sid))) for sid in SOURCE},
+          "source_path":bpath,
+          "final_lambda_by_method":{k:float(v) for k,v in lambdas_b.items()},
+          "target_scores_frozen_before_labels":True,
+          "score_vectors":score_b}
     gt=g[tgt];yt=y[tgt]
     per_subject={}
     for sid in TARGET:
@@ -314,6 +355,21 @@ def main():
       contrast_summary(c4,"C4_FB8xRegularisation_covNLL")]
     adj=holm([x["exact_signflip_p_two_sided"] for x in summaries])
     for x,padj in zip(summaries,adj):x["holm_p_C1_C4"]=padj
+    # Only now use target labels to summarize the already-frozen budget score vectors.
+    budget_summary={}
+    for fraction,br in budget_results.items():
+        budget_summary[fraction]={
+          "source_trials":br["source_trials"],
+          "source_trials_by_subject":br["source_trials_by_subject"],
+          "source_path":br["source_path"],
+          "final_lambda_by_method":br["final_lambda_by_method"],
+          "per_target_subject_auc":{
+            str(sid):{method:float(roc_auc_score(
+                yt[gt==sid],score[gt==sid]))
+                for method,score in br["score_vectors"].items()}
+            for sid in TARGET}}
+    del budget_results
+
     result={
       "status":"REAL_EEGMMIDB_S041_S060_REPRESENTATION_REGULARISATION_PROSPECTIVE",
       "official_dataset":"PhysioNet EEGMMIDB 1.0.0 DOI 10.13026/C28G6P",
@@ -323,6 +379,7 @@ def main():
       "all_original_task_cues_retained_in_every_band":True,
       "full_domain_grid":list(FULL_GRID),
       "representations":rep_meta,"source_paths":paths,
+      "source_budget_intervention":budget_summary,
       "per_target_subject":per_subject,"predeclared_contrasts":summaries,
       "files":files,"wall_seconds":round(time.monotonic()-t0,2),
       "interpretation":"Prospective participant-level mechanism experiment; no cross-paper SOTA inference."}
