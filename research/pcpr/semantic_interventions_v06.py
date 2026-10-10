@@ -40,7 +40,7 @@ class Intervention(ast.NodeTransformer):
  def visit_Call(self,node):
   node=self.generic_visit(node)
   name=call_name(node.func)
-  if self.operator=="drop_tensor_factory_dtype" and name in ("torch.tensor","torch.as_tensor"):
+  if self.operator=="drop_tensor_factory_dtype" and name in ("torch.tensor","torch.as_tensor","torch.eye","torch.zeros","torch.ones","torch.full","torch.arange"):
    kw=[x for x in node.keywords if x.arg=="dtype"]
    if len(kw)==1:
     node.keywords=[x for x in node.keywords if x.arg!="dtype"]
