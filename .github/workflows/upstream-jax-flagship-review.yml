@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: jax-ml/jax
-          ref: 877fdb22ddb3a7f9c68df73571a42541cbd30f7f
+          ref: 1d8cac844d810025b6189617508f8043631e3de6
           path: jax
           fetch-depth: 1
       - uses: actions/setup-python@v5
@@ -64,7 +64,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: jax-ml/jax
-          ref: 6ca63606754a0bf93852d6cf401eaeee302932fb
+          ref: c5e895b766b791d95139dfbc0de30e69095616e7
           path: jax
           fetch-depth: 1
       - uses: actions/setup-python@v5
@@ -108,7 +108,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: jax-ml/jax
-          ref: 877fdb22ddb3a7f9c68df73571a42541cbd30f7f
+          ref: 1d8cac844d810025b6189617508f8043631e3de6
           path: jax
           fetch-depth: 1
       - uses: actions/setup-python@v5
@@ -144,7 +144,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: jax-ml/jax
-          ref: 6ca63606754a0bf93852d6cf401eaeee302932fb
+          ref: c5e895b766b791d95139dfbc0de30e69095616e7
           path: jax
           fetch-depth: 1
       - uses: actions/setup-python@v5
