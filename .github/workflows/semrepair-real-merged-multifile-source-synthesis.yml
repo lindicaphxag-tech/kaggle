@@ -1,0 +1,50 @@
+name: SemRepair true upstream merged LeRobot bug three-file patch synthesis with source contracts
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/verified_multifile_source_synthesis.py'
+      - 'research/semrepair/test_verified_multifile_source_synthesis.py'
+      - 'research/semrepair/real_merged_lerobot_processor_contract.py'
+      - '.github/workflows/semrepair-real-merged-multifile-source-synthesis.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-publisher-16-program-source-repairs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Execute actual LeRobot upstream before-after AST, synthesize all 16 programs, test contracts
+        run: |
+          python -m unittest -v research.semrepair.test_real_merged_lerobot_processor_contract
+          python -m unittest -v research.semrepair.test_verified_multifile_source_synthesis
+      - name: Save all original publisher program behavior, author candidate patches, real publisher merged baseline
+        run: python -m research.semrepair.verified_multifile_source_synthesis > real_LeRobot_3711_multifile_16candidate_source_synthesis.json
+      - name: Show weak overfit tests versus full three-file semantic contract and independently merged publisher source
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('real_LeRobot_3711_multifile_16candidate_source_synthesis.json'))
+          for k in ('publisher_merge','catalog_program_count',
+                    'one_source_contract_test_plausible_count',
+                    'complete_source_contract_candidate_count',
+                    'minimum_cost_licensed_operator_set',
+                    'minimum_cost_over_finite_catalog'):
+              print('RESULT',k,x[k])
+          for x in x['all_candidate_programs_and_outcomes']:
+              print('PATCH',x['operators'],'COST',x['declared_cost'],
+                    'SINGLE',x['source_contract']['single_trigger_contract_pass'],
+                    'CROSSFILE',x['source_contract']['cross_file_contract_pass'],
+                    'ADMISSIBLE',x['accepted'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semrepair-genuine-LeRobot-3711-16-multifile-program-repairs-raw
+          path: real_LeRobot_3711_multifile_16candidate_source_synthesis.json
+          if-no-files-found: warn
+          retention-days: 90
