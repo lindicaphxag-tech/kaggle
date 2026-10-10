@@ -27,7 +27,7 @@ jobs:
         run: |
           set -euo pipefail
           curl --fail --location --retry 3 \
-            'https://github.com/lindicaphxag-tech/cs/archive/refs/heads/research/defaultreg-strict-inductive-signed-transfer-20261010.tar.gz' \
+            'https://codeload.github.com/lindicaphxag-tech/cs/tar.gz/ac9a95d7ca21521b07a75e6735d55f8455ebbf0b' \
             -o cs.tar.gz
           mkdir -p cs-unpack
           tar -xzf cs.tar.gz -C cs-unpack
@@ -46,7 +46,7 @@ jobs:
           cp -a kaggle/research/defaultreg_frontier bundle/kaggle/research/
           cp kaggle/.github/workflows/defaultreg-frontier-shin-bnci002.yml bundle/kaggle/.github/workflows/
           cp kaggle/.github/workflows/defaultreg-package-all-current.yml bundle/kaggle/.github/workflows/
-          CS_SHA=$(git ls-remote https://github.com/lindicaphxag-tech/cs.git refs/heads/research/defaultreg-strict-inductive-signed-transfer-20261010 | awk '{print $1}')
+          CS_SHA=ac9a95d7ca21521b07a75e6735d55f8455ebbf0b
           KAGGLE_SHA=$(git -C kaggle rev-parse HEAD)
           {
             echo '# Default Regularisation — exact current source snapshot'
