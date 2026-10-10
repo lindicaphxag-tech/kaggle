@@ -2,7 +2,7 @@
 
 Frozen design:
 - all available subjects, outer LOPO;
-- exact common 21 sensorimotor channels;
+- exact common 20 sensorimotor channels (preflight amendment: FCz unavailable in Lee2019);
 - 8-30 Hz, dataset task window, resampled to 160 Hz;
 - Z0: no outer-target labels/features/moments choose geometry, lambda, or model;
 - deterministic five-fold participant-grouped source selection;
@@ -24,7 +24,7 @@ from moabb.datasets import Cho2017,Lee2019_MI
 from moabb.paradigms import MotorImagery
 from pyriemann.classification import MDM
 
-COMMON21=("FC5","FC3","FC1","FCz","FC2","FC4","FC6",
+COMMON21=("FC5","FC3","FC1","FC2","FC4","FC6",
           "C5","C3","C1","Cz","C2","C4","C6",
           "CP5","CP3","CP1","CPz","CP2","CP4","CP6")
 FULL_GRID=(
@@ -45,7 +45,7 @@ def build_dataset(name):
 def covariances(X):
     X=np.asarray(X,dtype=np.float64)
     if X.ndim!=3 or X.shape[1]!=len(COMMON21) or not np.isfinite(X).all():
-        raise ValueError("Expected finite [trial,21,time] EEG")
+        raise ValueError("Expected finite [trial,20,time] EEG")
     X=X-X.mean(axis=-1,keepdims=True)
     C=X@X.transpose(0,2,1)/X.shape[-1]
     scale=np.trace(C,axis1=1,axis2=2)/X.shape[1]
@@ -304,7 +304,7 @@ def main():
       "status":"REAL_EXTERNAL_FULL_DOMAIN_PROSPECTIVE",
       "dataset":a.dataset,"subjects":list(subjects),"n_subjects":len(subjects),
       "task":"left_hand_vs_right_hand","channels":list(COMMON21),
-      "feature_dimension":231,"band_hz":[8,30],"epoch_seconds":[0,tmax],
+      "feature_dimension":int(len(COMMON21)*(len(COMMON21)+1)//2),"band_hz":[8,30],"epoch_seconds":[0,tmax],
       "resample_hz":160,"reject_by_annotation":False,
       "target_information_track":"Z0",
       "target_labels_used_before_scoring":False,
