@@ -1,0 +1,83 @@
+name: JAX 41228 baseline vs fix Poisson variance witness
+
+on:
+  push:
+    branches:
+      - ci/upstream-jax-flagship-review-20261011
+    paths:
+      - .github/workflows/upstream-jax-poisson-redgreen.yml
+      - validation/jax_poisson_pr41228_redgreen.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  poisson-red-green:
+    name: Poisson lam=1e8 / ${{ matrix.label }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: original-base
+            commit: 93e877c99dc05a1fe9409a9789c25e05bb187982
+            expected: broken_baseline
+          - label: patched-current-head
+            commit: 6ca63606754a0bf93852d6cf401eaeee302932fb
+            expected: corrected
+    steps:
+      - name: Checkout validation harness
+        uses: actions/checkout@v4
+        with:
+          ref: ci/upstream-jax-flagship-review-20261011
+          path: research
+          fetch-depth: 1
+      - name: Checkout exact immutable JAX source
+        uses: actions/checkout@v4
+        with:
+          repository: jax-ml/jax
+          ref: ${{ matrix.commit }}
+          path: jax
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install exact JAX checkout
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ./jax
+      - name: Assert repository source identity and execute multi-seed regression
+        working-directory: jax
+        env:
+          PYTHONPATH: ${{ github.workspace }}/jax
+          XLA_PYTHON_CLIENT_PREALLOCATE: "false"
+        run: |
+          ACTUAL="$(git rev-parse HEAD)"
+          test "$ACTUAL" = "${{ matrix.commit }}"
+          python ../research/validation/jax_poisson_pr41228_redgreen.py \
+            --expected ${{ matrix.expected }} \
+            --rate 1e8 --n-per-seed 100000 \
+            --report "../poisson-${{ matrix.label }}.json"
+      - name: Create execution manifest
+        if: always()
+        run: |
+          {
+            echo "upstream=jax-ml/jax"
+            echo "issue=41202"
+            echo "pr=41228"
+            echo "source_sha=${{ matrix.commit }}"
+            echo "harness_commit=$(git -C research rev-parse HEAD)"
+            echo "python=$(python --version)"
+            python -m pip show jax jaxlib numpy scipy | grep -E '^(Name|Version):'
+          } > "poisson-${{ matrix.label }}-environment.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: poisson-redgreen-${{ matrix.label }}
+          path: |
+            poisson-${{ matrix.label }}.json
+            poisson-${{ matrix.label }}-environment.txt
+          if-no-files-found: warn
+          retention-days: 90
