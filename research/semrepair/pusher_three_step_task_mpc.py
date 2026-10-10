@@ -49,7 +49,7 @@ FAULT_INNER_CLIP=.8
 STEPS=100
 HORIZON=3
 # Nine physically admissible endpoints plus exact Euclidean projection.
-FUTURE_CONTROL_GRID=(-1.,0.,1.)
+FUTURE_CONTROL_GRID=(-1.,-.5,0.,.5,1.)
 ARM_NAMES=("official-healthy","exact-instantaneous-action-oracle",
            "privileged-native-three-step-tail-MPC")
 
