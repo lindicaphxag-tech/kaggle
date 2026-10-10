@@ -90,5 +90,41 @@ class SimultaneousPathSensitivityTests(unittest.TestCase):
         ))
 
 
+    def test_translation_invariant_error_ignores_subject_intercepts(self):
+        rng = np.random.default_rng(48)
+        n, m = 16, 37
+        lam = np.linspace(0., 1., m)
+        A = .55 + .07*lam[None, :] + rng.normal(0., .006, (n, m))
+        R = np.tile((lam-.17)**2, (n, 1))
+        offsets = np.linspace(-.18, .18, n)[:, None]
+        a = simultaneous_path_sensitivity(A, R, lam, reps=1000, seed=7)
+        b = simultaneous_path_sensitivity(A+offsets, R, lam, reps=1000, seed=7)
+        self.assertAlmostEqual(
+            a["translation_invariant_oscillation_radius95"],
+            b["translation_invariant_oscillation_radius95"], places=12
+        )
+        self.assertAlmostEqual(
+            a["translation_invariant_span_bounds_nominal95"][0],
+            b["translation_invariant_span_bounds_nominal95"][0], places=12
+        )
+        # Whole-path absolute ordinate error is sensitive to subject offsets.
+        self.assertGreater(
+            b["full_path_supremum_bootstrap_radius"],
+            a["full_path_supremum_bootstrap_radius"]
+        )
+
+    def test_oscillation_radius_is_bounded_by_twice_sup_radius(self):
+        lam=np.linspace(0.,1.,15)
+        rng=np.random.default_rng(519)
+        A=np.clip(.65+.06*lam[None,:]+rng.normal(0,.03,(11,15)),0,1)
+        R=np.tile((lam-.3)**2,(11,1))
+        z=simultaneous_path_sensitivity(A,R,lam,reps=600,seed=8)
+        self.assertLessEqual(
+            z["translation_invariant_oscillation_radius95"],
+            2*z["full_path_supremum_bootstrap_radius"]+1e-12
+        )
+        self.assertEqual(z["status"],
+                         "POST_OUTCOME_CONDITIONAL_SIMULTANEOUS_SENSITIVITY_NOT_CONFIRMATORY")
+
 if __name__=="__main__":
     unittest.main()
