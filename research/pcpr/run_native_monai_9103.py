@@ -4,7 +4,7 @@ Retrospective exploration AFTER the v0.5 cohort's first source scan. Never
 report as independent blind patch correctness. Pinned unmodified upstream Git
 blobs and original two method bodies; one generic semantic intervention.
 """
-import ast,copy,hashlib,json,urllib.request
+import ast,copy,hashlib,json,urllib.request,builtins
 import torch
 from torch import nn
 from native_ast_lift_v03 import SAFE_BUILTINS,check_replay_ast
@@ -44,7 +44,8 @@ def lift_class(src):
    bases=[ast.Name(id="_Loss",ctx=ast.Load())],
    keywords=[],body=bodies,decorator_list=[])],type_ignores=[])
  module=ast.fix_missing_locations(module)
- scope={"__builtins__":SAFE_BUILTINS,"torch":torch,
+ scope={"__builtins__":{**SAFE_BUILTINS,"__build_class__":builtins.__build_class__},
+        "__name__":"pcpr_pinned_monai_source", "torch":torch,
         "_Loss":nn.modules.loss._Loss}
  exec(compile(module,"<verified-MONAI-class-AST>","exec"),scope,scope)
  return scope["BarlowTwinsLoss"]
