@@ -42,6 +42,8 @@ jobs:
         run: python research/pcpr/run_native_kornia_5446.py
       - name: Run pinned Kornia So2 native package broadcast before/after source
         run: python research/pcpr/run_native_kornia_5005.py
+      - name: Run finite-state adaptive proof-scope planner (synthetic only)
+        run: python research/pcpr/adaptive_scope_planner.py
       - name: Preserve case-level source provenance
         uses: actions/upload-artifact@v4
         with:
@@ -51,6 +53,7 @@ jobs:
             pcpr_vnext_frozen_first_score.json
             pcpr_v02_posthoc_effects.json
             pcpr_v02_unseen_eight_first_score.json
+            pcpr_minimax_synthetic.json
             pcpr_kornia_native_package_evidence.json
             pcpr_kornia_so2_native.json
           if-no-files-found: error
