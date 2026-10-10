@@ -930,24 +930,32 @@
     },
     {
       "created_at": "2026-10-10T07:58:41Z",
+      "expiry_recorded_at": "2026-10-10T21:58:27Z",
+      "expiry_sha256": "c0275da0e5a7987465945d71eb69b80c49e646da79fea0f65a7fdf0905c76798",
+      "expiry_source": "expirations/ros-controls__ros2_controllers__2696.json",
       "first_frozen_at": "2026-10-10T13:02:03Z",
       "id": "ros-controls/ros2_controllers#2696",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 2696,
       "prediction_deadline_at": "2026-10-10T19:02:03Z",
       "repository": "ros-controls/ros2_controllers",
       "source": "inbox/FIRST_SEEN_20261010T130203Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "340cd3431e0c951ccf875a2b11f4b7f1155842bfb90302adca8d13865291f442"
     },
     {
       "created_at": "2026-10-10T13:20:19Z",
+      "expiry_recorded_at": "2026-10-10T21:58:27Z",
+      "expiry_sha256": "0c57df972be32a02453106f8e7d35590d8ffe9b8da3f4b02b0be36a81486b355",
+      "expiry_source": "expirations/gazebosim__gz-sim__4068.json",
       "first_frozen_at": "2026-10-10T13:35:41Z",
       "id": "gazebosim/gz-sim#4068",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 4068,
       "prediction_deadline_at": "2026-10-10T19:35:41Z",
       "repository": "gazebosim/gz-sim",
       "source": "inbox/FIRST_SEEN_20261010T133541Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "d19ceac74bb22cb1743af924120c86a5357b653be307e2efb9493d198e4d930a"
     },
     {
@@ -1004,6 +1012,28 @@
       "source": "inbox/FIRST_SEEN_20261010T180028Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "8855b7ef63f51e550c1610bd70edd44b82a72bd74cb14ad003d5bdc793241b63"
+    },
+    {
+      "created_at": "2026-10-10T19:03:37Z",
+      "first_frozen_at": "2026-10-10T21:59:41Z",
+      "id": "Farama-Foundation/Minari#367",
+      "issue_number": 367,
+      "prediction_deadline_at": "2026-10-11T03:59:41Z",
+      "repository": "Farama-Foundation/Minari",
+      "source": "inbox/FIRST_SEEN_20261010T215941Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "466874311950d7b5d4a6caa1471af8f5d015dc645123afc63d56e33f6965f78b"
+    },
+    {
+      "created_at": "2026-10-10T19:35:46Z",
+      "first_frozen_at": "2026-10-10T21:59:41Z",
+      "id": "ros-controls/ros2_control#3683",
+      "issue_number": 3683,
+      "prediction_deadline_at": "2026-10-11T03:59:41Z",
+      "repository": "ros-controls/ros2_control",
+      "source": "inbox/FIRST_SEEN_20261010T215941Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "2c4982873391bcfda566c5440119b1289253d3c384f294b62973d3962444f09e"
     }
   ]
 }
