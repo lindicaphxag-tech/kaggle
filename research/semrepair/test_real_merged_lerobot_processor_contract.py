@@ -37,6 +37,16 @@ class ActualMergedLeRobotRepairTests(unittest.TestCase):
         self.assertTrue(r["after"]["actual_original_factory_kwargs"][
                         "postprocessor_overrides"]["absolute_actions_processor"]["enabled"])
 
+    def test_real_merged_multifile_registry_and_config_guard(self):
+        x=self.r["cross_file_merged_processor_contract"]
+        self.assertTrue(x["pre_merge_missing_fresh_rename_guard"])
+        self.assertTrue(x["merge_introduces_explicit_fresh_rename_refusal"])
+        self.assertTrue(x["pre_merge_uses_old_relative_processor_registry_key"])
+        self.assertTrue(x["merged_processor_registry_matches_override_key"])
+        self.assertEqual(len(x["verified_git_blobs"]),4)
+        self.assertTrue(all(len(v)==64 for v in
+                            x["verified_actual_source_sha256"].values()))
+
     def test_pretrained_nonrelative_renames_still_preserve_checkpoint_and_contract(self):
         r=next(x for x in self.r["scenarios"] if
                x["scenario"]=="pretrained_absolute_with_renames")
