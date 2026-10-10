@@ -65,7 +65,8 @@ class TwoDomainRobustSignedSourceTests(unittest.TestCase):
             "deployment_action_radius":2.0,
             "producer_abs_coeff_error":copy.deepcopy(DRIFT),
             "controller_abs_coeff_error":copy.deepcopy(DRIFT),
-            "max_allowed_abs_output_action_error":.01
+            "max_allowed_abs_output_action_error":.01,
+            "max_authorized_internal_source_clip":2.05
         }
 
     @staticmethod
@@ -139,6 +140,31 @@ class TwoDomainRobustSignedSourceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"cannot certify"):
             self.activate(profile=p)
         self.assertEqual(self.path.read_bytes(),self.original)
+
+    def test_signed_two_domains_cannot_override_calibration_hard_clip_cap(self):
+        p=copy.deepcopy(self.profile)
+        new=copy.deepcopy(NEW)
+        new["clip"]=2.11
+        replacement=_canonical(new)
+        p["replacement_source_sha256"]=sha256(replacement).hexdigest()
+        m=copy.deepcopy(self.manifest)
+        m["replacement_source_sha256"]=sha256(replacement).hexdigest()
+        with self.assertRaisesRegex(ValueError,"separately signed calibrated hard cap"):
+            self.activate(profile=p,original_manifest=m,replacement=replacement)
+        self.assertEqual(self.path.read_bytes(),self.original)
+
+    def test_bad_signed_clip_cap_shape_fails_closed(self):
+        p=copy.deepcopy(self.profile)
+        p["max_authorized_internal_source_clip"]=float("nan")
+        # Canonical serializer refuses NaN, even if supplied by trusted signers.
+        with self.assertRaises(ValueError):
+            self.activate(profile=p)
+        self.assertEqual(self.path.read_bytes(),self.original)
+
+    def test_signed_cap_authorizes_actual_nominal_patch_only(self):
+        report=self.activate()
+        self.assertAlmostEqual(report["signed_hard_internal_source_clip_cap"],2.05)
+        self.assertLessEqual(NEW["clip"],report["signed_hard_internal_source_clip_cap"])
 
     def test_pinned_outside_calibration_profile_sha_mismatch_refused(self):
         with self.assertRaisesRegex(ValueError,"independently pinned digest"):
