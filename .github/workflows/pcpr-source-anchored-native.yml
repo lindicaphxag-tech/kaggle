@@ -56,6 +56,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python research/pcpr/run_v05_authenticated_retry.py
+      - name: Run generic AST single-edit native counterfactuals (development only)
+        run: python research/pcpr/run_v06_native_counterfactuals.py
       - name: Preserve case-level source provenance
         uses: actions/upload-artifact@v4
         with:
@@ -70,6 +72,7 @@ jobs:
             pcpr_v04_cec_real_source_receipts.json
             pcpr_v05_unseen_eight_first_score.json
             pcpr_v05_eight_auth_transport_retry.json
+            pcpr_v06_native_single_edit_counterfactuals.json
             pcpr_kornia_native_package_evidence.json
             pcpr_kornia_so2_native.json
           if-no-files-found: error
