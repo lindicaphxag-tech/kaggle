@@ -14,7 +14,7 @@ only after every method's score vector (including the entire scalar path) has
 been frozen in memory for that outer participant.
 """
 from __future__ import annotations
-import argparse,itertools,json,math,platform,sys,time
+import argparse,hashlib,itertools,json,math,os,platform,sys,time
 from pathlib import Path
 
 import numpy as np
@@ -32,6 +32,10 @@ FULL_GRID=(
   0.0,0.0005,0.001,0.002,0.003,0.005,0.0075,0.01,0.015,0.02,0.03,
   0.05,0.075,0.10,0.15,0.20,0.30,0.40,0.50,0.60,0.70,0.80,
   0.90,0.95,0.98,0.99,1.0)
+DENSE_FRONTIER_GRID=tuple(sorted(set(
+  [round(i*.0025,10) for i in range(401)] +
+  [0.0,.0005,.001,.002,.003,.005,.0075,.01,.015,.02,.03,.05]
+)))
 SEED=20261010
 TMIN,TMAX=0.0,4.0
 RESAMPLE=160
@@ -95,6 +99,40 @@ def predictive_nll(state,residual,lam):
     Z=residual@U
     return float((np.sum(np.log(r))+np.mean(np.sum((Z*Z)/r,axis=1)))/len(r))
 
+def dense_predictive_nll(state,residual,lambdas=DENSE_FRONTIER_GRID):
+    e,U,_,_,nu,_=state
+    lam=np.asarray(lambdas,dtype=float)
+    r=(1-lam[:,None])*e[None,:]+lam[:,None]*nu
+    tol=64*np.finfo(float).eps*max(1.,nu,float(np.max(np.abs(e))))
+    valid=np.all(np.isfinite(r)&(r>tol),axis=1)
+    Z=residual@U;z2=np.mean(Z*Z,axis=0)
+    out=np.full(len(lam),np.nan)
+    rv=r[valid]
+    out[valid]=(np.sum(np.log(rv),axis=1)+np.sum(z2[None,:]/rv,axis=1))/len(e)
+    return out,valid
+
+def dense_score_matrix(state,X,lambdas=DENSE_FRONTIER_GRID):
+    e,U,d,mid,nu,_=state
+    lam=np.asarray(lambdas,dtype=float)
+    r=(1-lam[:,None])*e[None,:]+lam[:,None]*nu
+    tol=64*np.finfo(float).eps*max(1.,nu,float(np.max(np.abs(e))))
+    valid=np.all(np.isfinite(r)&(r>tol),axis=1)
+    V=(X-mid)@U
+    coef=np.zeros_like(r)
+    coef[valid]=(U.T@d)[None,:]/r[valid]
+    return V@coef.T,valid
+
+def hash_score_family(scores,dense_matrix,target_indices):
+    h=hashlib.sha256()
+    for name in sorted(scores):
+        h.update(name.encode());h.update(np.asarray(scores[name],dtype="<f8").tobytes())
+    h.update(b"DENSE_FRONTIER_GRID")
+    h.update(np.asarray(DENSE_FRONTIER_GRID,dtype="<f8").tobytes())
+    h.update(np.asarray(dense_matrix,dtype="<f8").tobytes())
+    h.update(b"TARGET_INDICES")
+    h.update(np.asarray(target_indices,dtype="<i8").tobytes())
+    return h.hexdigest()
+
 def analytic_scores(Xtr,ytr,Xte,kind):
     _,d,mid,R=moments(Xtr,ytr)
     est=(LedoitWolf(store_precision=False) if kind=="LW" else OAS(store_precision=False)).fit(R)
@@ -124,7 +162,9 @@ def source_path(C,y,g):
     if len(people)<8:raise ValueError("too few source participants")
     nfold=min(5,len(people))
     store={lam:{"auc":[],"nll":[]} for lam in FULL_GRID}
-    feasible={lam:True for lam in FULL_GRID};fold_receipts=[]
+    feasible={lam:True for lam in FULL_GRID}
+    dense_nll={lam:[] for lam in DENSE_FRONTIER_GRID};dense_feasible={lam:True for lam in DENSE_FRONTIER_GRID}
+    fold_receipts=[]
     for fold in range(nfold):
         held=[s for s in people if (s-1)%nfold==fold]
         va=np.isin(g,held);tr=~va
@@ -137,6 +177,14 @@ def source_path(C,y,g):
             _,_,_,R=moments(XX,yy);by_person[sid]=(yy,XX,R)
         fold_receipts.append({"fold":fold,"train_subjects":[int(s) for s in people if s not in held],
                               "validation_subjects":list(map(int,held))})
+        for sid in held:
+            _,_,R=by_person[sid]
+            vv,valid=dense_predictive_nll(state,R)
+            for jj,lam in enumerate(DENSE_FRONTIER_GRID):
+                if not valid[jj] or not np.isfinite(vv[jj]):
+                    dense_feasible[lam]=False
+                elif dense_feasible[lam]:
+                    dense_nll[lam].append(float(vv[jj]))
         for lam in FULL_GRID:
             if not feasible[lam]:continue
             aa=[];nn=[]
@@ -163,12 +211,17 @@ def source_path(C,y,g):
     lc=min(good,key=lambda z:(crit[z]["covariance_mean_nll"],z))
     threshold=crit[lc]["covariance_mean_nll"]+crit[lc]["covariance_nll_se"]
     one_se=[z for z in good if crit[z]["covariance_mean_nll"]<=threshold+1e-15]
+    dense_good=[lam for lam in DENSE_FRONTIER_GRID if dense_feasible[lam] and len(dense_nll[lam])==len(people)]
+    if not dense_good:raise ValueError("no dense covariance-fidelity point feasible")
+    dense_mean={str(float(lam)):float(np.mean(dense_nll[lam])) for lam in dense_good}
     return {"lambda_discriminability":float(ld),"lambda_covariance_nll":float(lc),
             "discriminability_boundary_hit":bool(ld in (0.,1.)),
             "covariance_boundary_hit":bool(lc in (0.,1.)),
             "feasible_lambdas":list(map(float,good)),
             "infeasible_lambdas":[float(z) for z in FULL_GRID if z not in good],
             "criteria_by_lambda":{str(z):crit[z] for z in good},
+            "dense_frontier_lambdas":list(map(float,dense_good)),
+            "dense_covariance_mean_nll_by_lambda":dense_mean,
             "covariance_1se_lambdas":list(map(float,one_se)),
             "inner_fold_receipts":fold_receipts}
 
@@ -226,11 +279,36 @@ def score_outer(C,y,g,target):
     csp_lr=LogisticRegression(C=1.,solver="lbfgs",max_iter=3000);csp_lr.fit(Ftr,y[tr])
     scores["CSP6_LogisticRegression"]=csp_lr.decision_function(Fte)
     timings["CSP6_LogisticRegression"]=time.perf_counter()-t
+    t=time.perf_counter();dense_matrix,dense_valid=dense_score_matrix(state,Xte)
+    timings["dense_target_score_path"]=time.perf_counter()-t
+    if not np.all(dense_valid[np.isin(np.asarray(DENSE_FRONTIER_GRID),np.asarray(path["dense_frontier_lambdas"]))]):
+        raise ValueError("source-fidelity dense grid not feasible on final source model")
+    score_family_sha256=hash_score_family(scores,dense_matrix,np.flatnonzero(te))
 
-    # Target labels are first accessed here, AFTER all score vectors exist.
+    # Target labels are first accessed here, AFTER all score vectors and hash exist.
     yy=y[te]
     auc={k:float(roc_auc_score(yy,v)) for k,v in scores.items()}
     path_auc={k:float(roc_auc_score(yy,v)) for k,v in path_scores.items()}
+    dense_auc={str(float(lam)):float(roc_auc_score(yy,dense_matrix[:,j]))
+               for j,lam in enumerate(DENSE_FRONTIER_GRID) if dense_valid[j] and str(float(lam)) in path["dense_covariance_mean_nll_by_lambda"]}
+    cov_dense=path["dense_covariance_mean_nll_by_lambda"]
+    best_cov=min(cov_dense.values())
+    ordered=sorted((float(cov_dense[k])-best_cov,float(dense_auc[k]),float(k)) for k in dense_auc)
+    running=[];lo=1.;hi=0.;max_span=0.;first_002=None
+    for delta,a,lam in ordered:
+        lo=min(lo,a);hi=max(hi,a);span=hi-lo;max_span=max(max_span,span)
+        if first_002 is None and span>=.02:first_002=delta
+        running.append({"covariance_regret":delta,"auc_min":lo,"auc_max":hi,"auc_span":span,"lambda_entered":lam})
+    grid_sensitivity={}
+    for stride in (1,2,4,8):
+        subset=ordered[::stride];aa=[];l=1.;h=0.
+        for delta,a,lam in subset:
+            l=min(l,a);h=max(h,a);aa.append(h-l)
+        grid_sensitivity[str(stride)]=float(max(aa) if aa else 0.)
+    frontier={"max_auc_span":float(max_span),
+              "first_covariance_regret_for_auc_span_ge_0_02":None if first_002 is None else float(first_002),
+              "grid_stride_max_span":grid_sensitivity,
+              "points":running}
     one=[str(float(l)) for l in path["covariance_1se_lambdas"]]
     vals=[path_auc[k] for k in one]
     timings["outer_total"]=time.perf_counter()-fold_start
@@ -243,6 +321,9 @@ def score_outer(C,y,g,target):
                                   "LedoitWolf_nearest_grid":float(min(FULL_GRID,key=lambda z:abs(z-lw))),
                                   "OAS_nearest_grid":float(min(FULL_GRID,key=lambda z:abs(z-oas)))},
             "source_path":path,"auc":auc,"target_auc_path_by_lambda":path_auc,
+            "dense_target_auc_path_by_lambda":dense_auc,
+            "validity_frontier":frontier,
+            "score_family_sha256_frozen_before_labels":score_family_sha256,
             "target_path_scores_frozen_before_labels":True,
             "source_covariance_1se_target_auc_span":float(max(vals)-min(vals)),
             "csp_generalized_eigenvalues":list(map(float,csp_eval)),
@@ -304,6 +385,8 @@ def main():
       "epoch_seconds":[TMIN,TMAX],"resample_hz":RESAMPLE,
       "target_information_track":"Z0","target_labels_used_before_scoring":False,
       "target_batch_statistics_used":False,"full_domain_grid":list(FULL_GRID),
+      "dense_frontier_grid":list(DENSE_FRONTIER_GRID),
+      "code_commit":os.environ.get("GITHUB_SHA","UNAVAILABLE_OUTSIDE_GITHUB_ACTIONS"),
       "participant_receipt":receipt,"mean_auc_by_method":macro,
       "primary_comparisons":comps,
       "objective_separation":{
@@ -313,6 +396,12 @@ def main():
         "lambda_D_boundary_hits":int(np.sum(np.isin(ld,[0.,1.]))),
         "lambda_C_boundary_hits":int(np.sum(np.isin(lc,[0.,1.]))),
         "median_analytic_LW_shrinkage":float(np.median(lw))},
+      "validity_frontier_dense_summary":{
+        "mean_max_auc_span":float(np.mean([f["validity_frontier"]["max_auc_span"] for f in folds])),
+        "median_max_auc_span":float(np.median([f["validity_frontier"]["max_auc_span"] for f in folds])),
+        "max_max_auc_span":float(np.max([f["validity_frontier"]["max_auc_span"] for f in folds])),
+        "score_family_hash_present_for_every_target":bool(all(len(f["score_family_sha256_frozen_before_labels"])==64 for f in folds)),
+        "target_path_used_for_selection":False},
       "validity_frontier_1se_summary":{
         "mean_target_auc_span":float(np.mean([f["source_covariance_1se_target_auc_span"] for f in folds])),
         "median_target_auc_span":float(np.median([f["source_covariance_1se_target_auc_span"] for f in folds])),
