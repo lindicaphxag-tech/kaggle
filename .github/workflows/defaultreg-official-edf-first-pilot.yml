@@ -14,6 +14,7 @@ permissions:
   contents: read
 jobs:
   official-edf-source-only:
+    if: github.event_name == 'push' && github.ref_name == 'research/defaultreg-public-edf-baseline-feasibility-20261010'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
