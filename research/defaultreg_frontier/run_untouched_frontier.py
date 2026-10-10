@@ -251,42 +251,47 @@ def source_path(C, y, groups):
             try:
                 for sid in held_people:
                     yy, XX, R = by_person[sid]
-                    score = scalar_scores(state, XX, lam)
-                    aucs.append(float(roc_auc_score(yy, score)))
                     nlls.append(predictive_nll(state, R, lam))
+                    if lam in FULL_GRID:
+                        score = scalar_scores(state, XX, lam)
+                        aucs.append(float(roc_auc_score(yy, score)))
             except (np.linalg.LinAlgError, ValueError, FloatingPointError):
                 feasible[lam] = False
                 continue
-            if not np.isfinite(aucs).all() or not np.isfinite(nlls).all():
+            if not np.isfinite(nlls).all():
                 feasible[lam] = False
                 continue
-            store[lam]["auc"].extend(aucs)
+            if lam in FULL_GRID and not np.isfinite(aucs).all():
+                feasible[lam] = False
+                continue
+            if lam in FULL_GRID:
+                store[lam]["auc"].extend(aucs)
             store[lam]["nll"].extend(nlls)
 
-    good = [
-        lam for lam in UNION_GRID
-        if feasible[lam] and len(store[lam]["auc"]) == len(people)
+    dense_good = [
+        lam for lam in DENSE_GRID
+        if feasible[lam] and len(store[lam]["nll"]) == len(people)
     ]
-    if not good:
-        raise ValueError("No scalar candidate feasible on every source participant")
+    full_good = [
+        lam for lam in FULL_GRID
+        if lam in dense_good and len(store[lam]["auc"]) == len(people)
+    ]
+    if len(full_good) < 2 or len(dense_good) < 8:
+        raise ValueError("Insufficient feasible full/dense path")
 
     criteria = {}
-    for lam in good:
-        a = np.asarray(store[lam]["auc"], dtype=float)
+    for lam in dense_good:
         n = np.asarray(store[lam]["nll"], dtype=float)
-        criteria[lam] = {
-            "source_macro_auc": float(np.mean(a)),
-            "source_auc_se": float(np.std(a, ddof=1) / np.sqrt(len(a))),
+        row = {
             "covariance_mean_nll": float(np.mean(n)),
             "covariance_nll_sd": float(np.std(n, ddof=1)),
             "covariance_nll_se": float(np.std(n, ddof=1) / np.sqrt(len(n))),
         }
-
-    full_good = [lam for lam in FULL_GRID if lam in criteria]
-    dense_good = [lam for lam in DENSE_GRID if lam in criteria]
-    if len(full_good) < 2 or len(dense_good) < 8:
-        raise ValueError("Insufficient feasible full/dense path")
-
+        if lam in full_good:
+            a = np.asarray(store[lam]["auc"], dtype=float)
+            row["source_macro_auc"] = float(np.mean(a))
+            row["source_auc_se"] = float(np.std(a, ddof=1) / np.sqrt(len(a)))
+        criteria[lam] = row
     lambda_macro = max(
         full_good,
         key=lambda lam: (criteria[lam]["source_macro_auc"], lam),
