@@ -1,0 +1,42 @@
+name: SemRepair robust hidden-world common-upstream physical action proof
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/robust_multiworld_upstream_control.py'
+      - 'research/semrepair/test_robust_multiworld_upstream_control.py'
+      - '.github/workflows/semrepair-multiworld-upstream-control.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  correct-hidden-source-upstream-robustness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Assert one common pre-interface input works in ALL hidden source worlds
+        run: python -m unittest -v research.semrepair.test_robust_multiworld_upstream_control
+      - name: Export numeric bracket, true world-output actions and sound refusal evidence
+        run: python -m research.semrepair.robust_multiworld_upstream_control > multiworld_same_upstream_action_certificate.json
+      - name: Show independent-output projection false optimism versus robust input model
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('multiworld_same_upstream_action_certificate.json'))
+          for name in ('uncertain_source_worlds','source_worlds_verified_to_share_correct_sign'):
+              z=r[name]
+              print(name,'DECISION',z['decision'],'ERROR_LOWER',
+                    z['global_minimax_lower_under_assumed_exact_model'],
+                    'ERROR_UPPER',z['global_minimax_upper_under_assumed_exact_model'],
+                    'EXECUTABLE_UPSTREAM',z['unique_common_upstream_witness'],
+                    'REPLAYED_PER_WORLD',z['per_world_ACTUAL_physical_commands'],
+                    'EXPANDED',z['expanded_interval_boxes'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: semrepair-robust-hidden-source-one-upstream-physical-proof
+          path: multiworld_same_upstream_action_certificate.json
+          retention-days: 90
