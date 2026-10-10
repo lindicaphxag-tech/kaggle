@@ -36,6 +36,10 @@ jobs:
         run: python research/pcpr/typed_effects_v02.py
       - name: Run unseen eight repos with pre-frozen v0.2 detector
         run: python research/pcpr/run_v02_unseen_eight.py
+      - name: Install Kornia import dependencies
+        run: python -m pip install kornia-rs numpy packaging
+      - name: Run pinned Kornia native package before/after source
+        run: python research/pcpr/run_native_kornia_5446.py
       - name: Preserve case-level source provenance
         uses: actions/upload-artifact@v4
         with:
@@ -45,4 +49,5 @@ jobs:
             pcpr_vnext_frozen_first_score.json
             pcpr_v02_posthoc_effects.json
             pcpr_v02_unseen_eight_first_score.json
+            pcpr_kornia_native_package_evidence.json
           if-no-files-found: error
