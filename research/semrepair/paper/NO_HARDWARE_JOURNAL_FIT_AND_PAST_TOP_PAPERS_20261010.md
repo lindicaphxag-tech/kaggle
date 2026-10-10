@@ -104,3 +104,27 @@ Reference source URLs:
 - RAS robust quadrotors: https://doi.org/10.1016/j.robot.2025.105088
 - EAAI: https://shop.elsevier.com/journals/engineering-applications-of-artificial-intelligence/0952-1976
 - Neurocomputing: https://shop.elsevier.com/journals/neurocomputing/0925-2312
+
+
+## 2026-10-10 late editorial cross-check: IST and newest accepted RAS source contracts
+
+### Most directly threatening recent RAS paper (do not ignore this in novelty comparisons)
+
+Luckcuck et al., **"A compositional approach to verifying modular robotic systems"**, Robotics and Autonomous Systems, **accepted 19 July 2026**, later assigned Volume 205 (November 2026), Article 105648, DOI https://doi.org/10.1016/j.robot.2026.105648 . This peer-reviewed study develops a *first-order logic ROS Contract Language* (RCL), Vanda parser and formal runtime monitor synthesis, heterogeneous component verification and case-study deployment on an independently existing modeled robotic system. The publisher's currently displayed volume can be a future issue even though acceptance predates October 2026. It is a stronger direct comparison than generic robot digital-twin articles. Its contribution is VERIFICATION and heterogeneous monitor generation; our potentially distinct contribution is **authorized source REPAIR selection under actuator reachability and software observation-equivalence obstructions**, with exact code-byte source activation. Merely claiming "compositional contracts on simulated robots" would overlap prior art and is NOT novel enough.
+
+### Information and Software Technology (IST): serious second SOFTWARE journal choice
+
+Official Elsevier scope: https://shop.elsevier.com/journals/information-and-software-technology/0950-5849 . IST requests practical software development improvement, design, coding, software testing, formal verification, V&V and empirical software engineering. A portable evidence-indexed source repair tool with true source-code before/after cases and software fault refusal data fits this remit. However, the current LeRobot source error is **author injected** and the Farama action adapter is **author injected**, so it does not yet establish practical gains on genuine software maintainer issues. IST is not a "guaranteed high probability acceptance backup" to JSS.
+
+### Newest actual implementation upgrade and evidential status
+
+- **Verified (not pending):** 7D (2..32D) minimal licensed source repair finite-catalog algorithm and strict caps, green https://github.com/lindicaphxag-tech/kaggle/actions/runs/38015187912 .
+- **Verified (not pending):** real external pretrained Pusher expert on 16 previously used task starts, signed clip-only source file change vs signed atomic config, 64 original native task replays; both recover -26.379423 mean original reward, .175368m mean object-goal distance. Source fields edited reduce from 3 to 1, a **66.7% field-count reduction**. This is NOT a 66.7% deployment-time improvement or signed vendor-hard-limit measurement. Green https://github.com/lindicaphxag-tech/kaggle/actions/runs/38015338180 .
+- **Verified (not pending):** executable ORIGINAL PyTorch to_absolute_actions/to_relative_actions from hash-verified HF LeRobot commit b9cb121cb7d4e3e26ec5c906d08dda68d151ba52 and Git blob 3405402904cf15ca18227b3a3fe006d7936f9d53. Across 64 two-hidden-world pairs and 8 correlated chunk steps, mean current-only minimax maximum error .23377410, correct-source historical anchor error 0. This is an *author-injected caller state lifetime defect*, NOT a real upstream LeRobot bug, and a blackbox that saved the original chunk anchor CAN TIE the repair. Green https://github.com/lindicaphxag-tech/kaggle/actions/runs/38016101114 .
+- **New algorithms pending CI:** (i) information-indexed authority decision over historical anchor worlds, where a valid cached-history blackbox is allowed to undercut needless source edits; (ii) exact one-typed-AST-node LeRobot callsite patch with original vendor torch converter unchanged; (iii) constrained 2D minimax over observational equivalence class × exact nonconvex actuator polytope union, including six combination source/history modes. These are algorithms with adversarial tests in the repo, but NO results are claimed before their jobs finish.
+
+### Updated editorial priority
+
+**Lead: JSS regular article**, subject to 2+ truly independently verified repository bug/fix histories and a portable program-level patch synthesizer, not just fine-grained corrections to authored source wrappers. **Second: IST regular paper** if software engineering empirical coverage broadens but new formal method depth falls short of CoCoSaFe or Vanda. **Third: RAS** only if software repair affects independently developed robot/control stacks and the main demonstration is robotics, not merely source identity. **Tool-focused publication: SoftwareX** if the primary valid output becomes a reusable, documented, maintained artifact rather than an independently new research theory; verify the actual indexing/quartile for chosen year (never infer CAS classification from SJR Q2). **Not primary**: EAAI and Neurocomputing without actual learned algorithm contribution.
+
+No 2026 CAS division or CCF tier has been independently confirmed from the Chinese Academy of Sciences/CCF authoritative listing in this turn, so DO NOT give a promised Zone 2 / CCF-B label or acceptance rate.
