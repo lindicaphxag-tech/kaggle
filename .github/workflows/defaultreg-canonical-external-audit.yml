@@ -37,7 +37,7 @@ jobs:
           assert x["target_labels_used_before_scoring"] is False
           assert x["target_batch_statistics_used"] is False
           assert x["full_domain_grid"][0]==0.0 and x["full_domain_grid"][-1]==1.0
-          assert len(x["folds"])==52 and len(x["channels"])==21
+          assert len(x["folds"])==52 and len(x["channels"])==20
           print("PASS_CHO2017_CANONICAL_FREEZE")
           PY
       - uses: actions/upload-artifact@v4
@@ -76,7 +76,7 @@ jobs:
           assert x["target_labels_used_before_scoring"] is False
           assert x["target_batch_statistics_used"] is False
           assert x["full_domain_grid"][0]==0.0 and x["full_domain_grid"][-1]==1.0
-          assert len(x["folds"])==54 and len(x["channels"])==21
+          assert len(x["folds"])==54 and len(x["channels"])==20
           print("PASS_LEE2019_CANONICAL_FREEZE")
           PY
       - uses: actions/upload-artifact@v4
