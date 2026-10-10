@@ -1,0 +1,152 @@
+# SNAPSHOT_SOURCE: lindicaphxag-tech/cs@0b26a5b0853e3b136a92c17e614a3a1936673621 path=papers/eeg-default-regularisation/paper_vnext/03_discussion_current.tex
+\section{Discussion}
+
+The reconstruction supports a different paper from the one suggested by the
+historical draft. The strongest result is not a new shrinkage estimator and
+not a universal multiplier. It is a validity result: covariance fidelity and
+cross-participant discrimination can define different regularisation regimes,
+and the choice between those objectives can alter both held-participant
+performance and the scientific conclusion drawn from an EEG representation
+comparison.
+
+The operator analysis clarifies why this is possible without claiming that
+the abstract distinction between covariance estimation and classification is
+new. Along the scalar shrinkage path, the standardized evaluation margin is
+invariant to the component of \(w_\lambda'\) that merely rescales the
+discriminant. Only the component that rotates the discriminant in the
+evaluation participant's covariance geometry can change the margin. The
+covariance-predictive derivative, by contrast, contains no class-contrast
+vector. Hence covariance stationarity provides no general guarantee of
+discriminative stationarity. Near an interior covariance optimum, the
+covariance loss can be locally flat to first order while the discriminative
+margin changes to first order. This local asymptotic statement is conditional:
+it does not apply unchanged when the covariance optimum lies on the boundary
+of the admissible path. That distinction is empirically relevant here,
+because BNCI2014\_002 selects \(\lambda_C=0\) in 13/14 outer folds,
+whereas BNCI2015\_001 selects interior values between 0.015 and 0.05. The
+Validity Frontier is therefore the primary empirical object in both cohorts;
+the local square-root mechanism is a compatible explanation only where its
+interior-optimum assumptions hold. The frontier measures how much decision
+variation is admitted by a given fidelity tolerance rather than treating
+numerical proximity in covariance loss as evidence of decision equivalence.
+
+The EEGMMIDB S021--S040 block establishes that this distinction can have a
+large prospective consequence. Source participant-discrimination selection
+improved macro AUC by approximately 0.056 over the stronger source
+covariance-NLL criterion and by 0.092 over Ledoit--Wolf, with both predeclared
+comparisons surviving Holm correction. The delete-one-source reselection
+audit is important because it changes the object that appears stable. The
+selected numerical strength moves from 0.4 to 0.95 when source composition is
+perturbed, whereas the ordering of source objectives retains a positive target
+consequence in all eight omissions. The empirical regularity is therefore not
+that \(\lambda=0.8\) is the correct EEG value; it is that a
+discrimination-matched source objective can occupy a different region from a
+covariance-matched objective and can transfer better under this protocol.
+
+The TRUE PRE-DATA external panel strengthens and simultaneously narrows that
+claim. BNCI2014\_002 and BNCI2015\_001 differ in acquisition geometry,
+channel count, tangent dimension, trial count and session structure, yet the
+two source objectives select different regularisation regions in 26/26 outer
+folds. The target-effect direction is also positive in both datasets:
+source-macro selection exceeds covariance-NLL by +0.0176 and +0.0433 AUC,
+respectively, and exceeds Ledoit--Wolf by +0.0229 and +0.0453. However,
+neither external dataset passes its own frozen exact sign-flip plus Holm
+family. We therefore regard the source-objective separation as strongly
+replicated in the studied motor-imagery cohorts and the target-performance
+consequence as directionally replicated, not as two additional individually
+significant superiority experiments. The distinction matters because the
+participant bootstrap intervals and exact randomisation tests answer related
+but non-identical finite-sample questions; choosing whichever is more
+favourable after seeing the outcome would defeat the purpose of the pre-data
+protocol.
+
+The corrected Validity Frontier adds a second form of external replication.
+The observed max-minus-min AUC spans exceed 0.02 over the frozen dense
+regularisation path in both TRUE PRE-DATA cohorts. Yet a positive percentile
+bootstrap lower endpoint for a data-selected maximum span does not by itself
+establish a population-level material path effect: even a flat population AUC
+path can produce a positive empirical max--min span from sampling noise across
+hundreds of lambda points. We therefore report these frontiers as descriptive
+post-score measurements and add an explicitly post-outcome simultaneous-path
+sensitivity diagnostic, rather than interpreting the original percentile
+intervals as proof of materiality. The raw fidelity budget required to
+reach a 0.02 span differs substantially: approximately 0.916 per-dimension
+NLL-regret units in BNCI2014\_002 and 0.175 in BNCI2015\_001. This
+heterogeneity is scientifically useful. It rejects the idea of one universal
+critical fidelity tolerance while supporting a more general statement that
+covariance fidelity defines a cohort-dependent decision-validity frontier.
+The dense-grid subset audit further shows that the observed spans are not an
+artifact of one particular grid resolution.
+
+The prospective representation experiment demonstrates why this validity
+question matters beyond classifier tuning. The regularisation objective
+significantly changes the filter-bank-versus-wideband contrast, but the
+direction is the opposite of the historical hypothesis:
+discrimination-oriented regularisation strengthens the wide-band advantage
+rather than uncovering a hidden filter-bank gain. The matched-dimension PCA
+control remains below WIDE231, while the nuisance-dimension and source-budget
+interventions do not support a simple monotonic feature-to-sample explanation.
+Thus the paper does not rescue its original representation story. It
+prospectively falsifies it while preserving the more general conclusion that
+regularisation objective can alter representation-level inference. This is a
+stronger measurement-validity result than a post-hoc ranking reversal selected
+because it supports the original narrative.
+
+The failed algorithmic corrections are similarly informative. Lower-tail
+signed selection did not beat correctly nested source tuning; CFCTS was
+prospectively inferior; FCTR collapses toward a covariance-fidelity region
+that underperformed on S021--S040; the TRUE PRE-DATA mean--tail--fidelity
+selector does not satisfy its frozen two-cohort tail promotion gate; and the
+post-S021 discriminability-first lexicographic rule is slightly worse than
+pure source-macro selection in both external cohorts. These results eliminate
+several plausible but unsupported claims of algorithmic novelty. They also
+suggest that the difficult part of the problem is not constructing a more
+ornate scalar selector. Participant heterogeneity creates a trade-off between
+mean transfer benefit and harmed-participant risk that is not resolved by a
+single source-only tie-breaker in the present data.
+
+The S061--S080 calibration-budget experiment provides another useful
+negative result. Its unlabeled adaptation subtracts one constant
+participant-specific feature translation before a fixed linear score.
+Because this only adds a constant to every score from that participant,
+within-participant ROC ordering cannot change and ROC AUC is algebraically
+invariant. The observed zero U-\(k\)/Z0 AUC differences are therefore not
+evidence that unlabeled calibration is practically useless. They expose an
+endpoint--operator identifiability mismatch. A future practical BCI extension
+must use a source-frozen operating threshold or another threshold-sensitive
+utility measure; such an extension is necessarily later than the current
+outcome and cannot be presented as part of the original prospective claim.
+
+These findings also define the novelty boundary relative to prior work.
+Covariance shrinkage, regularised discriminant analysis, participant-wise
+cross-validation, Riemannian tangent features and zero-calibration transfer
+are established techniques, and recent EEG work has explicitly studied the
+effects of regularisation and validation choices. The contribution here is
+therefore not the observation that a hyperparameter influences accuracy. It
+is the combined, auditable chain from objective-specific operator geometry to
+full-domain source conflict, prospective target consequence, source-pool
+sensitivity, true-pre-data external replication, uncertainty-aware validity
+frontiers and prospective falsification of a representation conclusion under
+one information budget.
+
+Several limits remain. The strongest external evidence is currently confined
+to motor imagery, and all headline regularisation results use linear
+discriminants on covariance/tangent representations. The two TRUE PRE-DATA
+external cohorts are independent acquisition strata but still too few for a
+general EEG-wide law or a meaningful dataset-level meta-analysis. AUC measures
+ranking and does not by itself establish calibrated operating-point utility.
+The harmed-participant tail remains non-trivial even when the average effect
+is favourable. Finally, the operator derivation identifies a local mechanism
+but has not yet been promoted to a target-label-free predictor of who will
+benefit; doing so would require a new independently frozen experiment rather
+than reusing the current target outcomes.
+
+For these reasons, the present scope is deliberately narrower than the
+historical title implied. The evidence supports a BSPC-style
+signal-processing and measurement-validity contribution in the studied
+cross-subject covariance/tangent discriminant family. A JNE submission becomes
+plausible if the final paper emphasizes the neural-engineering consequence of
+representation-dependent validity and preserves the unusually strict evidence
+chain. TNSRE would still require a separate direct BCI-utility extension,
+preferably threshold-sensitive, cross-session/device or online-like. Stronger
+wording cannot substitute for that evidence.
