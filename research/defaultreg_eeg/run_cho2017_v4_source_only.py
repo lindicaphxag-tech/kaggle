@@ -193,7 +193,7 @@ def main():
             raw_files.append({"subject":sid,"path":p.name,"bytes":p.stat().st_size,"sha256":sha(p)})
 
     paradigm=LeftRightImagery(
-        filters=([8,30],),
+        fmin=8,fmax=30,
         tmin=0.0,tmax=3.0,baseline=None,
         channels=list(COMMON20),resample=250.0,
         reject_by_annotation=False)
