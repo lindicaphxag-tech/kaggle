@@ -175,7 +175,12 @@ def four_way_orthogonal_source_and_history_repair():
     # Without source saturation, for external desired within [-2,2] all
     # requested actions are attainable through invertible P and C.
     restored=output_reachability_polygons(C,inner_bound=9.05,outer_bound=2.)
-    desired=((1.3,1.5),(1.7,1.5))
+    # Both targets can only be approximated at the far corner of the
+    # clipped sheared parallelogram (z1=.8,z2=.8)->(-2,.8), so the
+    # hard vertical lower bound of 0.7 is actually ATTAINABLE in this
+    # two-world example. Choosing positive target x instead would create
+    # an extra shearing obstruction >0.7, and invalidate that witness.
+    desired=((-2.,1.5),(-1.6,1.5))
     options={
       "neither_repaired":robust_blackbox_action_error_floor(
           indistinguishable_desired_actions=desired,
