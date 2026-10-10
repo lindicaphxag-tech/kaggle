@@ -1,0 +1,339 @@
+# SNAPSHOT_SOURCE: lindicaphxag-tech/cs@0b26a5b0853e3b136a92c17e614a3a1936673621 path=papers/eeg-default-regularisation/paper_vnext/80_methods.tex
+\section{Methods}
+
+\subsection{Evidence tiers and target-information budgets}
+Every analysis is assigned an evidence role before interpretation.
+Development or post-hoc analyses may use already exposed cohorts but cannot
+prospectively confirm a later method or claim. A prospective block is frozen
+before target outcomes are opened. TRUE PRE-DATA external replication further
+requires that the scientific protocol predates project access to that
+dataset's outcomes.
+
+Target information is tracked separately. Z0 uses no target labels, target
+feature moments, target batch-normalisation statistics, target quality
+thresholds or target-fitted geometry for model selection before scores are
+frozen. U-\(k\) permits a predeclared first \(k\) unlabeled target trials
+for an unsupervised calibration statistic. U-all permits the complete
+unlabeled target batch and is explicitly transductive. Headline
+regularisation claims use Z0.
+
+\subsection{EEG cohorts and representations}
+The PhysioNet EEGMMIDB protocol uses runs R04, R08 and R12, a fixed set of 21
+FC/C/CP sensorimotor channels and every recorded T1/T2 cue epoch from
+0.5--3.5~s. BAD annotations are retained as quality flags rather than
+silently deleting task cues. Trial covariances use divisor \(T\), a
+trace-proportional numerical SPD floor and a source-fitted tangent reference.
+
+The primary wide representation uses 8--30~Hz and has 231 tangent
+coordinates. The prospective representation experiment additionally uses
+eight fixed 4-Hz bands from 8--40~Hz (FB8-1848), a source-only PCA projection
+of that filter bank to 231 dimensions (FB8-SOURCE-PCA231), and a
+1848-dimensional WIDE+NUISANCE control obtained by appending
+label-independent source-scaled nuisance coordinates to WIDE231.
+
+The TRUE PRE-DATA v5 external cohorts use their complete frozen native
+montages rather than a performance-selected common montage.
+BNCI2014\_002 contains 14 participants, 15 EEG channels and 120 tangent
+coordinates. BNCI2015\_001 contains 12 participants, 13 EEG channels and
+91 tangent coordinates, with every session returned by the pinned dataset
+loader retained. Both use their official 5-s motor-imagery task interval,
+8--30~Hz filtering, resampling to 160~Hz and a source-only tangent reference.
+
+\subsection{Scalar regularisation path and source objectives}
+For identity shrinkage,
+\[
+ A_\lambda=(1-\lambda)S+\lambda\nu I,
+ \qquad
+ \nu=\operatorname{tr}(S)/p,
+\]
+the frozen primary selection grid is
+\[
+\{0,.0005,.001,.002,.003,.005,.0075,.01,.015,.02,.03,.05,.075,
+.10,.15,.20,.30,.40,.50,.60,.70,.80,.90,.95,.98,.99,1\}.
+\]
+Candidates that are singular at machine precision are marked infeasible
+rather than silently altered. The phrase 'full-domain' denotes that the
+predeclared finite candidate grid spans the endpoints and near-zero analytic
+shrinkage region of [0,1]; it does not assert continuous optimisation or a
+proof that no finer-grid optimum exists. A separate 405-point grid supports
+post-score frontier discretisation sensitivity.
+
+Inside each participant-grouped source-validation fold, every
+representation-dependent operation is refitted without the held source
+participant, including tangent geometry and, where applicable, PCA. Two
+source objectives are measured on the same held-source participants:
+participant-macro AUC, which is maximised, and covariance predictive NLL,
+which is minimised. Analytic Ledoit--Wolf and OAS are fitted on the same final
+source feature matrix. One-standard-error sets are reported only as
+operational sensitivity regions and are not called formal equivalence sets.
+
+\subsection{Operator geometry of objective mismatch}
+The source-trained discriminant is
+\[
+ w_\lambda=A_\lambda^{-1}d_s,
+\]
+and
+\[
+ B=\frac{dA_\lambda}{d\lambda}=\nu I-S,
+ \qquad
+ w_\lambda'=-A_\lambda^{-1}Bw_\lambda.
+\]
+For an evaluation participant with within-class covariance \(\Sigma_g\)
+and class contrast \(d_g\), define the standardized signed margin
+\[
+ m_g(\lambda)=
+ \frac{w_\lambda^\top d_g}
+ {\sqrt{w_\lambda^\top\Sigma_gw_\lambda}}.
+\]
+We decompose path motion into a scale component and a
+\(\Sigma_g\)-orthogonal rotation:
+\[
+ \alpha_g=
+ \frac{w_\lambda'^\top\Sigma_gw_\lambda}
+ {w_\lambda^\top\Sigma_gw_\lambda},
+ \qquad
+ r_g=w_\lambda'-\alpha_gw_\lambda.
+\]
+By construction \(r_g^\top\Sigma_gw_\lambda=0\), and direct
+differentiation gives
+\[
+ m_g'(\lambda)=
+ \frac{r_g^\top d_g}
+ {\sqrt{w_\lambda^\top\Sigma_gw_\lambda}}.
+\]
+Thus pure rescaling of a discriminant cannot alter its standardized margin;
+only path rotation aligned with the evaluation contrast can do so.
+
+For covariance predictive NLL per dimension,
+\[
+ C_g(\lambda)=\frac{1}{p}
+ \left[
+ \log\det A_\lambda+
+ \operatorname{tr}(A_\lambda^{-1}\Sigma_g)
+ \right],
+\]
+the derivative is
+\[
+ C_g'(\lambda)=\frac{1}{p}
+ \left[
+ \operatorname{tr}(A_\lambda^{-1}B)
+ -
+ \operatorname{tr}
+ (A_\lambda^{-1}BA_\lambda^{-1}\Sigma_g)
+ \right],
+\]
+which contains no class-contrast term. Therefore
+\(C_g'(\lambda_C)=0\) does not imply \(m_g'(\lambda_C)=0\).
+If an interior covariance optimum has finite positive curvature,
+Taylor expansion gives covariance regret
+\(C_g(\lambda_C+h)-C_g(\lambda_C)=O(h^2)\), whereas a nonzero
+margin derivative produces \(m_g(\lambda_C+h)-m_g(\lambda_C)=O(h)\).
+The resulting local \(\sqrt{\text{regret}}\) relation is explicitly
+conditional on an interior stationary point. It is not invoked as a local
+asymptotic explanation for outer folds whose covariance optimum lies at
+\(\lambda=0\) or 1; those folds are handled directly by the empirical
+finite-path validity envelope. These quantities are analysis-only diagnostics
+and never select a target model.
+
+\subsection{EEGMMIDB prospective target test and source-pool sensitivity}
+For S021--S040, source participants S001--S008, WIDE231, the complete scalar
+path and two paired target comparisons were frozen before any target outcome.
+The primary contrasts are source-macro selection versus Ledoit--Wolf and
+source-macro selection versus source covariance-NLL selection. Target labels
+enter only after source fitting and target score generation.
+
+Participant resampling does not represent uncertainty in the shared source
+pool. A post-primary delete-one-source audit therefore omits each of
+S001--S008 in turn, recomputes every inner tangent reference, reruns the
+complete regularisation path, reselects both source objectives, rebuilds the
+final geometry and refits the classifiers before rescoring the fixed target
+block. This sensitivity is not assigned a second confirmatory p-value.
+
+\subsection{TRUE PRE-DATA external v5 protocol}
+BNCI2014\_002 and BNCI2015\_001 were frozen under one v5 protocol before
+project access to either cohort's outcomes. Outer evaluation is full
+leave-one-participant-out. Inner source folds are participant-grouped and
+determined without target information. Every outer fold writes and SHA-256
+hashes the complete predeclared target score family before target labels are
+used for AUC calculation.
+
+Primary methods are Ledoit--Wolf LDA, OAS LDA, source covariance-NLL
+full-domain LDA, source participant-macro-AUC full-domain LDA,
+tangent-space logistic regression and Riemannian MDM. Two post-S021
+secondary selectors were also frozen before these external outcomes.
+
+The discriminability-first lexicographic selector defines
+\[
+ \mathcal D_\epsilon=
+ \{\lambda:A_s(\lambda)\ge A_s^*-\epsilon\},
+ \qquad \epsilon=0.01,
+\]
+and chooses the member of \(\mathcal D_\epsilon\) with minimum source
+covariance NLL.
+
+The mean--tail--fidelity selector first retains candidates within 0.01 AUC of
+the best source mean, then maximises the CVaR25 of held-source participant
+AUC, retains candidates within 0.005 AUC of the best CVaR25, and finally
+minimises source covariance NLL. Its predeclared promotion rule requires a
+target mean-bootstrap lower bound above -0.01 AUC, no increase in the
+>0.02 harm rate and non-negative target paired CVaR25 in at least two
+independent external cohorts; otherwise it remains secondary.
+
+\subsection{Corrected Regularisation Validity Frontier}
+For outer target participant \(g\), let
+\[
+ r_g(\lambda)
+ =
+ C_g^{\mathrm{source}}(\lambda)
+ -
+ \min_{\lambda'}C_g^{\mathrm{source}}(\lambda')
+\]
+be the source-only covariance predictive-NLL regret associated with the
+source pool that excludes participant \(g\). Let \(A_g(\lambda)\) be the
+target AUC obtained from the already frozen dense-path score vector.
+
+At the cohort level,
+\[
+ \bar r(\lambda)=\frac{1}{G}\sum_g r_g(\lambda),
+ \qquad
+ \bar A(\lambda)=\frac{1}{G}\sum_g A_g(\lambda).
+\]
+Because outer folds can have slightly different covariance optima, we use the
+finite-grid excess coordinate
+\[
+ \widetilde r(\lambda)=
+ \bar r(\lambda)-\min_{\lambda'}\bar r(\lambda').
+\]
+For budget \(\delta\),
+\[
+ \mathcal A_\delta=
+ \{\lambda:\widetilde r(\lambda)\le\delta\},
+\]
+and the AUC validity envelope is
+\[
+ E_{AUC}(\delta)=
+ \left[
+ \min_{\lambda\in\mathcal A_\delta}\bar A(\lambda),
+ \max_{\lambda\in\mathcal A_\delta}\bar A(\lambda)
+ \right].
+\]
+The maximum envelope span is reported over the dense path. The primary
+material-fragility budget is
+\[
+ \delta_{0.02}
+ =
+ \inf\{\delta:
+ \operatorname{span}(E_{AUC}(\delta))\ge0.02\}.
+\]
+Thresholds 0.01 and 0.05 are descriptive sensitivity analyses.
+
+This definition replaces a generic centered-AUC zero-crossing statistic that
+was identified as structurally uninformative before the first v5 target
+outcome: the covariance-optimal path point has zero centered difference by
+construction. Zero-crossing budgets are retained only for genuinely signed
+external scientific contrasts.
+
+Raw per-dimension NLL regret is primary. Regret divided by held-source NLL SD
+or SE at the covariance optimum is reported as scale-aware sensitivity. The
+dense path uses 0.0025 spacing plus the frozen near-zero anchors. Strict
+subsets with strides 1, 2, 4 and 8 audit grid discretisation.
+
+\subsection{Frontier uncertainty}
+The participant is resampled as a paired path. For each of 20,000 bootstrap
+draws, one participant-index vector is sampled and reused for every
+\(\lambda\); \(\bar r(\lambda)\), \(\bar A(\lambda)\), the finite-grid
+regret minimum, the envelope and each \(\delta_\tau\) are then recomputed.
+We report a percentile interval for maximum envelope span, the fraction of
+draws in which each material threshold is reachable and, conditional on a
+finite threshold, its percentile interval. No bootstrap path is used to
+select a deployed method.
+
+\subsection{Post-outcome simultaneous-path frontier sensitivity}
+After inspecting the external outcomes, we identified a second-order
+inference concern: percentile-bootstrap intervals for a data-selected
+max--min path span need not account for path-wide extremum selection.
+We therefore implement a supplementary simultaneous sensitivity audit on
+the archived \(G\times L\) target AUC matrix. For each participant bootstrap
+replicate, exactly one index vector is shared across all \(L\) lambda points.
+Let \(q_{1-\alpha}\) be the bootstrap quantile of the supremum norm
+\(\|\bar A^*-\bar A\|_\infty\). A simultaneous ordinate deviation no
+larger than \(q_{1-\alpha}\) implies the span differs from the observed
+span by no more than \(2q_{1-\alpha}\). We subtract twice this bound from
+every empirical validity-envelope span to define a conservative
+post-outcome sensitivity curve and report the first fixed empirical
+NLL-regret budget at which its lower curve reaches 0.02 AUC.
+
+This audit uses a paired whole-path resample, not 405 uncorrected
+pointwise intervals. It treats the source-regret axis as estimated but
+fixed, ignores uncertainty from overlapping outer source models, and
+does not cover acquiring new datasets. It is therefore a nominal
+conditional sensitivity diagnostic, not a new pre-registered test or a
+distribution-free confidence certificate. The complete procedure is
+implemented by src/frontier\_simultaneous\_path\_sensitivity.py.
+
+\subsection{Prospective representation interventions}
+The S041--S060 block compares WIDE231, FB8-1848, FB8-SOURCE-PCA231 and
+WIDE+NUISANCE1848 under matched target-information budgets. A separate
+source-budget intervention retains fixed fractions
+\(\{1,.75,.50,.25\}\) within each source participant-by-class cell while
+holding the target set, channels, frequency definition and feature
+construction fixed. Neither representation nor budget is chosen from target
+performance.
+
+\subsection{Calibration-budget identifiability control}
+The S061--S080 deployment-budget block compared Z0 with U5/U10/U20-prefix
+and U-all variants of a source-frozen linear score. The tested unlabeled
+adaptation subtracts a constant target-participant feature translation
+\(b_k\):
+\[
+ s_k(x)=w^\top(x-b_k-c)=s_0(x)-w^\top b_k.
+\]
+Within one participant, this is a constant score shift and therefore cannot
+change ROC ordering or ROC AUC. Consequently, a zero AUC contrast for this
+specific calibration operator is an algebraic identifiability result rather
+than evidence that unlabeled calibration is generally useless. Any practical
+calibration follow-up must use a threshold-sensitive endpoint and is
+post-outcome relative to this experiment.
+
+\subsection{Statistical inference and risk reporting}
+The participant is the primary inferential unit; trials and sessions are not
+treated as independent replicates. Paired contrasts report mean, median, Q25,
+Q10, Q05, worst participant, improved count, harm rates below -0.01 and
+-0.02, CVaR25, CVaR10 and a 20,000-resample participant bootstrap interval.
+Exact sign-flip tests are used for \(N\le20\), and Holm correction is
+applied to the predeclared H2/H3 family within each dataset.
+
+Datasets are replication strata. External cohorts are reported separately
+before equal-dataset descriptive summaries. Trials are never pooled across
+datasets as iid evidence, and leave-one-dataset-out direction analysis is not
+treated as informative until at least three eligible datasets exist.
+BNCI2015\_001 session-specific results are descriptive within-participant
+robustness analyses only.
+
+\subsection{Post-outcome individual-harm and influence sensitivity}
+To characterize heterogeneous benefit without selecting an alternative
+policy from visible target labels, a supplementary diagnostic takes only
+the frozen paired per-participant effect vectors. Material harm is defined
+as a paired AUC decrease strictly greater than 0.02 in magnitude. For each
+of the six cohort--comparator contrasts, we report the harmed count and
+fraction, the median, the symmetric 10\%-trimmed mean, and the full range
+of delete-one-target-participant means. A conventional two-sided 95\%
+Wilson interval provides a conditional iid-participant reference for the
+harm fraction. It is not a simultaneous interval, makes no allowance for
+source-fit dependence, and is not a population-of-datasets safety bound.
+These calculations were developed after all three cohorts had been
+observed and are not added to any frozen primary testing family. A
+delete-one-target calculation must not be confused with full
+delete-one-source refitting and reselection.
+
+\subsection{Result lineage and fail-closed receipts}
+Every admitted confirmatory result records exact participant IDs,
+participant/session trial counts, channel list and tangent dimension,
+target-information budget, environment, source/target fold membership,
+method-set identity, full source criteria by \(\lambda\), workflow commit,
+dataset/raw-file identities when available, result JSON hash and score-family
+hash. The v5 receipt validator additionally verifies that target scores were
+frozen before label-based AUC evaluation. Manuscript tables are rendered from
+absolute machine-readable metrics; manually supplied gain columns are
+forbidden. Historical rows whose provenance cannot be reconciled remain
+excluded rather than silently repaired.
