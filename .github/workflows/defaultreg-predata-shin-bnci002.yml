@@ -77,6 +77,11 @@ jobs:
           assert x["target_batch_statistics_used"] is False
           assert x["full_domain_grid"][0]==0.0 and x["full_domain_grid"][-1]==1.0
           assert 0.0005 in x["full_domain_grid"] and 0.075 in x["full_domain_grid"] and 0.95 in x["full_domain_grid"]
+          assert x["dense_frontier_grid"][0]==0.0 and x["dense_frontier_grid"][-1]==1.0
+          assert 0.0025 in x["dense_frontier_grid"] and len(x["dense_frontier_grid"])>=401
+          assert x["code_commit"]!="UNAVAILABLE_OUTSIDE_GITHUB_ACTIONS"
+          assert x["validity_frontier_dense_summary"]["score_family_hash_present_for_every_target"] is True
+          assert x["validity_frontier_dense_summary"]["target_path_used_for_selection"] is False
           methods={"LedoitWolf_LDA","OAS_LDA","source_cov_nll_full_domain_LDA",
                    "source_macro_full_domain_LDA","TS_LogisticRegression",
                    "Riemannian_MDM","CSP6_LogisticRegression"}
@@ -87,6 +92,8 @@ jobs:
           assert all(f["target_batch_moments_used"] is False for f in x["folds"])
           assert all(f["target_labels_accessed_only_after_score_freeze"] is True for f in x["folds"])
           assert all(f["target_path_scores_frozen_before_labels"] is True for f in x["folds"])
+          assert all(len(f["score_family_sha256_frozen_before_labels"])==64 for f in x["folds"])
+          assert all("validity_frontier" in f and "grid_stride_max_span" in f["validity_frontier"] for f in x["folds"])
           assert len(x["primary_comparisons"])==2
           assert all("holm_p_H2_H3" in z for z in x["primary_comparisons"])
           print("PASS_PRE_DATA_EXTERNAL_AUDIT",d)
