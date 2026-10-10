@@ -40,6 +40,32 @@ jobs:
           python -m py_compile research/defaultreg_v5/run_v5_predata_panel.py
           python -m py_compile research/defaultreg_v5_postprimary/run_csp6_lr_comparator.py
 
+      - name: Synthetic CSP projection contract
+        run: |
+          python - <<'PY'
+          import importlib.util
+          import pathlib
+          import numpy as np
+          p=pathlib.Path("research/defaultreg_v5_postprimary/run_csp6_lr_comparator.py")
+          spec=importlib.util.spec_from_file_location("cspcmp",p)
+          m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+          rng=np.random.default_rng(20261010)
+          n,dim,k=5,7,3
+          A=rng.normal(size=(n,dim,dim))
+          C=A@np.swapaxes(A,1,2)+np.eye(dim)[None,:,:]
+          W=rng.normal(size=(dim,k))
+          got=m.csp_features(C,W)
+          explicit=[]
+          for x in C:
+              P=W.T@x@W
+              v=np.diag(P);v=np.maximum(v,np.finfo(float).tiny)
+              v=v/v.sum()
+              explicit.append(np.log(v))
+          explicit=np.asarray(explicit)
+          np.testing.assert_allclose(got,explicit,rtol=1e-12,atol=1e-12)
+          print("PASS_CSP_PROJECTION_CONTRACT",got.shape)
+          PY
+
       - name: Execute fixed CSP6+LR comparator
         run: |
           mkdir -p "$RUNNER_TEMP/mne_data"
@@ -82,6 +108,7 @@ jobs:
           name: defaultreg-postprimary-csp-${{ matrix.dataset }}
           path: |
             research/defaultreg_v5_postprimary/FROZEN_CSP6_LR_COMPARATOR_20261010.md
+            research/defaultreg_v5_postprimary/CSP_IMPLEMENTATION_CORRECTION_20261010.md
             defaultreg_csp_${{ matrix.dataset }}/**
           if-no-files-found: warn
           retention-days: 90
