@@ -95,3 +95,26 @@ At strongest severity, paired seed outcome for source-vs-oracle original reward:
 Full heldout CI and raw JSON: https://github.com/lindicaphxag-tech/kaggle/actions/runs/38007699504 . Protocol committed pre-holdout-result: https://github.com/lindicaphxag-tech/kaggle/blob/research/six-line-submission-gates-20261010/research/semrepair/paper/EXTERNAL_FROZEN_SAC_POSTPILOT_PROTOCOL_20261010.md . All five fault levels are reported, and uncertainty analysis must use per-seed paired differences, not 960 i.i.d. robots. After observing the expert results, a second distinct Farama/Minari SAC-medium checkpoint was queued as sequential replication, NOT a blinded before-any-result multi-checkpoint trial. Its outcome must not be stated until the external CI completes.
 
 **Updated review-grade assessment:** this materially reduces the earlier zero-pretrained-policy evidence gap and gives a nontrivial external-policy action-reachability outcome that exceeds an exact per-step action blackbox oracle for some fault configurations. Remaining limitations: SAME Reacher embodiment, manually constructed extra action ABI and clipping, source-trust assertion, no actual installed software patch, no VLA/visual task, no globally task-optimal MPC blackbox, no third-party independent replication. These preclude present T-RO/RA-L/ICML-level parity or acceptance guarantees.
+
+
+## Independent published checkpoint replication: SAC-medium (executed after expert inspection)
+
+A DIFFERENT Farama/Minari pretrained SAC-medium checkpoint has now been pinned to source revision **7366bc42655652e36705974ec234a6456d695222**, actual downloaded bytes SHA256 **ee557cdd49c0a41b94256ab36a05a776f3bcf4ad2d7800d15051c56b747c4ea9**. The exact SAME official Reacher-v5 environment, 32 seed identities, 5 source fault configurations and 6 arms were evaluated WITHOUT new training or changing faults after the expert result. This is sequential cross-checkpoint replication with two policies from one publisher; NOT independent robot/embodiment generalization and NOT fully blinded pre-pilot experimental design.
+
+Green 960-episode run and raw artifact: https://github.com/lindicaphxag-tech/kaggle/actions/runs/38007987369
+
+| Predeclared (shear k, hidden inner software clip L) | Medium faulty mean return | Medium exact action oracle mean return | Medium numeric source candidate mean return | Source minus oracle |
+|---|---:|---:|---:|---:|
+| (0.8,1) | -3.342713 | -3.342713 | -3.342713 | 0 |
+| (2,1) | -3.345532 | -3.342686 | -3.342713 | **-0.000027** |
+| (3.5,1) | -3.659634 | -3.366105 | -3.342713 | +0.023392 |
+| (2,0.4) | -4.270007 | -3.544794 | -3.342713 | +0.202081 |
+| (3.5,0.4) | -9.560426 | -3.770020 | -3.342713 | +0.427307 |
+
+At strongest fault the second checkpoint exhibits 30/32 better and 2 ties (0 worse) source-vs-exact-action-oracle in OFFICIAL cumulative reward, but both still reach the crude 0.075m goal proximity threshold in all 32 seeds. At moderate shear k=2,L=1 there is a **slight source disadvantage** relative to the projection oracle; retaining it rules out universal method dominance. These two checkpoints are not independent manufacturers and the severe injected adapter is purposely engineered by the authors. The desired real-paper result must survive an **independent environment/robot body**, software provenance, tamper control, truly external policy variation beyond two SAC variants, and stronger global task-optimized MPC.
+
+### Descriptive uncertainty audit from original unmodified raw files
+
+An independent GitHub Action, using actions/download-artifact to fetch the immutable prior expert run **without rerunning/tuning it**, verifies the full 32-seed denominator, checks all five predeclared fault-severity comparisons, excludes exact ties for two-sided exact sign tests and applies Bonferroni correction for five contrasts. The strongest expert severity yields paired seed-bootstrapped descriptive 95-percent range **[+0.372819,+0.593425]** original reward, mean **+0.482485**, two-sided sign p adjusted for five severities **9.31323e-9** (30 better, 0 worse, 2 ties). The bootstrap distribution is only a sensitivity measure over 32 pseudorandom seed identities within ONE robot model, not proof of statistically independent robots or safety. Expert frozen original raw SHA256 **5048325bd46d98b04b1e2877b71c9d11c3edd2ab74c38cfc38e8084e3d4b288d**. [Green original paired statistical audit](https://github.com/lindicaphxag-tech/kaggle/actions/runs/38008067450). Separate medium-checkpoint paired uncertainty audit is being run from its original raw artifact; do not present it as completed until CI confirms.
+
+**Net scientific claim (conditional and narrower than top robotics):** In official Reacher-v5, two independently published frozen SAC checkpoints exhibit mean official-reward gain from source interface repair relative to an oracle instantaneous action reproducer under *severe purpose-built software clipping*, while their nominal weak-fault cases are neutral or slightly worse. Not demonstrated: learned VLA recovery, overall best task controller, secure patch provenance, cross-robot family generalization, or acceptance probability at top venues.
