@@ -25,7 +25,7 @@ class SourceEffectIRTests(unittest.TestCase):
   self.assertEqual(h[0]["status"],"TYPED_EFFECT_HYPOTHESIS_NOT_VERIFIED")
  def test_before_function_argument_scope(self):
   h,_=scan_pair("f.py",BASE,AFTER)
-  self.assertEqual(h[0]["before_public_arguments"],["x"])
+  self.assertEqual(h[0]["before_public_arguments"],("x",))
   self.assertTrue(h[0]["before_has_return"])
  def test_no_claim_of_patch_correctness(self):
   h,_=scan_pair("f.py",BASE,AFTER)
@@ -86,5 +86,5 @@ class SourceEffectIRTests(unittest.TestCase):
   self.assertEqual(len(h[0]["source_after_sha256"]),64)
  def test_stable_facet_order(self):
   h,_=scan_pair("f.py",BASE,AFTER)
-  self.assertEqual(h[0]["facets"],sorted(h[0]["facets"]))
+  self.assertEqual(h[0]["facets"],tuple(sorted(h[0]["facets"])))
 if __name__=="__main__":unittest.main()
