@@ -1,0 +1,46 @@
+name: SemRepair genuine LeRobot 4452 merged compensated sync RTC joint permutation regression
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/real_merged_lerobot_action_order_regression.py'
+      - 'research/semrepair/test_real_merged_lerobot_action_order_regression.py'
+      - '.github/workflows/semrepair-real-merged-lerobot-4452-action-order.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-publisher-controller-name-layout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install original upstream PyTorch backend
+        run: python -m pip install "torch==2.7.1"
+      - name: Test actual vendor sync source method before/after and original context feature ordering contract
+        run: python -m unittest -v research.semrepair.test_real_merged_lerobot_action_order_regression
+      - name: Produce all 96 action reindexing numerical cases, identity checks, context safeguards
+        run: python -m research.semrepair.real_merged_lerobot_action_order_regression > real_LeRobot_4452_96_bimanual_order_cases.json
+      - name: Print true publisher bug, known invertible compensation, and no real robot claim
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('real_LeRobot_4452_96_bimanual_order_cases.json'))
+          for k in ('real_independently_MERGED_upstream_PR','external_merge_commit',
+                    'distinct_source_regression_samples','baseline_original_mean_action_error',
+                    'source_corrected_max_action_error','true_state_action_permutation_refused',
+                    'already_aligned_original_remains_correct','no_robot_or_pretrained_policy_rollout_executed'):
+              print(k,r[k])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semrepair-original-merged-LeRobot-4452-96-compensating-joint-order-cases
+          path: real_LeRobot_4452_96_bimanual_order_cases.json
+          if-no-files-found: warn
+          retention-days: 90
