@@ -31,7 +31,16 @@ def wilson_reference_interval(k: int, n: int, confidence: float = 0.95) -> list[
     den = 1.0 + z * z / n
     center = (p + z * z / (2.0 * n)) / den
     spread = z * math.sqrt(p * (1.0 - p) / n + z * z / (4.0 * n * n)) / den
-    return [max(0.0, center - spread), min(1.0, center + spread)]
+    lower = max(0.0, center - spread)
+    upper = min(1.0, center + spread)
+    # Wilson's limiting boundaries are exactly 0 and 1 at k=0 and k=n.
+    # Enforce them explicitly so harmless platform roundoff cannot turn a
+    # fail-closed reproducibility test into a false failure.
+    if k == 0:
+        lower = 0.0
+    if k == n:
+        upper = 1.0
+    return [lower, upper]
 
 
 def audit(frozen: dict) -> dict:
