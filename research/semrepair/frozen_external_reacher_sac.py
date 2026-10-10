@@ -31,6 +31,9 @@ import gymnasium as gym
 from stable_baselines3 import SAC
 from huggingface_hub import hf_hub_download
 from .internal_saturation_reachability import exact_blackbox_torque_oracle
+from .strong_clipped_actuator_oracle import (
+    output_reachability_polygons,optimal_clipped_output
+)
 from .observable_interface_factorization import mv, mmul, I
 
 # The official Farama repository commit ID, not 'main' / changing latest.
@@ -46,8 +49,11 @@ P=((1.,FAULT_MAGNITUDE),(0.,1.))
 C=((1.,-FAULT_MAGNITUDE),(0.,1.))
 ARMS=("healthy","compensating-fault","matched-linear-inverse",
       "full-information-inner-geometry-projection",
-      "correct-source-atomic-upper-bound")
+      "exact-two-clip-action-oracle","correct-source-atomic-upper-bound")
 GOAL_DISTANCE_THRESHOLD=.075
+EXACT_REACHABILITY_POLYGONS=output_reachability_polygons(
+    C,inner_bound=INNER_CONTROL_LIMIT,outer_bound=1.)
+
 
 
 def frozen_external_checkpoint():
@@ -77,6 +83,8 @@ def _transform(action:np.ndarray,arm:str)->np.ndarray:
     elif arm=="full-information-inner-geometry-projection":
         actual=exact_blackbox_torque_oracle(ideal,controller=C,
                                              limit=INNER_CONTROL_LIMIT)["closest_actuator_torque"]
+    elif arm=="exact-two-clip-action-oracle":
+        actual=optimal_clipped_output(ideal,EXACT_REACHABILITY_POLYGONS)["action"]
     else:
         raise ValueError("unknown intervention")
     return np.asarray(actual,dtype=np.float32)
@@ -166,7 +174,10 @@ def run_official_reacher_external_policy()->dict:
         "same_initial_seed_across_arms":True,
         "source_fix_is_oracle_upper_bound_not_authenticated":True,
         "blackbox_torque_oracle_not_global_task_optimum":True,
+        "exact_double_clip_oracle_is_globally_optimal_in_instantaneous_action_error":True,
+        "exact_double_clip_oracle_not_global_future_reward_optimum":True,
         "blackbox_inner_projection_ignores_outer_clipping_geometry":True,
+        "stronger_two_clip_oracle_included":True,
         "original_official_reward_preserved":True,
         "scenario_sha256":sha256(json.dumps({
             "seeds":ENV_SEEDS,"policy_commit":HF_REVISION,"arms":ARMS,
