@@ -35,6 +35,10 @@ import math
 import sympy as sp
 import torch
 
+from .minimum_counterexample_probe_cover import (
+    Probe,exact_min_cost_counterexamples
+)
+
 from .maniskill_upstream_rotation_sign_case import (
     _frozen_upstream_source,_get_controller_method,_real_helper_function,
     _source_method_runtime,CONTROLLER,HELPER,CONTROLLER_BLOB_SHA1,
@@ -172,8 +176,9 @@ def _choose_discriminating_probe(survivors,real_methods,helper):
             "plausible_remaining":kept,
             "executions":len(survivors),
         })
-    return max(results,key=lambda x:(x["wrong_plausible_eliminated"],
-                                    -abs(x["upper"]),-abs(x["lower"])))
+    return (max(results,key=lambda x:(x["wrong_plausible_eliminated"],
+                                     -abs(x["upper"]),-abs(x["lower"]))),
+            results)
 
 
 def run_constrained_active_source_patch_experiment(*, licensed_patch_ids=("proposed_upper",)):
@@ -203,9 +208,32 @@ def run_constrained_active_source_patch_experiment(*, licensed_patch_ids=("propo
     survivors=[x["patch_id"] for x in candidates if x["training_plausible"]]
     if len(survivors)<4:
         raise AssertionError("calibration cannot expose intended training overfitting")
-    active=_choose_discriminating_probe(
+    _greedy_probe,probe_scan=_choose_discriminating_probe(
         survivors,methods,actual_helper)
-    remaining=active["plausible_remaining"]
+    # Exact cost-optimal counterexample coverage: hypothetical symmetric-
+    # test plausible WRONG programs are compared to the declared source
+    # contract, and the source-code bank determines their observed
+    # disqualification from ACTUAL original publisher torch executions.
+    wrong=tuple(name for name in survivors
+                if not proofs[name]["all_domain_symbolic_identity"])
+    available=[
+        Probe(f"cfg_{i}",1 if i==0 else 2,
+              tuple(name for name in wrong
+                    if name not in row["plausible_remaining"]))
+        for i,row in enumerate(probe_scan)
+    ]
+    optimal_probe_cover=exact_min_cost_counterexamples(
+        wrong,available,max_budget=1)
+    if not optimal_probe_cover["certificate_complete_against_catalog"]:
+        raise AssertionError("no minimum-cost safe probe certificate")
+    selected_probes=optimal_probe_cover["selected_probes"]
+    indices=[int(name.split("_")[1]) for name in selected_probes]
+    remaining=[name for name in survivors
+               if all(name in probe_scan[idx]["plausible_remaining"]
+                      for idx in indices)]
+    # Extra selected calibration evidence must never choose a different
+    # patch than the formal source-domain semantic certificate.
+    active=probe_scan[indices[0]]
     if not isinstance(licensed_patch_ids,(tuple,list)) or \
        any(not isinstance(k,str) for k in licensed_patch_ids):
         raise ValueError("explicit authorized source patch IDs required")
@@ -260,8 +288,9 @@ def run_constrained_active_source_patch_experiment(*, licensed_patch_ids=("propo
         "symmetric_training_probe":list(TRAIN_PROBE),
         "training_plausible_candidate_count":len(survivors),
         "training_overfit_wrong_candidate_count":naive_bad,
-        "active_probes_selected_count":1,
+        "active_probes_selected_count":len(selected_probes),
         "active_probe":active,
+        "minimum_cost_counterexample_suite":optimal_probe_cover,
         "active_remaining_candidate_count":len(remaining),
         "active_wrong_candidate_count":active_bad,
         "symbolically_certified_remaining_patch_count":len(eligible),
