@@ -1,0 +1,46 @@
+name: SemRepair state-changing diagnostic authority
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/state_changing_probe_authority.py'
+      - 'research/semrepair/test_state_changing_probe_authority.py'
+      - '.github/workflows/semrepair-state-changing-probe.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  finite-state:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.10', '3.12', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Falsify state-oblivious authority, check exact mutating-state plan
+        run: python -m unittest -v research.semrepair.test_state_changing_probe_authority
+      - name: Export bounded-world model and all-world outcome
+        run: |
+          python -m research.semrepair.state_changing_probe_authority > stateful_probe_report.json
+          python - <<'PY'
+          import json
+          x=json.load(open('stateful_probe_report.json'))
+          assert x['state_aware_minimax_cost']=='2'
+          assert x['state_oblivious_optimistic_cost']=='1'
+          assert x['invalid_naive_authorizations']==2
+          assert x['all_world_replay_cost']=='2'
+          assert x['cost_cap_1_refusal']
+          assert x['without_trusted_fast_minimax_cost']=='3'
+          print('PASS finite model only; no real robot/software success claimed')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semrepair-stateful-probe-${{ matrix.python }}
+          path: stateful_probe_report.json
+          if-no-files-found: warn
+          retention-days: 90
