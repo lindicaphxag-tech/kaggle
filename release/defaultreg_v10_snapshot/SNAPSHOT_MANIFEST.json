@@ -1,7 +1,7 @@
 {
   "schema": "defaultreg_v10_release_snapshot_v1",
   "source_repository": "lindicaphxag-tech/cs",
-  "source_commit": "c0801c9c77e55a9bf90a90c33b47210926194d75",
+  "source_commit": "6b0f941d0aea44d795d0ab1f3fe109514e8f8cd7",
   "source_pr": 50,
   "snapshot_purpose": "Independent clean-environment BSPC release audit; not a new scientific analysis",
   "copied_at_date": "2026-10-10",
@@ -17,6 +17,7 @@
     "Status claim guard checks semantic BSPC science-ready/package-hold state",
     "Latest translation-invariant/simultaneous frontier sensitivity text synchronized",
     "Literal LaTeX newline removed; long shrinkage grid and representation tokens made wrap-safe",
-    "Main prospective table reformatted to fit text width; long provenance/representation tokens made line-break safe; stale figure-finalization comment removed"
+    "Main prospective table reformatted to fit text width; long provenance/representation tokens made line-break safe; stale figure-finalization comment removed",
+    "Shortstack CI cells made LaTeX-safe with explicit text boxes"
   ]
 }
