@@ -1,0 +1,55 @@
+name: SemRepair Farama external second SAC-medium checkpoint transfer
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/external_reacher_medium_checkpoint.py'
+      - 'research/semrepair/external_reacher_sealed_holdout.py'
+      - 'research/semrepair/strong_clipped_actuator_oracle.py'
+      - '.github/workflows/semrepair-external-medium-replication.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  second-publisher-checkpoint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    env:
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Prepare exact official external simulator
+        run: python -m pip install "gymnasium[mujoco]==1.1.1" "stable-baselines3==2.6.0" "huggingface-hub==0.34.4"
+      - name: Run independently published SAC-medium without re-training
+        run: python -m research.semrepair.external_reacher_medium_checkpoint > medium_replication_raw.json
+      - name: Report ALL paired fault severities
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('medium_replication_raw.json'))
+          print('MODEL',r['second_pretrained_publisher'],r['checkpoint_revision'])
+          print('MODEL_SHA256',r['downloaded_checkpoint_sha256'])
+          print('ROWS',r['total_episode_count'])
+          for name,summary in sorted(r['summary'].items()):
+              print(name,'reward',round(summary['mean_original_reward'],6),
+                    'distance',round(summary['mean_tip_distance'],6),
+                    'reach',str(summary['hit_count'])+'/'+str(summary['episodes']))
+          for name,pair in sorted(r['paired'].items()):
+              print('SOURCE VS GLOBAL ACTION ORACLE',name,
+                    'delta',round(pair['source_minus_pointwise_optimal_blackbox_mean_return'],6),
+                    'positive/negative/tie',pair['positive_seed_count'],
+                    pair['negative_seed_count'],pair['ties'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semrepair-published-SAC-medium-32seed-960raw
+          path: medium_replication_raw.json
+          if-no-files-found: warn
+          retention-days: 90
