@@ -1,0 +1,57 @@
+name: SemRepair frozen SAC signed minimal clip-only robot source repair
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/clip_only_pusher_repair.py'
+      - 'research/semrepair/test_clip_only_pusher_repair.py'
+      - 'research/semrepair/signed_source_activation.py'
+      - '.github/workflows/semrepair-minimal-signed-clip-repair.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-native-robot-signed-minimal-recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    env:
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install official robot, frozen external expert SAC and test Ed25519
+        run: python -m pip install "cryptography==45.0.7" "gymnasium[mujoco]==1.1.1" "stable-baselines3==2.6.0" "huggingface-hub==0.34.4"
+      - name: Validate certificate and immutable signed minimal source configuration permissions
+        run: python -m unittest -v research.semrepair.test_signed_source_activation
+      - name: Compare full real Pusher tasks clip-only versus full atomic repair
+        run: |
+          python -m research.semrepair.clip_only_pusher_repair > minimal_source_actual_robot_raw.json
+          python -m unittest -v research.semrepair.test_clip_only_pusher_repair
+      - name: Print all four intervention arms including negative results
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('minimal_source_actual_robot_raw.json'))
+          print('PUBLISHER_WEIGHT_SHA',r['original_external_actor_sha256'])
+          print('ACTUAL_TASK_EPISODES',r['actual_official_task_replays'])
+          print('REPEAT_SEEDS',r['old_seen_seed_count'])
+          print('EXTERNAL_CLIP_CAP_ASSERTED',r['software_clip_cap_is_author_assumed_NOT_independently_signed'])
+          for name,value in sorted(r['summary'].items()):
+              print('ARM',name,'N',value['episodes'],
+                    'source_fields_edited',value['declared_source_fields_edited'],
+                    'original_reward',round(value['mean_original_reward'],6),
+                    'object_goal_distance_m',round(value['mean_actual_object_goal_distance'],6))
+          print('MAX_SIGNED_MINIMAL_MINUS_FULL_ATOMIC',
+                max(abs(s['clip_only_minus_atomic_reward']) for s in r['seed_paired']))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semrepair-real-native-frozen-signed-minimal-source-repair
+          path: minimal_source_actual_robot_raw.json
+          if-no-files-found: warn
+          retention-days: 90
