@@ -53,4 +53,10 @@ class InterventionTests(unittest.TestCase):
  def test_nonparameter_requires_grad_retained(self):
   source="def f(x):\n return torch.tensor(x,requires_grad=True)\n"
   with self.assertRaises(ValueError):mutate(source,"f","drop_parameter_grad")
+ def test_eye_dtype_counterfactual(self):
+  src="def forward(self,x):\n return torch.eye(x.size(0),dtype=x.dtype,device=x.device)\n"
+  mutated,report=mutate(src,"forward","drop_tensor_factory_dtype")
+  self.assertNotIn("dtype=x.dtype",mutated)
+  self.assertIn("device=x.device",mutated)
+  self.assertEqual(report["operator"],"drop_tensor_factory_dtype")
 if __name__=="__main__":unittest.main()
