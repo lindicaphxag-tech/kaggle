@@ -33,8 +33,9 @@ jobs:
           python -m pip install -e ./jax
           python -m pip install -r jax/build/test-requirements.txt
       - name: Run reviewer-requested focused regression
+        working-directory: jax
         run: |
-          python -m pytest -q jax/tests/scipy_stats_test.py -k TLogPdfLargeDf
+          python -m pytest -q tests/scipy_stats_test.py -k TLogPdfLargeDf
       - name: Record immutable identity and environment
         if: always()
         run: |
@@ -75,9 +76,10 @@ jobs:
           python -m pip install -e ./jax
           python -m pip install -r jax/build/test-requirements.txt
       - name: Run sampler, stable-log-PMF and independent public-API regressions
+        working-directory: jax
         run: |
-          python -m pytest -q jax/tests/random_lax_test.py -k 'PoissonLargeLambdaLogPmf or PoissonRejectionLogPmfMatchesScipy or StirlingTailUsesUnclampedLargeArgument or PoissonCentralDevianceAvoidsFloat32Cancellation or PoissonLogPmfTinyRateGradientsRemainFinite or PoissonLargeLambdaVariance or BinomialLargeCountTailRegression'
-          python -m pytest -q jax/tests/scipy_stats_test.py -k 'PoissonLogPmfLargeLambda or PoissonLogPmfCentralFloat32Accurate or PoissonLogPmfPublicApiTinyRateAutodiff'
+          python -m pytest -q tests/random_lax_test.py -k 'PoissonLargeLambdaLogPmf or PoissonRejectionLogPmfMatchesScipy or StirlingTailUsesUnclampedLargeArgument or PoissonCentralDevianceAvoidsFloat32Cancellation or PoissonLogPmfTinyRateGradientsRemainFinite or PoissonLargeLambdaVariance or BinomialLargeCountTailRegression'
+          python -m pytest -q tests/scipy_stats_test.py -k 'PoissonLogPmfLargeLambda or PoissonLogPmfCentralFloat32Accurate or PoissonLogPmfPublicApiTinyRateAutodiff'
       - name: Record immutable identity and environment
         if: always()
         run: |
