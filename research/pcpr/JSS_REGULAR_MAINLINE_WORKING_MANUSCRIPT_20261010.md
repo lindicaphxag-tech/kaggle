@@ -38,10 +38,11 @@ The distinctive research contribution must be demonstrated by full integration a
 | DeepChem #5190 | 14 native field registration observations over two classes; 13 field abstentions | Correlated development units, not 14 PRs |
 | Kornia #5446/#5005 | Actual SHA-pinned package API replays with observed state/shape effects | Previously inspected development cases |
 | Kornia #5026, SenseVoice #358 | Original pinned function AST native output/dtype/CTC effects | Native function-tier development replays |
+| MONAI #9103 | Original pinned BarlowTwinsLoss methods; in float16/bfloat16 original and one-edit counterfactual produce float32, fix preserves half precision; float32/float64 controls unchanged | Retrospective external-repository class-method replay, not full MONAI package and not new blind PR |
 | Synthetic minimax planner | 48 worlds, mean worst-cost 5.104 vs fixed-order 10.563 | 51.7% reduction against one weak synthetic comparator only |
 | CEC checker | Structural provenance, contradiction and non-promotion tests passed | Implementation behavior, not APCA accuracy |
 
-Latest generic single-edit native counterfactual CI is independently checked before being added as achieved evidence. Do not retroactively upgrade prior locked experiments.
+Generic single-edit native counterfactual CI: 3 previously inspected pinned examples passed (run 38029919629). Separate MONAI native class-method replay passed in four CPU dtype contexts (run 38030555883); these are development examples, not a prospective correctness detector. Do not retroactively upgrade prior locked experiments.
 
 ### 4. Related work with concrete reviewer standards
 
