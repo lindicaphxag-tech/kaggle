@@ -98,11 +98,11 @@ def execute_frozen_episode(env,policy,seed:int,arm:str)->dict:
         # components. Compute actual Euclidean distal error directly from
         # the underlying official MuJoCo x-position sites instead.
         unwrapped=env.unwrapped
-        tip_id=unwrapped.model.site("fingertip").id
-        target_id=unwrapped.model.site("target").id
-        tip=np.array(unwrapped.data.site_xpos[tip_id],dtype=float)
-        target=np.array(unwrapped.data.site_xpos[target_id],dtype=float)
+        tip=np.asarray(unwrapped.get_body_com("fingertip"),dtype=float)
+        target=np.asarray(unwrapped.get_body_com("target"),dtype=float)
         ee_error=float(np.linalg.norm(tip-target))
+        if abs(ee_error + float(information["reward_dist"]))>1e-7:
+            raise AssertionError("tip/target geometry inconsistent with official reward")
         distal.append(ee_error)
         rewards.append(float(reward))
         deviations.append(float(np.linalg.norm(np.asarray(proposed)-applied)))
