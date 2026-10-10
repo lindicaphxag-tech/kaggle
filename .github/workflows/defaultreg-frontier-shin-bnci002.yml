@@ -18,7 +18,37 @@ permissions:
   contents: read
 
 jobs:
+  smoke:
+    name: synthetic-frontier-smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install frozen MOABB stack
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2
+
+      - name: Compile runner and smoke test
+        run: |
+          python -m py_compile research/defaultreg_frontier/run_untouched_frontier.py
+          python -m py_compile research/defaultreg_frontier/test_runner_synthetic.py
+
+      - name: Run synthetic end-to-end frontier smoke test
+        run: |
+          cd research/defaultreg_frontier
+          python test_runner_synthetic.py
+
   frontier-confirmatory:
+    name: frontier-${{ matrix.dataset }}
+    needs: smoke
     strategy:
       fail-fast: false
       matrix:
@@ -40,16 +70,6 @@ jobs:
       - name: Install frozen MOABB stack
         run: python -m pip install --disable-pip-version-check moabb==1.7.2
 
-      - name: Compile frozen frontier runner
-        run: |
-          python -m py_compile research/defaultreg_frontier/run_untouched_frontier.py
-          python -m py_compile research/defaultreg_frontier/test_runner_synthetic.py
-
-      - name: Run synthetic frontier smoke test
-        run: |
-          cd research/defaultreg_frontier
-          python test_runner_synthetic.py
-
       - name: Execute untouched validity-frontier confirmation
         run: |
           mkdir -p "$MNE_DATA"
@@ -57,65 +77,78 @@ jobs:
             --dataset "${{ matrix.dataset }}" \
             --out "defaultreg_frontier_${{ matrix.dataset }}"
 
-      - name: Fail closed on denominator, Z0, score freeze and dense path
+      - name: Fail closed on provenance, denominator, Z0 and score freeze
         run: |
           DATASET="${{ matrix.dataset }}" python - <<'PY'
           import json, os, pathlib, re
 
-          d = os.environ["DATASET"]
-          p = pathlib.Path(
-              f"defaultreg_frontier_{d}/{d}_frontier_confirmatory.json"
-          )
+          d = os.environ['DATASET']
+          p = pathlib.Path(f'defaultreg_frontier_{d}/{d}_frontier_confirmatory.json')
           x = json.loads(p.read_text())
 
-          expected_n = {"Shin2017A": 29, "BNCI2014_002": 14}[d]
-          expected_channels = {"Shin2017A": 30, "BNCI2014_002": 15}[d]
+          expected_n = {'Shin2017A': 29, 'BNCI2014_002': 14}[d]
+          expected_channels = {'Shin2017A': 30, 'BNCI2014_002': 15}[d]
+          sha = re.compile(r'^[0-9a-f]{64}$')
 
-          assert x["status"] == "UNTOUCHED_FRONTIER_CONFIRMATION_EXECUTED"
-          assert x["cohort_role"] == "confirmatory"
-          assert x["dataset"] == d
-          assert x["n_subjects"] == expected_n
-          assert x["subjects"] == list(range(1, expected_n + 1))
-          assert x["channels_used"] == expected_channels
-          assert x["feature_dimension"] == expected_channels * (expected_channels + 1) // 2
+          assert x['status'] == 'UNTOUCHED_FRONTIER_CONFIRMATION_EXECUTED'
+          assert x['receipt_version'] == 4
+          assert x['cohort_role'] == 'confirmatory'
+          assert x['dataset'] == d
+          assert x['code_commit'] == os.environ['GITHUB_SHA']
+          assert x['workflow_run_id'] == os.environ['GITHUB_RUN_ID']
+          assert x['protocol_file'] == 'FROZEN_SHIN_BNCI002_FRONTIER_20261010.md'
+          assert sha.fullmatch(x['protocol_sha256'])
+          assert sha.fullmatch(x['full_grid_sha256'])
+          assert sha.fullmatch(x['dense_grid_sha256'])
 
-          assert x["target_information_track"] == "Z0"
-          assert x["target_labels_used_before_score_freeze"] is False
-          assert x["target_batch_statistics_used"] is False
+          assert x['n_subjects'] == expected_n
+          assert x['participant_count'] == expected_n
+          assert x['subjects'] == list(range(1, expected_n + 1))
+          assert x['channels_used'] == expected_channels
+          assert x['feature_dimension'] == expected_channels * (expected_channels + 1) // 2
+          assert len(x['participant_receipt']) == expected_n
+          assert x['trial_denominator'] == sum(r['trials'] for r in x['participant_receipt'])
+          assert x['trial_denominator'] == sum(f['target_trials'] for f in x['folds'])
 
-          assert x["full_grid"][0] == 0.0 and x["full_grid"][-1] == 1.0
-          assert x["dense_frontier_grid"][0] == 0.0
-          assert x["dense_frontier_grid"][-1] == 1.0
-          assert len(x["dense_frontier_grid"]) >= 400
+          assert x['target_information_track'] == 'Z0'
+          assert x['target_labels_used_before_score_freeze'] is False
+          assert x['target_batch_statistics_used'] is False
 
-          assert len(x["folds"]) == expected_n
-          assert len(x["participant_receipt"]) == expected_n
-          assert len(x["primary_comparisons"]) == 2
+          assert x['full_grid'][0] == 0.0 and x['full_grid'][-1] == 1.0
+          assert x['dense_frontier_grid'][0] == 0.0
+          assert x['dense_frontier_grid'][-1] == 1.0
+          assert len(x['dense_frontier_grid']) >= 400
+
+          assert len(x['folds']) == expected_n
+          assert len(x['primary_comparisons']) == 2
+          assert sha.fullmatch(x['score_manifest_sha256'])
 
           methods = {
-              "LedoitWolf_LDA",
-              "OAS_LDA",
-              "source_macro_full_domain_LDA",
-              "source_cov_nll_full_domain_LDA",
-              "discriminability_first_lexicographic_LDA",
-              "TS_LogisticRegression",
-              "Riemannian_MDM",
+              'LedoitWolf_LDA',
+              'OAS_LDA',
+              'source_macro_full_domain_LDA',
+              'source_cov_nll_full_domain_LDA',
+              'discriminability_first_lexicographic_LDA',
+              'TS_LogisticRegression',
+              'Riemannian_MDM',
           }
-          assert set(x["mean_auc_by_method"]) == methods
+          assert set(x['mean_auc_by_method']) == methods
 
-          sha = re.compile(r"^[0-9a-f]{64}$")
-          assert sha.fullmatch(x["score_manifest_sha256"])
+          seen = set()
+          for fold in x['folds']:
+              sid = fold['target_subject']
+              assert sid not in seen
+              seen.add(sid)
+              assert set(fold['auc']) == methods
+              assert fold['target_information_track'] == 'Z0'
+              assert fold['target_labels_used_for_selection'] is False
+              assert fold['target_batch_statistics_used'] is False
+              assert sha.fullmatch(fold['score_freeze']['score_sha256'])
+              assert fold['validity_frontier']['target_path_used_for_selection'] is False
+              assert len(fold['validity_frontier']['grid_sensitivity']) == 4
+          assert seen == set(range(1, expected_n + 1))
 
-          for f in x["folds"]:
-              assert set(f["auc"]) == methods
-              assert f["target_information_track"] == "Z0"
-              assert f["target_labels_used_for_selection"] is False
-              assert f["target_batch_statistics_used"] is False
-              assert sha.fullmatch(f["score_freeze"]["score_sha256"])
-              assert f["validity_frontier"]["target_path_used_for_selection"] is False
-              assert len(f["validity_frontier"]["grid_sensitivity"]) == 4
-
-          print("PASS_UNTOUCHED_FRONTIER_AUDIT", d)
+          print('PASS_UNTOUCHED_FRONTIER_RECEIPT', d, x['trial_denominator'])
           PY
 
       - uses: actions/upload-artifact@v4
