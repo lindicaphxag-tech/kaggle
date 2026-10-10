@@ -65,6 +65,67 @@ def _pinned_source(commit:str,path:str,expected_blob:str):
     return b.decode("utf-8"),sha256(b).hexdigest()
 
 
+def _execute_merged_real_config_guard(config_source):
+    """Execute the TRUE merged config AST guard in an isolated method.
+
+    This is specifically stronger than searching for the text of the new
+    if statement. No entire train.py import or Hub dependency needed.
+    """
+    parsed=ast.parse(config_source,filename=CONFIG_PATH)
+    classes=[n for n in parsed.body if isinstance(n,ast.ClassDef) and
+             n.name=="TrainPipelineConfig"]
+    if len(classes)!=1:
+        raise ValueError("real upstream TrainPipelineConfig absent")
+    methods=[n for n in classes[0].body if isinstance(n,ast.FunctionDef) and
+             n.name=="validate"]
+    if len(methods)!=1:
+        raise ValueError("real upstream training config validate() absent")
+    f=methods[0]
+    guards=[n for n in f.body if isinstance(n,ast.If) and
+            "self.rename_map" in ast.unparse(n.test) and
+            "active_cfg.pretrained_path" in ast.unparse(n.test)]
+    if len(guards)!=1:
+        raise ValueError("real merged upstream fresh rename guard not unique")
+    guard=guards[0]
+    if not any(isinstance(n,ast.Raise) for n in guard.body):
+        raise ValueError("merged no-pretrained-rename behavior is not fail closed")
+    a=ast.Assign(
+        targets=[ast.Name(id="active_cfg",ctx=ast.Store())],
+        value=ast.Attribute(value=ast.Name(id="self",ctx=ast.Load()),
+                            attr="trainable_config",ctx=ast.Load()))
+    fun=ast.FunctionDef(
+        name="actual_original_merged_config_guard",
+        args=ast.arguments(posonlyargs=[],args=[ast.arg(arg="self")],
+                           vararg=None,kwonlyargs=[],kw_defaults=[],
+                           kwarg=None,defaults=[]),
+        body=[a,guard,ast.Return(value=ast.Constant(value="PASS"))],
+        decorator_list=[],returns=None,type_comment=None)
+    mod=ast.fix_missing_locations(ast.Module(body=[fun],type_ignores=[]))
+    scope={}
+    exec(compile(mod,CONFIG_PATH,"exec"),scope,scope)
+    validator=scope["actual_original_merged_config_guard"]
+    result={}
+    for label,pretrained,rename in (
+        ("fresh_nonempty_rename",None,{"camera":"renamed_camera"}),
+        ("pretrained_nonempty_rename","checkpoint/path",{"camera":"renamed_camera"}),
+        ("fresh_empty_rename",None,None),
+    ):
+        obj=SimpleNamespace(rename_map=rename,
+                            trainable_config=SimpleNamespace(pretrained_path=pretrained))
+        try:
+            value=validator(obj)
+            result[label]={"decision":value,"raises_value_error":False}
+        except ValueError as exc:
+            result[label]={"decision":"REFUSE","raises_value_error":True,
+                           "message":str(exc)}
+    if not result["fresh_nonempty_rename"]["raises_value_error"] or \
+       any(result[x]["raises_value_error"] for x in (
+           "pretrained_nonempty_rename","fresh_empty_rename")):
+        raise AssertionError("actual merged config guard changes expected software semantics")
+    return {"actual_unchanged_upstream_AST_guard_executed":True,
+            "cases":result}
+
+
 def _extract_original_executable_setup(src):
     """Use original AST statements verbatim; no recreated if predicates."""
     parsed=ast.parse(src,filename=SCRIPT_PATH)
@@ -188,7 +249,9 @@ def audit_actual_merged_lerobot_source():
     new_cfg,new_cfg_sha=_pinned_source(AFTER_COMMIT,CONFIG_PATH,AFTER_CONFIG_BLOB)
     old_reg,old_reg_sha=_pinned_source(BEFORE_COMMIT,REGISTRY_PATH,BEFORE_REGISTRY_BLOB)
     new_reg,new_reg_sha=_pinned_source(AFTER_COMMIT,REGISTRY_PATH,AFTER_REGISTRY_BLOB)
+    executable_guard=_execute_merged_real_config_guard(new_cfg)
     cross_file_contract={
+       "merged_config_real_guard_execution":executable_guard,
        "pre_merge_missing_fresh_rename_guard":(
            "`rename_map` requires a pretrained policy checkpoint" not in old_cfg),
        "merge_introduces_explicit_fresh_rename_refusal":(
