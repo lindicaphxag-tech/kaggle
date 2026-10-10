@@ -25,7 +25,7 @@ jobs:
             sha: 656227de179fc76b43197ad2086f31a2db6c1637
             expected: broken_baseline
           - label: current-patch
-            sha: 877fdb22ddb3a7f9c68df73571a42541cbd30f7f
+            sha: 1d8cac844d810025b6189617508f8043631e3de6
             expected: corrected
     steps:
       - name: Checkout independent research harness
