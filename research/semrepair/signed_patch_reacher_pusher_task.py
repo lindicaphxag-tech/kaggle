@@ -90,6 +90,7 @@ def _activate_demo_owner_signed_source(path,old,new,policy_checkpoint_sha):
         "expected_nonce":nonce,
         "authorized_repair":"atomic",
         "actor_family":ACTOR_FAMILY,
+        "max_abs_input_action":2.0,
     }
     serialized=_canonical(manifest)
     signatures=[
@@ -100,7 +101,8 @@ def _activate_demo_owner_signed_source(path,old,new,policy_checkpoint_sha):
         manifest=manifest,signatures=signatures,
         trusted_public_roots=pubs,expected_current_epoch=1,
         expected_nonce=nonce,expected_actor_family=ACTOR_FAMILY,
-        expected_deployment_sha256=deployment,threshold=2)
+        expected_deployment_sha256=deployment,
+        expected_action_radius=2.0,threshold=2)
     return installed,manifest
 
 
