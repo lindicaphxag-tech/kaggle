@@ -40,6 +40,7 @@ MANIFEST_FIELDS=frozenset({
     "protocol","current_source_sha256","replacement_source_sha256",
     "current_epoch","target_epoch","deployment_sha256",
     "expected_nonce","authorized_repair","actor_family",
+    "max_abs_input_action",
 })
 REPAIR_OPTIONS=frozenset(("noop","producer-only","controller-only","atomic"))
 
@@ -74,7 +75,7 @@ def _validate_source_config(raw:bytes)->dict:
 
 def _verify_manifest_shape(m:dict, *, expected_current_epoch:int,
                            expected_nonce:str, expected_actor_family:str,
-                           expected_deployment_sha256:str)->None:
+                           expected_deployment_sha256:str, expected_action_radius:float)->None:
     if not isinstance(m,dict) or set(m)!=MANIFEST_FIELDS:
         raise ValueError("missing or unexpected signed manifest field")
     if m["protocol"]!=PROTOCOL or m["authorized_repair"] not in REPAIR_OPTIONS:
@@ -87,6 +88,11 @@ def _verify_manifest_shape(m:dict, *, expected_current_epoch:int,
     if m["expected_nonce"]!=expected_nonce or not isinstance(expected_nonce,str) or \
        len(expected_nonce)<16:
         raise ValueError("stale or mismatched activation challenge")
+    radius=m["max_abs_input_action"]
+    if type(radius) not in (int,float) or not math.isfinite(radius) or radius<=0 or \
+       not math.isfinite(expected_action_radius) or expected_action_radius<=0 or \
+       abs(float(radius)-expected_action_radius)>1e-12:
+        raise ValueError("signed deployment action envelope differs from trusted runner")
     if type(m["current_epoch"]) is not int or type(m["target_epoch"]) is not int or \
        m["current_epoch"]!=expected_current_epoch or \
        m["target_epoch"]!=expected_current_epoch+1:
@@ -125,6 +131,7 @@ def verified_atomic_source_activate(
     signatures:Sequence[dict], trusted_public_roots:Mapping[str,bytes],
     expected_current_epoch:int, expected_nonce:str,
     expected_actor_family:str, expected_deployment_sha256:str,
+    expected_action_radius:float,
     threshold:int=2,
 )->dict:
     """Bound signer approvals to exact OLD+NEW adapter configs and atomically switch.
@@ -141,7 +148,8 @@ def verified_atomic_source_activate(
     _verify_manifest_shape(
         manifest,expected_current_epoch=expected_current_epoch,
         expected_nonce=expected_nonce,expected_actor_family=expected_actor_family,
-        expected_deployment_sha256=expected_deployment_sha256)
+        expected_deployment_sha256=expected_deployment_sha256,
+        expected_action_radius=expected_action_radius)
     if sha256(existing).hexdigest()!=manifest["current_source_sha256"]:
         raise ValueError("original source bytes differ from signed identity")
     if sha256(replacement_bytes).hexdigest()!=manifest["replacement_source_sha256"]:
@@ -161,6 +169,21 @@ def verified_atomic_source_activate(
         raise ValueError("internal source limit changed outside atomic signed repair")
     if manifest["authorized_repair"]=="noop" and new!=original:
         raise ValueError("noop repair changes deployed source config")
+
+    # Conditional exact semantic certificate for the complete signed input
+    # action box. This does NOT prove any manufacturer's intended task, but
+    # prevents even two authorized signers from installing a patch that
+    # is known to contradict the declared target identity action contract.
+    p=new["producer"]
+    c=new["controller"]
+    prod=[[sum(c[i][k]*p[k][j] for k in range(2))
+           for j in range(2)] for i in range(2)]
+    semantic_error=max(abs(prod[i][j]-(1. if i==j else 0.))
+                       for i in range(2) for j in range(2))
+    max_inner_action=expected_action_radius * max(
+        sum(abs(v) for v in row) for row in p)
+    if semantic_error>1e-9 or max_inner_action>new["clip"]+1e-9:
+        raise ValueError("even signed repair fails full deployment action-envelope certificate")
 
     # Only after every verification passes do we put any bytes on disk.
     tmpname=None
@@ -190,6 +213,8 @@ def verified_atomic_source_activate(
         "installed_bytes_sha256":manifest["replacement_source_sha256"],
         "activated_epoch":manifest["target_epoch"],
         "source_actor_family":expected_actor_family,
+        "semantics_certified_action_radius":expected_action_radius,
+        "semantics_max_internal_producer_drive":max_inner_action,
         "cryptographic_primitive":"Ed25519",
         "endorsement_threshold":threshold,
         "does_not_authenticate_telemetry_or_external_robot_manufacturer":True,
