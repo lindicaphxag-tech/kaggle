@@ -25,7 +25,7 @@ jobs:
             commit: 93e877c99dc05a1fe9409a9789c25e05bb187982
             expected: broken_baseline
           - label: patched-current-head
-            commit: 91a0ee681e1d3aef5293d3451f3917b5148894c1
+            commit: 2af46d5f0bf14c458c8ffa3ff5bd8fc395d613f7
             expected: corrected
     steps:
       - name: Checkout validation harness
