@@ -142,3 +142,6 @@ BCI utility or TNSRE readiness.
 
 A negative result is retained. No subject, lambda subrange, channel subset or
 session is removed because it weakens the paper.
+
+
+Execution note: draft PR #93 was opened before this trigger commit; any result must correspond to the post-freeze branch history and exact workflow artifact.
