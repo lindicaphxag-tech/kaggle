@@ -1,0 +1,23 @@
+name: SemRepair Ed25519 source-code configuration activation and native robot evidence
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/signed_source_activation.py'
+      - 'research/semrepair/test_signed_source_activation.py'
+      - '.github/workflows/semrepair-signed-source-activation.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-byte-attestation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install independent cryptography and official native Pusher physics
+        run: python -m pip install "cryptography==45.0.7" "gymnasium[mujoco]==1.1.1"
+      - name: Run independently checkable Ed25519 quorum, replay, forged-byte and native arm tests
+        run: python -m unittest -v research.semrepair.test_signed_source_activation
