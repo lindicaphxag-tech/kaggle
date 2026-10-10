@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
-      CS_SHA: ab40f990b4158f597adca478e2eda50bec899d21
+      CS_SHA: 5d5529dff3be178a6b60db1802dfb9490b212f0f
       SNAPSHOT_ROOT: release/defaultreg_v10_snapshot
       OPENBLAS_NUM_THREADS: '1'
       OMP_NUM_THREADS: '1'
@@ -149,7 +149,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: defaultreg-cs-v10-release-ab40f990b415
+          name: defaultreg-cs-v10-release-5d5529dff3be
           path: |
             release_manuscript_audit.json
             release_vnext_table.json
