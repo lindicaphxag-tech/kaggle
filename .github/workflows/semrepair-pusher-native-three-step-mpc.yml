@@ -1,0 +1,64 @@
+name: SemRepair privileged official Pusher true-reward three-step MPC red team
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/pusher_three_step_task_mpc.py'
+      - 'research/semrepair/test_pusher_three_step_task_mpc.py'
+      - 'research/semrepair/pusher_privileged_dynamics_planner.py'
+      - '.github/workflows/semrepair-pusher-native-three-step-mpc.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-task-three-step-planning:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned native Pusher and external pretrained SAC environment
+        run: python -m pip install "gymnasium[mujoco]==1.1.1" "stable-baselines3==2.6.0" "huggingface-hub==0.34.4"
+      - name: Verify actual original reward matches clone and branch rollouts do not touch real physics state
+        run: |
+          python -m unittest -v research.semrepair.test_pusher_privileged_dynamics_planner
+          python -m unittest -v research.semrepair.test_pusher_three_step_task_mpc
+      - name: Compare strongest native 3 step blackbox with source patch on all 16 actual tasks
+        run: python -m research.semrepair.pusher_three_step_task_mpc > original_native_three_step_mpc_raw.json
+      - name: Report all negative, neutral and positive outcomes and measured rollout costs
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('original_native_three_step_mpc_raw.json'))
+          print('MODEL_SHA256',r['checkpoint_sha256'])
+          print('SCENARIO_SHA256',r['scenario_sha256'])
+          print('SEEDS',r['old_seen_seed_count'],'NATIVE_EPISODES',len(r['raw_rows']))
+          print('PHYSICS_MODEL_BRANCH_EVALS',r['real_native_reward_candidate_rollouts'])
+          print('MUJOCO_INTEGRATION_STEPS',r['native_mujoco_internal_integration_steps'])
+          print('FROZEN_SAC_TAIL_CALLS',r['tail_actor_predictions'])
+          for name,row in sorted(r['summaries'].items()):
+              print('ARM',name,row['episodes'],
+                    'original_reward',round(row['mean_original_reward'],6),
+                    'object_to_goal',round(row['mean_object_goal_distance'],6),
+                    'max_reward_prediction_error',row['max_true_reward_prediction_error'])
+          for name,row in sorted(r['paired_vs_healthy'].items()):
+              print('PAIRED_SOURCE_MINUS',name,'mean_original_reward',
+                    round(row['mean_source_reward_advantage'],6),
+                    'object_distance_reduction',round(row['source_object_goal_distance_reduction'],6),
+                    'wins_losses_ties',row['source_reward_wins'],
+                    row['source_reward_losses'],row['source_reward_ties'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semrepair-native-true-reward-mpc-recovery-original-raw
+          path: original_native_three_step_mpc_raw.json
+          if-no-files-found: warn
+          retention-days: 90
