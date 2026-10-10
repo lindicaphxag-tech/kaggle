@@ -1,0 +1,127 @@
+# SNAPSHOT_SOURCE: lindicaphxag-tech/cs@0b26a5b0853e3b136a92c17e614a3a1936673621 path=papers/eeg-default-regularisation/paper_vnext/01_intro.tex
+\section{Introduction}
+
+Cross-subject EEG decoding asks a model trained on one group of participants
+to operate on a new person who contributes no labelled calibration trials.
+This setting makes regularisation scientifically consequential rather than
+merely numerical. Covariance and tangent-space representations can contain
+hundreds or thousands of coordinates, while the number of independent source
+participants is modest and inter-participant covariance structure is
+heterogeneous. Analytic shrinkage therefore provides an attractive default
+\cite{ledoit2004,chen2010oas},
+but the statistical objective used to stabilise a covariance matrix is not the
+same quantity on which a transferred decoder is evaluated.
+
+For a two-class linear discriminant, let
+\[
+ A_\lambda=(1-\lambda)S+\lambda\nu I,
+ \qquad
+ w_\lambda=A_\lambda^{-1}d_s,
+\]
+where \(S\) and \(d_s\) are source within-class covariance and class
+contrast. Covariance-fidelity criteria choose \(\lambda\) according to how
+well \(A_\lambda\) predicts covariance structure. A held-participant decoder
+instead depends on how the inverse-spectrum weighting in \(w_\lambda\)
+aligns with that participant's class contrast. These objectives may coincide,
+but established covariance-based EEG decoding, including Riemannian
+classifiers and filter-bank spatial patterns \cite{barachant2012,ang2012fbcsp},
+already provides a framework in which classification risk and covariance
+estimation are distinct targets. Our
+question is therefore narrower and empirical: \emph{does this distinction
+produce a reproducible validity problem in cross-subject EEG when target
+information is unavailable?}
+
+Recent EEG research has explored additional model regularisers,
+optimal-transport adaptation, cyclic representation transfer and adaptive
+spatial--temporal attention
+\cite{miao2025freezing,morvay2026wbt,he2026cyclic,ren2026asta}.
+Riemannian spatial filtering has also been evaluated with ten decoding
+algorithms on six public MI datasets \cite{pan2025rsf}. These studies
+establish a high empirical bar, but their primary questions and target
+information budgets differ. In particular, unsupervised target-domain
+adaptation cannot be ranked against strict zero-target-information (Z0)
+selection as though they used identical participant information. Our
+primary contribution is thus a mechanism and measurement-validity analysis
+inside the predeclared Z0 covariance/tangent-linear-discriminant family,
+not a claim to outperform modern domain-adaptive encoders.
+
+The operator geometry makes the distinction precise. For an evaluation
+participant with covariance \(\Sigma_g\) and contrast \(d_g\), define the
+standardized margin
+\[
+ m_g(\lambda)=
+ \frac{w_\lambda^\top d_g}
+ {\sqrt{w_\lambda^\top\Sigma_gw_\lambda}}.
+\]
+The regularisation-path derivative \(w_\lambda'\) can be decomposed into a
+component that only rescales \(w_\lambda\) and a
+\(\Sigma_g\)-orthogonal rotation \(r_g\). The scale component cancels from
+the standardized margin, giving
+\[
+ m_g'(\lambda)=
+ \frac{r_g(\lambda)^\top d_g}
+ {\sqrt{w_\lambda^\top\Sigma_gw_\lambda}}.
+\]
+In contrast, the covariance-predictive NLL derivative contains covariance
+operators but no class-contrast vector. Hence a covariance optimum is not, in
+general, a discriminative stationary point. Around an interior covariance
+optimum, covariance regret is second order in path displacement whereas a
+non-zero margin derivative is first order. This supplies a mechanistic reason
+why a shallow covariance-fidelity basin can admit materially different
+decisions without claiming that such fragility must occur in every EEG cohort.
+
+The historical version of this study could not establish that chain. Its
+regularisation grid excluded the near-zero analytic-shrinkage region; a
+proposed transfer proxy squared a cross-participant margin and therefore lost
+direction information; several summary-table gains could not be traced to one
+machine-readable configuration lineage; and an apparent filter-bank advantage
+mixed representation and regularisation effects. We therefore reconstruct the
+study from participant-level artifacts, full-domain paths and explicitly
+frozen evidence tiers. Historical rows with unresolved arithmetic or
+provenance are quarantined rather than repaired by inference.
+
+The first prospective test, EEGMMIDB S021--S040, was frozen before any target
+outcome and used a strict Z0 information budget: no target labels, target
+feature moments, target-fitted geometry or target distribution statistics
+entered representation or regularisation selection. It tests whether the
+source objective separation has a held-participant consequence. Negative
+algorithm results are retained with equal status: lower-tail signed selection
+failed to improve over correctly nested source tuning, and a
+covariance-fidelity-constrained selector was prospectively inferior on a
+separate EEGMMIDB block. These failures prevent the paper from turning a
+measurement-validity finding into an unsupported new-estimator story.
+
+We next recover a stronger external evidence tier. BNCI2014\_002 and
+BNCI2015\_001 were frozen under one TRUE PRE-DATA protocol before project
+access to their outcomes. Each cohort uses its native montage, full outer
+leave-one-participant-out evaluation, participant-grouped inner selection and a
+dense regularisation path whose target scores are frozen before AUC
+calculation. These datasets test both source-objective separation and a
+post-S021 Regularisation Validity Frontier. The frontier does not ask for a
+target-optimal \(\lambda\); it asks how much held-participant AUC variation
+is compatible with a specified amount of source covariance-fidelity regret.
+A pre-outcome mathematical correction replaces a structurally meaningless
+generic zero-crossing statistic with material-fragility budgets for 0.01,
+0.02 and 0.05 AUC envelope spans.
+
+A separate prospectively frozen EEGMMIDB S041--S060 experiment asks a
+different scientific question: can regularisation objective change the
+conclusion drawn about EEG representations? It compares a wide-band
+231-dimensional tangent representation, an eight-band 1848-dimensional
+filter-bank representation, a source-only matched-dimension filter-bank PCA
+control and a label-independent nuisance-dimension control. This design
+permits the original hidden-filter-bank hypothesis to fail. A source-budget
+intervention further tests whether a simple monotonic feature-to-sample ratio
+law is sufficient to explain any objective mismatch.
+
+Accordingly, the contribution is an evidence chain rather than a leaderboard.
+We (i) derive the path-rotation condition that separates covariance fidelity
+from discriminative transfer; (ii) test the complete scalar domain under
+participant-grouped source selection; (iii) prospectively evaluate the target
+consequence and its harmed-participant tail; (iv) replicate source-objective
+separation in two TRUE PRE-DATA external cohorts while preserving
+dataset-level inferential boundaries; (v) quantify corrected, uncertainty-aware
+regularisation validity frontiers; and (vi) prospectively test whether the
+choice of regularisation objective changes a representation conclusion. We do
+not claim a universal EEG regularisation law, a universal multiplier, or a
+state-of-the-art replacement covariance estimator.
