@@ -12,6 +12,9 @@ class SignedFileActivatedFrozenPolicyTests(unittest.TestCase):
     def test_actual_signed_installed_bytes_used_by_mujoce_real_robot_simulator(self):
         r=self.data
         self.assertEqual(r["episode_count"],len(TEST_SEEDS)*3)
+        self.assertEqual(r["observed_numeric_source_repair_candidate"],"atomic")
+        self.assertTrue(r["numeric_candidate_from_actual_old_disk_source"])
+        self.assertTrue(r["numeric_taps_author_instrumented_not_vendor_authenticated"])
         self.assertTrue(r["actually_swapped_on_disk_runtime_adapter_file"])
         self.assertFalse(r["actual_manufacturer_operating_system_software_installation"])
         self.assertEqual(len(r["source_file_installed_sha256"]),64)
