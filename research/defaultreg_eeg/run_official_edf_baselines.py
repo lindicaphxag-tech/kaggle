@@ -124,20 +124,50 @@ def fit_analytic(train_X,train_y,test_X,estimator):
  w=np.linalg.solve(reg+np.eye(len(d))*max(float(np.trace(reg)),1.)*1e-10,d)
  return (test_X-midpoint)@w, float(fitted.shrinkage_)
 
-def subject_lopo_lambda(covs,y,groups):
- scores={lam:[] for lam in GRID}
+def subject_lopo_lambda(covs,y,groups,tail_fraction=0.25):
+ """Same source-subject validation folds for four scalar selection criteria.
+ No target information enters any criterion. This is a development comparison,
+ not evidence that tail risk is novel or superior.
+ """
+ rows={lam:{"auc":[],"signed":[],"squared":[]} for lam in GRID}
  for group in sorted(set(groups)):
   tr=groups!=group;val=~tr
   if len(set(y[val]))!=2:raise ValueError("Missing class for source participant")
   inv=reference(covs[tr])   # INNER fold source-only geometry, no validation subject
   Xtr=tangent(covs[tr],inv)
   Xva=tangent(covs[val],inv)
+  d_val,S_val_mid=within_residual(Xva,y[val])[1:]
   for lam in GRID:
    prediction=ridge_score(Xtr,y[tr],Xva,lam)
-   scores[lam].append(float(roc_auc_score(y[val],prediction)))
- means={lam:float(np.mean(scores[lam])) for lam in GRID}
- selected=max(GRID,key=lambda lam:(means[lam],lam))
- return float(selected),{str(lam):v for lam,v in means.items()}
+   auc=float(roc_auc_score(y[val],prediction))
+   resid,d_train,mid=within_residual(Xtr,y[tr])
+   S_train=(resid.T@resid)/(len(Xtr)-2)
+   trace=max(np.trace(S_train)/len(d_train),np.finfo(float).eps)
+   reg=(1-lam)*S_train+lam*trace*np.eye(len(d_train))
+   w=np.linalg.solve(reg,d_train)
+   den=float(w@S_val_mid@w)
+   floor=np.finfo(float).eps*max(1.0,float(w@w))
+   if not np.isfinite(den) or den<=floor:raise ValueError("Degenerate LOPO validation variance")
+   signed=float(w@d_val)/np.sqrt(den)
+   rows[lam]["auc"].append(auc)
+   rows[lam]["signed"].append(signed)
+   rows[lam]["squared"].append(signed*signed)
+ n_groups=len(set(groups));k=max(1,int(np.ceil(tail_fraction*n_groups)))
+ criterion={}
+ for lam in GRID:
+  signed=np.asarray(rows[lam]["signed"])
+  criterion[lam]={
+   "source_macro_auc":float(np.mean(rows[lam]["auc"])),
+   "signed_mean":float(np.mean(signed)),
+   "squared_margin":float(np.mean(rows[lam]["squared"])),
+   "tail_signed":float(np.mean(np.sort(signed)[:k])),
+   "negative_fraction":float(np.mean(signed<0))}
+ selected={
+   "source_macro_auc":float(max(GRID,key=lambda lam:(criterion[lam]["source_macro_auc"],lam))),
+   "signed_mean":float(max(GRID,key=lambda lam:(criterion[lam]["signed_mean"],lam))),
+   "squared_margin":float(max(GRID,key=lambda lam:(criterion[lam]["squared_margin"],lam))),
+   "tail_signed":float(max(GRID,key=lambda lam:(criterion[lam]["tail_signed"],lam)))}
+ return selected,{str(lam):criterion[lam] for lam in GRID}
 
 def main():
  ap=argparse.ArgumentParser()
@@ -171,7 +201,10 @@ def main():
  oa,oaval=fit_analytic(Xtrain,y[tr],Xheld,OAS(store_precision=False))
  scores["LedoitWolf_LDA"]=lw
  scores["OAS_LDA"]=oa
- scores["nested_source_lopo_lambda_LDA"]=ridge_score(Xtrain,y[tr],Xheld,selected)
+ scores["nested_source_macro_auc_LDA"]=ridge_score(Xtrain,y[tr],Xheld,selected["source_macro_auc"])
+ scores["source_signed_mean_LDA"]=ridge_score(Xtrain,y[tr],Xheld,selected["signed_mean"])
+ scores["source_squared_margin_LDA"]=ridge_score(Xtrain,y[tr],Xheld,selected["squared_margin"])
+ scores["source_tail_signed_LDA"]=ridge_score(Xtrain,y[tr],Xheld,selected["tail_signed"])
  logistic=LogisticRegression(max_iter=2000,solver="lbfgs",C=1.0)
  logistic.fit(Xtrain,y[tr])
  scores["LogisticRegression"]=logistic.decision_function(Xheld)
@@ -188,8 +221,8 @@ def main():
   "no_task_cues_dropped":True,
   "train_original_task_trials":int(tr.sum()),
   "target_original_task_trials":int(te.sum()),
-  "source_macro_auc_by_lambda":cvscores,
-  "source_selected_lambda":selected,
+  "source_only_validation_criteria_by_lambda":cvscores,
+  "source_selected_lambda_by_method":selected,
   "LedoitWolf_shrinkage":lwval,"OAS_shrinkage":oaval,
   "per_target_subject":{},
   "source_files":files,
