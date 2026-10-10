@@ -1,0 +1,22 @@
+name: DefaultReg Actions canary
+
+on:
+  push:
+    branches:
+      - research/defaultreg-frontier-shin-bnci002-20261010
+    paths:
+      - '.github/workflows/defaultreg-actions-canary.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Prove job instantiation
+        run: |
+          echo DEFAULTREG_ACTIONS_CANARY_OK
+          echo GITHUB_SHA=$GITHUB_SHA
