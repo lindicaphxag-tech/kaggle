@@ -68,11 +68,8 @@ def audit_pusher(full):
         if entry.get("steps")!=T:
             raise ValueError("truncated or reweighted Pusher task episode")
         groups[key]=entry
-    expected={(scenario,seed,arm)
-              for scenario in SEVERITIES
-              for seed in SEEDS
-              for arm in full["per_arm"] if False}
-    # We also insist each of all six actual actions is present.
+    # Require the complete six-arm inventory, not only the convenient
+    # source-versus-oracle subset.
     declared=tuple(full.get("scenario_arms",(
         "official-healthy","untouched-compensating-source-fault",
         "composite-inverse-blackbox","exact-two-clip-full-information-oracle",
