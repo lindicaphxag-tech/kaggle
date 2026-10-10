@@ -43,6 +43,11 @@ class ActualMergedLeRobotRepairTests(unittest.TestCase):
         self.assertTrue(x["merge_introduces_explicit_fresh_rename_refusal"])
         self.assertTrue(x["pre_merge_uses_old_relative_processor_registry_key"])
         self.assertTrue(x["merged_processor_registry_matches_override_key"])
+        g=x["merged_config_real_guard_execution"]
+        self.assertTrue(g["actual_unchanged_upstream_AST_guard_executed"])
+        self.assertTrue(g["cases"]["fresh_nonempty_rename"]["raises_value_error"])
+        self.assertFalse(g["cases"]["pretrained_nonempty_rename"]["raises_value_error"])
+        self.assertFalse(g["cases"]["fresh_empty_rename"]["raises_value_error"])
         self.assertEqual(len(x["verified_git_blobs"]),4)
         self.assertTrue(all(len(v)==64 for v in
                             x["verified_actual_source_sha256"].values()))
