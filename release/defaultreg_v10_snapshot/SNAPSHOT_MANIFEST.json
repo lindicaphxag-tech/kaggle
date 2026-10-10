@@ -1,7 +1,7 @@
 {
   "schema": "defaultreg_v10_release_snapshot_v1",
   "source_repository": "lindicaphxag-tech/cs",
-  "source_commit": "5d5529dff3be178a6b60db1802dfb9490b212f0f",
+  "source_commit": "b21aab079855376a091e8d457cd73432fcd83a0f",
   "source_pr": 50,
   "snapshot_purpose": "Independent clean-environment BSPC release audit; not a new scientific analysis",
   "copied_at_date": "2026-10-10",
@@ -13,6 +13,8 @@
   "release_fix": "Wilson k=0/k=n interval endpoints made platform-exact; direct child of prior frozen source commit",
   "release_fixes": [
     "Wilson k=0/k=n interval endpoints made platform-exact",
-    "Directional external-replication phrase gate fixed; overlapping claim aliases deduplicated per rule/line"
+    "Directional external-replication phrase gate fixed; overlapping claim aliases deduplicated per rule/line",
+    "Status claim guard now checks semantic BSPC science-ready/package-hold state rather than stale heading",
+    "Latest simultaneous-path sensitivity implementation and tests mirrored"
   ]
 }
