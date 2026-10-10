@@ -134,7 +134,10 @@ def _execute_real_pre_and_post_source(fn,*,pretrained_path,relative,rename_map,
                               reward_maker,logging)
     if len(interactions)!=1:
         raise AssertionError("original factory called incorrectly")
-    incoming=interactions[0]
+    # Original maker arguments are recorded without carrying non-serializable
+    # stub namespace objects into immutable JSON evidence.
+    incoming={k:(dict(vars(v)) if isinstance(v,SimpleNamespace) else v)
+              for k,v in interactions[0].items()}
     return {
         "controller_checkpoint_path_requested":pretrained_path,
         "processor_checkpoint_path_actually_used":final_path,
