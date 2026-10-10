@@ -151,7 +151,7 @@ RULES=(
   {
     "id":"external_directional_replication",
     "patterns":(
-      r"(?:target|H2|H3).{0,100}direction(?:ally)? replicated.{0,80}(?:external|cohort)",
+      r"(?:target|H2|H3).{0,100}direction(?:ally)?(?: was)? replicated.{0,80}(?:external|cohort)",
       r"(?:external|cohort).{0,100}target[- ]effect direction.{0,60}(?:replicated|positive)"
     ),
     "requires":("true_predata_external_directionally_consistent_two_cohort",),
@@ -241,6 +241,7 @@ REQUIRED_EVIDENCE_KEYS=(
 
 def audit_text(text,evidence,source="<memory>"):
     findings=[]
+    seen_rule_lines=set()
     for rule in RULES:
         blocked=bool(rule.get("always_forbidden",False))
         missing=[]
@@ -253,6 +254,13 @@ def audit_text(text,evidence,source="<memory>"):
         for pattern in rule["patterns"]:
             for m in re.finditer(pattern,text,flags=re.I):
                 line=text.count("\n",0,m.start())+1
+                key=(rule["id"],line)
+                # Patterns within one rule are semantic alternatives. Avoid
+                # double-reporting one sentence merely because two aliases
+                # overlap, while preserving repeated violations on new lines.
+                if key in seen_rule_lines:
+                    continue
+                seen_rule_lines.add(key)
                 findings.append({
                   "rule":rule["id"],"source":source,"line":line,
                   "match":m.group(0),"missing_evidence":missing,
