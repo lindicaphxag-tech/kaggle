@@ -52,7 +52,7 @@ jobs:
           assert x['dataset']==d
           assert x['n_subjects']==expected_n
           assert x['subjects']==list(range(1,expected_n+1))
-          assert len(x['channels'])==21 and x['feature_dimension']==231
+          assert len(x['channels'])==20 and x['feature_dimension']==210
           assert x['target_information_track']=='Z0'
           assert x['target_labels_used_before_scoring'] is False
           assert x['target_batch_statistics_used'] is False
