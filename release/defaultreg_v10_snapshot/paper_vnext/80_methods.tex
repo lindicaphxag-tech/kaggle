@@ -47,8 +47,12 @@ For identity shrinkage,
 \]
 the frozen primary selection grid is
 \[
-\{0,.0005,.001,.002,.003,.005,.0075,.01,.015,.02,.03,.05,.075,
-.10,.15,.20,.30,.40,.50,.60,.70,.80,.90,.95,.98,.99,1\}.
+\begin{aligned}
+\Lambda=\{&
+0,.0005,.001,.002,.003,.005,.0075,.01,.015,.02,.03,.05,.075,\\
+&.10,.15,.20,.30,.40,.50,.60,.70,.80,.90,.95,.98,.99,1
+\}.
+\end{aligned}
 \]
 Candidates that are singular at machine precision are marked infeasible
 rather than silently altered. The phrase 'full-domain' denotes that the
@@ -270,9 +274,37 @@ conditional sensitivity diagnostic, not a new pre-registered test or a
 distribution-free confidence certificate. The complete procedure is
 implemented by src/frontier\_simultaneous\_path\_sensitivity.py.
 
+\subsection{V11 translation-invariant real-artifact inference reanalysis}
+The initially implemented absolute-ordinate supremum bootstrap incorporates
+nuisance variability in the cohort's overall AUC level, despite the fact
+that adding one constant to a participant's entire AUC path does not change
+its \(\lambda\)-dependent range. We therefore augment the V10 path
+sensitivity with the oscillation seminorm
+\[
+ \operatorname{osc}(e)=\max_\lambda e(\lambda)-\min_\lambda e(\lambda).
+\]
+For every bootstrap draw, target participants are resampled in groups with
+their full 405-point AUC trajectories intact. The empirical error
+\(e^*(\lambda)=\bar A^*(\lambda)-\bar A(\lambda)\) is evaluated as a whole
+path, and its oscillation is stored. The 95th percentile of this empirical
+oscillation distribution defines a nominal, post-outcome, translation-
+invariant sensitivity radius \(q_{\mathrm{osc}}\). Since a span functional
+is 1-Lipschitz in this seminorm, we examine
+\[
+ L_{\mathrm{osc}}=\max(0,\operatorname{osc}(\bar A)-q_{\mathrm{osc}}).
+\]
+Any material-fragility budget corrected by this method holds the estimated
+source covariance-regret path fixed. Resampling target participants cannot
+quantify refit uncertainty from shared/overlapping outer source sets.
+The result is an exploratory conditional sensitivity assessment and not
+a formal uniform population confidence interval. The raw external input
+SHA-256 checksums, workflow artifact IDs, seed, 20,000 resamples and outputs
+are recorded in evidence/v11\_actual\_v5\_simultaneous\_frontier\_reanalysis.json.
+
 \subsection{Prospective representation interventions}
-The S041--S060 block compares WIDE231, FB8-1848, FB8-SOURCE-PCA231 and
-WIDE+NUISANCE1848 under matched target-information budgets. A separate
+The S041--S060 block compares four prespecified representations:
+WIDE231, FB8-1848, FB8-\allowbreak SOURCE-\allowbreak PCA231 and
+WIDE+\allowbreak NUISANCE1848, under matched target-information budgets. A separate
 source-budget intervention retains fixed fractions
 \(\{1,.75,.50,.25\}\) within each source participant-by-class cell while
 holding the target set, channels, frequency definition and feature
