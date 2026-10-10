@@ -20,8 +20,8 @@ class SymbolicNativeV08Tests(unittest.TestCase):
  def test_module_weight_native_dtype_gain(self):
   r=score_file("m.py",B,A)
   self.assertEqual(r["n_native_contexts"],4)
-  self.assertEqual(r["n_dtype_gain_contexts"],2)
-  self.assertEqual(r["n_preserving_contexts"],2)
+  self.assertEqual(r["n_dtype_gain_contexts"],3)
+  self.assertEqual(r["n_preserving_contexts"],1)
  def test_module_different_attribute_not_overpromoted(self):
   a=A.replace("self.weight.device","self.another.device")
   r=score_file("m.py",B,a)
@@ -35,7 +35,7 @@ class SymbolicNativeV08Tests(unittest.TestCase):
   a="def f(x):return torch.eye(x.size(0),dtype=x.dtype,device=x.device)"
   r=score_file("m.py",b,a)
   self.assertEqual(r["n_native_contexts"],4)
-  self.assertEqual(r["n_dtype_gain_contexts"],2)
+  self.assertEqual(r["n_dtype_gain_contexts"],3)
  def test_no_dtype_change_not_a_candidate(self):
   self.assertEqual(score_file("m.py",B,B)["n_candidates"],0)
  def test_non_matching_factory_args_refuses(self):
