@@ -1,0 +1,46 @@
+% Portable review-manuscript assembly, not publisher camera-ready template.
+% Compile from this directory:
+% pdflatex main_v10 && bibtex main_v10 && pdflatex main_v10 && pdflatex main_v10
+% Contains bibliography and evidence tables. Figure finalization still pending.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage[hidelinks]{hyperref}
+\title{Regularisation Validity in Cross-Subject EEG:\\
+Prospective Objective Mismatch, Validity Frontiers, and Representation Dependence}
+\author{Author and affiliation information pending verification}
+\date{}
+\begin{document}
+\maketitle
+\input{00_abstract_evidence_locked.tex}
+\noindent\textbf{Keywords:} EEG; cross-subject decoding; covariance shrinkage;
+regularised discriminant analysis; domain generalisation; selection bias;
+representation validity.
+\input{01_intro.tex}
+\input{80_methods.tex}
+\input{02_results_current.tex}
+\input{93_figure_participant_effects.tex}
+\input{03_discussion_current.tex}
+\section{Conclusions}
+In the studied zero-target covariance/tangent-space discriminant pipelines,
+source covariance fidelity and source held-participant discrimination favor
+different finite-grid shrinkage regimes. A prospectively frozen EEGMMIDB block
+shows that the choice has a real held-participant AUC consequence; two
+independently frozen external datasets preserve the effect direction but do
+not individually establish Holm-adjusted superiority. A second prospective
+experiment shows that the same choice can change a spectral-representation
+comparison, while refuting the historical filter-bank advantage. The
+regularisation validity frontier remains descriptive pending simultaneous
+path-level and source-pool uncertainty checks. These results warrant
+treating the regularisation objective as an explicit EEG measurement choice,
+not assuming that a covariance-estimation optimum is a transferable
+discrimination optimum or a universally superior selector.
+\clearpage
+\input{91_table_main_prospective_results.tex}
+\input{92_table_validity_frontier.tex}
+\bibliographystyle{unsrt}
+\bibliography{references_v10}
+\end{document}
