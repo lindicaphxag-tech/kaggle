@@ -78,14 +78,6 @@ def lift_constructor(source,name="Quaternion",counterfeit=False):
  init=source_ast_constructor(source,name)
  if counterfeit:
   replaced=False
-  for node in ast.walk(init):
-   if isinstance(node,ast.Expr) and isinstance(node.value,ast.Call) and isinstance(node.value.func,ast.Attribute):
-    if node.value.func.attr=="register_buffer" and len(node.value.args)==2:
-     node.value=ast.Assign(
-      targets=[ast.Attribute(value=ast.Name(id="self",ctx=ast.Load()),
-                             attr="_data",ctx=ast.Store())],
-      value=copy.deepcopy(node.value.args[1]))
-     # Expr cannot contain Assign: rewrite parent block below instead.
   # Strictly handle only direct if in source constructor.
   for statement in init.body:
    if not isinstance(statement,ast.If):continue
