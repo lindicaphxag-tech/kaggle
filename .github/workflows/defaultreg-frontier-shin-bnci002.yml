@@ -41,7 +41,14 @@ jobs:
         run: python -m pip install --disable-pip-version-check moabb==1.7.2
 
       - name: Compile frozen frontier runner
-        run: python -m py_compile research/defaultreg_frontier/run_untouched_frontier.py
+        run: |
+          python -m py_compile research/defaultreg_frontier/run_untouched_frontier.py
+          python -m py_compile research/defaultreg_frontier/test_runner_synthetic.py
+
+      - name: Run synthetic frontier smoke test
+        run: |
+          cd research/defaultreg_frontier
+          python test_runner_synthetic.py
 
       - name: Execute untouched validity-frontier confirmation
         run: |
