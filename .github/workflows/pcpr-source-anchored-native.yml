@@ -34,6 +34,8 @@ jobs:
         run: python research/pcpr/patch_scope_vnext.py
       - name: Run post-hoc typed-effect development (NOT prospective)
         run: python research/pcpr/typed_effects_v02.py
+      - name: Run unseen eight repos with pre-frozen v0.2 detector
+        run: python research/pcpr/run_v02_unseen_eight.py
       - name: Preserve case-level source provenance
         uses: actions/upload-artifact@v4
         with:
@@ -42,4 +44,5 @@ jobs:
             pcpr_deepchem_native_summary.json
             pcpr_vnext_frozen_first_score.json
             pcpr_v02_posthoc_effects.json
+            pcpr_v02_unseen_eight_first_score.json
           if-no-files-found: error
