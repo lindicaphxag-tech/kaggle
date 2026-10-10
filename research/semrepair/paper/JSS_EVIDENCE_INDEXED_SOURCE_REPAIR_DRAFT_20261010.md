@@ -165,3 +165,36 @@ This improves the preceding claim that all examined defects are author-injected:
 **Updated ground truth taxonomy for JSS:** (i) actual reported ManiSkill controller sign bug with unmerged proposed upstream repair; (ii) author-injected callsite stale anchor using REAL pinned LeRobot conversion source; (iii) author-injected Pusher/Reacher software source clipping for true actuator noninvertibility. Three source families, but only **one upstream-reported natural issue** and zero verified external merges. Obtain a second independently reported bug/fix pair, preferably with a different root cause, before claiming a broad external software defect corpus.
 
 **Additional accepted-paper standard:** JSS 2025 Nenchev et al. CoCoSaFe (DOI 10.1016/j.jss.2025.112499) verifies real code-level controller properties; RAS 2026 Luckcuck et al. RCL/Vanda (DOI 10.1016/j.robot.2026.105648) composes ROS assume–guarantee contracts. The credible novelty relative to them must be *minimal authorized executable software repair under exact information/actuation obstructions*, plus real before/after source evidence, not simply formal verification or monitoring.
+
+
+## 9. Active test-overfitting controls and genuinely MERGED independent LeRobot source defect
+
+The intended JSS/IST research claim is no longer just anomaly detection and source correction. It is the constrained choice of executable patches under scarce behavioral tests, whole-input semantics, source-code authority and cross-version component contracts. Test-suite overfitting is known APR prior art (see the 2024 Empirical Software Engineering xTestCluster patch-assessment work and the prior IST Crex paper); finite template-based synthesis and finite set-cover optimization are likewise established, not new mathematics.
+
+### 9.1 Actual pinned ManiSkill: active counterexamples to plausible incorrect source patches
+
+Original ManiSkill controller and original scaling helper are byte-verified at official git commit 62ff3a5896b4d5b4cf0ac4c8d79afe600c9404a3, related to independently reported issue #1469 and upstream PR #1472 (unmerged). An explicit 7-term typed AST grammar replaces ONLY one rotation multiplier in the original source method: unchanged negative lower, positive upper, negated negative lower, absolute lower, hardcoded training upper=0.1, half of the rotation-range width, and averaged positive gains.
+
+Under a symmetric training configuration lower=-0.1, upper=0.1, SIX candidates are plausible, but only the positive-upper variant satisfies the declared contract under arbitrary independently varying lower<0, upper>0. The other FIVE are test-overfitting candidates, NOT five genuine submitted vendor fixes. We submit:
+- a real frozen ManiSkill original-Torch-kernel seven-candidate executable AST experiment;
+- one adaptive counterexample chosen from a fixed bank of asymmetric calibration configurations;
+- exact minimum-cost distinguishing probe selection over the finite candidate bank via weighted set-cover DP (independently verified against brute-force);
+- a symbolic polynomial identity verifier for the independently varying rotation bounds;
+- 128 reserved asymmetric configurations and actions not accessed by patch selection;
+- license-check refusal even when the correct patch is known but not explicitly authorized.
+
+Code: research/semrepair/active_contract_patch_synthesis.py and minimum_counterexample_probe_cover.py plus tests and GH Actions. The pure-stdlib source-candidate test-cover solver PASSED five local container tests, including exact-optimum cross-check and missing-budget refusal. Full original upstream ManiSkill kernel GitHub CI is not yet verified green. The intended within-grammar symmetric-test false plausibility (five incorrect programs) is not a generic automatic program repair success rate or externally validated robustness result.
+
+### 9.2 Genuine independent publisher MERGED fix: LeRobot #3425 / PR #3711
+
+Upstream issue https://github.com/huggingface/lerobot/issues/3425 documents that rename_map was skipped for pretrained relative-action training when the policy training path silently rebuilt a FRESH processor pipeline. Preliminary upstream PRs #3428, #3511, #3512 and #3514 CLOSED without merging, proposing variants that forwarded rename_map to freshly created processors. Later upstream PR https://github.com/huggingface/lerobot/pull/3711 MERGED by actual LeRobot maintainers on 2026-06-03, with commit 19fe315971079e116b917ed4d482bfbf3c93bbbe. This is NOT our patch and its maintainer acceptance is NOT recognition of SemRepair.
+
+The externally merged repair preserves the pretrained actor+processor checkpoint contract and enables relative/absolute actions via named processor overrides. It also guards rename_map when no pretrained checkpoint exists, and renames the actual step registry key from delta_actions_processor to relative_actions_processor. Thus a naive patch that only forwards rename_map can satisfy a superficial data-key test while violating provenance and checkpoint pipeline semantics.
+
+We added an independent no-hardware, no-GPU executable source audit with original LeRobot Python training setup statements AST-extracted from the before-merge git commit 906b585826c0e34235a347554abfb94e0d65484b and the accepted merge SHA. All SIX original Git blobs for three distinct files are pinned: scripts/lerobot_train.py, configs/train.py, processor/relative_action_processor.py. It executes the unchanged upstream processor setup code across six configuration cases and checks the cross-component policy/processor contract before and after merging. Expensive pretrained checkpoints, policy inference and actual factory behavior are STUBBED; this is a source-level control-flow case study and cannot be reported as independent complete PI05 training success. New program and regression workflow: research/semrepair/real_merged_lerobot_processor_contract.py and .github/workflows/semrepair-real-merged-lerobot-multifile-contract.yml. GitHub CI was not yet verified when this document section was written.
+
+### 9.3 Publication strength and honest remaining gaps
+
+The current original AST repair search works for a declared one-expression grammar; it does NOT yet synthesize the multi-file maintainer merged LeRobot fix. The LeRobot tool AUDITS genuine before/after source, not automatic discovery of the maintainer patch. Both distinctions must remain explicit.
+
+Prior top JSS formal software papers such as Nenchev et al. CoCoSaFe (DOI 10.1016/j.jss.2025.112499), and general program-repair methods on Defects4J, test far more actual software systems than one real merged bug plus a controlled fake caller mutation. IST remains a plausible first submission target based on official software-testing, maintenance and empirical evidence scope; JSS remains higher generality stretch. Neither promises 2026 CAS 2, guaranteed acceptance nor an immediate November/December acceptance. Acquire a second genuinely externally resolved bug in another codebase plus CPU-cost and repair false-authorization audit before labeling this a top-paper-level general methodology.
