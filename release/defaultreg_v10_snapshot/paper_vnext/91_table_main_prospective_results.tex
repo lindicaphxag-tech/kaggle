@@ -2,39 +2,36 @@
 \centering
 \caption{Prospective and TRUE PRE-DATA Z0 evidence for regularisation-objective mismatch. AUC values are participant-macro averages. $\Delta_{\mathrm{cov}}$ compares full-domain source participant-discrimination selection with source covariance-NLL selection; $\Delta_{\mathrm{LW}}$ compares it with analytic Ledoit--Wolf. Confidence intervals are participant bootstrap intervals. Holm $p$ values belong to the frozen two-comparison family within each cohort. External cohorts are replication strata and are not pooled for significance.}
 \label{tab:main-prospective-results}
-\small
-\begin{tabular}{lrrrrrrrr}
-\hline
-Cohort & $N$ & Macro & Cov-NLL & LW & $\Delta_{\mathrm{cov}}$ (95\% CI) & Holm $p$ & $\Delta_{\mathrm{LW}}$ (95\% CI) & Holm $p$ \\
-\hline
+\scriptsize
+\setlength{\tabcolsep}{3.2pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular}{lrrrrcrcr}
+\toprule
+Cohort & $N$ & Macro & Cov-NLL & LW &
+\shortstack{$\Delta_{\mathrm{cov}}$\\95\% CI} &
+Holm $p$ &
+\shortstack{$\Delta_{\mathrm{LW}}$\\95\% CI} &
+Holm $p$ \\
+\midrule
 EEGMMIDB S021--S040
-& 20
-& 0.7212
-& 0.6651
-& 0.6292
-& +0.0561 [0.0218, 0.0905]
+& 20 & 0.7212 & 0.6651 & 0.6292
+& \shortstack{+0.0561\\[0.0218, 0.0905]}
 & 0.0060
-& +0.0920 [0.0411, 0.1431]
+& \shortstack{+0.0920\\[0.0411, 0.1431]}
 & 0.0051 \\
 BNCI2014\_002
-& 14
-& 0.7781
-& 0.7605
-& 0.7552
-& +0.0176 [-0.0036, 0.0373]
+& 14 & 0.7781 & 0.7605 & 0.7552
+& \shortstack{+0.0176\\[-0.0036, 0.0373]}
 & 0.1396
-& +0.0229 [0.0004, 0.0440]
+& \shortstack{+0.0229\\[0.0004, 0.0440]}
 & 0.1396 \\
 BNCI2015\_001
-& 12
-& 0.7670
-& 0.7237
-& 0.7217
-& +0.0433 [0.0002, 0.0935]
+& 12 & 0.7670 & 0.7237 & 0.7217
+& \shortstack{+0.0433\\[0.0002, 0.0935]}
 & 0.1855
-& +0.0453 [0.0029, 0.0957]
+& \shortstack{+0.0453\\[0.0029, 0.0957]}
 & 0.1855 \\
-\hline
+\bottomrule
 \end{tabular}
 
 \vspace{1mm}
