@@ -342,7 +342,7 @@ def source_path(C, y, groups):
         "dense_covariance_1se_lambdas": list(map(float, dense_cov_1se)),
         "dense_covariance_regret_by_lambda": dense_regret,
         "criteria_by_lambda": {
-            str(lam): criteria[lam] for lam in good
+            str(lam): criteria[lam] for lam in dense_good
         },
         "feasible_full_lambdas": list(map(float, full_good)),
         "feasible_dense_lambdas": list(map(float, dense_good)),
