@@ -51,6 +51,9 @@ jobs:
           assert dims=={'WIDE231':231,'FB8_1848':1848,'FB8_SOURCE_PCA231':231,'WIDE_NUISANCE1848':1848},dims
           assert len(x['per_target_subject'])==20
           assert len(x['predeclared_contrasts'])==4
+          assert set(x['source_budget_intervention'])=={'1.0','0.75','0.5','0.25'}
+          assert all(v['source_trials']>0 for v in x['source_budget_intervention'].values())
+          assert all(len(v['per_target_subject_auc'])==20 for v in x['source_budget_intervention'].values())
           assert {c['contrast'] for c in x['predeclared_contrasts']}=={
             'C1_FB8xRegularisation_LW_PRIMARY',
             'C2_FB8_minus_WIDE_NUISANCE1848',
