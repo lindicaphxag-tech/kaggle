@@ -855,14 +855,40 @@
     },
     {
       "created_at": "2026-10-09T19:28:46Z",
+      "expiry_recorded_at": "2026-10-10T06:21:03Z",
+      "expiry_sha256": "ae36378b6b1a6045419bf627bd4b38d085628b21cc7990f363ed68645a877471",
+      "expiry_source": "expirations/ros-navigation__navigation2__6640.json",
       "first_frozen_at": "2026-10-09T20:20:12Z",
       "id": "ros-navigation/navigation2#6640",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 6640,
       "prediction_deadline_at": "2026-10-10T02:20:12Z",
       "repository": "ros-navigation/navigation2",
       "source": "inbox/FIRST_SEEN_20261009T202012Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "27f8e2a6e57d7b5d314379eddef5a878b8d7243af86fb6373eadbaec909d923d"
+    },
+    {
+      "created_at": "2026-10-10T02:14:34Z",
+      "first_frozen_at": "2026-10-10T06:22:43Z",
+      "id": "google-deepmind/mujoco#3675",
+      "issue_number": 3675,
+      "prediction_deadline_at": "2026-10-10T12:22:43Z",
+      "repository": "google-deepmind/mujoco",
+      "source": "inbox/FIRST_SEEN_20261010T062243Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "3e4e39e6c1cf8f5373272ec0c51e0273983c531b37934cf19da0e4d82c2093bb"
+    },
+    {
+      "created_at": "2026-10-10T03:00:02Z",
+      "first_frozen_at": "2026-10-10T06:22:43Z",
+      "id": "isaac-sim/IsaacLab#8450",
+      "issue_number": 8450,
+      "prediction_deadline_at": "2026-10-10T12:22:43Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261010T062243Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "017a47260a157f1dd06c85d7bc5e850b0a5718cf6859118761e533d4cce2eb6b"
     }
   ]
 }
