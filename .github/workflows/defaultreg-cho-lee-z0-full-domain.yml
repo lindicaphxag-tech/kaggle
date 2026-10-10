@@ -1,0 +1,84 @@
+name: DefaultReg untouched Cho Lee Z0 full-domain external validation
+on:
+  push:
+    branches:
+      - research/defaultreg-cho-lee-z0-full-domain-20261010
+    paths:
+      - 'research/defaultreg_external/**'
+      - '.github/workflows/defaultreg-cho-lee-z0-full-domain.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'research/defaultreg_external/**'
+      - '.github/workflows/defaultreg-cho-lee-z0-full-domain.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  external-full-domain:
+    strategy:
+      fail-fast: false
+      matrix:
+        dataset: [cho2017, lee2019_mi]
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MNE_DATA: ${{ runner.temp }}/mne-data
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install frozen public EEG stack
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Record environment and disk
+        run: |
+          python - <<'PY'
+          import json,platform,sys,numpy,scipy,sklearn,mne,moabb
+          x={"python":sys.version,"platform":platform.platform(),"numpy":numpy.__version__,
+             "scipy":scipy.__version__,"sklearn":sklearn.__version__,
+             "mne":mne.__version__,"moabb":moabb.__version__}
+          open("environment-${{ matrix.dataset }}.json","w").write(json.dumps(x,indent=2))
+          print(json.dumps(x,indent=2))
+          PY
+          df -h
+      - name: Execute frozen external source-target block
+        run: |
+          python research/defaultreg_external/run_external_z0_full_domain.py \
+            --dataset ${{ matrix.dataset }} \
+            --out defaultreg_external_${{ matrix.dataset }}
+      - name: Fail closed on evidence semantics
+        run: |
+          python - <<'PY'
+          import json
+          name="${{ matrix.dataset }}"
+          p=f"defaultreg_external_{name}/external_full_domain_result.json"
+          x=json.load(open(p))
+          assert x["status"]=="REAL_PROSPECTIVE_EXTERNAL_Z0_FULL_DOMAIN"
+          assert x["confirmation_status"]=="UNTOUCHED_TARGET_BLOCK_AT_PROTOCOL_FREEZE"
+          assert x["target_information_budget"]=="Z0"
+          assert x["target_labels_or_statistics_used_for_selection"] is False
+          assert x["n_channels"]==21
+          assert x["full_domain_grid"][0]==0.0 and x["full_domain_grid"][-1]==1.0
+          assert len(x["per_target_subject"])==len(x["target_participants"])
+          expected={"LedoitWolf_LDA","OAS_LDA","source_cov_nll_full_domain_LDA",
+                    "source_macro_full_domain_LDA","FCTR_LDA","TS_LogisticRegression"}
+          assert set(x["mean_auc_by_method"])==expected
+          assert all(set(r["auc"])==expected for r in x["per_target_subject"])
+          assert all(len(r["path_auc_by_lambda"])==len(x["source_path"]["feasible_lambdas"])
+                     for r in x["per_target_subject"])
+          print("PASS_EXTERNAL_Z0_FULL_DOMAIN_EVIDENCE_GATE")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-external-${{ matrix.dataset }}
+          path: |
+            research/defaultreg_external/FROZEN_CHO_LEE_Z0_FULL_DOMAIN_20261010.md
+            environment-${{ matrix.dataset }}.json
+            defaultreg_external_${{ matrix.dataset }}/**
+          if-no-files-found: warn
+          retention-days: 90
