@@ -1,7 +1,7 @@
 {
   "schema": "defaultreg_v10_release_snapshot_v1",
   "source_repository": "lindicaphxag-tech/cs",
-  "source_commit": "ee8e56ce4f6b2ebe75375be51b5d9a11fca2ed2e",
+  "source_commit": "c0801c9c77e55a9bf90a90c33b47210926194d75",
   "source_pr": 50,
   "snapshot_purpose": "Independent clean-environment BSPC release audit; not a new scientific analysis",
   "copied_at_date": "2026-10-10",
@@ -16,6 +16,7 @@
     "Directional external-replication phrase gate fixed; overlapping claim aliases deduplicated per rule/line",
     "Status claim guard checks semantic BSPC science-ready/package-hold state",
     "Latest translation-invariant/simultaneous frontier sensitivity text synchronized",
-    "Literal LaTeX newline removed; long shrinkage grid and representation tokens made wrap-safe"
+    "Literal LaTeX newline removed; long shrinkage grid and representation tokens made wrap-safe",
+    "Main prospective table reformatted to fit text width; long provenance/representation tokens made line-break safe; stale figure-finalization comment removed"
   ]
 }
