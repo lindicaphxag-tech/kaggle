@@ -1,0 +1,97 @@
+name: DefaultReg v5 true pre-data BNCI panel
+on:
+  push:
+    branches:
+      - research/defaultreg-v5-predatapanel-20261010
+    paths:
+      - 'research/defaultreg_v5/**'
+      - '.github/workflows/defaultreg-v5-predata-panel.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  predata-panel:
+    strategy:
+      fail-fast: false
+      matrix:
+        dataset: [BNCI2014_002, BNCI2015_001]
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MNE_DATA: ${{ runner.temp }}/mne_data
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install frozen numerical stack
+        run: |
+          python -m pip install --disable-pip-version-check             moabb==1.7.2 numpy==2.3.5 scipy==1.17.0             scikit-learn==1.8.0 mne==1.11.0 pyriemann==0.12
+          python - <<'PY'
+          import moabb,numpy,scipy,sklearn,mne,pyriemann
+          print({
+            'moabb':moabb.__version__,'numpy':numpy.__version__,
+            'scipy':scipy.__version__,'sklearn':sklearn.__version__,
+            'mne':mne.__version__,'pyriemann':pyriemann.__version__})
+          assert moabb.__version__=='1.7.2'
+          assert numpy.__version__=='2.3.5'
+          assert sklearn.__version__=='1.8.0'
+          assert mne.__version__=='1.11.0'
+          assert pyriemann.__version__=='0.12'
+          PY
+      - name: Compile frozen v5 runner
+        run: python -m py_compile research/defaultreg_v5/run_v5_predata_panel.py
+      - name: Execute true pre-data outer LOPO
+        run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_v5/run_v5_predata_panel.py             --dataset "${{ matrix.dataset }}"             --data-root "$MNE_DATA"             --out "defaultreg_v5_${{ matrix.dataset }}"
+      - name: Fail closed on v5 evidence contract
+        run: |
+          DATASET="${{ matrix.dataset }}" python - <<'PY'
+          import hashlib,json,os,pathlib
+          d=os.environ['DATASET'];root=pathlib.Path(f'defaultreg_v5_{d}')
+          p=root/f'{d}_v5_result.json';x=json.loads(p.read_text())
+          expected_n={'BNCI2014_002':14,'BNCI2015_001':12}[d]
+          expected_ch={'BNCI2014_002':15,'BNCI2015_001':13}[d]
+          expected_dim={15:120,13:91}[expected_ch]
+          assert x['status']=='V5_TRUE_PREDATA_EXTERNAL_COMPLETE'
+          assert x['dataset']==d and x['n_subjects']==expected_n
+          assert x['subjects']==list(range(1,expected_n+1))
+          assert x['n_channels']==expected_ch and x['tangent_dimension']==expected_dim
+          assert x['target_information_track']=='Z0'
+          assert x['score_freeze_precedes_target_auc'] is True
+          assert len(x['dense_grid'])>400
+          methods={'LedoitWolf_LDA','OAS_LDA','source_cov_nll_full_domain_LDA',
+                   'source_macro_full_domain_LDA','discriminability_first_LDA',
+                   'mean_tail_fidelity_LDA','TS_LogisticRegression','Riemannian_MDM'}
+          assert set(x['methods'])==methods and set(x['macro_auc'])==methods
+          assert len(x['per_subject'])==expected_n
+          assert all(set(r['auc'])==methods for r in x['per_subject'])
+          assert 'bootstrap95' in x['primary_H2_macro_vs_cov']
+          assert 'exact_signflip_p' in x['primary_H2_macro_vs_cov']
+          assert 'holm_p_H2_H3' in x['primary_H2_macro_vs_cov']
+          assert 'cvar25' in x['primary_H2_macro_vs_cov']
+          score=root/'frozen_target_scores_before_auc.npz'
+          h=hashlib.sha256(score.read_bytes()).hexdigest()
+          assert h==x['score_bundle_sha256']
+          receipt=json.loads((root/'receipt.json').read_text())
+          assert receipt['score_bundle_sha256']==h
+          assert receipt['n_subjects']==expected_n
+          print('PASS_V5_TRUE_PREDATA_CONTRACT',d)
+          print('macro',x['macro_auc'])
+          print('H2',x['primary_H2_macro_vs_cov'])
+          print('H3',x['primary_H3_macro_vs_LW'])
+          print('secondary',x['secondary_mean_tail_vs_macro'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-v5-${{ matrix.dataset }}
+          path: |
+            research/defaultreg_v5/FROZEN_PREDATA_BNCI_PANEL_20261010.md
+            defaultreg_v5_${{ matrix.dataset }}/**
+          if-no-files-found: warn
+          retention-days: 90
