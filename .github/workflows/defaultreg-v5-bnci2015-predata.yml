@@ -6,6 +6,12 @@ on:
       - research/defaultreg-v5-predatapanel-20261010
     paths:
       - '.github/workflows/defaultreg-v5-bnci2015-predata.yml'
+  pull_request:
+    branches:
+      - research/defaultreg-v5-predatapanel-20261010
+    paths:
+      - '.github/workflows/defaultreg-v5-bnci2015-predata.yml'
+      - 'execution/defaultreg_v5_bnci2015_ci_trigger.txt'
   workflow_dispatch:
 
 permissions:
