@@ -1,1 +1,2 @@
 CI-only trigger. Frozen scientific protocol and code unchanged.
+Second CI-only synchronization trigger after base workflow allowed child PR.
