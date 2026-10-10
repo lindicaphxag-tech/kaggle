@@ -1,0 +1,48 @@
+name: SemRepair frozen Farama SAC heldout evidence statistical audit
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/paired_external_sac_audit.py'
+      - 'research/semrepair/test_paired_external_sac_audit.py'
+      - '.github/workflows/semrepair-frozen-paired-statistics.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independent-recompute:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Test statistical denominator and tie-handling invariants
+        run: python -m unittest -v research.semrepair.test_paired_external_sac_audit
+      - name: Retrieve ALL pre-existing frozen-source expert holdout raw rows
+        uses: actions/download-artifact@v4
+        with:
+          repository: lindicaphxag-tech/kaggle
+          run-id: 38007699504
+          github-token: ${{ github.token }}
+          name: semrepair-official-reacher-postpilot-32seed-fivefault-raw
+          path: frozen-evidence
+      - name: Compute paired effect CI and familywise sign evidence
+        run: |
+          python -m research.semrepair.paired_external_sac_audit frozen-evidence/sealed_external_reacher_full.json > paired_seed_audit.json
+          python - <<'PY'
+          import json
+          r=json.load(open('paired_seed_audit.json'))
+          print('RAW_SHA256',r['raw_sha256'])
+          for scenario,data in sorted(r['comparisons_by_severity'].items()):
+              print(scenario,'n',data['reset_count'],
+                    'reward_difference',round(data['mean_official_reward_gain'],6),
+                    'paired_95pct_bootstrap',data['paired_seed_bootstrap_95pct_descriptive'],
+                    'sign_p_bonferroni',data['bonferroni_adjusted_p_for_five_fixed_levels'],
+                    'positive/negative/tie',data['source_better'],data['source_worse'],data['exact_ties'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: semrepair-external-sac-expert-paired-seed-audit
+          path: paired_seed_audit.json
+          retention-days: 90
