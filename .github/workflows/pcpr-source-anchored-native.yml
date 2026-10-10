@@ -4,6 +4,10 @@ on:
     paths:
       - "research/pcpr/**"
       - ".github/workflows/pcpr-source-anchored-native.yml"
+  pull_request:
+    paths:
+      - "research/pcpr/**"
+      - ".github/workflows/pcpr-source-anchored-native.yml"
   workflow_dispatch:
 permissions:
   contents: read
