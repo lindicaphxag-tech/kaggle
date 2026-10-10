@@ -161,3 +161,38 @@ Independent audit re-reads the archived raw Pusher file rather than rerunning se
 - **CVPR 2026** *FLARE: A Failure-Aware Framework for Autonomous Correction and Recovery in Visual-Language Robotic Manipulation* https://openaccess.thecvf.com/content/CVPR2026/html/Zhao_FLARE_A_Failure-Aware_Framework_for_Autonomous_Correction_and_Recovery_in_CVPR_2026_paper.html — visual-language learned manipulation and retry/reset, not a software source authenticity study but much stronger learned policy evidence.
 
 **Go/no-go:** one additional independent manufacturer/policy architecture, actual source attestation with executable signed patch switch, globally task-aware adaptive baseline, and outside-party replay are required for T-RO/RA-L/CoRL excellence. Neither performance transfer in two Farama tasks nor 960 trial count alone is a top-tier paper acceptance certificate.
+
+
+## Executed Pusher source-file statistics and second independently published actor — added after above frozen expert test
+
+### First-party SEED-PAIRED reanalysis from independent GitHub workflow, not hand-picked new runs
+
+Original Pusher SAC-expert raw file from GitHub Actions #38009127179 was independently read by a separate audit workflow #38009661288; full original raw row SHA256 is **7abafeb9a4b9bed0f74a5d5ccf00a5ba0b4932ae1a6219e1c66697af9c0ea58c**. It refuses missing/duplicate conditions, incorrect reward components and corrupted source-to-healthy identities. It uses the same 32 reset seeds in each of all five fixed faults and 10 simultaneous exact sign tests (original return and true object-to-goal distance) with a ten-test Bonferroni multiplier.
+
+For the strongest k=3.5,L=.8 comparison (source candidate minus full-information instantaneous action oracle):
+
+- Original reward gain mean **+8.738653**; descriptive 32-paired-seed bootstrap 95% **[+7.123533,+10.347212]** original reward units.
+- TRUE physical **object-to-goal distance reduction mean 0.058898 m**; descriptive paired-seed bootstrap 95% **[0.0455503,0.0716533] metres**.
+- 10-test familywise corrected exact two-sided sign p ≈ **2.46335e-6** for both reward improvement and object-goal-distance reduction.
+- Fingertip-to-object distance also reduces mean **0.079979 m**; the SOURCE method has a **more negative** mean official control penalty by 0.0115012 reward units per step than the action oracle, so the cumulative reward gain CANNOT be attributed solely to a cheaper action penalty. Physical object progress and fingertip proximity more than compensate for higher source action control cost.
+- Mild k=.8,L=2 shows 0 reward and goal-distance effect as expected; intermediate k=2,L=2 has reward improvement +0.335309 with an object distance bootstrap CI slightly crossing zero (about [-0.000002,0.004585] m). Do NOT misstate all five cases as uniform large physical benefit.
+
+Successful independent original-artifact audit with both major endpoints and full metrics:
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38009661288
+
+### SECOND externally published Pusher-v5 SAC-medium checkpoint — sequential cross-actor generalization
+
+This second policy was selected after seeing the first published SAC-expert cross-robot result; all first Pusher faults/seed IDs were reused WITHOUT changes. Farama/Minari published Pusher-v5-SAC-medium is pinned to full revision **d7d16ee5dfaa1f9e43df96cbdd6846cead1dabb6**, verified exact ZIP SHA256 **6ad4f083db0713cb5c6ec649cbcff50c5205e25c78756aed89f9921d75b1d2b8**; zero author training. Full second 32*5*6 = **960 official Pusher episodes GREEN**:
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38009508516
+
+| Fixed Pusher fault (shear k, clip L) | Medium policy: unpatched return | Full-information instant action oracle return | Numeric source candidate return | Source-oracle mean original reward difference | Physical object-goal distance reduction |
+|---|---:|---:|---:|---:|---:|
+| 0.8,2 | -31.553906 | -31.551123 | -31.551519 | **-0.000396** | 0.000008 m |
+| 2,2 | -31.869618 | -31.684600 | -31.551519 | +0.133081 | 0.001033 m |
+| 3.5,2 | -45.414064 | -32.497173 | -31.551519 | +0.945654 | 0.005904 m |
+| 2,0.8 | -47.818633 | -33.941309 | -31.551519 | +2.389790 | 0.011218 m |
+| 3.5,0.8 | -92.944053 | -37.096160 | -31.551519 | **+5.544641** | **0.020738 m** |
+
+Strongest source versus oracle result: **32/32 positive reward differences**, no negative or tied seed; source returns -31.551519 and oracle -37.096160; object-to-goal distance source 0.215279 m, oracle 0.236017 m. Weakest fault has a tiny negative reward difference in the published medium checkpoint, so this is not universal dominance.
+
+**Conclusive current evidence scope:** two externally provided Farama robot environments (Reacher and Pusher) and four pinned published SAC actor checkpoints, each evaluated on carefully engineered 2-component clipping source defects; positive source-vs-exact-instant-action-oracle original reward and object-goal-distance effects at severe Pusher faults. This is materially stronger than the first first-party two-slider apparatus, but there is no real VLA, no external independent signer roots or installed robot software patch, and no full-horizon globally reward-optimal competing recovery controller. Not an independently confirmed academic top-paper or guaranteed accept-ready.
