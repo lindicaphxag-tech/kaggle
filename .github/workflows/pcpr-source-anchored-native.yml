@@ -75,6 +75,11 @@ jobs:
         run: python research/pcpr/run_v08_spikingjelly_pinned_dev.py
       - name: Run SHA-pinned TorchJD cross-expression native development case
         run: python research/pcpr/run_v09_torchjd_original_dev.py
+      - name: First-score third 32-PR holdout (v0.9 source-exact cast expressions)
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python research/pcpr/run_v09_new_32_holdout.py
       - name: Preserve case-level source provenance
         uses: actions/upload-artifact@v4
         with:
@@ -95,6 +100,7 @@ jobs:
             pcpr_v08_new_64_frozen_first_score.json
             pcpr_v08_spikingjelly_pinned_dev.json
             pcpr_v09_torchjd_821_original_source.json
+            pcpr_v09_new_32_frozen_first_score.json
             pcpr_kornia_native_package_evidence.json
             pcpr_kornia_so2_native.json
           if-no-files-found: error
