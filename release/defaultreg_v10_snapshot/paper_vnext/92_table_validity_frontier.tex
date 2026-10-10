@@ -1,24 +1,18 @@
-\begin{table}[t]
+\begin{table*}[t]
 \centering
-\caption{Corrected TRUE PRE-DATA Regularisation Validity Frontiers. The primary material-fragility threshold is a 0.02 AUC envelope span. $\delta_{0.02}$ is expressed in raw per-dimension source covariance predictive-NLL regret. Percentile intervals describe 20,000 paired participant-path resamples; they are not simultaneous confidence bands or tests of a data-selected positive range.}
+\caption{Original v5 405-candidate target AUC path spreads and V11 translation-invariant simultaneous-path sensitivity. Observed ranges are exact reconstructions from the raw TRUE PRE-DATA external experiment outputs; ordinary 20,000-resample percentile intervals for an empirical max--min statistic are shown only for provenance, not as simultaneous population confidence intervals. \(q_{\mathrm{osc}}\) is the nominal 95th percentile of the paired-bootstrap error-path oscillation; \(L_{\mathrm{osc}}=\max(0,\text{observed span}-q_{\mathrm{osc}})\) conditions on the fixed studied cohorts and is post-outcome.}
 \label{tab:validity-frontier}
 \small
-\begin{tabular}{lrrr}
+\begin{tabular}{lrrrrr}
 \hline
-Cohort & Max AUC span (95\% CI) & $\delta_{0.02}$ & Finite bootstrap fraction \\
+Cohort & \(N\) & Observed span & Prior percentile interval & \(q_{\mathrm{osc}}\) & \(L_{\mathrm{osc}}\) \\
 \hline
-BNCI2014\_002
-& 0.0384 [0.0271, 0.0666]
-& 0.9161
-& 0.9995 \\
-BNCI2015\_001
-& 0.0501 [0.0224, 0.1034]
-& 0.1752
-& 0.9877 \\
+BNCI2014\_002 & 14 & 0.0384 & [0.0271, 0.0666] & 0.0403 & 0.0000 \\
+BNCI2015\_001 & 12 & 0.0501 & [0.0224, 0.1034] & 0.0592 & 0.0000 \\
 \hline
 \end{tabular}
 
 \vspace{1mm}
 \footnotesize
-Both cohorts admit a material downstream AUC span over the frozen dense regularisation path, but the critical raw fidelity budget differs substantially. The supported conclusion is therefore a reproducible, cohort-dependent validity frontier rather than one universal critical $\delta$. The obsolete generic centered-AUC zero-crossing statistic is not used.
-\end{table}
+Original observed \(\delta_{0.02}\) fidelity-regret budgets are 0.9161 and 0.1752 raw per-dimension source NLL units; neither path crosses the 0.02 AUC threshold after the V11 oscillation correction. A zero conservative lower bound is inconclusive, not proof of a flat population path. The bootstrap does not account for overlapping source-model refits or across-dataset sampling uncertainty. All quantities are descriptive and no new confirmatory hypothesis test is introduced.
+\end{table*}
