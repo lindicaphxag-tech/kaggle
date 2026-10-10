@@ -20,6 +20,7 @@ from __future__ import annotations
 from hashlib import sha256
 import json
 import math
+import copy
 from itertools import product
 import numpy as np
 import gymnasium as gym
@@ -55,7 +56,6 @@ class PrivilegedOneStepModelPlanner:
         # warmstart accelerations/history. FULLPHYSICS silently omits
         # information and can bias predicted Pusher reward by >1e-4.
         self.state_spec=mujoco.mjtState.mjSTATE_INTEGRATION
-        self.state=np.empty(mujoco.mj_stateSize(model,self.state_spec),dtype=np.float64)
         self.fingertip=model.body("tips_arm").id
         self.obj=model.body("object").id
         self.goal=model.body("goal").id
@@ -65,17 +65,16 @@ class PrivilegedOneStepModelPlanner:
         # mj_getState/mj_setState copies actual physics state from the TRUE
         # current official environment into an isolated MjData. No baseline
         # interacts with the real task to evaluate its unselected candidates.
-        mujoco.mj_getState(self.model,env_source_data,self.state,self.state_spec)
-        mujoco.mj_setState(self.model,self.scratch,self.state,self.state_spec)
-        # The official Gymnasium Pusher calls mj_step(frame_skip) then reads
-        # get_body_com WITHOUT an extra mj_forward. Computing another
-        # forward pass after the last integration would change the exact
-        # reward observation time; this was a real comparator mismatch.
-        # mj_step runs its own forward-dynamics stage, so no extra forward
-        # at the beginning is needed either.
+        # Python MuJoCo 3.3.7 exposes MjData.__copy__, internally backed by
+        # native mj_copyData. This transfers the *complete* derived contact
+        # buffers, solver history and every field, unlike mjSTATE_INTEGRATION
+        # which transfers only the integrator's input variables. Correctness
+        # matters more than CPU memory allocation cost for this privileged
+        # reviewer-falsifier.
+        self.scratch=copy.copy(env_source_data)
         self.scratch.ctrl[:]=np.asarray(action,dtype=np.float64)
-        for _ in range(self.frame_skip):
-            mujoco.mj_step(self.model,self.scratch)
+        mujoco.mj_step(self.model,self.scratch,nstep=self.frame_skip)
+        mujoco.mj_rnePostConstraint(self.model,self.scratch)
         obj=self.scratch.xpos[self.obj]
         tip=self.scratch.xpos[self.fingertip]
         goal=self.scratch.xpos[self.goal]
