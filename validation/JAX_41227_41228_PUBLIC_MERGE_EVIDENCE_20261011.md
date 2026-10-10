@@ -1,5 +1,15 @@
 # JAX #41227 and #41228 — independently executed regression evidence
 
+## 2026-10-11 latest current-PR-head status (supersedes older snapshot below)
+
+- **[JAX #41227](https://github.com/jax-ml/jax/pull/41227)**: current one-commit head `5ca3f43d82c7bf81351074816781c9e1d755f6ed`; its Git tree matches the previously exact-source-tested `1d8cac8...` content (`870699f350e72c87dafbb36a5ae89ff4bc8769bf`). Its 20 existing/new Student-t test cases and true before/after numerical witness remain grounded on that byte-identical code tree.
+- **[JAX #41228](https://github.com/jax-ml/jax/pull/41228)**: source-exact tested **`2af46d5f0bf14c458c8ffa3ff5bd8fc395d613f7`**, with the Poisson-local numerical correction and near-float32-maximum finite log-PMF regression. [Four green exact-source CI jobs #38081399284](https://github.com/lindicaphxag-tech/kaggle/actions/runs/38081399284): **54 public Poisson distribution cases passed; 43 Poisson/sampling-related cases passed; 20 Student-t cases passed**. Focused tests overlap and are not counted again. 
+- [New exact-source Poisson red/green #38081402392](https://github.com/lindicaphxag-tech/kaggle/actions/runs/38081402392): 2/2 completed; original JAX source `93e877c...` variance/λ **1.4613796483** versus pinned repaired source `2af46d5...` **0.9996126592** with three seeds and 300,000 draws per revision at λ=10⁸.
+- **Rebase caveat:** after that CI, #41228 moved to `fbd0d2256286b85961b46caa64564d369a9830ed` on a newer JAX mainline. The four relevant PR file Git blobs are **exactly unchanged** relative to tested `2af46d5...`: `jax/_src/random/core.py` blob `ffe5ca968973fcf63981fdd648dc53dcb63eb42f`, `jax/_src/scipy/stats/poisson.py` blob `9d519197342499fb8757e585644ce55d74f5e7ef`, `tests/random_lax_test.py` blob `26b32f59933b3b27981c0d8a2d1769349790a256`, `tests/scipy_stats_test.py` blob `8e3e91617fe95c02355dc5991b75e9771095ef71`. **This proves the Poisson contribution file content is identical, not that every dependency in the rebased full JAX tree has been re-executed.**
+- Official upstream JAX reviews remain binding. Independent CI, immutable commit receipts, verified file blobs and reproducible data **are not maintainer approvals or merged status**.
+
+---
+
 Public reproducibility note for maintainer review, 2026-10-11 (UTC+9).
 The writer is the external contributor; this is **not an upstream review approval, official JAX CI, or a merged change**.
 
