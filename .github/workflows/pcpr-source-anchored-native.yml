@@ -58,6 +58,8 @@ jobs:
         run: python research/pcpr/run_v05_authenticated_retry.py
       - name: Run generic AST single-edit native counterfactuals (development only)
         run: python research/pcpr/run_v06_native_counterfactuals.py
+      - name: Run pinned MONAI loss dtype native counterfactual (development only)
+        run: python research/pcpr/run_native_monai_9103.py
       - name: Preserve case-level source provenance
         uses: actions/upload-artifact@v4
         with:
@@ -73,6 +75,7 @@ jobs:
             pcpr_v05_unseen_eight_first_score.json
             pcpr_v05_eight_auth_transport_retry.json
             pcpr_v06_native_single_edit_counterfactuals.json
+            pcpr_monai_9103_native_counterfactual.json
             pcpr_kornia_native_package_evidence.json
             pcpr_kornia_so2_native.json
           if-no-files-found: error
