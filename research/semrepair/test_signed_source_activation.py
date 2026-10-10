@@ -114,6 +114,22 @@ class SignedSourceActivationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"outside signed allowed"):
             self.activate(manifest=m,signatures=self.signatures(manifest=m))
 
+    def test_signed_controller_patch_cannot_change_hidden_saturation(self):
+        # Two real issuer signatures do NOT authorize bypassing signed
+        # component scope. A signed controller repair cannot silently increase
+        # the producer's internal actuator authority clip.
+        r=copy.deepcopy(OLD)
+        r["controller"]=[[1.,0.],[0.,1.]]
+        r["clip"]=2.
+        replacement=_canonical(r)
+        manifest=copy.deepcopy(self.manifest)
+        manifest["authorized_repair"]="controller-only"
+        manifest["replacement_source_sha256"]=sha256(replacement).hexdigest()
+        with self.assertRaisesRegex(ValueError,"internal source limit changed"):
+            self.activate(manifest=manifest,signatures=self.signatures(manifest=manifest),
+                          replacement=replacement)
+        self.assertEqual(self.path.read_bytes(),self.old)
+
     def test_vendor_env_or_deployment_contract_mismatch_refuses(self):
         m=copy.deepcopy(self.manifest)
         m["actor_family"]="AnotherRobot"
