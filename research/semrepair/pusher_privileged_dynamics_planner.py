@@ -51,7 +51,10 @@ class PrivilegedOneStepModelPlanner:
         self.source_pairs=[(x*limit,y*limit) for x,y in product(
             (-1.,-.5,0.,.5,1.),repeat=2)]
         self.scratch=mujoco.MjData(model)
-        self.state_spec=mujoco.mjtState.mjSTATE_FULLPHYSICS
+        # Contact dynamics requires the FULL INTEGRATION state, including
+        # warmstart accelerations/history. FULLPHYSICS silently omits
+        # information and can bias predicted Pusher reward by >1e-4.
+        self.state_spec=mujoco.mjtState.mjSTATE_INTEGRATION
         self.state=np.empty(mujoco.mj_stateSize(model,self.state_spec),dtype=np.float64)
         self.fingertip=model.body("tips_arm").id
         self.obj=model.body("object").id
