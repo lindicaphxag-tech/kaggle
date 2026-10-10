@@ -1,0 +1,128 @@
+name: Default Regularisation CFCTS prospective S011-S020
+on:
+  push:
+    branches:
+      - research/defaultreg-cfcts-s011-s020-prospective-20261010
+    paths:
+      - 'research/defaultreg_eeg/**'
+      - '.github/workflows/defaultreg-cfcts-s011-s020.yml'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  cfcts-ten-target-prospective:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      OPENBLAS_NUM_THREADS: 1
+      OMP_NUM_THREADS: 1
+      MKL_NUM_THREADS: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install frozen scientific stack
+        run: python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.17.0 scikit-learn==1.8.0 mne==1.11.0
+      - name: Record environment and immutable runner SHA
+        run: |
+          python - <<'PY'
+          import json,platform,sys,hashlib,pathlib,numpy,scipy,sklearn,mne
+          p=pathlib.Path("research/defaultreg_eeg/run_official_edf_baselines.py")
+          x={"python":sys.version,"platform":platform.platform(),"numpy":numpy.__version__,
+             "scipy":scipy.__version__,"sklearn":sklearn.__version__,"mne":mne.__version__,
+             "runner_sha256":hashlib.sha256(p.read_bytes()).hexdigest()}
+          pathlib.Path("research/defaultreg_eeg/cfcts_environment.json").write_text(json.dumps(x,indent=2))
+          print(json.dumps(x,indent=2))
+          PY
+      - name: Execute frozen official EDF prospective ten-target CFCTS block
+        run: |
+          python research/defaultreg_eeg/run_official_edf_baselines.py \
+            --edf-root research/defaultreg_eeg/edf_original \
+            --out research/defaultreg_eeg/official_cfcts_s011_s020
+      - name: Fail closed on source/target split, arms and denominator
+        run: |
+          python - <<'PY'
+          import json,pathlib
+          p=pathlib.Path("research/defaultreg_eeg/official_cfcts_s011_s020/full_pilot_json.json")
+          x=json.loads(p.read_text())
+          assert x["source_participants"]==list(range(1,9))
+          assert x["heldout_participants"]==list(range(11,21))
+          assert x["target_data_used_for_training_or_hyperparam_selection"] is False
+          assert x["no_task_cues_dropped"] is True
+          assert x["CFCTS_source_only_selection"]["target_information_used"] is False
+          assert len(x["source_files"])==54
+          assert set(x["per_target_subject"])=={str(i) for i in range(11,21)}
+          arms=set(next(iter(x["per_target_subject"].values()))["auc"])
+          expected={"LedoitWolf_LDA","OAS_LDA","nested_source_macro_auc_LDA",
+                    "source_signed_mean_LDA","source_squared_margin_LDA",
+                    "source_tail_signed_LDA","CFCTS_LDA","LogisticRegression"}
+          assert arms==expected,(arms,expected)
+          assert all(v["target_trials"]>0 for v in x["per_target_subject"].values())
+          print("CFCTS_PROSPECTIVE_PROTOCOL_PASS")
+          PY
+      - name: Produce preregistered participant-level paired summary
+        run: |
+          python - <<'PY'
+          import json,pathlib,statistics,random
+          p=pathlib.Path("research/defaultreg_eeg/official_cfcts_s011_s020/full_pilot_json.json")
+          x=json.loads(p.read_text())
+          rows=[]
+          for sid,v in sorted(x["per_target_subject"].items(),key=lambda z:int(z[0])):
+              rows.append({"subject":sid,**v["auc"]})
+          arms=list(rows[0].keys())
+          arms.remove("subject")
+          means={a:sum(r[a] for r in rows)/len(rows) for a in arms}
+          primary="nested_source_macro_auc_LDA"
+          d=[r["CFCTS_LDA"]-r[primary] for r in rows]
+          obs=abs(sum(d))
+          ge=0
+          for mask in range(1<<len(d)):
+              stat=abs(sum(v if ((mask>>i)&1) else -v for i,v in enumerate(d)))
+              ge+=stat>=obs-1e-15
+          exact_two_sided=ge/(1<<len(d))
+          rng=random.Random(20261010)
+          boot=sorted(sum(d[rng.randrange(len(d))] for _ in d)/len(d) for _ in range(20000))
+          ci=[boot[int(.025*(len(boot)-1))],boot[int(.975*(len(boot)-1))]]
+          ordered=sorted(d)
+          secondary={}
+          for base in ("LedoitWolf_LDA","OAS_LDA","LogisticRegression"):
+              z=[r["CFCTS_LDA"]-r[base] for r in rows]
+              secondary[base]={"mean_delta":sum(z)/len(z),"per_subject":z}
+          summary={
+            "independent_unit":"participant",
+            "n":len(rows),
+            "primary_comparator_predeclared_before_outcome_access":primary,
+            "mean_auc_by_arm":means,
+            "per_subject_rows":rows,
+            "cfcts_minus_primary_per_subject":d,
+            "cfcts_minus_primary_mean":sum(d)/len(d),
+            "cfcts_minus_primary_median":statistics.median(d),
+            "cfcts_minus_primary_bootstrap95_seed20261010":ci,
+            "cfcts_minus_primary_exact_signflip_two_sided":exact_two_sided,
+            "cfcts_minus_primary_lower_quartile_order_stat":ordered[1],
+            "cfcts_minus_primary_worst":min(d),
+            "cfcts_harmed_by_more_than_0_02":sum(v<-0.02 for v in d),
+            "secondary_descriptive_deltas":secondary,
+            "no_trial_level_significance_claim":True,
+            "same_dataset_only":True,
+            "low_power_n10_warning":True
+          }
+          out=pathlib.Path("research/defaultreg_eeg/official_cfcts_s011_s020/participant_summary.json")
+          out.write_text(json.dumps(summary,indent=2,sort_keys=True))
+          print(json.dumps(summary,indent=2,sort_keys=True))
+          PY
+      - name: Archive exact real-data evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: defaultreg-cfcts-s011-s020-prospective
+          path: |
+            research/defaultreg_eeg/cfcts_environment.json
+            research/defaultreg_eeg/FROZEN_CFCTS_S011_S020_PROSPECTIVE_20261010.md
+            research/defaultreg_eeg/official_cfcts_s011_s020/**
+          if-no-files-found: warn
+          retention-days: 90
