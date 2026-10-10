@@ -42,7 +42,7 @@ MANIFEST_FIELDS=frozenset({
     "expected_nonce","authorized_repair","actor_family",
     "max_abs_input_action",
 })
-REPAIR_OPTIONS=frozenset(("noop","producer-only","controller-only","atomic"))
+REPAIR_OPTIONS=frozenset(("noop","producer-only","controller-only","clip-only","atomic"))
 
 
 def _canonical(value)->bytes:
@@ -174,7 +174,7 @@ def verified_atomic_source_activate(
         authorized=manifest["authorized_repair"] in ("atomic",repair_token)
         if not authorized and new[component]!=original[component]:
             raise ValueError("repair mutates a component outside signed allowed class")
-    if new["clip"]!=original["clip"] and manifest["authorized_repair"]!="atomic":
+    if new["clip"]!=original["clip"] and manifest["authorized_repair"] not in ("atomic","clip-only"):
         raise ValueError("internal source limit changed outside atomic signed repair")
     if manifest["authorized_repair"]=="noop" and new!=original:
         raise ValueError("noop repair changes deployed source config")
