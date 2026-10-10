@@ -1,0 +1,114 @@
+name: DefaultReg v5 post-primary CSP6 comparator
+
+on:
+  push:
+    branches:
+      - research/defaultreg-v5-postprimary-csp-20261010
+    paths:
+      - 'research/defaultreg_v5_postprimary/**'
+      - '.github/workflows/defaultreg-v5-postprimary-csp.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  csp6:
+    strategy:
+      fail-fast: false
+      matrix:
+        dataset: [BNCI2014_002, BNCI2015_001]
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install exact v5 stack
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2 numpy==2.3.5 scipy==1.17.0 scikit-learn==1.8.0 mne==1.11.0 pyriemann==0.12
+
+      - name: Verify environment and compile
+        run: |
+          python -c "import moabb,numpy,scipy,sklearn,mne,pyriemann; assert moabb.__version__=='1.7.2'; assert numpy.__version__=='2.3.5'; assert scipy.__version__=='1.17.0'; assert sklearn.__version__=='1.8.0'; assert mne.__version__=='1.11.0'; assert pyriemann.__version__=='0.12'"
+          python -m py_compile research/defaultreg_v5/run_v5_predata_panel.py
+          python -m py_compile research/defaultreg_v5_postprimary/run_csp6_lr_comparator.py
+
+      - name: Synthetic CSP projection contract
+        run: |
+          python - <<'PY'
+          import importlib.util
+          import pathlib
+          import numpy as np
+          p=pathlib.Path("research/defaultreg_v5_postprimary/run_csp6_lr_comparator.py")
+          spec=importlib.util.spec_from_file_location("cspcmp",p)
+          m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+          rng=np.random.default_rng(20261010)
+          n,dim,k=5,7,3
+          A=rng.normal(size=(n,dim,dim))
+          C=A@np.swapaxes(A,1,2)+np.eye(dim)[None,:,:]
+          W=rng.normal(size=(dim,k))
+          got=m.csp_features(C,W)
+          explicit=[]
+          for x in C:
+              P=W.T@x@W
+              v=np.diag(P);v=np.maximum(v,np.finfo(float).tiny)
+              v=v/v.sum()
+              explicit.append(np.log(v))
+          explicit=np.asarray(explicit)
+          np.testing.assert_allclose(got,explicit,rtol=1e-12,atol=1e-12)
+          print("PASS_CSP_PROJECTION_CONTRACT",got.shape)
+          PY
+
+      - name: Execute fixed CSP6+LR comparator
+        run: |
+          mkdir -p "$RUNNER_TEMP/mne_data"
+          python research/defaultreg_v5_postprimary/run_csp6_lr_comparator.py \
+            --dataset "${{ matrix.dataset }}" \
+            --data-root "$RUNNER_TEMP/mne_data" \
+            --out "$GITHUB_WORKSPACE/defaultreg_csp_${{ matrix.dataset }}"
+
+      - name: Fail closed on comparator contract
+        run: |
+          DATASET="${{ matrix.dataset }}" python - <<'PY'
+          import json,os,pathlib,re
+          d=os.environ["DATASET"]
+          root=pathlib.Path(f"defaultreg_csp_{d}")
+          x=json.loads((root/f"{d}_postprimary_csp6_lr.json").read_text())
+          r=json.loads((root/"receipt.json").read_text())
+          expected={"BNCI2014_002":14,"BNCI2015_001":12}[d]
+          assert x["status"]=="POST_PRIMARY_CSP6_LR_COMPARATOR_COMPLETE"
+          assert x["evidence_role"]=="post_primary_classical_comparator_only"
+          assert x["dataset"]==d and x["n_subjects"]==expected
+          assert x["target_information_track"]=="Z0"
+          assert x["target_labels_used_for_fit"] is False
+          assert x["score_freeze_precedes_target_auc"] is True
+          assert x["method"]=="CSP6_LogisticRegression"
+          assert x["n_csp_components"]==6
+          assert len(x["per_subject"])==expected
+          assert len(x["fold_receipts"])==expected
+          assert len(x["participant_receipt"])==expected
+          assert re.fullmatch(r"[0-9a-f]{64}",x["score_bundle_sha256"])
+          assert r["score_bundle_sha256"]==x["score_bundle_sha256"]
+          assert r["n_subjects"]==expected
+          assert 0.0<=x["macro_auc"]<=1.0
+          assert all(0.0<=q["auc"]<=1.0 for q in x["per_subject"])
+          print("PASS_POST_PRIMARY_CSP6_COMPARATOR",d,x["macro_auc"])
+          PY
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-postprimary-csp-${{ matrix.dataset }}
+          path: |
+            research/defaultreg_v5_postprimary/FROZEN_CSP6_LR_COMPARATOR_20261010.md
+            research/defaultreg_v5_postprimary/CSP_IMPLEMENTATION_CORRECTION_20261010.md
+            defaultreg_csp_${{ matrix.dataset }}/**
+          if-no-files-found: warn
+          retention-days: 90
