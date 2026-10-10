@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
-      CS_SHA: c0801c9c77e55a9bf90a90c33b47210926194d75
+      CS_SHA: 6b0f941d0aea44d795d0ab1f3fe109514e8f8cd7
       SNAPSHOT_ROOT: release/defaultreg_v10_snapshot
       OPENBLAS_NUM_THREADS: '1'
       OMP_NUM_THREADS: '1'
@@ -64,16 +64,16 @@ jobs:
         run: |
           python src/render_vnext_verified_tables.py \
             --input paper_vnext/evidence/current_verified_results.json \
-            --json-out ../release_vnext_table.json \
-            --md-out ../release_vnext_table.md
+            --json-out "$GITHUB_WORKSPACE/release_vnext_table.json" \
+            --md-out "$GITHUB_WORKSPACE/release_vnext_table.md"
 
       - name: Run participant harm and influence audit
         working-directory: release/defaultreg_v10_snapshot
         run: |
           python src/participant_harm_influence_audit.py \
             --input evidence/verified_three_cohort_paired_effect_vectors_v8.json \
-            --json-out ../release_harm_influence.json \
-            --md-out ../release_harm_influence.md
+            --json-out "$GITHUB_WORKSPACE/release_harm_influence.json" \
+            --md-out "$GITHUB_WORKSPACE/release_harm_influence.md"
 
       - name: Audit manuscript structure, citations and Highlights
         run: |
@@ -129,7 +129,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends \
-            texlive-latex-base texlive-latex-recommended texlive-pictures texlive-fonts-recommended
+            texlive-latex-base texlive-latex-recommended texlive-pictures texlive-fonts-recommended poppler-utils
 
       - name: Compile v10 manuscript
         working-directory: release/defaultreg_v10_snapshot/paper_vnext
@@ -149,7 +149,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: defaultreg-cs-v10-release-c0801c9c77e5
+          name: defaultreg-cs-v10-release-6b0f941d0aea
           path: |
             release_manuscript_audit.json
             release_vnext_table.json
