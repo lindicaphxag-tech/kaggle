@@ -1034,6 +1034,17 @@
       "source": "inbox/FIRST_SEEN_20261010T215941Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "2c4982873391bcfda566c5440119b1289253d3c384f294b62973d3962444f09e"
+    },
+    {
+      "created_at": "2026-10-10T22:22:01Z",
+      "first_frozen_at": "2026-10-10T22:27:21Z",
+      "id": "DLR-RM/stable-baselines3#2291",
+      "issue_number": 2291,
+      "prediction_deadline_at": "2026-10-11T04:27:21Z",
+      "repository": "DLR-RM/stable-baselines3",
+      "source": "inbox/FIRST_SEEN_20261010T222721Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "94cf2102d8e3a4fd6b4f3800b8a07dedce5adb105e699f22938ab59367564d91"
     }
   ]
 }
