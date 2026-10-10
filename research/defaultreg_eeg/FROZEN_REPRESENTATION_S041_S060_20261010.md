@@ -142,3 +142,36 @@ paper because it shows that a routine signal-processing design decision
 
 For TNSRE, this remains insufficient without practical BCI calibration /
 cross-session/device implications.
+
+
+## Frozen extension before reading any S041-S060 target outcome: source sample budget
+
+This extension was committed before the model opened any S041-S060 result.
+A prior workflow attempt may have started from the earlier protocol commit; any
+artifact from that pre-extension attempt is **superseded** for confirmatory
+interpretation and must not be used to choose the extension.
+
+On R1 WIDE only, repeat source-only selection and final target scoring after
+deterministically retaining the following fraction within every SOURCE
+participant x class cell:
+
+`{1.00, 0.75, 0.50, 0.25}`.
+
+Rules:
+- target trials are never subsampled and never enter selection;
+- the random seed is fixed at 20261010 plus a deterministic fraction offset;
+- every source participant and both classes remain represented;
+- the tangent reference is refitted using only the retained source trials;
+- the full [0,1] shrinkage grid is unchanged;
+- report the source-discriminability optimum, source covariance-NLL optimum,
+  analytic Ledoit-Wolf, and per-target AUC under each budget.
+
+This is a controlled sample-size intervention with the sensors, frequency
+band, epoch, target participants and feature definition held fixed. Together
+with WIDE_NUISANCE1848 it separates two mechanisms the historical 21-vs-64
+channel comparison could not isolate:
+1. increased feature dimension without new neural signal;
+2. reduced source trial budget without changing feature dimension.
+
+The budget series is a **mechanism sensitivity analysis**, not an additional
+primary outcome family. It cannot be used to choose which budget to headline.
