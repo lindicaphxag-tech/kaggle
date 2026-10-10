@@ -1,0 +1,76 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 5,
+  "new_candidates": [
+    {
+      "author_login": "jkterry1",
+      "body": "In the past few months, large numbers of better manually generated policies have been added, but weren't added to that list. They probably should be.",
+      "created_at": "2026-10-10T14:27:11Z",
+      "html_url": "https://github.com/Farama-Foundation/Gymnasium/issues/1772",
+      "id": "Farama-Foundation/Gymnasium#1772",
+      "issue_number": 1772,
+      "labels": [
+        "help wanted"
+      ],
+      "repository": "Farama-Foundation/Gymnasium",
+      "surface_sha256": "ee0db0e87d5851e87e451c87aa97df651581a36d6e68dc900f6f87f265ed5ad6",
+      "title": "Fix exclude_env_names in gen_gifs.py"
+    },
+    {
+      "author_login": "MokiMeow",
+      "body": "## Bug Description\n\n`axis_angle_to_R` reverses negative rotations and rotations between pi and 2*pi. The conversion reconstructs sine from cosine, which loses its sign. `Emitter.emit(theta=...)` and the mouse drag plane both use this helper.\n\n## Steps to Reproduce\n\nOn headless Linux, set `PYGLET_HEADLESS=1` before running this script.\n\n```python\nimport numpy as np\nimport genesis as gs\nimport genesis.utils.geom as gu\n\ngs.init(backend=gs.cpu, precision=\"64\")\naxis = np.array([0.0, 0.0, 1.0], dtype=gs.np_float)\npoint = np.array([1.0, 0.0, 0.0], dtype=gs.np_float)\nprint(gu.axis_angle_to_R(axis, -np.pi / 2) @ point)\nprint(gu.axis_angle_to_R(axis, 3 * np.pi / 2) @ point)\n```\n\nBoth return approximately `[0, 1, 0]`.\n\n## Expected Behavior\n\nBoth rotations should return approximately `[0, -1, 0]`.\n\nA rectangular PBD emitter with `theta=-pi/4` or `7*pi/4` also emits particles at the mirrored orientation. In an eight-particle reproduction, the maximum position error is 0.053m. Small float32 angles also lose their sine through cancellation.\n\n## Environment\n\n- Debian 12, Python 3.11.2, CPU backend (Intel i7-13650HX)\n- NumPy 2.4.6, PyTorch 2.14.1+cpu, Quadrants 1.3.3\n- GPU/CUDA: N/A\n\n## Release version or Commit ID\n\n`49dc56bde03fe2d695d13c829d2dfec2b0d02c5a`\n",
+      "created_at": "2026-10-10T16:37:46Z",
+      "html_url": "https://github.com/Genesis-Embodied-AI/genesis-world/issues/3515",
+      "id": "Genesis-Embodied-AI/genesis-world#3515",
+      "issue_number": 3515,
+      "labels": [],
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "surface_sha256": "ff2ded534bf5c70fad18dcf19122b7c4031c4c91561acbaa2173cdf2c7a321e1",
+      "title": "[Bug]: Axis-angle conversions reverse negative rotations"
+    },
+    {
+      "author_login": "TruongKhang",
+      "body": "Hi organizers,\n\nI am the captain of `team-vsn`. Our first `pai-warmup` submission has been in `QUEUED` since it was accepted and has not started yet.\n\n**Submission details**\n- Submission ID: `da9b2d80-2ec6-4b83-b297-1f5f000f81c2`\n- Track: `pai-warmup`\n- Created: `2026-10-10T13:50:53+00:00`\n\n**Current status** (`alpasim_challenge.py status`, last checked 2026-10-10 15:32 UTC)\n- `status: QUEUED`, `queue_position: 1`, `queue_total: 1`\n- `updated_at` is still `2026-10-10T13:50:53+00:00` (unchanged since creation)\n- `evaluation_started_at`, `image_digest`, `resolved_image_uri` and `failure_code` are all `null`\n\n**What we checked on our side**\n- The image was pushed to our team ECR repository with a specific tag (not `latest`), and `submit` accepted it after its `docker manifest inspect` check.\n- The tag resolves to a `linux/amd64` image of about 3.9 GiB (under the 40 GiB limit).\n- The image passes the container contract locally (read-only root filesystem, user `10001:10001`, no host mounts, gRPC on `ALPASIM_DRIVER_PORT`).\n- `limits` shows `pai-warmup` 0 of 3 used before this submission, and the official allowance is unaffected.\n\n**Questions**\n1. Is the warmup queue currently being processed, or is something holding this submission?\n2. Is there an expected wait for warmup runs, or anything we should do on our side?",
+      "created_at": "2026-10-10T15:43:28Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/200",
+      "id": "NVlabs/alpasim#200",
+      "issue_number": 200,
+      "labels": [
+        "bug"
+      ],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "2d26f6f5e350f3a55668c14453f680a90adb2ceb959c2d6327c18929462858ca",
+      "title": "[E2E Challenge] pai-warmup submission stays QUEUED at position 1/1 (not started after ~2 h)"
+    },
+    {
+      "author_login": "TruongKhang",
+      "body": "Hi organizers, I'm captain of `team-vsn`. This is our first warmup submission and it failed at the driver readiness stage, similar to #165:\n\n- Team: `team-vsn`\n- Submission ID: `da9b2d80-2ec6-4b83-b297-1f5f000f81c2`\n- Track: `pai-warmup`\n- Evaluation: started `2026-10-10T15:46:18Z`, completed `2026-10-10T15:54:22Z`\n- `failure_code`: `CONTESTANT_GRPC_NOT_READY`\n- `failure_reason`: contestant driver ports opened, but get_version did not succeed for all endpoints within 300s\n- `failed_stage`: `wait_for_driver_grpc`\n\nLocally the same image passes our container-contract smoke test and answers `GetVersion` within seconds, and the same driver code is ready in about 10 s per replica with four replicas per GPU. We cannot reproduce on an H100 locally because of the different GPU architecture.\n\nOur driver opens its gRPC port first and loads its model in the background; `GetVersion` returns `UNAVAILABLE` until loading finishes, and keeps returning it if loading failed, in which case the driver logs the exception at ERROR level.\n\nCould you share, from the contestant container logs (one replica is enough):\n1. any ERROR line and the exception or traceback that follows it, or\n2. if there is none, the last 20 lines of one replica's log?\n\nThat would tell us whether this is a model-loading error or a startup-time issue on the shared H100s. Thank you!\n",
+      "created_at": "2026-10-10T16:36:01Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/201",
+      "id": "NVlabs/alpasim#201",
+      "issue_number": 201,
+      "labels": [],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "3697f17254790f4f542506c45f547b0e91231af16a136ed6087bc17a30522bc8",
+      "title": "[E2E Challenge] pai-warmup failed with CONTESTANT_GRPC_NOT_READY: request for driver log lines"
+    },
+    {
+      "author_login": "mini-1235",
+      "body": "## Bug report\n\n**Required Info:**\n\n- Operating System:\n  - macOS 27 (Apple silicon)\n- Computer:\n  - MacBook Pro (Apple silicon)\n- ROS2 Version:\n  - Rolling, source build on top of RoboStack binaries\n- Version or commit hash:\n  - `main`, any commit since b356ac1f8 (#6279)\n- DDS implementation:\n  - rmw_zenoh_cpp\n\n#### Steps to reproduce issue\n\n```bash\nros2 launch nav2_bringup tb4_simulation_launch.py headless:=True use_composition:=True\n\n# Goal A, default BT\nros2 action send_goal /navigate_to_pose nav2_msgs/action/NavigateToPose \\\n  \"{pose: {header: {frame_id: map}, pose: {position: {x: 15.68, y: 13.88}, orientation: {w: 1.0}}}}\" &\n\n# While A is running: goal B with a different BT, which onPreempt must reject\nros2 action send_goal /navigate_to_pose nav2_msgs/action/NavigateToPose \\\n  \"{pose: {header: {frame_id: map}, pose: {position: {x: 6.88, y: 7.68}, orientation: {w: 1.0}}}, behavior_tree: 'NotTheRunningBT.xml'}\"\n```\n\n#### Expected behavior\n\nB is rejected. A keeps its plan and finishes at A.\n\n#### Actual behavior\n\n\nB is aborted, but the robot drives to B and A reports `SUCCEEDED` with `error_code=0`. In our run\nit finished 10.75 m from A and 0.027 m from B. The log shows:\n\n```text\n[NavigatorMutex] Major error! Navigation requested while another navigation task is in progress!\nPreemption request was rejected since the requested BT XML file is not the same ...\nGoal succeeded\n```\n\n#### Reproduction instructions\n\nSee above.\n\n#### Additional information\n\nSince #6279, `onGoalReceived` runs in `handle_goal`, before `onPreempt` decides whether the new\ngoal may preempt. `goalReceived` writes the new goal to the running BT's blackboard, so the\nrunning BT already follows B when `onPreempt` rejects it. Reception also calls\n`startNavigating()` while the same navigator is still current, which logs the \"Major error!\".\n\nAssisted with Codex 6.1 Sol\n",
+      "created_at": "2026-10-10T16:09:26Z",
+      "html_url": "https://github.com/ros-navigation/navigation2/issues/6644",
+      "id": "ros-navigation/navigation2#6644",
+      "issue_number": 6644,
+      "labels": [],
+      "repository": "ros-navigation/navigation2",
+      "surface_sha256": "8855b7ef63f51e550c1610bd70edd44b82a72bd74cb14ad003d5bdc793241b63",
+      "title": "Rejected goal preemption changes the active goal\u2019s destination and falsely reports success"
+    }
+  ],
+  "post_activation_issue_identities_observed": 68,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-10T18:00:28Z",
+  "schema_version": 1
+}
