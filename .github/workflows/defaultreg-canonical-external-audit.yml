@@ -1,0 +1,88 @@
+name: DefaultReg canonical external replication audit
+on:
+  push:
+    branches:
+      - research/defaultreg-cho-lee-full-domain-20261010
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cho2017:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install frozen stack
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Run frozen Cho2017 protocol
+        run: python research/defaultreg_external/run_external_full_domain.py --dataset Cho2017 --out defaultreg_external_Cho2017
+      - name: Audit frozen output
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open("defaultreg_external_Cho2017/Cho2017_full_domain_lopo.json"))
+          assert x["status"]=="REAL_EXTERNAL_FULL_DOMAIN_PROSPECTIVE"
+          assert x["dataset"]=="Cho2017" and x["n_subjects"]==52
+          assert x["subjects"]==list(range(1,53))
+          assert x["target_information_track"]=="Z0"
+          assert x["target_labels_used_before_scoring"] is False
+          assert x["target_batch_statistics_used"] is False
+          assert x["full_domain_grid"][0]==0.0 and x["full_domain_grid"][-1]==1.0
+          assert len(x["folds"])==52 and len(x["channels"])==20
+          print("PASS_CHO2017_CANONICAL_FREEZE")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-canonical-Cho2017
+          path: defaultreg_external_Cho2017/**
+          if-no-files-found: warn
+          retention-days: 90
+
+  lee2019:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install frozen stack
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Run frozen Lee2019 protocol
+        run: python research/defaultreg_external/run_external_full_domain.py --dataset Lee2019_MI --out defaultreg_external_Lee2019_MI
+      - name: Audit frozen output
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open("defaultreg_external_Lee2019_MI/Lee2019_MI_full_domain_lopo.json"))
+          assert x["status"]=="REAL_EXTERNAL_FULL_DOMAIN_PROSPECTIVE"
+          assert x["dataset"]=="Lee2019_MI" and x["n_subjects"]==54
+          assert x["subjects"]==list(range(1,55))
+          assert x["target_information_track"]=="Z0"
+          assert x["target_labels_used_before_scoring"] is False
+          assert x["target_batch_statistics_used"] is False
+          assert x["full_domain_grid"][0]==0.0 and x["full_domain_grid"][-1]==1.0
+          assert len(x["folds"])==54 and len(x["channels"])==20
+          print("PASS_LEE2019_CANONICAL_FREEZE")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-canonical-Lee2019
+          path: defaultreg_external_Lee2019_MI/**
+          if-no-files-found: warn
+          retention-days: 90
