@@ -78,8 +78,8 @@ jobs:
       - name: Audit manuscript structure, citations and Highlights
         run: |
           python - <<'PY'
-          import json, pathlib, re
-          root=pathlib.Path('cs/paper_vnext')
+          import json, os, pathlib, re
+          root=pathlib.Path(os.environ['SNAPSHOT_ROOT'])/'paper_vnext'
           files={p.name:p.read_text() for p in root.iterdir() if p.suffix in {'.tex','.bib','.txt'}}
           main=files['main_v10.tex']
           inputs=re.findall(r'\\input\{([^}]+)\}',main)
@@ -101,7 +101,7 @@ jobs:
               for term in ('TODO','TBD','pending verification','Figure finalization still pending','??'):
                   if term in text: placeholders.append([name,term])
           report={
-              'cs_sha':r'3a920bbf5f0c177e9afa8258f13785f734cd886c',
+              'cs_sha':os.environ['CS_SHA'],
               'missing_inputs':missing_inputs,
               'citation_count':len(set(cites)),
               'bib_entry_count':len(bibkeys),
