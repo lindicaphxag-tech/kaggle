@@ -49,9 +49,13 @@ SAFE_BUILTINS = {k: __builtins__[k] if isinstance(__builtins__,dict)
 # defense-in-depth only: a container/process sandbox is required for hostile
 # upstream Python and never supplied by this allowlist.
 SAFE_BUILTINS["__import__"] = __import__
+
+# "input" may legally be a function parameter (e.g., MONAI forward(input,...));
+# the Python builtin input() is absent from SAFE_BUILTINS, so it cannot
+# be invoked unless an actual passed callable is provided by the harness.
 DANGEROUS_NAMES = {"eval","exec","compile","open","__import__","globals",
                    "locals","vars","getattr","setattr","delattr","breakpoint",
-                   "input","help","dir"}
+                   "help","dir"}
 DANGEROUS_NODES=(ast.Import,ast.ImportFrom,ast.Global,ast.Nonlocal,
                  ast.With,ast.AsyncWith,ast.Try,ast.Lambda,ast.ClassDef)
 def check_replay_ast(node):
