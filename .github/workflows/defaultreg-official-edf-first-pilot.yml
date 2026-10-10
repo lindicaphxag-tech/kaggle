@@ -3,6 +3,9 @@ on:
   push:
     branches:
       - research/defaultreg-public-edf-baseline-feasibility-20261010
+  pull_request:
+    branches:
+      - main
     paths:
       - 'research/defaultreg_eeg/**'
       - '.github/workflows/defaultreg-official-edf-first-pilot.yml'
