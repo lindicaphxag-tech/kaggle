@@ -1,0 +1,59 @@
+name: SemRepair Pusher-v5 pretrained SAC seven-actuator cross-robot validation
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/external_pusher_transfer.py'
+      - 'research/semrepair/test_external_pusher_transfer.py'
+      - 'research/semrepair/strong_clipped_actuator_oracle.py'
+      - '.github/workflows/semrepair-cross-robot-pusher.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  cross-robot-pusher:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned third-party official Pusher and actor runtime
+        run: python -m pip install "gymnasium[mujoco]==1.1.1" "stable-baselines3==2.6.0" "huggingface-hub==0.34.4"
+      - name: Check trusted checkpoint bytes and complete seven-DoF oracle controls
+        run: python -m unittest -v research.semrepair.test_strong_clipped_actuator_oracle research.semrepair.test_external_pusher_transfer
+      - name: Run ALL predeclared pretrained external Pusher-v5 tasks
+        run: python -m research.semrepair.external_pusher_transfer > external_pusher_full.json
+      - name: Reveal ALL 5 severities and all 6 matching controls
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('external_pusher_full.json'))
+          print('CROSS-ROBOT',r['official_env'],'DIMENSIONS',r['native_action_dimension'],r['native_observation_dimension'])
+          print('MODEL',r['external_policy_full_commit'],r['external_policy_verified_sha256'])
+          print('SCENARIO',r['scenario_sha256'],'EPISODES',len(r['raw_rows']))
+          for key,s in sorted(r['per_arm'].items()):
+              print('ARM',key,'N',s['n'],'return',round(s['mean_official_return'],6),
+                    'object-goal-distance',round(s['mean_object_goal_distance'],6),
+                    'final-object-distance',round(s['mean_final_object_goal_distance'],6),
+                    'control-penalty',round(s['mean_official_control_reward'],6))
+          for key,s in sorted(r['paired'].items()):
+              print('PAIRED',key,'source minus exact per-step action oracle',
+                    round(s['paired_original_reward_source_minus_oracle'],6),
+                    'source-object-distance-reduction',
+                    round(s['paired_object_goal_distance_reduction'],6),
+                    'better/worse/tied',s['source_wins'],s['source_losses'],s['ties'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semrepair-third-party-pusher-v5-32seed-all-faults
+          path: external_pusher_full.json
+          if-no-files-found: warn
+          retention-days: 90
