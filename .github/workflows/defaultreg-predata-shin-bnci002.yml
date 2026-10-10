@@ -8,7 +8,7 @@ on:
       - 'research/defaultreg_predata_external/**'
       - '.github/workflows/defaultreg-predata-shin-bnci002.yml'
   pull_request:
-    branches: [main]
+    branches: [main, research/defaultreg-predata-shin-bnci002-20261010]
     paths:
       - 'research/defaultreg_predata_external/**'
       - '.github/workflows/defaultreg-predata-shin-bnci002.yml'
