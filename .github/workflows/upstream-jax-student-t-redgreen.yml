@@ -1,0 +1,78 @@
+name: JAX 41227 Student-t original vs fix numerical red-green
+
+on:
+  push:
+    branches:
+      - ci/upstream-jax-flagship-review-20261011
+    paths:
+      - .github/workflows/upstream-jax-student-t-redgreen.yml
+      - validation/jax_student_t_pr41227_redgreen.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  student-t-red-green:
+    name: Student-t float32 / ${{ matrix.label }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: original-base
+            sha: 656227de179fc76b43197ad2086f31a2db6c1637
+            expected: broken_baseline
+          - label: current-patch
+            sha: 877fdb22ddb3a7f9c68df73571a42541cbd30f7f
+            expected: corrected
+    steps:
+      - name: Checkout independent research harness
+        uses: actions/checkout@v4
+        with:
+          path: research
+          ref: ci/upstream-jax-flagship-review-20261011
+      - name: Checkout immutable JAX source
+        uses: actions/checkout@v4
+        with:
+          repository: jax-ml/jax
+          path: jax
+          ref: ${{ matrix.sha }}
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install exact JAX and SciPy
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ./jax
+      - name: Reproduce large-DF float32 logpdf error against SciPy
+        working-directory: jax
+        env:
+          PYTHONPATH: ${{ github.workspace }}/jax
+        run: |
+          test "$(git rev-parse HEAD)" = "${{ matrix.sha }}"
+          python ../research/validation/jax_student_t_pr41227_redgreen.py \
+            --expect ${{ matrix.expected }} \
+            --report "../student-t-${{ matrix.label }}.json"
+      - name: Record version identity
+        if: always()
+        run: |
+          {
+            echo "upstream=jax-ml/jax"
+            echo "pr=41227"
+            echo "source_sha=${{ matrix.sha }}"
+            echo "harness_sha=$(git -C research rev-parse HEAD)"
+            echo "python=$(python --version)"
+            python -m pip show jax jaxlib numpy scipy | grep -E '^(Name|Version):'
+          } > "student-t-${{ matrix.label }}-environment.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: student-t-redgreen-${{ matrix.label }}
+          path: |
+            student-t-${{ matrix.label }}.json
+            student-t-${{ matrix.label }}-environment.txt
+          if-no-files-found: warn
+          retention-days: 90
