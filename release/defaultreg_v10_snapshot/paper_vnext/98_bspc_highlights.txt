@@ -1,0 +1,8 @@
+# SNAPSHOT_SOURCE: lindicaphxag-tech/cs@0b26a5b0853e3b136a92c17e614a3a1936673621 path=papers/eeg-default-regularisation/paper_vnext/98_bspc_highlights.txt
+Highlights — Biomedical Signal Processing and Control
+
+- Covariance fidelity and source discrimination favor distinct shrinkage regions.
+- Source-selected regularisation improves AUC in a frozen 20-person EEG test.
+- Two pre-data EEG cohorts replicate objective conflict, but not significance.
+- Regularisation changes spectral-representation conclusions prospectively.
+- Participant harm remains material despite positive average decoding gains.
