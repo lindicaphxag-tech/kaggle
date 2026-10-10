@@ -1,0 +1,120 @@
+name: DefaultReg full-domain S021-S040 prospective confirmation
+on:
+  push:
+    branches:
+      - research/defaultreg-full-domain-s021-s040-20261010
+    paths:
+      - 'research/defaultreg_eeg/run_full_domain_s021_s040.py'
+      - 'research/defaultreg_eeg/FROZEN_FULL_DOMAIN_S021_S040_20261010.md'
+      - '.github/workflows/defaultreg-full-domain-s021-s040.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'research/defaultreg_eeg/run_full_domain_s021_s040.py'
+      - 'research/defaultreg_eeg/FROZEN_FULL_DOMAIN_S021_S040_20261010.md'
+      - '.github/workflows/defaultreg-full-domain-s021-s040.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  full-domain-prospective:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install frozen scientific stack
+        run: python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.17.0 scikit-learn==1.8.0 mne==1.11.0
+      - name: Execute frozen S021-S040 full-domain Z0 protocol
+        run: |
+          python research/defaultreg_eeg/run_full_domain_s021_s040.py \
+            --edf-root $RUNNER_TEMP/eegmmidb \
+            --out $GITHUB_WORKSPACE/defaultreg_full_domain_s021_s040
+      - name: Fail closed on identity, full domain and information budget
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('defaultreg_full_domain_s021_s040/full_domain_result.json'))
+          assert x['status']=='REAL_EEGMMIDB_S021_S040_FULL_DOMAIN_PROSPECTIVE'
+          assert x['source_participants']==list(range(1,9))
+          assert x['heldout_participants']==list(range(21,41))
+          assert x['target_information_track']=='Z0'
+          assert x['target_data_used_for_training_or_hyperparam_selection'] is False
+          assert x['target_batch_statistics_used'] is False
+          assert x['no_task_cues_dropped'] is True
+          assert x['full_domain_grid'][0]==0.0 and x['full_domain_grid'][-1]==1.0
+          assert 0.002 in x['full_domain_grid'] and 0.05 in x['full_domain_grid']
+          assert len(x['per_target_subject'])==20
+          assert all(v['target_trials']>0 for v in x['per_target_subject'].values())
+          assert len(x['source_files'])==84
+          assert all(f['all_original_cues']==f['selected_and_scored'] for f in x['source_files'])
+          p=x['source_path']
+          assert p['lambda_discriminability'] in p['feasible_lambdas']
+          assert p['lambda_covariance_nll'] in p['feasible_lambdas']
+          print('PASS_FULL_DOMAIN_Z0_PROTOCOL_AUDIT')
+          PY
+      - name: Exact participant inference for two preregistered hypotheses
+        run: |
+          python - <<'PY'
+          import json, numpy as np
+          p='defaultreg_full_domain_s021_s040/full_domain_result.json'
+          x=json.load(open(p))
+          rows=[x['per_target_subject'][str(i)]['auc'] for i in range(21,41)]
+          cand='source_macro_full_domain_LDA'
+          comps=['LedoitWolf_LDA','source_cov_nll_full_domain_LDA']
+          rng=np.random.default_rng(20261010)
+          def exact_signflip(d):
+              d=np.asarray(d,float);obs=abs(d.mean());n=len(d);ex=0;total=1<<n
+              batch=65536
+              bits=np.arange(n,dtype=np.uint64)
+              for start in range(0,total,batch):
+                  masks=np.arange(start,min(total,start+batch),dtype=np.uint64)[:,None]
+                  signs=np.where(((masks>>bits)&1)==1,-1.0,1.0)
+                  stats=np.abs((signs*d).mean(axis=1))
+                  ex+=int(np.sum(stats>=obs-1e-15))
+              return ex/total
+          def boot(d,reps=20000):
+              d=np.asarray(d,float)
+              idx=rng.integers(0,len(d),size=(reps,len(d)))
+              m=d[idx].mean(axis=1)
+              return [float(v) for v in np.quantile(m,[.025,.975])]
+          out={'n':20,'independent_unit':'participant','comparisons':{}}
+          rawp=[]
+          for b in comps:
+              d=np.array([r[cand]-r[b] for r in rows],float)
+              q={
+                'baseline':b,'candidate':cand,
+                'mean_delta':float(d.mean()),'median_delta':float(np.median(d)),
+                'q25_delta':float(np.quantile(d,.25)),'worst_delta':float(d.min()),
+                'improved':int(np.sum(d>0)),'tied':int(np.sum(d==0)),
+                'harmed_gt_0_02':int(np.sum(d<-.02)),
+                'bootstrap95_seed20261010':boot(d),
+                'exact_signflip_two_sided':float(exact_signflip(d)),
+                'per_subject_delta':d.tolist()}
+              rawp.append(q['exact_signflip_two_sided'])
+              out['comparisons'][b]=q
+          order=np.argsort(rawp);adj=[0.0]*len(rawp);running=0.0;m=len(rawp)
+          for rank,idx in enumerate(order):
+              running=max(running,min(1.0,(m-rank)*rawp[idx]));adj[idx]=running
+          for b,a in zip(comps,adj):out['comparisons'][b]['holm_p_two_primary']=a
+          out['trial_level_pseudoreplication_used']=False
+          out['shared_loso_training_refit_uncertainty_included']=False
+          out['warning']='Participant inference does not reproduce source-pool refitting uncertainty.'
+          json.dump(out,open('defaultreg_full_domain_s021_s040/prospective_stats.json','w'),indent=2,sort_keys=True)
+          print(json.dumps(out,indent=2,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-full-domain-s021-s040
+          path: |
+            research/defaultreg_eeg/FROZEN_FULL_DOMAIN_S021_S040_20261010.md
+            defaultreg_full_domain_s021_s040/**
+          if-no-files-found: warn
+          retention-days: 90
