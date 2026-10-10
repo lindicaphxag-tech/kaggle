@@ -1,6 +1,6 @@
 """Public-data-only DEFAULT REGULARISATION official EDF feasibility baseline.
 
-Pre-registered train subjects S001..S008, heldout S009+S010; runs R04/R08/R12.
+Prospective train subjects S001..S008, heldout S011..S020; runs R04/R08/R12.
 Published PhysioNet EEGMMIDB v1.0.0 (10.13026/C28G6P), ODC-By v1.
 NO target-person training or target-batch moments; NO abandoned T1/T2 events.
 ONE band 8-30 Hz, 21 sensors, source-fitted SPD-log tangent coordinates.
@@ -8,7 +8,7 @@ ONE band 8-30 Hz, 21 sensors, source-fitted SPD-log tangent coordinates.
 Baseline arms: LedoitWolf LDA, OAS LDA, source-person LOPO macro-AUC
 tuned ridge-LDA, LogisticRegression. All use the same source-only final
 geometry, original untouched heldout target trials, and no target labels
-before scoring. This is a 2-target feasibility pilot, NOT multi-cohort
+before scoring. This is a 10-target prospective within-cohort block, NOT multi-cohort
 replication, historic manuscript matching, clinical result, or novel method.
 
 This standalone runner contains no private manuscript or proprietary code.
@@ -28,7 +28,7 @@ CHANS=("FC5","FC3","FC1","FCZ","FC2","FC4","FC6",
        "CP5","CP3","CP1","CPZ","CP2","CP4","CP6")
 RUNS=(4,8,12)
 SOURCE=tuple(range(1,9))
-HELDOUT=(9,10)
+HELDOUT=tuple(range(11,21))
 GRID=(0.2,0.4,0.6,0.8,0.95)
 URL="https://physionet.org/files/eegmmidb/1.0.0"
 
@@ -170,6 +170,68 @@ def subject_lopo_lambda(covs,y,groups,tail_fraction=0.25):
    "tail_signed":float(max(GRID,key=lambda lam:(criterion[lam]["tail_signed"],lam)))}
  return selected,{str(lam):criterion[lam] for lam in GRID}
 
+def subject_cfcts_lambda(covs,y,groups,tail_fraction=0.25):
+ """Strict source-inner geometry + covariance-fidelity constrained tail transfer.
+ This public prospective implementation is frozen before any S011-S020 result.
+ """
+ rows={lam:{"cov_nll":[],"signed":[]} for lam in GRID}
+ for group in sorted(set(groups)):
+  tr=groups!=group;val=~tr
+  if len(set(y[val]))!=2:raise ValueError("Missing class for source participant")
+  inv=reference(covs[tr])
+  Xtr=tangent(covs[tr],inv)
+  Xva=tangent(covs[val],inv)
+  resid,d_train,_=within_residual(Xtr,y[tr])
+  resid_val,d_val,_=within_residual(Xva,y[val])
+  S_val=(resid_val.T@resid_val)/(len(Xva)-2)
+  S_train=(resid.T@resid)/(len(Xtr)-2)
+  S_train=(S_train+S_train.T)/2
+  nu=max(float(np.trace(S_train)/S_train.shape[0]),np.finfo(float).eps)
+  for lam in GRID:
+   reg=(1-lam)*S_train+lam*nu*np.eye(S_train.shape[0])
+   sign,logdet=np.linalg.slogdet(reg)
+   if sign<=0 or not np.isfinite(logdet):
+    raise ValueError("CFCTS regularized covariance not SPD")
+   solve=np.linalg.solve(reg,resid_val.T)
+   quad=np.sum(resid_val.T*solve,axis=0)
+   if not np.isfinite(quad).all():raise ValueError("CFCTS covariance NLL nonfinite")
+   nll=float((logdet+float(np.mean(quad)))/reg.shape[0])
+   w=np.linalg.solve(reg,d_train)
+   den=float(w@S_val@w)
+   floor=np.finfo(float).eps*max(1.,float(w@w))
+   if not np.isfinite(den) or den<=floor:
+    raise ValueError("CFCTS validation discriminant variance degenerate")
+   margin=float(w@d_val)/np.sqrt(den)
+   rows[lam]["cov_nll"].append(nll)
+   rows[lam]["signed"].append(margin)
+ n=len(set(groups));k=max(1,int(np.ceil(tail_fraction*n)))
+ mean_nll={lam:float(np.mean(rows[lam]["cov_nll"])) for lam in GRID}
+ best_cov=min(GRID,key=lambda lam:(mean_nll[lam],-lam))
+ best_vals=np.asarray(rows[best_cov]["cov_nll"])
+ sem=float(np.std(best_vals,ddof=1)/np.sqrt(len(best_vals))) if len(best_vals)>1 else 0.
+ boundary=mean_nll[best_cov]+sem
+ tol=64*np.finfo(float).eps*max(1.,abs(boundary))
+ admissible=tuple(lam for lam in GRID if mean_nll[lam]<=boundary+tol)
+ if not admissible:raise AssertionError("CFCTS admissible set empty")
+ tail={lam:float(np.mean(np.sort(np.asarray(rows[lam]["signed"]))[:k])) for lam in GRID}
+ signed_mean={lam:float(np.mean(rows[lam]["signed"])) for lam in GRID}
+ neg={lam:float(np.mean(np.asarray(rows[lam]["signed"])<0)) for lam in GRID}
+ selected=max(admissible,key=lambda lam:(tail[lam],signed_mean[lam],lam))
+ return {
+  "selected_lambda":float(selected),
+  "best_covariance_lambda":float(best_cov),
+  "admissible_lambdas":list(map(float,admissible)),
+  "covariance_sem_at_best":sem,
+  "mean_covariance_nll_by_lambda":{str(lam):mean_nll[lam] for lam in GRID},
+  "tail_signed_margin_by_lambda":{str(lam):tail[lam] for lam in GRID},
+  "mean_signed_margin_by_lambda":{str(lam):signed_mean[lam] for lam in GRID},
+  "negative_margin_fraction_by_lambda":{str(lam):neg[lam] for lam in GRID},
+  "per_source_subject_cov_nll":{str(lam):list(map(float,rows[lam]["cov_nll"])) for lam in GRID},
+  "per_source_subject_signed_margin":{str(lam):list(map(float,rows[lam]["signed"])) for lam in GRID},
+  "tail_fraction":tail_fraction,
+  "source_participants":n,
+  "target_information_used":False}
+
 def main():
  ap=argparse.ArgumentParser()
  ap.add_argument("--edf-root",default="edf_original")
@@ -194,6 +256,7 @@ def main():
  if np.intersect1d(np.unique(g[tr]),np.unique(g[te])).size:
   raise ValueError("Target subject contaminated source training")
  selected,cvscores=subject_lopo_lambda(matrix[tr],y[tr],g[tr])
+ cfcts=subject_cfcts_lambda(matrix[tr],y[tr],g[tr])
  fit_inv=reference(matrix[tr]) # SOURCE ONLY: never target covariance
  Xtrain=tangent(matrix[tr],fit_inv)
  Xheld=tangent(matrix[te],fit_inv) # Apply frozen reference one trial at a time
@@ -206,13 +269,14 @@ def main():
  scores["source_signed_mean_LDA"]=ridge_score(Xtrain,y[tr],Xheld,selected["signed_mean"])
  scores["source_squared_margin_LDA"]=ridge_score(Xtrain,y[tr],Xheld,selected["squared_margin"])
  scores["source_tail_signed_LDA"]=ridge_score(Xtrain,y[tr],Xheld,selected["tail_signed"])
+ scores["CFCTS_LDA"]=ridge_score(Xtrain,y[tr],Xheld,cfcts["selected_lambda"])
  logistic=LogisticRegression(max_iter=2000,solver="lbfgs",C=1.0)
  logistic.fit(Xtrain,y[tr])
  scores["LogisticRegression"]=logistic.decision_function(Xheld)
  if len({len(x) for x in scores.values()})!=1:raise ValueError("Unequal trial counts")
  result={
   "status":"REAL_ORIGINAL_EDF_IF_DOWNLOADED_SHA_VERIFIED",
-  "warning":"2-target single-band feasibility only; not significant gain, external replication, historical protocol reproduction or TNSRE submission.",
+  "warning":"Prospective 10-target same-cohort block only; not external cohort replication, historical protocol reproduction, clinical validation or automatic TNSRE submission.",
   "official_dataset":"PhysioNet EEGMMIDB 1.0.0 DOI 10.13026/C28G6P",
   "license":"Open Data Commons Attribution v1.0",
   "target_data_used_for_training_or_hyperparam_selection":False,
@@ -224,6 +288,7 @@ def main():
   "target_original_task_trials":int(te.sum()),
   "source_only_validation_criteria_by_lambda":cvscores,
   "source_selected_lambda_by_method":selected,
+  "CFCTS_source_only_selection":cfcts,
   "LedoitWolf_shrinkage":lwval,"OAS_shrinkage":oaval,
   "per_target_subject":{},
   "source_files":files,
