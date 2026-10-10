@@ -30,9 +30,13 @@ jobs:
           PYTHONPATH=research/pcpr python -O -m unittest discover -s research/pcpr -p 'test_*.py' -q
       - name: Verify original Git blobs and execute native PyTorch field witnesses
         run: python research/pcpr/run_real_deepchem_source.py
+      - name: Run the six frozen transfer PRs (first score, source candidates ONLY)
+        run: python research/pcpr/patch_scope_vnext.py
       - name: Preserve case-level source provenance
         uses: actions/upload-artifact@v4
         with:
           name: pcpr-deepchem-original-operator-audit
-          path: pcpr_deepchem_native_summary.json
+          path: |
+            pcpr_deepchem_native_summary.json
+            pcpr_vnext_frozen_first_score.json
           if-no-files-found: error
