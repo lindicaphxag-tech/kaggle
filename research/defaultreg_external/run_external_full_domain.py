@@ -178,6 +178,9 @@ def source_path(C,y,g):
                 float(crit[ld]["source_macro_auc"]-crit[lc]["source_macro_auc"]),
             "covariance_nll_regret_at_discriminability_lambda":
                 float(crit[ld]["covariance_mean_nll"]-crit[lc]["covariance_mean_nll"]),
+            "source_covariance_regret_by_lambda":{
+                str(l):float(crit[l]["covariance_mean_nll"]-crit[lc]["covariance_mean_nll"])
+                for l in good},
             "feasible_lambdas":list(map(float,good)),
             "infeasible_lambdas":[float(x) for x in FULL_GRID if x not in good],
             "criteria_by_lambda":{str(k):v for k,v in crit.items()},
@@ -219,10 +222,13 @@ def score_outer(C,y,g,target):
     scores["LedoitWolf_LDA"],lw=analytic_scores(Xtr,y[tr],Xte,"LW")
     scores["OAS_LDA"],oas=analytic_scores(Xtr,y[tr],Xte,"OAS")
     state=spectral_state(Xtr,y[tr])
-    scores["source_macro_full_domain_LDA"]=ridge_scores(
-        state,Xte,path["lambda_discriminability"])
-    scores["source_cov_nll_full_domain_LDA"]=ridge_scores(
-        state,Xte,path["lambda_covariance_nll"])
+    # Freeze the entire predeclared scalar-path score family before reading
+    # outer-target labels. This is for validity-frontier auditing only: no
+    # target-path lambda may become a fitted or selected method.
+    path_scores={str(lam):ridge_scores(state,Xte,float(lam))
+                 for lam in path["feasible_lambdas"]}
+    scores["source_macro_full_domain_LDA"]=path_scores[str(path["lambda_discriminability"])]
+    scores["source_cov_nll_full_domain_LDA"]=path_scores[str(path["lambda_covariance_nll"])]
     lr=LogisticRegression(C=1.0,solver="lbfgs",max_iter=3000)
     lr.fit(Xtr,y[tr]);scores["TS_LogisticRegression"]=lr.decision_function(Xte)
     mdm=MDM(metric="riemann",n_jobs=1)
@@ -232,6 +238,14 @@ def score_outer(C,y,g,target):
     # Only now evaluate target labels.
     yy=y[te]
     auc={name:float(roc_auc_score(yy,score)) for name,score in scores.items()}
+    path_auc={lam:float(roc_auc_score(yy,score)) for lam,score in path_scores.items()}
+    c1=[str(float(l)) for l in path["covariance_1se_lambdas"]]
+    c1_auc=[path_auc[l] for l in c1]
+    validity_1se={
+      "source_defined_lambdas":list(map(float,path["covariance_1se_lambdas"])),
+      "target_auc_min":float(min(c1_auc)),
+      "target_auc_max":float(max(c1_auc)),
+      "target_auc_span":float(max(c1_auc)-min(c1_auc))}
     return {"target_subject":int(target),
             "source_subjects":[int(x) for x in sorted(set(g[tr]))],
             "target_trials":int(te.sum()),
@@ -242,6 +256,9 @@ def score_outer(C,y,g,target):
             "target_batch_moments_used":False,
             "analytic_shrinkage":{"LedoitWolf":lw,"OAS":oas},
             "source_path":path,"auc":auc,
+            "target_auc_path_by_lambda":path_auc,
+            "target_path_scores_frozen_before_labels":True,
+            "source_covariance_1se_target_validity":validity_1se,
             "fold_wall_seconds":float(time.perf_counter()-t0)}
 
 def paired_summary(folds,candidate,baseline):
@@ -296,6 +313,14 @@ def main():
       "source_inner_split":"deterministic participant_id modulo 5, geometry refit without held source fold",
       "participant_receipt":receipt,
       "mean_auc_by_method":macro,"primary_comparisons":comparisons,
+      "validity_frontier_summary":{
+        "mean_source_covariance_1se_target_auc_span":float(np.mean([
+          f["source_covariance_1se_target_validity"]["target_auc_span"] for f in folds])),
+        "median_source_covariance_1se_target_auc_span":float(np.median([
+          f["source_covariance_1se_target_validity"]["target_auc_span"] for f in folds])),
+        "max_source_covariance_1se_target_auc_span":float(np.max([
+          f["source_covariance_1se_target_validity"]["target_auc_span"] for f in folds])),
+        "target_path_used_for_selection":False},
       "folds":folds,
       "environment":{"python":sys.version,"platform":platform.platform(),
                      "moabb":moabb.__version__,"sklearn":sklearn.__version__,
