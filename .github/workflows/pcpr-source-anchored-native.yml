@@ -53,6 +53,7 @@ jobs:
       - name: Run pre-inspection v0.5 typed AST transfer (hypotheses only)
         run: python research/pcpr/run_v05_unseen_eight.py
       - name: Run v0.5 authenticated transport retry after original eight fetch failures
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python research/pcpr/run_v05_authenticated_retry.py
