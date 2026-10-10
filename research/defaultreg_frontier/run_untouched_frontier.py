@@ -836,9 +836,15 @@ def main():
     protocol_file = Path(__file__).resolve().with_name(
         "FROZEN_SHIN_BNCI002_FRONTIER_20261010.md"
     )
+    outcome_freeze_file = Path(__file__).resolve().with_name(
+        "OUTCOME_INTERPRETATION_FREEZE_20261010.md"
+    )
     if not protocol_file.exists():
         raise FileNotFoundError("Frozen protocol file missing next to runner")
+    if not outcome_freeze_file.exists():
+        raise FileNotFoundError("Outcome interpretation freeze missing next to runner")
     protocol_sha256 = sha256_file(protocol_file)
+    outcome_interpretation_sha256 = sha256_file(outcome_freeze_file)
 
     full_grid_sha256 = hashlib.sha256(
         json.dumps(
@@ -874,6 +880,8 @@ def main():
         "workflow_run_id": workflow_run_id,
         "protocol_file": protocol_file.name,
         "protocol_sha256": protocol_sha256,
+        "outcome_interpretation_file": outcome_freeze_file.name,
+        "outcome_interpretation_sha256": outcome_interpretation_sha256,
         "full_grid_sha256": full_grid_sha256,
         "dense_grid_sha256": dense_grid_sha256,
         "subjects": list(map(int, spec["subjects"])),
@@ -930,6 +938,7 @@ def main():
         "trial_denominator": target_trial_denominator,
         "code_commit": code_commit,
         "protocol_sha256": protocol_sha256,
+        "outcome_interpretation_sha256": outcome_interpretation_sha256,
         "score_manifest_sha256": score_manifest_sha,
         "wall_seconds": result["wall_seconds"],
     }, indent=2))
