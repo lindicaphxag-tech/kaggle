@@ -26,7 +26,32 @@ class PrivilegedNativePlannerTests(unittest.TestCase):
             initial,_=env.reset(seed=SEEDS[0])
             ideal,_=actor.predict(initial,deterministic=True)
             action,score=planner.choose_feasible_action(env.unwrapped.data,ideal)
-            _,real_reward,_,_,_=env.step(action)
+            recomputed=planner.native_reward_of_action(env.unwrapped.data,action)
+            self.assertAlmostEqual(float(score),float(recomputed),places=9)
+            scratch_qpos=planner.scratch.qpos.copy()
+            scratch_qvel=planner.scratch.qvel.copy()
+            scratch_xpos=planner.scratch.xpos.copy()
+            _,real_reward,_,_,info=env.step(action)
+            if abs(float(recomputed)-float(real_reward))>1e-7:
+                actual=env.unwrapped.data
+                print("PHYSICS_MISMATCH_DIAGNOSTIC",{
+                    "source_integrator_version":__import__("mujoco").__version__,
+                    "clone_reward":float(recomputed),
+                    "official_reward":float(real_reward),
+                    "official_reward_parts":info,
+                    "candidate_control":action.tolist(),
+                    "qpos_max_abs_delta":float(np.max(np.abs(scratch_qpos-actual.qpos))),
+                    "qvel_max_abs_delta":float(np.max(np.abs(scratch_qvel-actual.qvel))),
+                    "derived_body_xpos_max_abs_delta":float(np.max(np.abs(scratch_xpos-actual.xpos))),
+                    "cloned_predicted_native_action_reward":float(
+                        -0.1*np.sum(np.square(action))),
+                    "cloned_object_goal_distance":float(np.linalg.norm(
+                        scratch_xpos[planner.obj]-scratch_xpos[planner.goal])),
+                    "official_object_goal_distance":-float(info["reward_dist"]),
+                    "cloned_fingertip_object_distance":float(np.linalg.norm(
+                        scratch_xpos[planner.obj]-scratch_xpos[planner.fingertip])),
+                    "official_fingertip_object_distance":-float(info["reward_near"])/.5,
+                },flush=True)
             self.assertAlmostEqual(float(score),float(real_reward),places=7)
             self.assertEqual(action.shape,(7,))
             self.assertTrue(np.all(action<=2.00001))
