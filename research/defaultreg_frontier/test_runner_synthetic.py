@@ -63,6 +63,7 @@ def main():
             score_file,
             y[outer],
             path["dense_covariance_regret_by_lambda"],
+            path["dense_covariance_1se_lambdas"],
         )
         expected={
             "LedoitWolf_LDA",
@@ -77,6 +78,9 @@ def main():
         assert result["validity_frontier"]["target_path_used_for_selection"] is False
         assert len(result["validity_frontier"]["grid_sensitivity"])==4
         assert result["validity_frontier"]["max_auc_span"]>=0.0
+        assert result["validity_frontier"]["source_1se_auc_span"]>=0.0
+        assert result["validity_frontier"]["source_1se_lambdas"]
+        assert result["validity_frontier"]["target_path_used_for_selection"] is False
 
     print("PASS_SYNTHETIC_FRONTIER_SMOKE")
 
