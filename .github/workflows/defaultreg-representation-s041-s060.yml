@@ -1,0 +1,72 @@
+name: DefaultReg S041-S060 representation x regularisation
+on:
+  push:
+    branches:
+      - research/defaultreg-representation-s041-s060-20261010
+    paths:
+      - 'research/defaultreg_eeg/**'
+      - '.github/workflows/defaultreg-representation-s041-s060.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'research/defaultreg_eeg/**'
+      - '.github/workflows/defaultreg-representation-s041-s060.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  representation-regularisation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install frozen scientific stack
+        run: python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.17.0 scikit-learn==1.8.0 mne==1.11.0
+      - name: Execute frozen S041-S060 representation x regularisation experiment
+        run: |
+          python research/defaultreg_eeg/run_representation_s041_s060.py \
+            --edf-root $RUNNER_TEMP/eegmmidb \
+            --out $GITHUB_WORKSPACE/defaultreg_representation_s041_s060
+      - name: Fail closed on information budget, denominator, dimensions and contrasts
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          p=pathlib.Path('defaultreg_representation_s041_s060/representation_regularisation_result.json')
+          x=json.loads(p.read_text())
+          assert x['status']=='REAL_EEGMMIDB_S041_S060_REPRESENTATION_REGULARISATION_PROSPECTIVE'
+          assert x['source_participants']==list(range(1,9))
+          assert x['heldout_participants']==list(range(41,61))
+          assert x['target_information_track']=='Z0'
+          assert x['target_data_used_for_selection'] is False
+          assert x['target_batch_statistics_used'] is False
+          assert x['all_original_task_cues_retained_in_every_band'] is True
+          dims={k:v['feature_dimension'] for k,v in x['representations'].items()}
+          assert dims=={'WIDE231':231,'FB8_1848':1848,'FB8_SOURCE_PCA231':231,'WIDE_NUISANCE1848':1848},dims
+          assert len(x['per_target_subject'])==20
+          assert len(x['predeclared_contrasts'])==4
+          assert {c['contrast'] for c in x['predeclared_contrasts']}=={
+            'C1_FB8xRegularisation_LW_PRIMARY',
+            'C2_FB8_minus_WIDE_NUISANCE1848',
+            'C3_FB8_PCA231_minus_WIDE231',
+            'C4_FB8xRegularisation_covNLL'}
+          assert all(c['n_participants']==20 for c in x['predeclared_contrasts'])
+          assert all('holm_p_C1_C4' in c for c in x['predeclared_contrasts'])
+          assert all(len(v['auc'])==4 for v in x['per_target_subject'].values())
+          print('PASS_S041_S060_REPRESENTATION_REGULARISATION_GATE')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-representation-s041-s060
+          path: |
+            research/defaultreg_eeg/FROZEN_REPRESENTATION_S041_S060_20261010.md
+            defaultreg_representation_s041_s060/**
+          if-no-files-found: warn
+          retention-days: 90
