@@ -1,0 +1,47 @@
+name: SemRepair globally bounded common-upstream source-world mixed-integer verification
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/exact_common_source_world_milp.py'
+      - 'research/semrepair/test_exact_common_source_world_milp.py'
+      - '.github/workflows/semrepair-global-mixed-integer-source-world.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verified-bounded-original-upstream-milp:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install bounded globally optimal MILP source-world optimizer
+        run: python -m pip install "numpy==2.3.3" "scipy==1.16.2"
+      - name: Independent physical-input replay, six seeded dense brute force grids and analytic certificates
+        run: python -m unittest -v research.semrepair.test_exact_common_source_world_milp
+      - name: Generate exact mixed-integer dual-primal common source-world certificate
+        run: python -m research.semrepair.exact_common_source_world_milp > multiworld_milp_real_upstream_input_dual_primal.json
+      - name: Record feasibility rather than optimism of unattainable physical outputs
+        run: |
+          python - <<'PY'
+          import json
+          z=json.load(open("multiworld_milp_real_upstream_input_dual_primal.json"))
+          for name,v in z.items():
+              print('SCENARIO',name,'DECISION',v['decision'],
+                    'DUAL',v['global_mixed_integer_dual_lower'],
+                    'PRIMAL',v['global_primal_objective_upper'],
+                    'ACTUAL_REPLAY',v['replayed_true_max_error'],
+                    'COMMON_UPSTREAM',v['actual_shared_upstream_control'],
+                    'BINARY',v['expanded_source_CLIP_binary_variables'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semrepair-global-original-source-hidden-world-MILP-certificates
+          path: multiworld_milp_real_upstream_input_dual_primal.json
+          if-no-files-found: warn
+          retention-days: 90
