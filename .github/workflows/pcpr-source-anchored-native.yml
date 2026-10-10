@@ -85,6 +85,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python research/pcpr/run_v09_auth_transport_retry.py
+      - name: Replay authentic prepatch unchanged-test contract (Kornia #5358)
+        run: python research/pcpr/run_prepatch_kornia_5358_contracts.py
       - name: Preserve case-level source provenance
         uses: actions/upload-artifact@v4
         with:
@@ -109,4 +111,5 @@ jobs:
             pcpr_v09_auth_transport_retry_after_32_http_errors.json
             pcpr_kornia_native_package_evidence.json
             pcpr_kornia_so2_native.json
+            pcpr_prepatch_kornia_5358_contracts.json
           if-no-files-found: error
