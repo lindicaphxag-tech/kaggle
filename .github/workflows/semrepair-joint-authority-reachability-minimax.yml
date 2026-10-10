@@ -1,0 +1,44 @@
+name: SemRepair joint hidden history and physical reachability minimax repair proof
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/joint_information_reachability_operator.py'
+      - 'research/semrepair/test_joint_information_reachability_operator.py'
+      - 'research/semrepair/strong_clipped_actuator_oracle.py'
+      - '.github/workflows/semrepair-joint-authority-reachability-minimax.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  coupled-information-actuator-operator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Test complete nonconvex physically reachable region and information ambiguity oracle
+        run: |
+          python -m unittest -v research.semrepair.test_joint_information_reachability_operator
+          python -m unittest -v research.semrepair.test_strong_clipped_actuator_oracle
+      - name: Four-way factorized intervention truth table with complete witnesses
+        run: python -m research.semrepair.joint_information_reachability_operator > joint_source_history_four_way.json
+      - name: Prove which intervention removes which of the two obstructions
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('joint_source_history_four_way.json'))
+          print('AUTHORED_FAMILIES',x['faults_both_author_constructed'])
+          for k,v in sorted(x['all_modes'].items()):
+              print('INTERVENTION',k,
+                    'minimax_error',round(v['tight_numerical_worst_case_minimax_error_upper'],8),
+                    'hidden_worlds',v['world_count'],
+                    'physically_reachable_components',v['physical_region_components'],
+                    'witness',v['reachable_physical_action_witness'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: semrepair-info-fiber-source-polytope-orthogonal-repair-6modes
+          path: joint_source_history_four_way.json
+          retention-days: 90
