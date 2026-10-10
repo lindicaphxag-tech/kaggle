@@ -105,7 +105,13 @@ def check(call,allowed_roots):
    if q not in KERNELS:
     if not isinstance(x.func,ast.Attribute) or x.func.attr not in TENSOR_METHODS:
      raise ValueError("UNSAFE_CALL_"+q)
-    if not isinstance(x.func.value,ast.Name) or x.func.value.id not in allowed_roots:
+    target=x.func.value
+    root_direct=isinstance(target,ast.Name) and target.id in allowed_roots
+    nested_cast=(x.func.attr=="to" and isinstance(target,ast.Call)
+                 and ((name(target.func) in KERNELS) or
+                      (isinstance(target.func,ast.Attribute)
+                       and target.func.attr in TENSOR_METHODS)))
+    if not (root_direct or nested_cast):
      raise ValueError("NON_ROOT_METHOD_"+q)
   if isinstance(x,ast.keyword) and x.arg not in {"dims","dtype","dim","keepdim"}:
    raise ValueError("UNSUPPORTED_KW_"+str(x.arg))
