@@ -78,3 +78,16 @@ No trial-level significance testing.
   target block.
 
 This is a prospective falsification record, not an acceptance or SOTA claim.
+
+## Statistical plan correction frozen before outcome access
+
+The first workflow draft contained a summary helper that would choose the best
+classical comparator from target-block mean AUC. That helper is rejected as a
+primary analysis because it uses target outcomes to select the comparator. No
+S011-S020 output had been read when this correction was committed. The raw
+method outputs are unaffected. Primary comparator is now fixed as
+nested_source_macro_auc_LDA. A two-sided exact sign-flip test on the 10
+participant-level paired differences is reported only for this one primary
+contrast; with n=10 it is low powered and must be shown together with every
+paired value and a participant bootstrap interval. Secondary comparisons are
+descriptive unless separately multiplicity-corrected.
