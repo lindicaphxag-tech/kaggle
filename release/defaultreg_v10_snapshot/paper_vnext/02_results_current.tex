@@ -1,0 +1,381 @@
+# SNAPSHOT_SOURCE: lindicaphxag-tech/cs@0b26a5b0853e3b136a92c17e614a3a1936673621 path=papers/eeg-default-regularisation/paper_vnext/02_results_current.tex
+\section{Results}
+
+\subsection{The full source domain separates covariance fidelity from discrimination}
+The first reviewer-critical test used authentic EEGMMIDB source data from
+S001--S008 (360 original task trials) and expanded the scalar path to the
+complete \([0,1]\) domain, including the analytic-shrinkage neighbourhood.
+With participant-grouped source validation, the macro-AUC optimum occurred at
+\(\lambda=0.8\) (0.67833), whereas held-source covariance predictive NLL was
+minimised at \(\lambda=0.075\). Ledoit--Wolf and OAS fitted on the final
+source representation selected 0.01567 and 0.01953, respectively. The
+low-regularisation region was therefore available rather than excluded by
+construction.
+
+The separation is visible over the path rather than only at the selected
+values. Source macro AUC rises from 0.55732 at \(\lambda=0.015\) to 0.62032
+at 0.075, 0.66251 at 0.5 and 0.67833 at 0.8. Covariance NLL moves in the
+opposite direction after its optimum: -2.56323 at 0.075, -1.93560 at 0.5 and
+-1.64090 at 0.8. The discriminability and covariance one-standard-error
+admissible sets overlap only at 0.075 and 0.10 (Jaccard 0.125). Choosing the
+covariance-NLL optimum instead of the discriminability optimum costs 0.05801
+source macro-AUC; choosing the discriminability optimum increases covariance
+NLL by 0.92233. These are source-only mechanism results and do not establish
+an unseen-target gain.
+
+\subsection{Strict Z0 execution is feasible, but two targets do not establish efficacy}
+The first official EDF feasibility run held out S009 and S010 while using
+S001--S008 as source. All 90 target task cues were retained and no target
+data entered geometry or parameter selection. On S009, Ledoit--Wolf,
+source-participant nested shrinkage and the source-signed/tail controls
+obtained AUC 0.57143, 0.57540 and 0.58135, respectively. On S010,
+Ledoit--Wolf obtained 0.79960 while nested shrinkage and the signed/tail
+controls obtained 0.77183 and 0.77976. This deliberately small block therefore
+demonstrates protocol integrity and target heterogeneity, not efficacy.
+
+\subsection{The BNCI objective separation survives a full-domain stress test}
+A first BNCI2014\_001 experiment evaluated all nine participants in outer
+LOSO with 288 left/right motor-imagery trials per participant. The initial
+development grid began at 0.2; hence its apparent benefit over analytic
+shrinkage could not answer the reviewer's search-space objection. After those
+target outcomes had been exposed, we therefore ran a disclosed post-hoc
+stress audit over the complete \([0,1]\) domain. It is not treated as
+independent confirmation.
+
+Across the nine outer folds, analytic Ledoit--Wolf selected
+\(\lambda=0.00227\)--0.00355. The source covariance-NLL optimum was 0.10 in
+all nine folds, whereas the source participant-macro-AUC optimum was 0.50 in
+one fold, 0.90 in two and 0.95 in six. Thus restoring the near-zero region did
+not move the discriminability optimum towards analytic shrinkage.
+Participant-macro target AUC was 0.75291 for Ledoit--Wolf, 0.75295 for OAS,
+0.76475 for logistic regression, 0.77182 for the source covariance-NLL
+optimum and 0.78646 for the full-domain source-discriminability optimum.
+The latter exceeded Ledoit--Wolf by a descriptive mean 0.03355 AUC (7/9
+participants improved; exact sign-flip \(p=0.03125\)). Because the same nine
+targets had been exposed previously, this effect is classified as post-hoc
+mechanism stress evidence rather than a confirmatory generalisation result.
+
+\subsection{Prospective falsification removes two candidate replacement rules}
+The preregistered lower-tail signed selector did not improve over nested
+source-participant scalar tuning in the initial BNCI2014\_001 run: its
+participant-macro AUC was 0.78455 versus 0.78782 for nested source-macro-AUC
+tuning, a mean paired difference of -0.00328, with a worst participant
+difference of -0.04070. It is therefore retained as a direction-aware
+mechanism control rather than a superior algorithm.
+
+A separate candidate, covariance-fidelity-constrained transfer shrinkage
+(CFCTS), was frozen before evaluating EEGMMIDB S011--S020. The source set
+remained S001--S008 and the information budget was Z0. Mean AUC was 0.66730
+for the preregistered nested comparator and 0.63309 for CFCTS, a paired mean
+difference of -0.03421 (participant bootstrap 95\% CI
+[-0.05593,-0.01190], exact two-sided sign-flip \(p=0.02734\)). Six of ten
+participants were harmed by more than 0.02 AUC and the worst difference was
+-0.08893. CFCTS is therefore rejected as the primary correction rather than
+retuned on these participants.
+
+\subsection{Prospective full-domain mismatch predicts an untouched 20-participant target block}
+The full-domain S021--S040 experiment was frozen before any target outcome.
+Source participants remained S001--S008; the target-information budget was
+Z0; every original task cue was retained. The source-only path selected
+\(\lambda_D=0.8\) for participant discriminability and \(\lambda_C=0.075\)
+for covariance predictive NLL, while the final source Ledoit--Wolf and OAS
+values were 0.01567 and 0.01953.
+
+Across the 20 untouched target participants, participant-macro AUC was
+0.62919 for Ledoit--Wolf, 0.63562 for OAS, 0.67003 for logistic regression,
+0.66509 for source covariance-NLL selection and 0.72116 for full-domain
+source-discriminability selection. Relative to Ledoit--Wolf, the latter
+improved mean participant AUC by 0.09197 (median 0.07133; 16/20 participants
+improved; participant-bootstrap 95\% CI [0.04108,0.14310]; exact
+\(2^{20}\) sign-flip \(p=0.00255\); Holm-adjusted \(p=0.00510\)).
+Relative to the stronger source covariance-NLL comparator, the improvement
+was 0.05607 (median 0.05929; 15/20 improved; 95\% CI
+[0.02185,0.09049]; exact sign-flip and Holm-adjusted \(p=0.00597\)).
+
+The effect was not universal. Four participants were harmed by more than
+0.02 AUC relative to Ledoit--Wolf and five relative to covariance-NLL
+selection; the worst paired changes were -0.11067 and -0.07312,
+respectively. The prospective result therefore supports a target consequence
+of the objective mismatch while motivating a separate hard-participant
+reliability analysis.
+
+A stricter post-primary delete-one-source sensitivity propagated source-pool
+variation through the entire analysis rather than fixing the original
+hyperparameter. After omitting each of S001--S008 in turn, we recomputed every
+inner source tangent reference, reran the complete \([0,1]\) path, reselected
+both the discriminability and covariance-NLL optima, rebuilt the final tangent
+reference and refit the classifiers. The discriminability-selected strength
+varied across \(\{0.4,0.8,0.95\}\), whereas the covariance-NLL optimum was
+0.075 in seven omissions and 0.10 in one, demonstrating genuine source-pool
+selection uncertainty. Nevertheless, discriminability-selected macro AUC was
+0.71272 on average across omissions (SD 0.00926; range
+0.69999--0.72581). Its advantage over a freshly reselected covariance-NLL
+model remained positive in 8/8 omissions (mean +0.05556; range
++0.04329 to +0.07172), and its advantage over a freshly refit Ledoit--Wolf
+model was also positive in 8/8 (mean +0.10079; range +0.07069 to +0.13741).
+This is a post-primary training-pool sensitivity analysis, not an additional
+confirmatory hypothesis test, but it directly shows that the prospective
+effect does not depend on one source participant or on freezing the originally
+selected lambda.
+
+A separate deterministic score-regeneration audit then rebuilt all five
+prospective target methods from the immutable S021--S040 trial-covariance
+artifact and the frozen implementation semantics. Across all 20 target
+participants and five methods, regenerated AUCs matched the workflow table at
+the stored eight-decimal precision (maximum absolute difference 0.0).
+This closes a result-lineage gap without rewriting the original chronology:
+the original workflow did not archive an independent trial-score file, so the
+regenerated score hashes are explicitly post-hoc reproducibility evidence
+rather than an original score freeze.
+
+\subsection{Two TRUE PRE-DATA external cohorts replicate source-objective separation and preserve the target-effect direction}
+The external v5 panel was frozen before project access to either
+BNCI2014\_002 or BNCI2015\_001 outcomes. The scientific runner, source
+selection rules, dense path, secondary selectors and score-freeze contract
+were fixed before the first cohort was opened. BNCI2015\_001 was then
+executed with byte-identical scientific assets; its execution-only child PR
+changed only the CI trigger. BNCI2014\_002 contributed 14 participants,
+15 native EEG channels and 2240 target trials. BNCI2015\_001 contributed
+12 participants, 13 native channels and 5600 target trials across two or
+three sessions per participant. Both analyses were Z0.
+
+Source-objective separation was complete across the external panel. In
+BNCI2014\_002, source participant-discrimination and covariance-NLL selected
+different strengths in 14/14 outer folds: the discrimination optimum lay
+between 0.7 and 0.9, while the covariance optimum was zero in 13 folds and
+0.02 in one. In BNCI2015\_001 they differed in 12/12 folds: the
+discrimination optimum was 0.9 or 0.95, while covariance-NLL selected
+0.015--0.05. Thus the two TRUE PRE-DATA cohorts contain 26/26 outer folds
+with different source objective optima. This fold count is descriptive
+consistency within two datasets, not 26 independent replication strata.
+
+The target consequence had the same direction in both datasets but the
+frozen small-sample exact tests remained individually inconclusive. In
+BNCI2014\_002, participant-macro AUC was 0.77810 for source-macro selection,
+0.76047 for covariance-NLL and 0.75523 for Ledoit--Wolf.
+Source-macro minus covariance-NLL was +0.01763 AUC
+(95\% participant-bootstrap CI [-0.00358,0.03728], exact sign-flip
+\(p=0.12329\), Holm \(p=0.13965\)); source-macro minus Ledoit--Wolf was
++0.02287 (95\% CI [0.00045,0.04402], Holm \(p=0.13965\)).
+In BNCI2015\_001, the corresponding AUCs were 0.76697, 0.72368 and 0.72166.
+The source-macro advantages were +0.04329 over covariance-NLL
+(95\% CI [0.00016,0.09345], exact \(p=0.10107\), Holm
+\(p=0.18555\)) and +0.04531 over Ledoit--Wolf
+(95\% CI [0.00290,0.09565], exact \(p=0.09277\), Holm
+\(p=0.18555\)). The equal-dataset descriptive means of H2 and H3 were
++0.03046 and +0.03409 AUC, respectively. We therefore describe the target
+effect as directionally replicated across both TRUE PRE-DATA cohorts, not as
+two individually significant superiority confirmations.
+
+The harmed-participant tail persisted. For H2, three of 14 BNCI2014\_002
+participants and two of 12 BNCI2015\_001 participants lost more than
+0.02 AUC; the corresponding CVaR25 values were negative. The predeclared
+mean--tail--fidelity selector therefore remained secondary: its change versus
+pure source-macro selection was +0.00416 in BNCI2014\_002 and +0.00055 in
+BNCI2015\_001, with negative target CVaR25 in both. A descriptive audit of
+the simpler discriminability-first lexicographic selector also failed to
+support promotion, with mean changes of -0.00865 and -0.00753 AUC relative
+to pure source-macro selection. The external evidence therefore strengthens
+the objective-mismatch finding without producing a superior new selector.
+
+BNCI2015\_001 additionally supplied the predeclared descriptive
+cross-session check. Source-macro minus covariance-NLL was positive on average
+within sessions 0A, 1B and 2C (+0.06252, +0.05296 and +0.06270 AUC,
+respectively); source-macro minus Ledoit--Wolf was similarly positive
+(+0.06495, +0.05432 and +0.06657). Session rows were not used as independent
+inferential units.
+
+\subsection{Post-outcome participant-harm uncertainty and influence}
+To check whether positive cohort means conceal negative transfer, we performed
+an explicitly post-outcome sensitivity audit of all six frozen participant
+effect vectors (three cohorts by two covariance comparators). Relative to
+source covariance-NLL, the numbers of participants losing more than 0.02 AUC
+were 5/20 in EEGMMIDB S021--S040, 3/14 in BNCI2014\_002 and 2/12 in
+BNCI2015\_001; the corresponding Ledoit--Wolf counts were 4/20, 2/14 and
+2/12. For the covariance-NLL contrasts, 95\% Wilson iid-participant
+reference intervals for those harm fractions were [0.112, 0.469],
+[0.076, 0.476] and [0.047, 0.448], respectively. These intervals are
+conditional descriptive references, not source-pool or new-dataset safety
+guarantees, because the target participants share fitted source models.
+
+The frozen 46-person individual effect distribution is visualised in
+Fig.~\ref{fig:participant-harm-v10}; the plot is descriptive rather than
+an additional independent experiment.\n\nAn additional post-outcome influence calculation removed one target
+participant at a time without refitting the shared source model. The smallest
+remaining mean effects versus covariance-NLL were +0.0475, +0.0142 and
++0.0258 AUC in the same dataset order. Thus the observed positive
+within-cohort mean directions do not depend on any single test participant.
+However, BNCI2015\_001 had a mean gain of +0.0433 but a median gain of only
++0.0105, indicating a right-skewed benefit distribution. Neither this
+delete-one diagnostic nor its positive direction supplies a new
+confirmatory test or resolves the substantial harmed-participant tail.
+The exact participant-level audit is reproducible by
+src/participant\_harm\_influence\_audit.py using the immutable three-cohort
+paired-effect receipt.
+
+\subsection{Corrected TRUE PRE-DATA validity frontiers show reproducible decision variation but cohort-specific steepness}
+The original v5 runner emitted a generic zero-crossing statistic for an AUC
+path centered on its own covariance optimum. That statistic was identified as
+structurally uninformative before the first v5 target result became available:
+the covariance-optimal point has zero centered difference by construction and
+therefore places zero inside every non-negative admissibility set. Following
+the frozen pre-outcome correction, we instead report the complete
+covariance-regret--AUC envelope, its maximum span, and the
+material-fragility budget
+\[
+ \delta_\tau=
+ \inf\{\delta:
+ \operatorname{span}(E_{AUC}(\delta))\ge\tau\},
+\]
+with \(\tau=0.02\) AUC primary and 0.01/0.05 descriptive. Each
+20,000-draw participant bootstrap resamples outer participants once and reuses
+the same indices at every \(\lambda\).
+
+BNCI2014\_002 had a maximum dense-path AUC envelope span of 0.03844
+(bootstrap 95\% CI [0.02714,0.06656]). Its primary material-fragility budget
+was \(\delta_{0.02}=0.91611\) raw per-dimension covariance-NLL regret,
+finite in 99.945\% of bootstrap draws; the conditional-finite 95\% interval
+was [0.26093,1.29696]. The 0.05 threshold was not reached in the point
+estimate. BNCI2015\_001 had a larger maximum span of 0.05011
+(95\% CI [0.02238,0.10335]) and reached 0.02 at a substantially smaller
+budget, \(\delta_{0.02}=0.17519\), finite in 98.77\% of draws
+(conditional-finite 95\% CI [0.04263,0.61685]); its point
+\(\delta_{0.05}\) was 0.57390.
+
+The result is robust to the predeclared grid-resolution audit. Reducing the
+405-point path to every eighth candidate changes the maximum span only from
+0.03844 to 0.03825 in BNCI2014\_002 and from 0.05011 to 0.05004 in
+BNCI2015\_001; the corresponding \(\delta_{0.02}\) values become 0.93097
+and 0.17788. Thus both cohorts support a non-trivial regularisation validity
+frontier, while the markedly different critical budgets reject a universal
+frontier steepness or universal fidelity threshold.
+
+\subsection{Simultaneous-path sensitivity limits material-frontier inference}
+The corrected validity frontiers have observed maximum AUC spans of 0.0384
+and 0.0501 in the two external cohorts. Their paired-participant percentile
+bootstrap intervals quantify resampling variability of the maximum-spread
+statistic, but they are not simultaneous confidence bands over the 405
+candidate shrinkage values. In particular, an empirical maximum--minimum
+span can be positive under a flat population AUC path merely because many
+noisy candidate points are searched. The percentile interval's lower
+endpoint exceeding 0.02 does not itself justify a population-level
+materiality claim.
+
+A post-outcome sensitivity implementation now estimates the supremum of the
+participant-bootstrap mean-path deviation across all shrinkage candidates.
+Writing \(\widehat A(\lambda)\) for the observed participant-mean AUC path
+and \(q_{.95}\) for the 95th percentile of
+\(\sup_\lambda|\widehat A^*(\lambda)-\widehat A(\lambda)|\), we report the
+conservative simultaneous-path sensitivity lower bound
+\[
+  L_{\mathrm{span}}=
+  \max\left\{0,
+    \big[\max_\lambda\widehat A(\lambda)-
+         \min_\lambda\widehat A(\lambda)\big]-2q_{.95}
+  \right\}.
+\]
+This is a nominal post-outcome diagnostic conditional on the estimated
+source covariance-regret axis; it does not represent refitting uncertainty
+from overlapping leave-one-person-out source pools. No numerical
+simultaneous-bound result is asserted until the archived dense-path AUC
+matrices are reprocessed. The descriptive frontier observations remain
+valid, but material population-level fragility is a separate inferential
+question.
+
+\subsection{Prospective representation testing falsifies the historical hidden-filter-bank narrative}
+The S041--S060 representation block was frozen independently of S021--S040.
+It compared WIDE231, FB8-1848, source-only PCA-compressed FB8-PCA231 and a
+label-independent WIDE+NUISANCE1848 dimension control under Ledoit--Wolf,
+OAS, full-domain source discrimination and full-domain source covariance-NLL.
+All 20 targets remained Z0 and all original task cues were retained in every
+band.
+
+Under source-discrimination selection, participant-macro AUC was 0.74461 for
+WIDE231, 0.66202 for FB8-1848, 0.68884 for FB8-PCA231 and 0.62002 for
+WIDE+NUISANCE1848. The preregistered primary interaction,
+\[
+ [A_{\mathrm{FB8},D}-A_{\mathrm{WIDE},D}]
+ -
+ [A_{\mathrm{FB8},LW}-A_{\mathrm{WIDE},LW}],
+\]
+was -0.07781 AUC (95\% CI [-0.12415,-0.03451], exact sign-flip
+\(p=0.00332\), Holm \(p=0.01328\)). The corresponding interaction using
+source covariance-NLL as the covariance-oriented comparator was -0.04312
+(95\% CI [-0.06794,-0.01741], Holm \(p=0.01751\)). Thus regularisation
+objective choice prospectively changes the representation comparison, but in
+the opposite direction to the historical hypothesis: discrimination-oriented
+regularisation strengthens the WIDE advantage rather than revealing a hidden
+filter-bank advantage.
+
+The matched-dimension control also contradicts a pure spectral-information
+story. FB8-PCA231 minus WIDE231 under source-discrimination selection was
+-0.05577 (95\% CI [-0.09992,-0.01380], Holm \(p=0.04633\)).
+Conversely, FB8 minus the label-independent WIDE+NUISANCE1848 control was
++0.04200 but did not survive the four-contrast family (Holm
+\(p=0.08661\)). The frozen source-budget intervention supplied a second
+fixed-signal counterfactual: with 25\%, 50\%, 75\% and 100\% of source
+trials retained, the source-discrimination advantage over covariance-NLL was
++0.04370, +0.08515, +0.06923 and +0.07755 AUC. Neither effect size nor
+selected shrinkage strength varied monotonically with source sample budget.
+Together, these results prospectively reject both the historical
+filter-bank-reversal headline and a simple monotonic \(p/n\) mechanism.
+
+\subsection{A target-calibration AUC experiment exposes an identifiability limitation}
+A separate prospective EEGMMIDB block, S061--S080, compared Z0
+source-only scoring with unlabeled U5/U10/U20-prefix and U-all target
+adaptation. Under Z0, source-discriminability selection improved over
+Ledoit--Wolf by +0.07463 macro AUC (20 participants; 95\% bootstrap CI
+[0.03695,0.11042]; Holm \(p=0.01296\)), with 17 participants improved
+and two harmed by more than 0.02. The nine predeclared deployment-budget
+contrasts passed the structural audit.
+
+All matched U-k and U-all changes in ROC AUC were exactly zero, but this
+result is \emph{not} evidence that unlabeled calibration is empirically
+useless. The frozen calibration applied only a constant target-participant
+feature shift \(b_k\) before a fixed linear score \(s(x)=w^\top(x-c)\).
+For every trial of that participant,
+\[
+s_k(x)=w^\top(x-b_k-c)=s_0(x)-w^\top b_k.
+\]
+The subtraction is independent of the trial and therefore leaves the
+within-participant score ordering unchanged. Since ROC AUC depends
+only on this ordering, its paired U-k/Z0 contrast is algebraically forced
+to zero. These zero effects are retained as an identifiability negative
+control, not interpreted as a measured calibration null. Any assessment of
+calibration utility must use a source-frozen operating threshold or a
+threshold-sensitive utility measure, and an S061--S080 extension would
+necessarily be post-outcome.
+
+
+\subsection{Dataset-stratified effect consistency is descriptive, not a third prospective test}
+To inspect replication-stratum heterogeneity without pseudoreplicating
+trials, we extracted all 46 held-participant paired effects for the three
+prospectively evaluated cohorts (EEGMMIDB S021--S040, BNCI2014\_002,
+BNCI2015\_001) from their original successful workflows. The original
+primary H2 (source-discriminability minus covariance-NLL) cohort mean
+differences were +0.05607, +0.01763 and +0.04329, respectively.
+The primary H3 (source-discriminability minus Ledoit--Wolf) differences
+were +0.09197, +0.02287 and +0.04531.
+
+A newly designed, explicitly \emph{post-outcome descriptive}
+equal-dataset summary gives +0.03900 AUC for H2 and +0.05338 for H3;
+restricting it to the two independent external cohorts gives +0.03046
+and +0.03409, respectively. These values assign one weight per dataset
+regardless of its participant/trial count; they are not participant- or
+trial-pooled effects. The companion conditional participant-resampling
+audit, with 20,000 seeded draws inside each fixed dataset, yields
+intervals [0.01938,0.06022] for the three-dataset H2 descriptive mean,
+and [0.02989,0.07813] for H3. Across the two external datasets alone
+the conditional intervals are [0.00696,0.05754] and
+[0.01002,0.06183].
+
+These conditional intervals do \emph{not} account for uncertainty about
+sampling new EEG acquisition datasets, overlapping source fits or the
+post-outcome choice to combine cohorts. They cannot supersede the
+original cohort-wise Holm results, which did not establish independent
+external superiority. Moreover, the source-macro H2 method harmed
+10 of the 46 held participants by more than 0.02 AUC relative to
+covariance-NLL (5/20, 3/14, 2/12), and H3 harmed 8/46 relative to
+Ledoit--Wolf (4/20, 2/14, 2/12). This replication-stratified pattern
+supports bounded objective-mismatch conclusions with explicit harm,
+not a universally safe new shrinkage rule.
