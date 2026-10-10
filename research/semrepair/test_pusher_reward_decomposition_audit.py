@@ -52,7 +52,7 @@ class CrossRobotAuditTests(unittest.TestCase):
 
     def test_reject_mismatched_reward_components(self):
         f=fixture()
-        r=next(r for r in f["raw_rows"] if r["arm"]=="blind-numeric-source-candidate")
+        r=next(r for r in f["raw_rows"] if r["arm"]=="exact-two-clip-full-information-oracle")
         r["official_episode_return"]+=2.
         with self.assertRaisesRegex(ValueError,"reward gain"):
             audit_pusher(f)
