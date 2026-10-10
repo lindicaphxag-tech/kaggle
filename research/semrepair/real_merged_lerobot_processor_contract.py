@@ -42,6 +42,12 @@ AFTER_COMMIT="19fe315971079e116b917ed4d482bfbf3c93bbbe"
 SCRIPT_PATH="src/lerobot/scripts/lerobot_train.py"
 BEFORE_SOURCE_BLOB="463668eb25fefbf1814cd9bc0a855e06ffd93093"
 AFTER_SOURCE_BLOB="4ddef3105bb5ac5164dd08c5e629f78834bbd5e0"
+CONFIG_PATH="src/lerobot/configs/train.py"
+BEFORE_CONFIG_BLOB="55498d3acaa22905c72ee2cb2b7554195ab4e6b5"
+AFTER_CONFIG_BLOB="bac1a946b5d6cc613ae0baca0ab43f02be67f977"
+REGISTRY_PATH="src/lerobot/processor/relative_action_processor.py"
+BEFORE_REGISTRY_BLOB="e1e65acb11f5f0603ee3e9bd785e56ed0a113dd2"
+AFTER_REGISTRY_BLOB="5b1039291b1dc7448d3706ffb969111913b5dff5"
 UPSTREAM_ISSUE="https://github.com/huggingface/lerobot/issues/3425"
 UPSTREAM_MERGED_PR="https://github.com/huggingface/lerobot/pull/3711"
 N_SEMANTIC_CASES=6
@@ -178,6 +184,31 @@ def _model_invariant(out,*,required_named_observations=True,
 def audit_actual_merged_lerobot_source():
     before,before_hash=_pinned_source(BEFORE_COMMIT,SCRIPT_PATH,BEFORE_SOURCE_BLOB)
     after,after_hash=_pinned_source(AFTER_COMMIT,SCRIPT_PATH,AFTER_SOURCE_BLOB)
+    old_cfg,old_cfg_sha=_pinned_source(BEFORE_COMMIT,CONFIG_PATH,BEFORE_CONFIG_BLOB)
+    new_cfg,new_cfg_sha=_pinned_source(AFTER_COMMIT,CONFIG_PATH,AFTER_CONFIG_BLOB)
+    old_reg,old_reg_sha=_pinned_source(BEFORE_COMMIT,REGISTRY_PATH,BEFORE_REGISTRY_BLOB)
+    new_reg,new_reg_sha=_pinned_source(AFTER_COMMIT,REGISTRY_PATH,AFTER_REGISTRY_BLOB)
+    cross_file_contract={
+       "pre_merge_missing_fresh_rename_guard":(
+           "`rename_map` requires a pretrained policy checkpoint" not in old_cfg),
+       "merge_introduces_explicit_fresh_rename_refusal":(
+           "`rename_map` requires a pretrained policy checkpoint" in new_cfg),
+       "pre_merge_uses_old_relative_processor_registry_key":(
+           'register("delta_actions_processor")' in old_reg),
+       "merged_processor_registry_matches_override_key":(
+           'register("relative_actions_processor")' in new_reg),
+       "verified_actual_source_sha256":{
+           "old_training_config":old_cfg_sha,"new_training_config":new_cfg_sha,
+           "old_processor_registry":old_reg_sha,"new_processor_registry":new_reg_sha},
+       "verified_git_blobs":{
+           "old_training_config":BEFORE_CONFIG_BLOB,
+           "new_training_config":AFTER_CONFIG_BLOB,
+           "old_processor_registry":BEFORE_REGISTRY_BLOB,
+           "new_processor_registry":AFTER_REGISTRY_BLOB},
+    }
+    if not all(value for k,value in cross_file_contract.items() if k not in
+               ("verified_actual_source_sha256","verified_git_blobs")):
+        raise AssertionError("actual upstream merge does not satisfy cross-file version contract")
     src_fns={};statement_counts={}
     for name,source in (("pre_merge",before),("maintainer_merged",after)):
         fn,n=_extract_original_executable_setup(source)
@@ -230,6 +261,7 @@ def audit_actual_merged_lerobot_source():
         "before_actual_source_sha256":before_hash,
         "after_actual_source_sha256":after_hash,
         "source_AST_statements_executed":statement_counts,
+        "cross_file_merged_processor_contract":cross_file_contract,
         "frozen_original_publisher_train_setup_source_ran":True,
         "programmatically_reimplemented_factory":True,
         "actual_pretrained_model_loaded":False,
