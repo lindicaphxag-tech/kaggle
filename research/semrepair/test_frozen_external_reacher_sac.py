@@ -15,7 +15,7 @@ class ExternalReacherPolicyTests(unittest.TestCase):
         self.assertEqual(len(ENV_SEEDS),16)
         self.assertEqual(len(set(ENV_SEEDS)),16)
         self.assertTrue(all(seed>=0 for seed in ENV_SEEDS))
-        self.assertEqual(len(ARMS),6)
+        self.assertEqual(len(ARMS),7)
         self.assertEqual(mmul(C,P),I)
 
     def test_low_amplitude_compensation_matches_healthy(self):
