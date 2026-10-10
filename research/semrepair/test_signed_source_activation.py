@@ -87,6 +87,16 @@ class SignedSourceActivationTests(unittest.TestCase):
             self.activate(signatures=[sig,sig,sig])
         self.assertEqual(self.path.read_bytes(),self.old)
 
+    def test_distinct_issuer_labels_with_same_ed25519_root_are_not_a_quorum(self):
+        self.roots["owner-B"]=self.roots["owner-A"]
+        payload=_canonical(self.manifest)
+        original_signature=self.keys["owner-A"].sign(payload).hex()
+        aliases=[{"issuer":"owner-A","ed25519_hex":original_signature},
+                 {"issuer":"owner-B","ed25519_hex":original_signature}]
+        with self.assertRaisesRegex(ValueError,"insufficient distinct"):
+            self.activate(signatures=aliases)
+        self.assertEqual(self.path.read_bytes(),self.old)
+
     def test_forged_second_signature_rejected(self):
         sig=self.signatures(("owner-A","owner-B"))
         sig[1]["ed25519_hex"]="00"*64
