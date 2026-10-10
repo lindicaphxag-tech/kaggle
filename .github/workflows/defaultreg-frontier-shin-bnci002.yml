@@ -144,9 +144,19 @@ jobs:
               assert fold['target_labels_used_for_selection'] is False
               assert fold['target_batch_statistics_used'] is False
               assert sha.fullmatch(fold['score_freeze']['score_sha256'])
-              assert fold['validity_frontier']['target_path_used_for_selection'] is False
-              assert len(fold['validity_frontier']['grid_sensitivity']) == 4
+              vf = fold['validity_frontier']
+              assert vf['target_path_used_for_selection'] is False
+              assert vf['source_1se_lambdas']
+              assert vf['source_1se_auc_span'] >= 0.0
+              assert vf['max_auc_span'] >= vf['source_1se_auc_span'] - 1e-12
+              assert len(vf['grid_sensitivity']) == 4
           assert seen == set(range(1, expected_n + 1))
+
+          summary = x['frontier_summary']
+          assert summary['n_participants'] == expected_n
+          assert summary['raw_fidelity_budgets_not_pooled_across_participants'] is True
+          assert summary['full_path_span_mean'] >= 0.0
+          assert summary['source_1se_span_mean'] >= 0.0
 
           print('PASS_UNTOUCHED_FRONTIER_RECEIPT', d, x['trial_denominator'])
           PY
