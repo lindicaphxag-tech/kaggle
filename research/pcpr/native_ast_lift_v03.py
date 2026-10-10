@@ -34,6 +34,30 @@ PINNED={
 def blob_id(content):
  return hashlib.sha1(b"blob "+str(len(content)).encode()+b"\0"+content).hexdigest()
 
+
+# AST-lift defense in depth; NOT a secure process sandbox for arbitrary code.
+# External source must still be Git-pinned and executed only on an isolated,
+# least-privilege worker without credentials. Reject whole scripts/imports.
+SAFE_BUILTINS = {k: __builtins__[k] if isinstance(__builtins__,dict)
+                 else getattr(__builtins__,k)
+                 for k in ("float","int","bool","str","len","range","enumerate",
+                           "tuple","list","dict","set","sum","min","max","abs",
+                           "isinstance","ValueError","TypeError","RuntimeError",
+                           "super","type","slice")}
+DANGEROUS_NAMES = {"eval","exec","compile","open","__import__","globals",
+                   "locals","vars","getattr","setattr","delattr","breakpoint",
+                   "input","help","dir"}
+DANGEROUS_NODES=(ast.Import,ast.ImportFrom,ast.Global,ast.Nonlocal,
+                 ast.With,ast.AsyncWith,ast.Try,ast.Lambda,ast.ClassDef)
+def check_replay_ast(node):
+ for n in ast.walk(node):
+  if isinstance(n,DANGEROUS_NODES):
+   raise ValueError("UNSAFE_AST_NODE:"+type(n).__name__)
+  if isinstance(n,ast.Name) and (n.id in DANGEROUS_NAMES or n.id.startswith("__")):
+   raise ValueError("UNSAFE_AST_NAME:"+n.id)
+  if isinstance(n,ast.Attribute) and n.attr.startswith("__") and n.attr!="__init__":
+   raise ValueError("UNSAFE_AST_ATTRIBUTE:"+n.attr)
+
 def fetch_ref(family,version):
  spec=PINNED[family]
  ref=spec["base"] if version=="before" else spec["head"]
@@ -67,9 +91,10 @@ def lift_function(source,name):
  node=source_ast_function(source,name)
  # Explicitly no decorators; original function body AST left UNMODIFIED.
  if node.decorator_list:raise ValueError("Decorated function unsupported")
+ check_replay_ast(node)
  t=ast.fix_missing_locations(ast.Module(body=[node],type_ignores=[]))
  space={"torch":torch,"ParametrizedLine":ParametrizedLine}
- exec(compile(t,"<pinned-original-function-AST>","exec"),{"__builtins__":__builtins__,**space},space)
+ exec(compile(t,"<pinned-original-function-AST>","exec"),{"__builtins__":SAFE_BUILTINS,**space},space)
  return space[name]
 
 def lift_constructor(source,name="Quaternion",counterfeit=False):
@@ -92,6 +117,7 @@ def lift_constructor(source,name="Quaternion",counterfeit=False):
        value=copy.deepcopy(call.args[1]))
       replaced=True
   if not replaced:raise ValueError("Counterfeit AST anchor missing")
+ check_replay_ast(init)
  cls=ast.ClassDef(name=name,bases=[ast.Attribute(
        value=ast.Name(id="nn",ctx=ast.Load()),attr="Module",ctx=ast.Load())],
        keywords=[],body=[init],decorator_list=[])
