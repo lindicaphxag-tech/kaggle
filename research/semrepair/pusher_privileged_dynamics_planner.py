@@ -67,11 +67,15 @@ class PrivilegedOneStepModelPlanner:
         # interacts with the real task to evaluate its unselected candidates.
         mujoco.mj_getState(self.model,env_source_data,self.state,self.state_spec)
         mujoco.mj_setState(self.model,self.scratch,self.state,self.state_spec)
-        mujoco.mj_forward(self.model,self.scratch)
+        # The official Gymnasium Pusher calls mj_step(frame_skip) then reads
+        # get_body_com WITHOUT an extra mj_forward. Computing another
+        # forward pass after the last integration would change the exact
+        # reward observation time; this was a real comparator mismatch.
+        # mj_step runs its own forward-dynamics stage, so no extra forward
+        # at the beginning is needed either.
         self.scratch.ctrl[:]=np.asarray(action,dtype=np.float64)
         for _ in range(self.frame_skip):
             mujoco.mj_step(self.model,self.scratch)
-        mujoco.mj_forward(self.model,self.scratch)
         obj=self.scratch.xpos[self.obj]
         tip=self.scratch.xpos[self.fingertip]
         goal=self.scratch.xpos[self.goal]
