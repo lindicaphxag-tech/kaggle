@@ -1,0 +1,25 @@
+# SNAPSHOT_SOURCE: lindicaphxag-tech/cs@0b26a5b0853e3b136a92c17e614a3a1936673621 path=papers/eeg-default-regularisation/paper_vnext/92_table_validity_frontier.tex
+\begin{table}[t]
+\centering
+\caption{Corrected TRUE PRE-DATA Regularisation Validity Frontiers. The primary material-fragility threshold is a 0.02 AUC envelope span. $\delta_{0.02}$ is expressed in raw per-dimension source covariance predictive-NLL regret. Percentile intervals describe 20,000 paired participant-path resamples; they are not simultaneous confidence bands or tests of a data-selected positive range.}
+\label{tab:validity-frontier}
+\small
+\begin{tabular}{lrrr}
+\hline
+Cohort & Max AUC span (95\% CI) & $\delta_{0.02}$ & Finite bootstrap fraction \\
+\hline
+BNCI2014\_002
+& 0.0384 [0.0271, 0.0666]
+& 0.9161
+& 0.9995 \\
+BNCI2015\_001
+& 0.0501 [0.0224, 0.1034]
+& 0.1752
+& 0.9877 \\
+\hline
+\end{tabular}
+
+\vspace{1mm}
+\footnotesize
+Both cohorts admit a material downstream AUC span over the frozen dense regularisation path, but the critical raw fidelity budget differs substantially. The supported conclusion is therefore a reproducible, cohort-dependent validity frontier rather than one universal critical $\delta$. The obsolete generic centered-AUC zero-crossing statistic is not used.
+\end{table}
