@@ -1,0 +1,39 @@
+name: SemRepair finite source patch test overfitting exact minimal distinguishing set
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/minimum_counterexample_probe_cover.py'
+      - 'research/semrepair/test_minimum_counterexample_probe_cover.py'
+      - '.github/workflows/semrepair-exact-counterexample-suite.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact-budgeted-counterexamples:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compare exact DP optimum against independent brute-force and verify fail-closed test budgets
+        run: python -m unittest -v research.semrepair.test_minimum_counterexample_probe_cover
+      - name: Produce exact weighted minimum distinguishing suite and full candidate coverage
+        run: python -m research.semrepair.minimum_counterexample_probe_cover > minimum_counterexample_suite.json
+      - name: Disclose finite-catalog and non-vendor semantic assumptions
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('minimum_counterexample_suite.json'))
+          for key in ('decision','candidate_count','bank_size','provable_minimum_cost',
+                      'selected_probes','dp_reachable_states','dp_transitions',
+                      'certificate_complete_against_catalog',
+                      'source_code_executed_in_this_stdlib_only_test'):
+              print(key,r[key])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: semrepair-minimum-source-counterexample-cost-certificate
+          path: minimum_counterexample_suite.json
+          retention-days: 90
