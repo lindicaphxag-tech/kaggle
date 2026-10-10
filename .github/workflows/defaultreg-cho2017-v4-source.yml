@@ -1,0 +1,85 @@
+name: DefaultReg Cho2017 v4 source-only freeze
+on:
+  push:
+    branches:
+      - research/defaultreg-cho2017-v4-source-20261010
+    paths:
+      - 'research/defaultreg_eeg/run_cho2017_v4_source_only.py'
+      - 'research/defaultreg_eeg/FROZEN_CHO2017_V4_SOURCE_TARGET_SPLIT_20261010.md'
+      - '.github/workflows/defaultreg-cho2017-v4-source.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  cho2017-source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MOABB_DOWNLOAD_PROVIDER: upstream
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install frozen MOABB stack
+        run: |
+          python -m pip install --disable-pip-version-check             moabb==1.7.2 numpy==2.3.5 scipy==1.17.0             scikit-learn==1.8.0 mne==1.11.0
+          python - <<'PY'
+          import moabb,numpy,scipy,sklearn,mne
+          print({
+            'moabb':moabb.__version__,
+            'numpy':numpy.__version__,
+            'scipy':scipy.__version__,
+            'sklearn':sklearn.__version__,
+            'mne':mne.__version__,
+          })
+          assert moabb.__version__=='1.7.2'
+          PY
+      - name: Compile frozen source-only runner
+        run: python -m py_compile research/defaultreg_eeg/run_cho2017_v4_source_only.py
+      - name: Execute SOURCE-ONLY Cho2017 freeze
+        run: |
+          python research/defaultreg_eeg/run_cho2017_v4_source_only.py             --data-root "$RUNNER_TEMP/cho2017"             --out "$GITHUB_WORKSPACE/defaultreg_cho2017_v4_source"
+      - name: Fail closed on subject roles and denominator
+        run: |
+          python - <<'PY'
+          import json
+          p='defaultreg_cho2017_v4_source/source_freeze.json'
+          x=json.load(open(p))
+          assert x['status']=='CHO2017_V4_SOURCE_ONLY_FROZEN_NO_TARGET_DATA'
+          assert x['moabb_version']=='1.7.2'
+          assert x['download_provider']=='upstream'
+          assert x['source_participants']==[3,5,19,26,31,32,36,37,44,45,46,47]
+          assert x['confirmatory_target_ids_metadata_only']==[4,6,8,10,11,12,14,15,17,18,20,28,33,34,39,40,43,48,50,52]
+          assert x['reserve_ids_metadata_only']==[1,2,7,9,13,16,21,22,23,24,25,27,29,30,35,38,41,42,49,51]
+          assert x['target_data_loaded'] is False
+          assert x['n_channels']==20 and x['tangent_dimension']==210
+          assert x['source_trials']==2400
+          assert all(v['n_trials']==200 and v['left_hand']==100 and v['right_hand']==100
+                     for v in x['per_source_subject'].values())
+          assert x['primary_full_grid'][0]==0.0 and x['primary_full_grid'][-1]==1.0
+          assert x['dense_frontier_grid'][0]==0.0 and x['dense_frontier_grid'][-1]==1.0
+          assert len(x['dense_frontier_grid'])>400
+          assert len(x['raw_source_files'])>=12
+          src=set(x['source_participants'])
+          tgt=set(x['confirmatory_target_ids_metadata_only'])
+          reserve=set(x['reserve_ids_metadata_only'])
+          assert src.isdisjoint(tgt) and src.isdisjoint(reserve) and tgt.isdisjoint(reserve)
+          print('PASS_CHO2017_V4_SOURCE_ONLY_FREEZE')
+          print('lambda_D',x['primary_source_path']['lambda_discriminability'])
+          print('lambda_C',x['primary_source_path']['lambda_covariance_nll'])
+          print('LW',x['final_source_analytic_shrinkage']['LedoitWolf'])
+          print('OAS',x['final_source_analytic_shrinkage']['OAS'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-cho2017-v4-source-freeze
+          path: |
+            research/defaultreg_eeg/FROZEN_CHO2017_V4_SOURCE_TARGET_SPLIT_20261010.md
+            defaultreg_cho2017_v4_source/**
+          if-no-files-found: warn
+          retention-days: 90
