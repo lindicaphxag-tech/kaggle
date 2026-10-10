@@ -15,7 +15,7 @@ class ExternalReacherPolicyTests(unittest.TestCase):
         self.assertEqual(len(ENV_SEEDS),16)
         self.assertEqual(len(set(ENV_SEEDS)),16)
         self.assertTrue(all(seed>=0 for seed in ENV_SEEDS))
-        self.assertEqual(len(ARMS),5)
+        self.assertEqual(len(ARMS),6)
         self.assertEqual(mmul(C,P),I)
 
     def test_low_amplitude_compensation_matches_healthy(self):
@@ -30,8 +30,11 @@ class ExternalReacherPolicyTests(unittest.TestCase):
         fault=_transform(sample,"compensating-fault")
         self.assertGreater(float(np.linalg.norm(fixed-fault)),.01)
         projected=_transform(sample,"full-information-inner-geometry-projection")
-        self.assertLessEqual(float(np.linalg.norm(sample-projected)),
-                             float(np.linalg.norm(sample-fault))+1e-7)
+        exact=_transform(sample,"exact-two-clip-action-oracle")
+        self.assertLessEqual(float(np.linalg.norm(sample-exact)),
+                             float(np.linalg.norm(sample-np.clip(projected,-1.,1.)))+1e-6)
+        self.assertLessEqual(float(np.linalg.norm(sample-exact)),
+                             float(np.linalg.norm(sample-fault))+1e-6)
 
     def test_official_mujoco_external_task_and_pretrained_checkpoint(self):
         model,sha=frozen_external_checkpoint()
