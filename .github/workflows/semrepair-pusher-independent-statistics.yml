@@ -1,0 +1,56 @@
+name: SemRepair Pusher original reward and object-distance paired independent audit
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/pusher_reward_decomposition_audit.py'
+      - 'research/semrepair/test_pusher_reward_decomposition_audit.py'
+      - '.github/workflows/semrepair-pusher-independent-statistics.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independent-source-evidence-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Test Pusher physical progress, reward terms and 10-comparison statistics
+        run: python -m unittest -v research.semrepair.test_pusher_reward_decomposition_audit
+      - name: Fetch pre-existing external Pusher original raw data and freeze immutable identity
+        uses: actions/download-artifact@v4
+        with:
+          repository: lindicaphxag-tech/kaggle
+          run-id: 38009127179
+          github-token: ${{ github.token }}
+          name: semrepair-third-party-pusher-v5-32seed-all-faults
+          path: original-pusher
+      - name: Recompute from original Pusher data; never rerun or retune original policy
+        run: |
+          python -m research.semrepair.pusher_reward_decomposition_audit original-pusher/external_pusher_full.json > original_pusher_audit.json
+          python - <<'PY'
+          import json
+          report=json.load(open('original_pusher_audit.json'))
+          print('RAW_SHA256',report['raw_rows_sha256'])
+          for name,entry in sorted(report['results'].items()):
+              a=entry['endpoints']['official_return_gain']
+              b=entry['endpoints']['actual_object_goal_distance_reduction']
+              print('PAIR',name,
+                    'reward_gain',round(a['mean'],6),
+                    'reward_95pct_bootstrap',a['bootstrap_95pct_descriptive'],
+                    'bonferroni_10_reward_p',a['ten_contrast_bonferroni_p'],
+                    'object_distance_reduction_m',round(b['mean'],6),
+                    'object_95pct_bootstrap',b['bootstrap_95pct_descriptive'],
+                    'bonferroni_10_object_p',b['ten_contrast_bonferroni_p'],
+                    'fingertip_delta_m',round(entry['mean_contact_distance_reduction'],6),
+                    'mean_control_penalty_change',round(entry['mean_weighted_control_reward_gain_per_step'],7))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semrepair-independent-pusher-object-progress-and-reward-audit
+          path: original_pusher_audit.json
+          if-no-files-found: warn
+          retention-days: 90
