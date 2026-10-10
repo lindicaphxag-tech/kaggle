@@ -27,7 +27,6 @@ sys.path.insert(0,str(src))
 import torch
 from torch import nn
 from kornia.geometry.quaternion import Quaternion
-assert str(src)==str(Path(__file__).resolve().parents[0]) if False else True
 q=Quaternion(torch.tensor([1.,0.,0.,0.],dtype=torch.float32))
 plain_keys=list(q.state_dict())
 plain_buff=list(dict(q.named_buffers()))
