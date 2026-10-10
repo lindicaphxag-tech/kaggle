@@ -199,7 +199,9 @@ guarantees, because the target participants share fitted source models.
 
 The frozen 46-person individual effect distribution is visualised in
 Fig.~\ref{fig:participant-harm-v10}; the plot is descriptive rather than
-an additional independent experiment.\n\nAn additional post-outcome influence calculation removed one target
+an additional independent experiment.
+
+An additional post-outcome influence calculation removed one target
 participant at a time without refitting the shared source model. The smallest
 remaining mean effects versus covariance-NLL were +0.0475, +0.0142 and
 +0.0258 AUC in the same dataset order. Thus the observed positive
@@ -280,6 +282,36 @@ simultaneous-bound result is asserted until the archived dense-path AUC
 matrices are reprocessed. The descriptive frontier observations remain
 valid, but material population-level fragility is a separate inferential
 question.
+
+\subsection{Real-artifact V11 reanalysis closes the 405-point inference question}
+We recovered both original TRUE PRE-DATA v5 GitHub Actions artifacts,
+verified their raw result JSON SHA-256 hashes, and independently reconstructed
+the 14-by-405 and 12-by-405 participant-by-regularisation AUC matrices.
+The observed range and the original paired percentile bootstrap intervals
+reproduced exactly up to numeric precision. BNCI2014\_002 retained the
+observed span 0.03844 and originally reported percentile interval
+[0.02714,0.06656]; BNCI2015\_001 retained span 0.05011 and interval
+[0.02238,0.10335]. Both remain observations, not simultaneously
+corrected population effect statements.
+
+We next used 20,000 participant-paired whole-path resamples, with seed
+20261010, and evaluated a translation-invariant path error
+\(\operatorname{osc}(\bar A^*-\bar A)\), the difference between its maximum
+and minimum across all 405 candidates. Its nominal 95th percentile was
+0.04035 for BNCI2014\_002 and 0.05923 for BNCI2015\_001.
+Because \(|\operatorname{osc}(f)-\operatorname{osc}(g)|
+\leq\operatorname{osc}(f-g)\), a conservative conditional span sensitivity
+lower bound is the positive part of the observed span minus this radius.
+The resulting lower bound is zero in both cohorts; neither supplies
+simultaneously adjusted evidence that the underlying participant-mean
+path span exceeds 0.02 AUC.
+
+This is a post-outcome conditional bootstrap sensitivity analysis; shared
+outer source fits, their model-selection variation, and sampling an
+additional dataset are not included. It does not establish that the true
+path is flat. It prevents us from using selected extrema as a confirmatory
+materiality result. The separately predeclared cross-participant primary
+selection contrasts are unchanged by this correction.
 
 \subsection{Prospective representation testing falsifies the historical hidden-filter-bank narrative}
 The S041--S060 representation block was frozen independently of S021--S040.
