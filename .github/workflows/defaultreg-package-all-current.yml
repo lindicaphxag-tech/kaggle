@@ -1,5 +1,5 @@
-name: Package current DefaultReg kaggle source
-# self-only-source-snapshot
+name: Package all current DefaultReg assets
+# public-cs-tarball-v3
 
 on:
   push:
@@ -15,34 +15,59 @@ permissions:
 jobs:
   package:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Checkout kaggle frontier branch
         uses: actions/checkout@v4
         with:
           path: kaggle
 
-      - name: Build exact kaggle source snapshot
+      - name: Download public cs research branch archive
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p bundle/kaggle/research bundle/kaggle/.github/workflows
+          curl --fail --location --retry 3 \
+            'https://github.com/lindicaphxag-tech/cs/archive/refs/heads/research/defaultreg-strict-inductive-signed-transfer-20261010.tar.gz' \
+            -o cs.tar.gz
+          mkdir -p cs-unpack
+          tar -xzf cs.tar.gz -C cs-unpack
+          CS_ROOT=$(find cs-unpack -mindepth 1 -maxdepth 1 -type d | head -n 1)
+          test -d "$CS_ROOT/papers/eeg-default-regularisation"
+          echo "CS_ROOT=$CS_ROOT" >> "$GITHUB_ENV"
+
+      - name: Build exact current source bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p bundle/cs bundle/kaggle/research bundle/kaggle/.github/workflows
+          cp -a "$CS_ROOT/papers/eeg-default-regularisation" bundle/cs/
+          mkdir -p bundle/cs/.github/workflows
+          cp "$CS_ROOT/.github/workflows/defaultreg-signed-source-diagnostic.yml" bundle/cs/.github/workflows/ || true
           cp -a kaggle/research/defaultreg_frontier bundle/kaggle/research/
           cp kaggle/.github/workflows/defaultreg-frontier-shin-bnci002.yml bundle/kaggle/.github/workflows/
           cp kaggle/.github/workflows/defaultreg-package-all-current.yml bundle/kaggle/.github/workflows/
+          CS_SHA=$(git ls-remote https://github.com/lindicaphxag-tech/cs.git refs/heads/research/defaultreg-strict-inductive-signed-transfer-20261010 | awk '{print $1}')
+          KAGGLE_SHA=$(git -C kaggle rev-parse HEAD)
           {
-            echo '# Default Regularisation — kaggle source snapshot'
+            echo '# Default Regularisation — exact current source snapshot'
             echo
-            echo "kaggle_head=$(git -C kaggle rev-parse HEAD)"
+            echo "cs_head=$CS_SHA"
+            echo "kaggle_head=$KAGGLE_SHA"
             echo "packaged_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          } > bundle/KAGGLE_SOURCE_MANIFEST.md
-          find bundle -type f -print0 | sort -z | xargs -0 sha256sum > bundle/KAGGLE_SOURCE_SHA256.txt
+            echo
+            echo 'Included:'
+            echo '- cs/papers/eeg-default-regularisation/**'
+            echo '- cs/.github/workflows/defaultreg-signed-source-diagnostic.yml'
+            echo '- kaggle/research/defaultreg_frontier/**'
+            echo '- kaggle/.github/workflows/defaultreg-frontier-shin-bnci002.yml'
+          } > bundle/SOURCE_SNAPSHOT_MANIFEST.md
+          find bundle -type f -print0 | sort -z | xargs -0 sha256sum > bundle/SOURCE_SNAPSHOT_SHA256.txt
 
-      - name: Upload kaggle source snapshot
+      - name: Upload all-current source snapshot
         uses: actions/upload-artifact@v4
         with:
-          name: defaultreg-current-kaggle-source
+          name: defaultreg-all-current-source
           path: bundle/**
           include-hidden-files: true
-          retention-days: 90
           if-no-files-found: error
+          retention-days: 90
