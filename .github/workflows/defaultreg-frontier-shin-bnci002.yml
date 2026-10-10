@@ -97,7 +97,9 @@ jobs:
           assert x['code_commit'] == os.environ['GITHUB_SHA']
           assert x['workflow_run_id'] == os.environ['GITHUB_RUN_ID']
           assert x['protocol_file'] == 'FROZEN_SHIN_BNCI002_FRONTIER_20261010.md'
+          assert x['outcome_interpretation_file'] == 'OUTCOME_INTERPRETATION_FREEZE_20261010.md'
           assert sha.fullmatch(x['protocol_sha256'])
+          assert sha.fullmatch(x['outcome_interpretation_sha256'])
           assert sha.fullmatch(x['full_grid_sha256'])
           assert sha.fullmatch(x['dense_grid_sha256'])
 
@@ -167,6 +169,7 @@ jobs:
           name: defaultreg-frontier-${{ matrix.dataset }}
           path: |
             research/defaultreg_frontier/FROZEN_SHIN_BNCI002_FRONTIER_20261010.md
+            research/defaultreg_frontier/OUTCOME_INTERPRETATION_FREEZE_20261010.md
             defaultreg_frontier_${{ matrix.dataset }}/**
           if-no-files-found: warn
           retention-days: 90
