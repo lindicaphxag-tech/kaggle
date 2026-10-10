@@ -322,6 +322,11 @@ def source_path(C, y, groups):
         key=lambda lam: (criteria[lam]["covariance_mean_nll"], lam),
     )
     dense_cov_min = criteria[dense_cov_lambda]["covariance_mean_nll"]
+    dense_cov_se = criteria[dense_cov_lambda]["covariance_nll_se"]
+    dense_cov_1se = [
+        lam for lam in dense_good
+        if criteria[lam]["covariance_mean_nll"] <= dense_cov_min + dense_cov_se + 1e-15
+    ]
     dense_regret = {
         str(lam): float(criteria[lam]["covariance_mean_nll"] - dense_cov_min)
         for lam in dense_good
@@ -334,6 +339,7 @@ def source_path(C, y, groups):
         "lexicographic_macro_margin": macro_margin,
         "lexicographic_admissible_lambdas": list(map(float, discrim_admissible)),
         "dense_covariance_lambda": float(dense_cov_lambda),
+        "dense_covariance_1se_lambdas": list(map(float, dense_cov_1se)),
         "dense_covariance_regret_by_lambda": dense_regret,
         "criteria_by_lambda": {
             str(lam): criteria[lam] for lam in good
@@ -484,7 +490,12 @@ def freeze_target_scores(C_source, y_source, C_target, path, out_file):
     }
 
 
-def evaluate_frozen_scores(score_file, target_y, source_regret_by_lambda):
+def evaluate_frozen_scores(
+    score_file,
+    target_y,
+    source_regret_by_lambda,
+    source_1se_lambdas,
+):
     """Apply target labels only after the score-family file exists and is hashed."""
     data = np.load(score_file, allow_pickle=False)
     y = np.asarray(target_y)
@@ -539,6 +550,22 @@ def evaluate_frozen_scores(score_file, target_y, source_regret_by_lambda):
 
     max_span = max(row["auc_span"] for row in envelope)
 
+    lambda_cov = min(common, key=lambda lam: (regrets[lam], lam))
+    auc_at_cov = path_auc[str(float(lambda_cov))]
+    first_harm_0_02 = None
+    first_harm_0_05 = None
+    for row in envelope:
+        if first_harm_0_02 is None and row["auc_min"] <= auc_at_cov - 0.02 + 1e-15:
+            first_harm_0_02 = row["budget"]
+        if first_harm_0_05 is None and row["auc_min"] <= auc_at_cov - 0.05 + 1e-15:
+            first_harm_0_05 = row["budget"]
+
+    source_1se = [float(lam) for lam in source_1se_lambdas]
+    if not source_1se or any(lam not in common for lam in source_1se):
+        raise ValueError("Source covariance 1-SE lambdas must be non-empty dense-grid subset")
+    source_1se_auc = [path_auc[str(float(lam))] for lam in source_1se]
+    source_1se_span = float(max(source_1se_auc) - min(source_1se_auc))
+
     # Strict subset sensitivity: no interpolation.
     grid_rows = []
     for stride in (1, 2, 4, 8):
@@ -565,7 +592,13 @@ def evaluate_frozen_scores(score_file, target_y, source_regret_by_lambda):
         "target_auc_path_by_lambda": path_auc,
         "validity_frontier": {
             "envelope_path": envelope,
+            "lambda_covariance": float(lambda_cov),
+            "auc_at_covariance": float(auc_at_cov),
             "max_auc_span": float(max_span),
+            "source_1se_lambdas": source_1se,
+            "source_1se_auc_span": source_1se_span,
+            "first_harm_0_02_budget": first_harm_0_02,
+            "first_harm_0_05_budget": first_harm_0_05,
             "grid_sensitivity": grid_rows,
             "target_path_used_for_selection": False,
         },
@@ -645,25 +678,53 @@ def holm(ps):
 
 
 def bootstrap_frontier_span(folds):
-    spans = np.asarray([
+    max_spans = np.asarray([
         f["validity_frontier"]["max_auc_span"]
         for f in folds
     ], dtype=float)
+    one_se_spans = np.asarray([
+        f["validity_frontier"]["source_1se_auc_span"]
+        for f in folds
+    ], dtype=float)
+
     rng = np.random.default_rng(SEED)
     idx = rng.integers(
-        0, len(spans), size=(20000, len(spans))
+        0, len(max_spans), size=(20000, len(max_spans))
     )
-    means = np.mean(spans[idx], axis=1)
-    lo, hi = np.quantile(means, [0.025, 0.975])
-    return {
-        "participant_mean_max_auc_span": float(np.mean(spans)),
-        "participant_median_max_auc_span": float(np.median(spans)),
-        "participant_min_max_auc_span": float(np.min(spans)),
-        "participant_max_max_auc_span": float(np.max(spans)),
-        "participant_bootstrap_mean_ci95": [float(lo), float(hi)],
-        "bootstrap_reps": 20000,
-    }
+    max_means = np.mean(max_spans[idx], axis=1)
+    se_means = np.mean(one_se_spans[idx], axis=1)
+    max_lo, max_hi = np.quantile(max_means, [0.025, 0.975])
+    se_lo, se_hi = np.quantile(se_means, [0.025, 0.975])
 
+    harm02 = [
+        f["validity_frontier"]["first_harm_0_02_budget"]
+        for f in folds
+    ]
+    harm05 = [
+        f["validity_frontier"]["first_harm_0_05_budget"]
+        for f in folds
+    ]
+
+    return {
+        "n_participants": int(len(folds)),
+        "full_path_span_mean": float(np.mean(max_spans)),
+        "full_path_span_median": float(np.median(max_spans)),
+        "full_path_span_q25": float(np.quantile(max_spans, 0.25)),
+        "full_path_span_max": float(np.max(max_spans)),
+        "full_path_fraction_gt_0_02": float(np.mean(max_spans > 0.02)),
+        "full_path_fraction_gt_0_05": float(np.mean(max_spans > 0.05)),
+        "full_path_span_bootstrap_mean_ci95": [float(max_lo), float(max_hi)],
+        "source_1se_span_mean": float(np.mean(one_se_spans)),
+        "source_1se_span_median": float(np.median(one_se_spans)),
+        "source_1se_span_max": float(np.max(one_se_spans)),
+        "source_1se_fraction_gt_0_02": float(np.mean(one_se_spans > 0.02)),
+        "source_1se_fraction_gt_0_05": float(np.mean(one_se_spans > 0.05)),
+        "source_1se_span_bootstrap_mean_ci95": [float(se_lo), float(se_hi)],
+        "fraction_with_harm_0_02_reachable": float(np.mean([x is not None for x in harm02])),
+        "fraction_with_harm_0_05_reachable": float(np.mean([x is not None for x in harm05])),
+        "bootstrap_reps": 20000,
+        "raw_fidelity_budgets_not_pooled_across_participants": True,
+    }
 
 def main():
     ap = argparse.ArgumentParser()
@@ -703,6 +764,7 @@ def main():
             score_file,
             y[outer],
             path["dense_covariance_regret_by_lambda"],
+            path["dense_covariance_1se_lambdas"],
         )
 
         folds.append({
