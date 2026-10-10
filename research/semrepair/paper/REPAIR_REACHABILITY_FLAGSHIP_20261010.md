@@ -118,3 +118,46 @@ At strongest fault the second checkpoint exhibits 30/32 better and 2 ties (0 wor
 An independent GitHub Action, using actions/download-artifact to fetch the immutable prior expert run **without rerunning/tuning it**, verifies the full 32-seed denominator, checks all five predeclared fault-severity comparisons, excludes exact ties for two-sided exact sign tests and applies Bonferroni correction for five contrasts. The strongest expert severity yields paired seed-bootstrapped descriptive 95-percent range **[+0.372819,+0.593425]** original reward, mean **+0.482485**, two-sided sign p adjusted for five severities **9.31323e-9** (30 better, 0 worse, 2 ties). The bootstrap distribution is only a sensitivity measure over 32 pseudorandom seed identities within ONE robot model, not proof of statistically independent robots or safety. Expert frozen original raw SHA256 **5048325bd46d98b04b1e2877b71c9d11c3edd2ab74c38cfc38e8084e3d4b288d**. [Green original paired statistical audit](https://github.com/lindicaphxag-tech/kaggle/actions/runs/38008067450). Separate medium-checkpoint paired uncertainty audit is being run from its original raw artifact; do not present it as completed until CI confirms.
 
 **Net scientific claim (conditional and narrower than top robotics):** In official Reacher-v5, two independently published frozen SAC checkpoints exhibit mean official-reward gain from source interface repair relative to an oracle instantaneous action reproducer under *severe purpose-built software clipping*, while their nominal weak-fault cases are neutral or slightly worse. Not demonstrated: learned VLA recovery, overall best task controller, secure patch provenance, cross-robot family generalization, or acceptance probability at top venues.
+
+
+## Major 2026-10-10 advancement: SECOND official robot embodiment, Pusher-v5
+
+**New first-party experiment on a truly different externally supplied seven-actuator MuJoCo robot and its independently published frozen RL checkpoint.** This is no longer only the Reacher-v5 model. Publisher and environment are still both Farama Foundation; not independent hardware, VLA, or a non-Farama controller implementation.
+
+- Official Pusher-v5: 7D joint torque, 23D observation, **object pushing** with original unmodified 100-step reward (object-goal distance + fingertip-object proximity + action penalty). Gymnasium 1.1.1, Stable-Baselines3 2.6.0.
+- Published SAC-expert: farama-minari/Pusher-v5-SAC-expert pinned full commit **3e103602f3fba3500ee6f21d762c0ff3e94892ff**, verified model ZIP SHA256 **6a2a51ddc1f2539aaa779bb7390c3022a0e42effc096962ee2bdaa1fb74f37b3**. Zero author retraining, weights unchanged.
+- To avoid conflating robot dimensions, the authored source interface P=[[1,k],[0,1]],C=[[1,-k],[0,1]] affects ONLY first two shoulder controls (0 and 1), with a planted intermediate source clip; other FIVE physical robot channels are unchanged. Final Pusher official [-2,2]^7 actuator contract is untouched. Relative clip severities from Reacher rescaled to official limit 2, not hand-tuned on Pusher results.
+- Prespecified 32 initial-state seeds 23011..23042, five unchanged fault strengths, six paired methods, **960 genuine official Pusher episodes x 100 steps**, all cases and negative outcomes preserved. Numerical two-tap+heldout diagnostics select an atomic patch from internal values without symbolic true fault labels. Source patch outcome still relies on author's simulated adapter substitution and unverifiable internal tap trust; NOT a securely installed signed patch.
+- Strongest comparator: an exact FULL-KNOWLEDGE one-step Euclidean-optimal blackbox actuator-output projection onto the reachable set after BOTH authored intermediate clipping and actual Pusher final actuator clipping. Thus a poor naive inverse is not the only baseline; however it is still NOT a global future-reward-optimizing MPC policy.
+
+### Observed COMPLETE five-condition test results (not cherry-picked)
+
+| Authored shear k / internal clip L | Unpatched official Pusher mean return | Instant-action optimal blackbox return | Numeric source candidate return | Source-oracle reward gain | Mean object-goal distance reduction from oracle |
+|---|---:|---:|---:|---:|---:|
+| 0.8,2 | -25.532645 | -25.532645 | -25.532645 | 0 | 0 |
+| 2,2 | -26.020487 | -25.867955 | -25.532645 | **+0.335309** | 0.002253 m |
+| 3.5,2 | -38.138008 | -27.075393 | -25.532645 | **+1.542748** | 0.010995 m |
+| 2,0.8 | -33.868015 | -29.412782 | -25.532645 | **+3.880137** | 0.028355 m |
+| 3.5,0.8 | -55.793656 | -34.271298 | -25.532645 | **+8.738653** | 0.058898 m |
+
+At the strongest severity, reported mean ORIGINAL physical object-to-goal distance is faulty **0.237735 m**, best instantaneous action oracle **0.224518 m**, and numeric source candidate **0.165620 m**. This is importantly a true task-geometric effect, not merely reward shaping: absolute object-goal distance drops **5.89 cm versus the oracle** on average across the same 32 reset seeds. It does not imply a predeclared discrete task success-rate increase, and it is not an independent multi-manufacturer test. Paired reward directions: **30 source-better, 2 source-worse, 0 tied**. At mild fault all 32 ties. Because the source candidate is a simulator implementation-level ideal repair, its task return exactly equals the healthy checkpoint reference and should not be marketed as field-installed code.
+
+Actual GREEN external-robot native MuJoCo CI with all 960 raw episodes, reward decomposition, source checkpoint SHA, and every fault level:
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38009127179
+
+Protocol prepared before seeing the Pusher results (but after seeing earlier Reacher pilot and severity results):
+https://github.com/lindicaphxag-tech/kaggle/blob/research/six-line-submission-gates-20261010/research/semrepair/paper/PUShER_CROSS_ROBOT_FROZEN_PROTOCOL_20261010.md
+
+Independent audit re-reads the archived raw Pusher file rather than rerunning selected cases. It separately computes **10 predeclared paired seed contrasts**: 5 original cumulative rewards and 5 *actual object-to-goal physical distance* endpoints with joint multiplicity adjustment and separately decomposes fingertip-proximity and official control penalty, to check for spurious energy-only improvements. Its outcome must be reported only after its CI actually passes. A second externally published SAC-medium Pusher checkpoint is a FOLLOW-UP chosen after seeing expert results, not a pre-results fully blinded independent study. Its result must not be added until the second checkpoint CI runs.
+
+### Current novelty and realistic comparison to accepted 2026 top results
+
+**Empirically stronger than the previous SemRepair draft:** across Reacher-v5 and Pusher-v5, actual external robot physics, two independently pretrained reward functions and frozen RL checkpoints now show strong severity-dependent source repair improvement versus the exact best instantaneous actuator-input blackbox. On Pusher, the gain also appears in the physical object-to-goal metric.
+
+**Do not overclaim:** the reachability statement and optimal projection are standard geometry; the original scientific idea must be about identifiable, source-bound, authorized repair UNDER actuator non-invertibility. The object-level improvement may partly stem from the engineer-authored interfaces and specific shoulder-channel choice, and does not prove a statistical population effect across independently built robots. Authors have not authenticated producer/controller module origins or actual patch-byte installations. A globally task-optimal adaptive controller or full-horizon MPC could differ substantially from the strong instantaneous action comparator. No vision or language agent is involved.
+
+- **ICML 2026** Yan et al. *Can VLMs Diagnose and Recover from VLA Manipulation Faults?* https://proceedings.mlr.press/v306/yan26r.html — 20 VLMs, real VLA and real robot manipulation. Our work has less task/policy coverage and no real-world proof.
+- **IEEE RA-L 2026** *Reliable Robotic Task Execution in the Face of Anomalies*, DOI 10.1109/LRA.2025.3632090 — real Kinova and xArm deployments with anomaly-triggered repair; our current simulator cannot claim corresponding validation.
+- **CVPR 2026** *FLARE: A Failure-Aware Framework for Autonomous Correction and Recovery in Visual-Language Robotic Manipulation* https://openaccess.thecvf.com/content/CVPR2026/html/Zhao_FLARE_A_Failure-Aware_Framework_for_Autonomous_Correction_and_Recovery_in_CVPR_2026_paper.html — visual-language learned manipulation and retry/reset, not a software source authenticity study but much stronger learned policy evidence.
+
+**Go/no-go:** one additional independent manufacturer/policy architecture, actual source attestation with executable signed patch switch, globally task-aware adaptive baseline, and outside-party replay are required for T-RO/RA-L/CoRL excellence. Neither performance transfer in two Farama tasks nor 960 trial count alone is a top-tier paper acceptance certificate.
