@@ -100,3 +100,5 @@ jobs:
             defaultreg_predata_${{ matrix.dataset }}/**
           if-no-files-found: warn
           retention-days: 90
+
+# CI trigger only; frozen scientific protocol unchanged.
