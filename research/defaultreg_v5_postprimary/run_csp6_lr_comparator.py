@@ -60,7 +60,7 @@ def csp_fit(C,y,n_components=N_CSP):
 
 def csp_features(C,W):
     C=np.asarray(C,float);W=np.asarray(W,float)
-    proj=np.einsum("pi,nij,jq->npq",W,C,W)
+    proj=np.einsum("ip,nij,jq->npq",W,C,W)
     var=np.diagonal(proj,axis1=1,axis2=2)
     var=np.maximum(var,np.finfo(float).tiny)
     var=var/np.sum(var,axis=1,keepdims=True)
