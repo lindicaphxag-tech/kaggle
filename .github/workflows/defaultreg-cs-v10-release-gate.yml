@@ -1,0 +1,156 @@
+name: DefaultReg CS v10 release gate
+
+on:
+  push:
+    branches:
+      - ci/defaultreg-cs-v10-release-gate-20261010
+    paths:
+      - '.github/workflows/defaultreg-cs-v10-release-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      CS_SHA: 3a920bbf5f0c177e9afa8258f13785f734cd886c
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - name: Checkout frozen CS research commit
+        uses: actions/checkout@v4
+        with:
+          repository: lindicaphxag-tech/cs
+          ref: 3a920bbf5f0c177e9afa8258f13785f734cd886c
+          path: cs
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install numerical test dependency
+        run: python -m pip install --disable-pip-version-check numpy==2.3.5
+
+      - name: Run reviewer-critical unit tests
+        working-directory: cs
+        run: |
+          python -m unittest discover -s papers/eeg-default-regularisation/tests -p test_regularisation_path_geometry.py -v
+          python -m unittest discover -s papers/eeg-default-regularisation/tests -p test_frontier_simultaneous_path_sensitivity.py -v
+          python -m unittest discover -s papers/eeg-default-regularisation/tests -p test_participant_harm_influence_audit.py -v
+          python -m unittest discover -s papers/eeg-default-regularisation/tests -p test_participant_inference.py -v
+          python -m unittest discover -s papers/eeg-default-regularisation/tests -p test_render_vnext_verified_tables.py -v
+          python -m unittest discover -s papers/eeg-default-regularisation/tests -p test_submission_claim_gate_v2.py -v
+
+      - name: Run chronology-aware claim guard
+        working-directory: cs
+        run: |
+          python papers/eeg-default-regularisation/src/vnext_claim_guard.py \
+            --root papers/eeg-default-regularisation/paper_vnext
+
+      - name: Render canonical evidence table
+        working-directory: cs
+        run: |
+          python papers/eeg-default-regularisation/src/render_vnext_verified_tables.py \
+            --input papers/eeg-default-regularisation/paper_vnext/evidence/current_verified_results.json \
+            --json-out ../release_vnext_table.json \
+            --md-out ../release_vnext_table.md
+
+      - name: Run participant harm and influence audit
+        working-directory: cs
+        run: |
+          python papers/eeg-default-regularisation/src/participant_harm_influence_audit.py \
+            --input papers/eeg-default-regularisation/evidence/verified_three_cohort_paired_effect_vectors_v8.json \
+            --json-out ../release_harm_influence.json \
+            --md-out ../release_harm_influence.md
+
+      - name: Audit manuscript structure, citations and Highlights
+        run: |
+          python - <<'PY'
+          import json, pathlib, re
+          root=pathlib.Path('cs/papers/eeg-default-regularisation/paper_vnext')
+          files={p.name:p.read_text() for p in root.iterdir() if p.suffix in {'.tex','.bib','.txt'}}
+          main=files['main_v10.tex']
+          inputs=re.findall(r'\\input\{([^}]+)\}',main)
+          missing_inputs=[x for x in inputs if x not in files and x+'.tex' not in files]
+          cites=[]
+          for name,text in files.items():
+              if name.endswith('.tex'):
+                  for group in re.findall(r'\\cite(?:t|p)?\{([^}]+)\}',text):
+                      cites.extend(k.strip() for k in group.split(','))
+          bibkeys=re.findall(r'@\w+\{([^,]+),',files['references_v10.bib'])
+          missing_cites=sorted(set(cites)-set(bibkeys))
+          unused_bib=sorted(set(bibkeys)-set(cites))
+          abstract=re.search(r'\\begin\{abstract\}(.*?)\\end\{abstract\}',files['00_abstract_evidence_locked.tex'],re.S).group(1)
+          abstract_words=re.findall(r"[A-Za-z0-9][A-Za-z0-9_+.'-]*",re.sub(r'\\[A-Za-z]+(?:\{[^}]*\})?',' ',abstract))
+          highlights=[x[2:].strip() for x in files['98_bspc_highlights.txt'].splitlines() if x.startswith('- ')]
+          highlight_lengths=[len(x) for x in highlights]
+          placeholders=[]
+          for name,text in files.items():
+              for term in ('TODO','TBD','pending verification','Figure finalization still pending','??'):
+                  if term in text: placeholders.append([name,term])
+          report={
+              'cs_sha':r'3a920bbf5f0c177e9afa8258f13785f734cd886c',
+              'missing_inputs':missing_inputs,
+              'citation_count':len(set(cites)),
+              'bib_entry_count':len(bibkeys),
+              'missing_citations':missing_cites,
+              'unused_bibliography_entries':unused_bib,
+              'abstract_word_count':len(abstract_words),
+              'highlight_count':len(highlights),
+              'highlight_lengths':highlight_lengths,
+              'highlights_over_85_characters':[h for h in highlights if len(h)>85],
+              'placeholders':placeholders,
+              'author_placeholder_present':'pending verification' in main,
+              'figure_inputs':[x for x in inputs if 'figure' in x.lower()],
+              'table_inputs':[x for x in inputs if 'table' in x.lower()],
+          }
+          pathlib.Path('release_manuscript_audit.json').write_text(json.dumps(report,indent=2))
+          print(json.dumps(report,indent=2))
+          assert not missing_inputs
+          assert not missing_cites
+          assert 3 <= len(highlights) <= 5
+          assert not report['highlights_over_85_characters']
+          assert 150 <= len(abstract_words) <= 250
+          PY
+
+      - name: Install minimal LaTeX toolchain
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            texlive-latex-base texlive-latex-recommended texlive-pictures texlive-fonts-recommended
+
+      - name: Compile v10 manuscript
+        working-directory: cs/papers/eeg-default-regularisation/paper_vnext
+        run: |
+          pdflatex -interaction=nonstopmode -halt-on-error main_v10.tex
+          bibtex main_v10
+          pdflatex -interaction=nonstopmode -halt-on-error main_v10.tex
+          pdflatex -interaction=nonstopmode -halt-on-error main_v10.tex
+          test -s main_v10.pdf
+          if grep -E 'LaTeX Warning: (Citation|Reference).*undefined|There were undefined references' main_v10.log; then
+            echo 'Undefined LaTeX references remain' >&2
+            exit 1
+          fi
+          pdfinfo main_v10.pdf | tee ../../../../release_pdfinfo.txt || true
+
+      - name: Archive release receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: defaultreg-cs-v10-release-3a920bbf5f0c
+          path: |
+            release_manuscript_audit.json
+            release_vnext_table.json
+            release_vnext_table.md
+            release_harm_influence.json
+            release_harm_influence.md
+            release_pdfinfo.txt
+            cs/papers/eeg-default-regularisation/paper_vnext/main_v10.pdf
+            cs/papers/eeg-default-regularisation/paper_vnext/main_v10.log
+            cs/papers/eeg-default-regularisation/paper_vnext/main_v10.bbl
+          if-no-files-found: warn
+          retention-days: 90
