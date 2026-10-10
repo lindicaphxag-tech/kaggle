@@ -28,7 +28,8 @@ class RealTaskLookaheadTests(unittest.TestCase):
             obs,_=env.reset(seed=SEEDS[0])
             desired,_=self.actor.predict(obs,deterministic=True)
             action,_,num=p.choose(env.unwrapped.data,desired)
-            self.assertGreaterEqual(num,9)
+            # Physical actions are deduplicated after native source and final clips.
+            self.assertGreaterEqual(num,15)
             immediate=p.branch_value(env.unwrapped.data,desired,
                                      tuple(float(z) for z in action[:2]),horizon=1)
             _,real,_,_,_=env.step(action)
@@ -64,7 +65,10 @@ class RealTaskLookaheadTests(unittest.TestCase):
             obs,_=env.reset(seed=SEEDS[0])
             desired,_=self.actor.predict(obs,deterministic=True)
             samples=p._proposals(desired)
-            self.assertGreaterEqual(len(samples),9)
+            # 25 hypothetical inner source grid points collapse to fewer
+            # distinct reachable actuator outputs; the exact projection
+            # is also included, so do not assert 25 unique commands.
+            self.assertGreaterEqual(len(samples),15)
             for s in samples:
                 self.assertEqual(len(s),2)
                 self.assertTrue(np.all(np.abs(s)<=2.0000001))
