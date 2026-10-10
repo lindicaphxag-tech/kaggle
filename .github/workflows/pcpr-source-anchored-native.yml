@@ -50,6 +50,8 @@ jobs:
         run: python research/pcpr/native_ast_lift_v03.py
       - name: Run real-source CEC receipt attachment (previously inspected cases)
         run: python research/pcpr/attach_real_cec_receipts.py
+      - name: Run pre-inspection v0.5 typed AST transfer (hypotheses only)
+        run: python research/pcpr/run_v05_unseen_eight.py
       - name: Preserve case-level source provenance
         uses: actions/upload-artifact@v4
         with:
@@ -62,6 +64,7 @@ jobs:
             pcpr_minimax_synthetic.json
             pcpr_v03_original_source_native.json
             pcpr_v04_cec_real_source_receipts.json
+            pcpr_v05_unseen_eight_first_score.json
             pcpr_kornia_native_package_evidence.json
             pcpr_kornia_so2_native.json
           if-no-files-found: error
