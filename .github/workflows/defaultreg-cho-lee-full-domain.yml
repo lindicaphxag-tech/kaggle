@@ -7,7 +7,7 @@ on:
       - 'research/defaultreg_external/**'
       - '.github/workflows/defaultreg-cho-lee-full-domain.yml'
   pull_request:
-    branches: [main]
+    branches: [main, research/defaultreg-cho-lee-full-domain-20261010]
     paths:
       - 'research/defaultreg_external/**'
       - '.github/workflows/defaultreg-cho-lee-full-domain.yml'
