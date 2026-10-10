@@ -1,0 +1,56 @@
+name: SemRepair frozen third-party Reacher-v5 SAC policy transfer
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/frozen_external_reacher_sac.py'
+      - 'research/semrepair/test_frozen_external_reacher_sac.py'
+      - 'research/semrepair/internal_saturation_reachability.py'
+      - '.github/workflows/semrepair-external-reacher-policy.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  frozen-external-sb3-policy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install official Reacher simulator and pretrained actor runtime
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "gymnasium[mujoco]==1.1.1" "stable-baselines3==2.5.0" "huggingface-hub==0.34.4"
+      - name: Verify actual frozen weight download and original task
+        run: python -m unittest -v research.semrepair.test_frozen_external_reacher_sac
+      - name: Execute fixed independent seeds and five matched interventions
+        run: python -m research.semrepair.frozen_external_reacher_sac > official_reacher_full_raw.json
+      - name: Print ALL task outcomes
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('official_reacher_full_raw.json'))
+          print('EXTERNAL MODEL',r['third_party_policy_repo'],r['third_party_policy_commit'])
+          print('WEIGHT SHA256',r['checkpoint_sha256'])
+          print('SCENARIO SHA256',r['scenario_sha256'])
+          print('ALL EPISODES',len(r['rows']))
+          for name,result in sorted(r['summary'].items()):
+              print(name,str(result['ever_reached_0075_count'])+'/'+str(result['episodes']),
+                    'official_return',round(result['mean_original_return'],6),
+                    'mean_goal_dist',round(result['mean_tip_target_distance'],6),
+                    'mean_command_gap',round(result['mean_policy_action_error'],6))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semrepair-frozen-farama-reacher-sac-16seed-raw
+          path: official_reacher_full_raw.json
+          if-no-files-found: warn
+          retention-days: 90
