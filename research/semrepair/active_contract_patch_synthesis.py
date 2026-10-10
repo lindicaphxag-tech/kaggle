@@ -176,7 +176,7 @@ def _choose_discriminating_probe(survivors,real_methods,helper):
                                     -abs(x["upper"]),-abs(x["lower"])))
 
 
-def run_constrained_active_source_patch_experiment():
+def run_constrained_active_source_patch_experiment(*, licensed_patch_ids=("proposed_upper",)):
     controller,controller_sha=_frozen_upstream_source(
         CONTROLLER,CONTROLLER_BLOB_SHA1)
     helper,helper_sha=_frozen_upstream_source(
@@ -206,11 +206,15 @@ def run_constrained_active_source_patch_experiment():
     active=_choose_discriminating_probe(
         survivors,methods,actual_helper)
     remaining=active["plausible_remaining"]
+    if not isinstance(licensed_patch_ids,(tuple,list)) or \
+       any(not isinstance(k,str) for k in licensed_patch_ids):
+        raise ValueError("explicit authorized source patch IDs required")
+    licensed=set(licensed_patch_ids)
     eligible=[x for x in candidates if x["patch_id"] in remaining and
-              x["symbolic_domain_proof"]["all_domain_symbolic_identity"]]
-    if not eligible:
-        raise AssertionError("no truly contract-compliant source candidate in catalog")
-    chosen=min(eligible,key=lambda p:(p["ast_edit_cost"],p["patch_id"]))
+              x["symbolic_domain_proof"]["all_domain_symbolic_identity"] and
+              x["patch_id"] in licensed]
+    chosen=(min(eligible,key=lambda p:(p["ast_edit_cost"],p["patch_id"]))
+            if eligible else None)
     # The 128 final (asymmetric) task-free policy test cases are
     # NOT available to choose the probe, patch or proof. Fresh PRNG seed
     # disclosed for replicability; one is NOT a new independent robot.
@@ -234,7 +238,9 @@ def run_constrained_active_source_patch_experiment():
         "cases_failed":sum(x>TOL for x in errors),
         "symbolic_contract_true":proofs[name]["all_domain_symbolic_identity"],
     } for name,errors in outcomes.items()]
-    if next(x for x in heldout if x["patch_id"]==chosen["patch_id"])["cases_failed"]!=0:
+    if chosen is not None and next(
+        x for x in heldout if x["patch_id"]==chosen["patch_id"]
+    )["cases_failed"]!=0:
         raise AssertionError("symbolically admitted patch fails truly frozen heldout tests")
     naive_bad=sum(x["training_plausible"] and not
         x["symbolic_domain_proof"]["all_domain_symbolic_identity"]
@@ -259,8 +265,13 @@ def run_constrained_active_source_patch_experiment():
         "active_remaining_candidate_count":len(remaining),
         "active_wrong_candidate_count":active_bad,
         "symbolically_certified_remaining_patch_count":len(eligible),
-        "selected_minimal_verified_AST_patch":chosen["patch_id"],
-        "selected_source_executable_AST":ast.unparse(methods[chosen["patch_id"]]),
+        "source_permission_decision":(
+            "CANDIDATE_SOURCE_PATCH_REQUIRES_SEPARATE_VENDOR_APPROVAL"
+            if chosen is not None else "REFUSE_NO_AUTHORIZED_CONTRACT_VALID_SOURCE_PATCH"),
+        "licensed_candidate_ids":sorted(licensed),
+        "selected_minimal_verified_AST_patch":chosen["patch_id"] if chosen else None,
+        "selected_source_executable_AST":(
+            ast.unparse(methods[chosen["patch_id"]]) if chosen else None),
         "heldout_distinct_asymmetric_config_action_examples":N_FINAL_HELDOUT,
         "heldout_result_per_candidate":heldout,
         "actual_upstream_torch_kernel_executions":len(candidates)+
