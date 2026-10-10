@@ -1,0 +1,66 @@
+name: Package all current DefaultReg assets
+
+on:
+  push:
+    branches:
+      - research/defaultreg-frontier-shin-bnci002-20261010
+    paths:
+      - '.github/workflows/defaultreg-package-all-current.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout kaggle frontier branch
+        uses: actions/checkout@v4
+        with:
+          path: kaggle
+
+      - name: Checkout cs DefaultReg branch
+        uses: actions/checkout@v4
+        with:
+          repository: lindicaphxag-tech/cs
+          ref: research/defaultreg-strict-inductive-signed-transfer-20261010
+          path: cs
+
+      - name: Build exact current source bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p bundle/cs bundle/kaggle
+          cp -a cs/papers/eeg-default-regularisation bundle/cs/
+          mkdir -p bundle/cs/.github/workflows
+          cp cs/.github/workflows/defaultreg-signed-source-diagnostic.yml bundle/cs/.github/workflows/ || true
+          cp cs/.github/workflows/defaultreg-package-current.yml bundle/cs/.github/workflows/ || true
+          cp -a kaggle/research/defaultreg_frontier bundle/kaggle/research/
+          mkdir -p bundle/kaggle/.github/workflows
+          cp kaggle/.github/workflows/defaultreg-frontier-shin-bnci002.yml bundle/kaggle/.github/workflows/
+          cp kaggle/.github/workflows/defaultreg-package-all-current.yml bundle/kaggle/.github/workflows/
+          {
+            echo '# Default Regularisation — exact current source snapshot'
+            echo
+            echo "cs_head=$(git -C cs rev-parse HEAD)"
+            echo "kaggle_head=$(git -C kaggle rev-parse HEAD)"
+            echo "packaged_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo
+            echo 'Included source trees:'
+            echo '- cs/papers/eeg-default-regularisation/**'
+            echo '- cs/.github/workflows/defaultreg-signed-source-diagnostic.yml'
+            echo '- kaggle/research/defaultreg_frontier/**'
+            echo '- kaggle/.github/workflows/defaultreg-frontier-shin-bnci002.yml'
+          } > bundle/SOURCE_SNAPSHOT_MANIFEST.md
+          find bundle -type f -print0 | sort -z | xargs -0 sha256sum > bundle/SOURCE_SNAPSHOT_SHA256.txt
+
+      - name: Upload exact source bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: defaultreg-all-current-source
+          path: bundle/**
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 90
