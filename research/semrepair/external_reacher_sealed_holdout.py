@@ -25,7 +25,7 @@ from pathlib import Path
 import numpy as np
 import gymnasium as gym
 from .frozen_external_reacher_sac import (
-    ENV_NAME,HF_REPO,HF_REVISION,HF_FILENAME,
+    ENV_NAME,ENV_SEEDS,HF_REPO,HF_REVISION,HF_FILENAME,
     frozen_external_checkpoint,execute_frozen_episode
 )
 from .strong_clipped_actuator_oracle import (
@@ -186,7 +186,7 @@ def run_sealed_external_holdout():
     return {
         "protocol":"semrepair-external-sb3-reacher-frozen-postpilot-holdout-v1",
         "post_pilot_predeclared_not_originally_prospective":True,
-        "original_pilot_seeds":list(range(1001,1013)),
+        "original_pilot_seeds":list(ENV_SEEDS),
         "holdout_seeds":list(HOLDOUT_SEEDS),
         "independent_seed_count":len(HOLDOUT_SEEDS),
         "physical_robot_families":1,
