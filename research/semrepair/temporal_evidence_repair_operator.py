@@ -105,8 +105,25 @@ def select_information_authority(
                    ("cost_cache",cost_cache),("cost_source",cost_source)):
         if type(v) not in (float,int) or not isfinite(v) or v<0:
             raise ValueError(f"invalid declared cost or tolerance {name}")
+    # Reject contradictory purported trustworthy history BEFORE choosing
+    # the cheapest intervention. Otherwise a forged 'verified' source
+    # witness could be silently ignored whenever CURRENT_ONLY_MINIMAX has
+    # zero cost, defeating fail-closed provenance semantics and giving a
+    # false impression that a calibration-source identity was checked.
+    for flag,claim,label in (
+        (cache_verified,historical_cache,"cache"),
+        (source_anchor_verified,source_anchor,"source"),
+    ):
+        if not flag:
+            continue
+        if not isinstance(claim,torch.Tensor) or claim.shape!=current.shape or \
+           not bool(torch.isfinite(claim).all()):
+            raise ValueError("purported verified historical reference missing or invalid "+label)
+        if not any(bool(torch.allclose(claim.to(v),v,atol=1e-12,rtol=0))
+                   for v in possible_historical_anchors):
+            raise ValueError("purported verified historical reference contradicts source-world evidence")
     options=[]
-    if radius<=allowable_max_action_error+1e-12:
+    if radius<=allowable_max_action_error:
         options.append((float(cost_current_only),"CURRENT_ONLY_MINIMAX",
                         midpoint,radius,False))
     if cache_verified and cache_epoch is not None and chunk_epoch==cache_epoch:
