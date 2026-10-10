@@ -24,6 +24,7 @@ import argparse
 import hashlib
 import json
 import math
+import os
 import platform
 import sys
 import time
@@ -770,10 +771,49 @@ def main():
         ).encode()
     ).hexdigest()
 
+    protocol_file = Path(__file__).resolve().with_name(
+        "FROZEN_SHIN_BNCI002_FRONTIER_20261010.md"
+    )
+    if not protocol_file.exists():
+        raise FileNotFoundError("Frozen protocol file missing next to runner")
+    protocol_sha256 = sha256_file(protocol_file)
+
+    full_grid_sha256 = hashlib.sha256(
+        json.dumps(
+            list(FULL_GRID), separators=(",", ":")
+        ).encode()
+    ).hexdigest()
+    dense_grid_sha256 = hashlib.sha256(
+        json.dumps(
+            list(DENSE_GRID), separators=(",", ":")
+        ).encode()
+    ).hexdigest()
+
+    target_trial_denominator = int(
+        sum(f["target_trials"] for f in folds)
+    )
+    participant_trial_denominator = int(
+        sum(r["trials"] for r in participant_receipt)
+    )
+    if target_trial_denominator != participant_trial_denominator:
+        raise AssertionError(
+            "Target trial denominator disagrees with participant receipt"
+        )
+
+    code_commit = os.environ.get("GITHUB_SHA", "LOCAL_UNVERSIONED")
+    workflow_run_id = os.environ.get("GITHUB_RUN_ID", "LOCAL_UNVERSIONED")
+
     result = {
         "status": "UNTOUCHED_FRONTIER_CONFIRMATION_EXECUTED",
+        "receipt_version": 4,
         "dataset": args.dataset,
         "cohort_role": "confirmatory",
+        "code_commit": code_commit,
+        "workflow_run_id": workflow_run_id,
+        "protocol_file": protocol_file.name,
+        "protocol_sha256": protocol_sha256,
+        "full_grid_sha256": full_grid_sha256,
+        "dense_grid_sha256": dense_grid_sha256,
         "subjects": list(map(int, spec["subjects"])),
         "n_subjects": int(len(spec["subjects"])),
         "events": list(spec["events"]),
@@ -790,11 +830,13 @@ def main():
         "full_grid": list(FULL_GRID),
         "dense_frontier_grid": list(DENSE_GRID),
         "participant_receipt": participant_receipt,
+        "participant_count": int(len(spec["subjects"])),
+        "trial_denominator": target_trial_denominator,
+        "score_manifest_sha256": score_manifest_sha,
         "mean_auc_by_method": macro,
         "primary_comparisons": comparisons,
         "lexicographic_secondary_comparisons": lexicographic,
         "frontier_summary": bootstrap_frontier_span(folds),
-        "score_manifest_sha256": score_manifest_sha,
         "folds": folds,
         "environment": {
             "python": sys.version,
@@ -823,6 +865,9 @@ def main():
         "mean_auc_by_method": macro,
         "primary_comparisons": comparisons,
         "frontier_summary": result["frontier_summary"],
+        "trial_denominator": target_trial_denominator,
+        "code_commit": code_commit,
+        "protocol_sha256": protocol_sha256,
         "score_manifest_sha256": score_manifest_sha,
         "wall_seconds": result["wall_seconds"],
     }, indent=2))
