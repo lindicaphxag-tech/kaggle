@@ -135,8 +135,12 @@ def robust_blackbox_action_error_floor(*,indistinguishable_desired_actions,
     worst=max(abs(witness[j]-w[j]) for w in targets for j in range(2))
     if worst>hi+5e-9:raise AssertionError("claimed actuator minimax witness is invalid")
 
+    # Authorization is conservative. Numerical search accuracy is NOT
+    # extra permission: a tolerance just below the sound upper bound must
+    # REFUSE even when the bracket width is smaller than search_accuracy.
     meets=(requested_error_tolerance is None or
-           hi<=requested_error_tolerance+absolute_search_accuracy)
+           (hi<=requested_error_tolerance and
+            worst<=requested_error_tolerance))
     return {
         "decision":"CONDITIONALLY_ACTION_COMPENSABLE"
                    if meets else "REFUSE_UNREACHABLE_OR_UNIDENTIFIABLE_COMMAND",
