@@ -98,3 +98,78 @@ jobs:
           path: jax-41228-validation-receipt.txt
           if-no-files-found: error
           retention-days: 90
+
+  student-t-existing-api-regressions:
+    name: JAX 41227 existing Student-t API regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout immutable upstream Student-t PR
+        uses: actions/checkout@v4
+        with:
+          repository: jax-ml/jax
+          ref: 877fdb22ddb3a7f9c68df73571a42541cbd30f7f
+          path: jax
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install unmodified JAX source and test dependencies
+        run: |
+          python -m pip install -e ./jax
+          python -m pip install -r jax/build/test-requirements.txt
+      - name: Run ALL existing Student-t logpdf tests and new regression
+        working-directory: jax
+        run: python -m pytest -q tests/scipy_stats_test.py -k TLogPdf
+      - name: Record exact SHA and dependency versions
+        if: always()
+        run: |
+          {
+            echo "pr=41227"
+            echo "sha=$(git -C jax rev-parse HEAD)"
+            python -m pip show jax jaxlib scipy numpy | grep -E '^(Name|Version):'
+          } > jax-41227-broad.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jax-41227-broad-student-t
+          path: jax-41227-broad.txt
+
+  poisson-existing-api-regressions:
+    name: JAX 41228 existing Poisson APIs and sampler regressions
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout immutable upstream Poisson PR
+        uses: actions/checkout@v4
+        with:
+          repository: jax-ml/jax
+          ref: 0c98448116cf7a005ae4a5c0d1aa4753d341ec24
+          path: jax
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install unmodified JAX source and test dependencies
+        run: |
+          python -m pip install -e ./jax
+          python -m pip install -r jax/build/test-requirements.txt
+      - name: Run existing and newly introduced Poisson distribution tests
+        working-directory: jax
+        run: python -m pytest -q tests/scipy_stats_test.py -k Poisson
+      - name: Run existing and newly introduced sampler regressions
+        working-directory: jax
+        run: python -m pytest -q tests/random_lax_test.py -k 'Poisson or BinomialLargeCountTailRegression or StirlingTailUsesUnclampedLargeArgument'
+      - name: Record exact SHA and dependency versions
+        if: always()
+        run: |
+          {
+            echo "pr=41228"
+            echo "sha=$(git -C jax rev-parse HEAD)"
+            python -m pip show jax jaxlib scipy numpy | grep -E '^(Name|Version):'
+          } > jax-41228-broad.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jax-41228-broad-poisson
+          path: jax-41228-broad.txt
