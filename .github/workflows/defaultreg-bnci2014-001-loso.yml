@@ -1,0 +1,67 @@
+name: DefaultReg BNCI2014_001 full LOSO external validation
+on:
+  push:
+    branches:
+      - research/defaultreg-bnci2014-001-loso-20261010
+    paths:
+      - 'research/defaultreg_bnci/**'
+      - '.github/workflows/defaultreg-bnci2014-001-loso.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'research/defaultreg_bnci/**'
+      - '.github/workflows/defaultreg-bnci2014-001-loso.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  bnci2014-001-loso:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install frozen MOABB stack
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Execute preregistered 9-subject source-only LOSO
+        run: |
+          python research/defaultreg_bnci/run_bnci2014_001_loso.py \
+            --out defaultreg_bnci2014_001_loso
+      - name: Validate full-subject denominator and frozen primary method
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('defaultreg_bnci2014_001_loso/bnci2014_001_loso.json'))
+          assert x['status']=='REAL_BNCI2014_001_FULL_LOSO_COMPLETE'
+          assert x['subjects']==list(range(1,10))
+          assert x['n_subjects']==9
+          assert x['target_batch_statistics_used'] is False
+          assert x['target_labels_used_before_scoring'] is False
+          assert x['primary_new_method']=='source_tail_signed_LDA'
+          assert x['primary_baseline']=='nested_source_macro_auc_LDA'
+          assert len(x['folds'])==9
+          assert set(x['trial_count_by_subject'])==set(map(str,range(1,10)))
+          assert len(set(x['trial_count_by_subject'].values()))==1
+          expected={'LedoitWolf_LDA','OAS_LDA','nested_source_macro_auc_LDA',
+                    'source_signed_mean_LDA','source_squared_margin_LDA',
+                    'source_tail_signed_LDA','LogisticRegression'}
+          assert set(x['mean_auc_by_method'])==expected
+          assert all(set(f['auc'])==expected for f in x['folds'])
+          assert all(f['target_data_used_for_selection'] is False for f in x['folds'])
+          print('PASS_FULL_LOSO_EXTERNAL_DATASET_AUDIT')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-bnci2014-001-loso
+          path: |
+            research/defaultreg_bnci/PREREG_BNCI2014_001_LOSO_20261010.md
+            defaultreg_bnci2014_001_loso/**
+          if-no-files-found: warn
+          retention-days: 90

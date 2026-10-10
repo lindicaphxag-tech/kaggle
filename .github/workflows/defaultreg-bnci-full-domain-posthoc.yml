@@ -1,0 +1,58 @@
+name: DefaultReg BNCI full-domain posthoc reviewer audit
+on:
+  push:
+    branches:
+      - research/defaultreg-bnci-full-domain-posthoc-20261010
+    paths:
+      - 'research/defaultreg_bnci/**'
+      - '.github/workflows/defaultreg-bnci-full-domain-posthoc.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'research/defaultreg_bnci/**'
+      - '.github/workflows/defaultreg-bnci-full-domain-posthoc.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  bnci-full-domain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install frozen MOABB stack
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Execute full-domain post-hoc reviewer stress test
+        run: |
+          python research/defaultreg_bnci/run_bnci2014_001_full_domain_posthoc.py \
+            --out defaultreg_bnci_full_domain_posthoc
+      - name: Validate exposure label and complete lambda domain
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('defaultreg_bnci_full_domain_posthoc/bnci_full_domain_posthoc.json'))
+          assert x['status']=='REAL_BNCI2014_001_FULL_DOMAIN_POSTHOC_AFTER_TARGET_EXPOSURE'
+          assert x['confirmation_status']=='NOT_INDEPENDENT_CONFIRMATION'
+          assert x['full_domain_grid'][0]==0.0 and x['full_domain_grid'][-1]==1.0
+          assert 0.002 in x['full_domain_grid'] and 0.003 in x['full_domain_grid']
+          assert len(x['folds'])==9
+          assert all(f['target_data_used_for_selection'] is False for f in x['folds'])
+          assert all('source_path' in f for f in x['folds'])
+          print('PASS_BNCI_FULL_DOMAIN_POSTHOC_AUDIT')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-bnci-full-domain-posthoc
+          path: |
+            research/defaultreg_bnci/FROZEN_FULL_DOMAIN_POSTHOC_AUDIT_20261010.md
+            defaultreg_bnci_full_domain_posthoc/**
+          if-no-files-found: warn
+          retention-days: 90
