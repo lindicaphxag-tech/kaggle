@@ -56,6 +56,22 @@ Git tree identities are exact values returned by GitHub's git-commit endpoints. 
 - [Existing + new official test selections](../.github/workflows/upstream-jax-flagship-review.yml).
 - Workflows lock exact upstream SHAs, install those sources and record the genuine commit identity and package versions. A later maintainer change requires fresh testing or verified byte-identical tree identity.
 
+## Concise upstream-maintainer review responses (not posted)
+
+These **are drafts**: this GitHub integration has read-only permissions on `jax-ml/jax` and returned HTTP 403 to top-level PR comments and reviewer-request attempts. Do not state that a message was sent or approved.
+
+**For [JAX #41227](https://github.com/jax-ml/jax/pull/41227):**
+
+> @jakevdp Thank you for the review. The current single-commit head `5ca3f43d` implements the four requested API/test changes (multiply by the half constant; parameterized floating dtypes; vectorized cases; standard NumPy/JIT comparison helpers). It also avoids intermediate `scale**2 * df` overflow/underflow. Independent JAX-source CI ([4/4 jobs](https://github.com/lindicaphxag-tech/kaggle/actions/runs/38081399284)) passed the 20 relevant existing/new Student-t cases; an old-versus-fixed experiment ([run](https://github.com/lindicaphxag-tech/kaggle/actions/runs/38077445868)) reduced worst float32 large-df absolute logpdf error from 0.91894 to 4.89e-7. The tested code tree is identical to the one-commit PR head. Would you be willing to re-review when convenient? Happy to address a remaining concrete issue.
+
+**For [JAX #41228](https://github.com/jax-ml/jax/pull/41228):**
+
+> @jakevdp Thank you for the request to avoid two competing Poisson `logpmf` implementations. The current changes make the rejection sampler and public `jax.scipy.stats.poisson.logpmf` call one shared stabilized helper, while the Stirling asymptotic patch is local to Poisson (leaving the shared Binomial helper unchanged). The source-pinned [4/4 job CI](https://github.com/lindicaphxag-tech/kaggle/actions/runs/38081399284) passed 54 Poisson public-API and 43 sampler-related tests; [identical-protocol old/fixed CI](https://github.com/lindicaphxag-tech/kaggle/actions/runs/38081402392) recovered variance/λ from 1.46138 to 0.99961 at λ=1e8. The tested `2af46d5` Poisson core/test Git blobs are identical to the subsequently rebased `fbd0d22` head, although the full rebased JAX baseline needs its official checks. Could you confirm whether this resolves the original helper-location concern?
+
+Please use one response per official PR from an authorized GitHub session. Further CI or code churn without new reviewer findings is lower value than actual human re-review.
+
+---
+
 ## Review / interpretation boundaries
 
 For #41227, the current diff implements reviewer suggestions to use `mul(df, half)`, parameterized floating dtype and the vectorized official `_CheckAgainstNumpy` / `_CompileAndCheck` test pattern. The later fix avoids `scale**2 * df` intermediate overflow/underflow. For #41228, the public SciPy-compatible Poisson log-PMF shares one stabilized helper with the rejection sampler; Stirling asymptotics are now local to Poisson, not the Binomial-shared helper. These statements are based on read source diffs, not substitute maintainer approval.
