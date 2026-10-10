@@ -1,0 +1,27 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "fmauch",
+      "body": "When a JTC action gets aborted because a new trajectory comes in, the trajectory result is `INVALID GOAL`. That doesn't seem to be meaningful feedback. As a user I would expect `INVALID GOAL` if the goal I sent contains something illegal. However, I think in that case we reject the goal already.\n\nI would suggest to add a new error code to `ctrl_msgs/action/FollowJointTrajectory.action` e.g. `MOTION_REPLACED` or `ABORTED_BY_NEW_TRAJECTORY` or even a more generic one `UNSUCCESSFUL` or such.\n\nI'm happy to implement this, once a decision has been made.",
+      "created_at": "2026-10-10T07:58:41Z",
+      "html_url": "https://github.com/ros-controls/ros2_controllers/issues/2696",
+      "id": "ros-controls/ros2_controllers#2696",
+      "issue_number": 2696,
+      "labels": [
+        "enhancement",
+        "persistent"
+      ],
+      "repository": "ros-controls/ros2_controllers",
+      "surface_sha256": "340cd3431e0c951ccf875a2b11f4b7f1155842bfb90302adca8d13865291f442",
+      "title": "[JTC] Overwriting a goal results in INVALID GOAL"
+    }
+  ],
+  "post_activation_issue_identities_observed": 62,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-10T13:02:03Z",
+  "schema_version": 1
+}
