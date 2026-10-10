@@ -72,3 +72,26 @@ With the same P,C and internal L=9: action box radius R=2 needs noop with declar
 There is a real mathematical and simulator-mechanical phenomenon (source repair changes actuator feasible set), and a strict finite-domain permission planner. But neither is by itself a top-tier robotic learning contribution. Source-provenance identity, independent tap issuers, actual code-byte patch installation, real external controller/robot, and frozen policy task gain are unimplemented. The black-box comparator is pointwise force optimal, not a globally optimal task controller. Sixteen correlated targets are NOT independent systems and do not justify confidence intervals about fleet transfer.
 
 **Required next experimental paper gate:** frozen external pretrained manipulation policy on a distinct robot/control architecture, permission-qualified trusted interface observations, matched probe/action cost across strong active adaptation baselines, true unsafe authorization and abstention risk, prospective unseen controllers, and outside-lab replay. Until then label work as Draft; do NOT claim accepted CAS-2 / CCF-B level or universal safety.
+
+
+## 2026-10-10 first external frozen pretrained robot-policy result (new and stronger evidence)
+
+The prior report lacked any pretrained policy. We have now actually executed official Gymnasium Reacher-v5 with the third-party Farama/Minari pretrained SAC-expert checkpoint, pinned to full source commit ad8fadfbe3ab40ce9c1bae5b33641041056b3090, downloaded model byte SHA256 095cd4cfe742a07c9e2c5587ca95fe1ce97360efaaa02c7e6569fe9ca00c6454, Stable-Baselines3 2.6.0 and Gymnasium 1.1.1. There were ZERO author training steps. This is an external RL policy, NOT vision-language-action (VLA).
+
+The INITIAL 16-seed 80-episode pilot with (shear=.8, inner L=1) showed NO effect: official mean reward -2.593024 for healthy, faulty, inverse-blackbox, inner projection and source fix; raw green CI https://github.com/lindicaphxag-tech/kaggle/actions/runs/38007320983 . This negative result led to a post-pilot, fully enumerated five-severity *new-seed* protocol. It is NOT a pure preregistration of the entire study.
+
+The new independent reset seeds 23011..23042, five fixed fault levels and six same-seed arms were committed before test evidence; 960 paired episode rows, no rejected severities, official original Reacher reward. The strongest blackbox arm is an EXACT 2D GLOBAL PROJECTION of the desired instantaneous action into the physically reachable output set after BOTH hidden software clip AND original Reacher action clamp. A separate fitted numeric low-amplitude two-tap+holdout method classifies the two component mappings as atomic; the simulator then performs source-known adapter substitution. Crucially this method DOES NOT attest source bytes, authenticate sensors, or execute a signed production patch.
+
+| Fault shear, inner clip L | Unpatched mean original reward | Perfectly informed action-wise blackbox oracle | Proposed numerical source candidate | Mean source minus oracle |
+|---|---:|---:|---:|---:|
+| k=.8, L=1 (pilot severity on fresh seeds) | -2.993996 | -2.993996 | -2.993996 | 0 |
+| k=2, L=1 | -2.994736 | -2.994310 | -2.993996 | +0.000314 |
+| k=3.5, L=1 | -3.322207 | -3.024224 | -2.993996 | +0.030227 |
+| k=2, L=.4 | -4.375293 | -3.217566 | -2.993996 | +0.223570 |
+| k=3.5, L=.4 | -8.154021 | -3.476482 | -2.993996 | +0.482485 |
+
+At strongest severity, paired seed outcome for source-vs-oracle original reward: **30 better, 0 worse, 2 ties among 32 reset seeds**; 32/32 goal-ever-reaching at 0.075 for source and oracle, fault untouched 29/32. At minimal severity 32/32 seeds tie exactly. The high-severity effect therefore concerns normalized physical action fidelity and official cumulative reward, **not an extensive improvement in the 0.075m reach-success outcome**. Fault setups were authored, and there is ONE external robot model / ONE published expert checkpoint in this experiment.
+
+Full heldout CI and raw JSON: https://github.com/lindicaphxag-tech/kaggle/actions/runs/38007699504 . Protocol committed pre-holdout-result: https://github.com/lindicaphxag-tech/kaggle/blob/research/six-line-submission-gates-20261010/research/semrepair/paper/EXTERNAL_FROZEN_SAC_POSTPILOT_PROTOCOL_20261010.md . All five fault levels are reported, and uncertainty analysis must use per-seed paired differences, not 960 i.i.d. robots. After observing the expert results, a second distinct Farama/Minari SAC-medium checkpoint was queued as sequential replication, NOT a blinded before-any-result multi-checkpoint trial. Its outcome must not be stated until the external CI completes.
+
+**Updated review-grade assessment:** this materially reduces the earlier zero-pretrained-policy evidence gap and gives a nontrivial external-policy action-reachability outcome that exceeds an exact per-step action blackbox oracle for some fault configurations. Remaining limitations: SAME Reacher embodiment, manually constructed extra action ABI and clipping, source-trust assertion, no actual installed software patch, no VLA/visual task, no globally task-optimal MPC blackbox, no third-party independent replication. These preclude present T-RO/RA-L/ICML-level parity or acceptance guarantees.
