@@ -1,0 +1,82 @@
+name: DefaultReg Cho+Lee untouched full-domain replication
+on:
+  push:
+    branches:
+      - research/defaultreg-cho-lee-full-domain-20261010
+    paths:
+      - 'research/defaultreg_external/**'
+      - '.github/workflows/defaultreg-cho-lee-full-domain.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'research/defaultreg_external/**'
+      - '.github/workflows/defaultreg-cho-lee-full-domain.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  external-full-domain:
+    strategy:
+      fail-fast: false
+      matrix:
+        dataset: [Cho2017, Lee2019_MI]
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MNE_DATA: ${{ runner.temp }}/mne_data
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install frozen MOABB stack
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Execute untouched full-domain outer LOPO
+        run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_external/run_external_full_domain.py \
+            --dataset "${{ matrix.dataset }}" \
+            --out "defaultreg_external_${{ matrix.dataset }}"
+      - name: Fail closed on cohort, Z0, full-domain and participant denominator
+        run: |
+          DATASET="${{ matrix.dataset }}" python - <<'PY'
+          import json, os, pathlib
+          d=os.environ['DATASET']
+          p=pathlib.Path(f'defaultreg_external_{d}/{d}_full_domain_lopo.json')
+          x=json.loads(p.read_text())
+          expected_n={'Cho2017':52,'Lee2019_MI':54}[d]
+          assert x['status']=='REAL_EXTERNAL_FULL_DOMAIN_PROSPECTIVE'
+          assert x['dataset']==d
+          assert x['n_subjects']==expected_n
+          assert x['subjects']==list(range(1,expected_n+1))
+          assert len(x['channels'])==21 and x['feature_dimension']==231
+          assert x['target_information_track']=='Z0'
+          assert x['target_labels_used_before_scoring'] is False
+          assert x['target_batch_statistics_used'] is False
+          assert x['full_domain_grid'][0]==0.0 and x['full_domain_grid'][-1]==1.0
+          assert 0.002 in x['full_domain_grid'] and 0.95 in x['full_domain_grid']
+          assert len(x['folds'])==expected_n
+          assert len(x['participant_receipt'])==expected_n
+          methods={'LedoitWolf_LDA','OAS_LDA','source_macro_full_domain_LDA',
+                   'source_cov_nll_full_domain_LDA','TS_LogisticRegression',
+                   'Riemannian_MDM'}
+          assert set(x['mean_auc_by_method'])==methods
+          assert all(set(f['auc'])==methods for f in x['folds'])
+          assert all(f['target_data_used_for_selection'] is False for f in x['folds'])
+          assert all(f['target_batch_moments_used'] is False for f in x['folds'])
+          assert len(x['primary_comparisons'])==2
+          assert all('holm_p_H2_H3' in z for z in x['primary_comparisons'])
+          print('PASS_EXTERNAL_FULL_DOMAIN_Z0_AUDIT',d)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-external-full-domain-${{ matrix.dataset }}
+          path: |
+            research/defaultreg_external/FROZEN_CHO_LEE_FULL_DOMAIN_20261010.md
+            defaultreg_external_${{ matrix.dataset }}/**
+          if-no-files-found: warn
+          retention-days: 90
