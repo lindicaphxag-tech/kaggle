@@ -13,6 +13,7 @@ import urllib.request
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from pcpr_source_closure import assess_pair
+from source_effect_path import ownership_route
 
 REPOSITORY="deepchem/deepchem"
 BEFORE="455d07f3e17e880a4d980b5b0365e4a02b417e14"
@@ -21,6 +22,7 @@ SOURCES={
     "before_layers":(BEFORE,"deepchem/models/torch_models/layers.py","907addd5443cfc9acd56961c1284eb6e45fc63ac"),
     "after_layers":(AFTER,"deepchem/models/torch_models/layers.py","e6318ee8a68ef1a3e26af6ea0b8e47c0d0b45767"),
     "unchanged_consumer":(BEFORE,"deepchem/models/torch_models/torch_model.py","8a73f0b8af1868576fac29ab9d202f4f7a3957cd"),
+    "unchanged_owner":(BEFORE,"deepchem/models/torch_models/weavemodel_pytorch.py","deee66f4c4445224d7b1600ca79a599c1950c61c"),
 }
 def git_blob(data: bytes):
     return hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest()
@@ -60,6 +62,10 @@ def run():
           "upstream":"https://github.com/deepchem/deepchem/pull/5190",
           "source_git_blobs":{k:v[2] for k,v in SOURCES.items()},
           "classes":{}}
+    route=ownership_route(src["unchanged_owner"],src["unchanged_consumer"])
+    data["ownership_route"]=route
+    if route["status"]!="STATIC_OWNERSHIP_ROUTE":
+        raise RuntimeError("Unchanged interclass optimizer ownership route did not validate: "+str(route.get("missing")))
     for class_name in ("WeaveLayer","WeaveGather"):
         report=assess_pair(src["before_layers"],src["after_layers"],
                            src["unchanged_consumer"],class_name)
@@ -82,6 +88,7 @@ def run():
                             for cls in data["classes"].values() for x in cls["fields"]),
       "tested_classes":len(data["classes"]),
       "source_consumer_pinned":True,
+      "ownership_route_pinned":True,
       "external_PyTorch_package_integration":False}
     return data
 
