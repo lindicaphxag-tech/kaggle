@@ -25,6 +25,7 @@ from __future__ import annotations
 
 from hashlib import sha256
 from itertools import product
+import copy
 import json
 import numpy as np
 import gymnasium as gym
@@ -98,9 +99,9 @@ class TrueNativeThreeStepMPC:
     def _advance_and_native_reward(self,actual):
         d=self.scratch
         d.ctrl[:]=actual
-        for _ in range(self.skip):
-            mujoco.mj_step(self.model,d)
-            self.physics_integration_steps+=1
+        mujoco.mj_step(self.model,d,nstep=self.skip)
+        mujoco.mj_rnePostConstraint(self.model,d)
+        self.physics_integration_steps+=self.skip
         # Official Gym Pusher _get_rew is called WITHOUT extra mj_forward,
         # and uses body COM fields as left by the final mj_step.
         obj=d.xpos[self.obj]
@@ -114,8 +115,10 @@ class TrueNativeThreeStepMPC:
     def branch_value(self,source_data,ideal,first_pair,*,horizon=HORIZON):
         if horizon<1 or horizon>HORIZON:
             raise ValueError("horizon must be within frozen 1..3")
-        mujoco.mj_getState(self.model,source_data,self.stored,self.spec)
-        mujoco.mj_setState(self.model,self.scratch,self.stored,self.spec)
+        # Copy every field including derived contacts and solver buffers:
+        # mjSTATE_INTEGRATION alone omits computed data used at contact
+        # boundaries. This is MuJoCo 3.3.7 MjData.__copy__/mj_copyData.
+        self.scratch=copy.copy(source_data)
         step_action=np.asarray(ideal,dtype=np.float64).copy()
         step_action[:2]=first_pair
         step_action=np.clip(step_action,-ENV_LIMIT,ENV_LIMIT)
