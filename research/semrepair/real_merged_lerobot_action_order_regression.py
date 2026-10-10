@@ -130,15 +130,30 @@ def run_real_merged_compensating_order_issue():
         ctrl_old=tuple(float(v) for v in before)
         ctrl_new=tuple(float(v) for v in after)
         reference=tuple(float(v) for v in action)
+        # Fair, INFORMED blackbox gets exact old interface name layouts:
+        # it can inverse-permute its upstream commands and TIE the source
+        # fix, without altering the old publisher code. This is NOT the
+        # original pretrained policy's unmodified output.
+        compensated=torch.tensor(
+            [reference[checkpoint.index(name)] for name in hardware],
+            dtype=torch.float64)
+        compensated_obj=_fake_operator(compensated,checkpoint,hardware)
+        compensated_output=old_method(
+            compensated_obj,{"observation.state":"stub"})
+        compensated_error=max(abs(float(y)-r)
+                              for y,r in zip(compensated_output,reference))
         err_old=max(abs(a-b) for a,b in zip(ctrl_old,reference))
         err_new=max(abs(a-b) for a,b in zip(ctrl_new,reference))
         raw.append({"case":seed,
                     "actual_original_sync_max_abs_error":err_old,
                     "actual_merged_sync_max_abs_error":err_new,
+                    "equal_information_input_reindex_max_abs_error":compensated_error,
                     "before_first_joint_action":ctrl_old[0],
                     "after_first_joint_action":ctrl_new[0]})
     if not all(x["actual_original_sync_max_abs_error"]>20 and
-               x["actual_merged_sync_max_abs_error"]<1e-12 for x in raw):
+               x["actual_merged_sync_max_abs_error"]<1e-12 and
+               x["equal_information_input_reindex_max_abs_error"]<1e-12
+               for x in raw):
         raise AssertionError("did not reproduce the genuine upstream order bug")
     old_name_layout={name:float for name in hardware}
     new_state=align(old_name_layout,checkpoint,what="state")
@@ -182,6 +197,8 @@ def run_real_merged_compensating_order_issue():
             x["actual_original_sync_max_abs_error"] for x in raw)/len(raw),
         "source_corrected_max_action_error":max(
             x["actual_merged_sync_max_abs_error"] for x in raw),
+        "equal_information_blackbox_inverse_reindex_max_error":max(
+            x["equal_information_input_reindex_max_abs_error"] for x in raw),
         "already_aligned_original_remains_correct":True,
         "raw_cases":raw,
         "limitation":"true original publisher AST, stubbed policy actions not real bimanual robot hardware or VLA",
