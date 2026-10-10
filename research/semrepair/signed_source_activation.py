@@ -157,6 +157,8 @@ def verified_atomic_source_activate(
         authorized=manifest["authorized_repair"] in ("atomic",repair_token)
         if not authorized and new[component]!=original[component]:
             raise ValueError("repair mutates a component outside signed allowed class")
+    if new["clip"]!=original["clip"] and manifest["authorized_repair"]!="atomic":
+        raise ValueError("internal source limit changed outside atomic signed repair")
     if manifest["authorized_repair"]=="noop" and new!=original:
         raise ValueError("noop repair changes deployed source config")
 
