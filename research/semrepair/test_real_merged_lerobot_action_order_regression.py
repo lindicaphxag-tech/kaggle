@@ -24,6 +24,7 @@ class GenuineCompensatingSourceRegressionTests(unittest.TestCase):
         self.assertEqual(x["distinct_source_regression_samples"],96)
         self.assertGreater(x["baseline_original_mean_action_error"],20)
         self.assertEqual(x["source_corrected_max_action_error"],0)
+        self.assertEqual(x["equal_information_blackbox_inverse_reindex_max_error"],0)
         for r in x["raw_cases"]:
             self.assertGreater(r["actual_original_sync_max_abs_error"],20)
             self.assertLess(r["actual_merged_sync_max_abs_error"],1e-12)
