@@ -145,3 +145,30 @@ session is removed because it weakens the paper.
 
 
 Execution note: draft PR #93 was opened before this trigger commit; any result must correspond to the post-freeze branch history and exact workflow artifact.
+
+
+## Pre-execution validity-frontier amendment
+
+This amendment was committed while every Cho2017/Lee2019 workflow on the
+canonical branch still had zero executable jobs and before any target AUC from
+either cohort was produced.
+
+In addition to the six frozen held-target methods above, the runner will
+archive the target score vector for **every feasible lambda on the already
+frozen full scalar path**. Target labels still enter only after all path score
+vectors are frozen.
+
+This does NOT add a target-tuned method. No target-path lambda is selected.
+The full path is archived solely to estimate the predeclared
+Regularisation Validity Frontier:
+
+- source covariance-fidelity regret
+  r_C(lambda)=C(lambda)-min_lambda C(lambda);
+- target participant AUC as a downstream quantity Q_g(lambda);
+- the downstream envelope over source-defined covariance-fidelity budgets;
+- the AUC span inside the source covariance 1-SE admissible set.
+
+The path allows the external cohorts to test whether small source covariance-
+fidelity regret can coexist with materially different unseen-participant
+decoding conclusions. It may falsify the proposed decision-fragility
+mechanism. It cannot be used to replace H2/H3 methods after outcome inspection.
