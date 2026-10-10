@@ -1,0 +1,102 @@
+name: DefaultReg PRE-DATA Shin+BNCI002 external confirmation
+
+on:
+  push:
+    branches:
+      - research/defaultreg-predata-shin-bnci002-20261010
+    paths:
+      - 'research/defaultreg_predata_external/**'
+      - '.github/workflows/defaultreg-predata-shin-bnci002.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'research/defaultreg_predata_external/**'
+      - '.github/workflows/defaultreg-predata-shin-bnci002.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  predata-external:
+    strategy:
+      fail-fast: false
+      matrix:
+        dataset: [Shin2017A, BNCI2014_002]
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MNE_DATA: ${{ runner.temp }}/mne_data
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install frozen stack
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Execute frozen PRE-DATA outer LOPO
+        run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_predata_external/run_predata_external.py \
+            --dataset "${{ matrix.dataset }}" \
+            --out "defaultreg_predata_${{ matrix.dataset }}"
+      - name: Hash every downloaded cache file visible to this job
+        if: always()
+        run: |
+          DATASET="${{ matrix.dataset }}" python - <<'PY'
+          import hashlib,json,os,pathlib
+          root=pathlib.Path(os.environ["MNE_DATA"])
+          rows=[]
+          if root.exists():
+              for p in sorted(x for x in root.rglob("*") if x.is_file()):
+                  h=hashlib.sha256()
+                  with p.open("rb") as f:
+                      for b in iter(lambda:f.read(1<<20),b""):h.update(b)
+                  rows.append({"path":str(p.relative_to(root)),"bytes":p.stat().st_size,"sha256":h.hexdigest()})
+          out=pathlib.Path(f"defaultreg_predata_{os.environ['DATASET']}")
+          out.mkdir(exist_ok=True)
+          (out/"raw_cache_sha256_manifest.json").write_text(json.dumps({"root":"MNE_DATA","files":rows},indent=2,sort_keys=True))
+          print("RAW_CACHE_FILES",len(rows))
+          PY
+      - name: Fail closed on participant denominator, Z0 and baseline panel
+        run: |
+          DATASET="${{ matrix.dataset }}" python - <<'PY'
+          import json,os,pathlib
+          d=os.environ["DATASET"]
+          p=pathlib.Path(f"defaultreg_predata_{d}/{d}_predata_full_domain_lopo.json")
+          x=json.loads(p.read_text())
+          expected={"Shin2017A":29,"BNCI2014_002":14}[d]
+          assert x["status"]=="REAL_PRE_DATA_EXTERNAL_FULL_DOMAIN_COMPLETE"
+          assert x["n_subjects"]==expected
+          assert x["subjects"]==list(range(1,expected+1))
+          assert x["target_information_track"]=="Z0"
+          assert x["target_labels_used_before_scoring"] is False
+          assert x["target_batch_statistics_used"] is False
+          assert x["full_domain_grid"][0]==0.0 and x["full_domain_grid"][-1]==1.0
+          assert 0.0005 in x["full_domain_grid"] and 0.075 in x["full_domain_grid"] and 0.95 in x["full_domain_grid"]
+          methods={"LedoitWolf_LDA","OAS_LDA","source_cov_nll_full_domain_LDA",
+                   "source_macro_full_domain_LDA","TS_LogisticRegression",
+                   "Riemannian_MDM","CSP6_LogisticRegression"}
+          assert set(x["mean_auc_by_method"])==methods
+          assert len(x["folds"])==expected
+          assert all(set(f["auc"])==methods for f in x["folds"])
+          assert all(f["target_data_used_for_selection"] is False for f in x["folds"])
+          assert all(f["target_batch_moments_used"] is False for f in x["folds"])
+          assert all(f["target_labels_accessed_only_after_score_freeze"] is True for f in x["folds"])
+          assert all(f["target_path_scores_frozen_before_labels"] is True for f in x["folds"])
+          assert len(x["primary_comparisons"])==2
+          assert all("holm_p_H2_H3" in z for z in x["primary_comparisons"])
+          print("PASS_PRE_DATA_EXTERNAL_AUDIT",d)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-predata-${{ matrix.dataset }}
+          path: |
+            research/defaultreg_predata_external/FROZEN_SHIN_BNCI002_PRE_DATA_20261010.md
+            defaultreg_predata_${{ matrix.dataset }}/**
+          if-no-files-found: warn
+          retention-days: 90
