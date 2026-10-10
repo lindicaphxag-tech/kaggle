@@ -28,6 +28,8 @@ jobs:
         run: |
           PYTHONPATH=research/pcpr python -m unittest discover -s research/pcpr -p 'test_*.py' -v
           PYTHONPATH=research/pcpr python -O -m unittest discover -s research/pcpr -p 'test_*.py' -q
+      - name: Run fail-closed causal evidence closure reference example
+        run: python research/pcpr/causal_evidence_closure.py
       - name: Verify original Git blobs and execute native PyTorch field witnesses
         run: python research/pcpr/run_real_deepchem_source.py
       - name: Run the six frozen transfer PRs (first score, source candidates ONLY)
