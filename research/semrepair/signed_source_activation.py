@@ -107,6 +107,7 @@ def _signature_quorum(payload:bytes,signature_records:Sequence[dict],
     if threshold<1 or threshold>len(trusted_public_roots):
         raise ValueError("invalid trusted issuer quorum")
     verified=set()
+    verified_key_material=set()
     for record in signature_records:
         if not isinstance(record,dict) or set(record)!={"issuer","ed25519_hex"}:
             raise ValueError("invalid signature record")
@@ -115,10 +116,18 @@ def _signature_quorum(payload:bytes,signature_records:Sequence[dict],
             continue
         if issuer in verified:
             continue
+        key_bytes=trusted_public_roots[issuer]
+        # Two issuer LABELS controlling the same 32-byte public key are
+        # not independent roots; prevent identity alias quorum inflation.
+        if not isinstance(key_bytes,bytes) or len(key_bytes)!=32:
+            raise ValueError("invalid trusted Ed25519 public root")
+        if key_bytes in verified_key_material:
+            continue
         try:
-            pub=Ed25519PublicKey.from_public_bytes(trusted_public_roots[issuer])
+            pub=Ed25519PublicKey.from_public_bytes(key_bytes)
             pub.verify(bytes.fromhex(record["ed25519_hex"]),payload)
             verified.add(issuer)
+            verified_key_material.add(key_bytes)
         except (ValueError,TypeError,InvalidSignature):
             continue
     if len(verified)<threshold:
