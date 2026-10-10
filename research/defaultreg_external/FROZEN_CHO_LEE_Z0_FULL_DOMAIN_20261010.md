@@ -1,7 +1,7 @@
 # Default Regularisation — prospective Cho2017 + Lee2019_MI Z0 full-domain external validation
 
 Frozen: 2026-10-10, before any target-participant AUC from these two datasets
-is opened by this project.
+is opened by this project. Public execution lineage: draft PR #96.
 
 This document supersedes no earlier provenance. BNCI2014_001 is already exposed
 and remains development/post-hoc evidence. The two cohorts below are the first
