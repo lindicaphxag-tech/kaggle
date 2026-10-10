@@ -54,7 +54,7 @@ class CrossRobotAuditTests(unittest.TestCase):
         f=fixture()
         r=next(r for r in f["raw_rows"] if r["arm"]=="exact-two-clip-full-information-oracle")
         r["official_episode_return"]+=2.
-        with self.assertRaisesRegex(ValueError,"reward gain"):
+        with self.assertRaisesRegex(ValueError,"reward components"):
             audit_pusher(f)
 
     def test_sign_tests_with_ties_and_unfavorable_source(self):
