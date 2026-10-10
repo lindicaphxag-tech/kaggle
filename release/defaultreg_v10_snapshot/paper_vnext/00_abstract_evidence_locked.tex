@@ -1,0 +1,27 @@
+# SNAPSHOT_SOURCE: lindicaphxag-tech/cs@0b26a5b0853e3b136a92c17e614a3a1936673621 path=papers/eeg-default-regularisation/paper_vnext/00_abstract_evidence_locked.tex
+\begin{abstract}
+Covariance regularisation is usually selected for estimation fidelity,
+whereas zero-target cross-subject EEG is evaluated by discrimination on
+unseen participants. We examine their mismatch along the complete scalar path
+range, sampled using a predeclared finite grid in covariance/tangent-space linear discriminants. An operator
+derivation shows that the standardized margin changes through
+discriminant-path rotation while covariance predictive loss contains no
+class-contrast term. Model selection and representation fitting used
+neither target labels nor distribution statistics. On a prospectively
+frozen EEGMMIDB block (\(N=20\)), source participant-macro-AUC selection
+improved target macro AUC over source covariance-NLL selection by 0.0561
+and Ledoit--Wolf by 0.0920 (both Holm-adjusted \(p\) values below 0.006).
+The benefit is not uniform: 5/20 and 4/20 participants, respectively,
+lost more than 0.02 AUC. In two independently frozen external cohorts
+(BNCI2014\_002, \(N=14\); BNCI2015\_001, \(N=12\)), source objective
+optima differed in 26/26 outer folds. Target effects were positive
+(+0.0176 and +0.0433 versus covariance-NLL) but individually
+non-significant after Holm correction (\(p=0.1397\) and 0.1856).
+Their validity frontiers spanned 0.0384 and 0.0501 AUC with
+cohort-dependent covariance-fidelity budgets. A separate prospective
+experiment detected a regularisation-by-representation interaction
+(-0.0778 AUC; Holm \(p=0.0133\)), opposite the historical filter-bank
+hypothesis. We do not propose a universally superior estimator.
+Instead, objective choice emerges as a consequential validity variable
+in the studied cross-subject EEG pipelines.
+\end{abstract}
