@@ -4,6 +4,8 @@ on:
     paths:
       - 'research/semrepair/frozen_external_reacher_sac.py'
       - 'research/semrepair/test_frozen_external_reacher_sac.py'
+      - 'research/semrepair/strong_clipped_actuator_oracle.py'
+      - 'research/semrepair/test_strong_clipped_actuator_oracle.py'
       - 'research/semrepair/internal_saturation_reachability.py'
       - '.github/workflows/semrepair-external-reacher-policy.yml'
   workflow_dispatch:
@@ -28,7 +30,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install "gymnasium[mujoco]==1.1.1" "stable-baselines3==2.6.0" "huggingface-hub==0.34.4"
       - name: Verify actual frozen weight download and original task
-        run: python -m unittest -v research.semrepair.test_frozen_external_reacher_sac
+        run: python -m unittest -v research.semrepair.test_strong_clipped_actuator_oracle research.semrepair.test_frozen_external_reacher_sac
       - name: Execute fixed independent seeds and five matched interventions
         run: python -m research.semrepair.frozen_external_reacher_sac > official_reacher_full_raw.json
       - name: Print ALL task outcomes
@@ -50,7 +52,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: semrepair-frozen-farama-reacher-sac-16seed-raw
+          name: semrepair-frozen-farama-reacher-sac-16seed-6arm-raw
           path: official_reacher_full_raw.json
           if-no-files-found: warn
           retention-days: 90
