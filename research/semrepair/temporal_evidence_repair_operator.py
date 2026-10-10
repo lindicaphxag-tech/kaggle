@@ -142,8 +142,8 @@ def select_information_authority(
     return InformationDecision(
         "AUTHORIZE_WITHIN_EXPLICIT_INFORMATION_MODEL",
         kind,guarantee,cost,radius,
-        "caller-supplied verification and epoch identity are assumed, not independently authenticated here",
-        source_mutation),reference
+        "caller-supplied verification and epoch identity are assumed, not independently authenticated here; this operator selects authority but does not write bytes",
+        False),reference
 
 
 def execute_original_lerobot_conversion(
