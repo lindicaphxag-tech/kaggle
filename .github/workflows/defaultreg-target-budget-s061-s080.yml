@@ -1,0 +1,67 @@
+name: DefaultReg S061-S080 target-information budgets
+on:
+  push:
+    branches:
+      - research/defaultreg-target-budget-s061-s080-20261010
+    paths:
+      - 'research/defaultreg_eeg/**'
+      - '.github/workflows/defaultreg-target-budget-s061-s080.yml'
+  pull_request:
+    branches:
+      - research/defaultreg-full-domain-s021-s040-20261010
+    paths:
+      - 'research/defaultreg_eeg/**'
+      - '.github/workflows/defaultreg-target-budget-s061-s080.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  target-budget:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install frozen scientific stack
+        run: python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.17.0 scikit-learn==1.8.0 mne==1.11.0
+      - name: Execute frozen target-information budget experiment
+        run: |
+          python research/defaultreg_eeg/run_target_info_budget_s061_s080.py \
+            --edf-root $RUNNER_TEMP/eegmmidb \
+            --out $GITHUB_WORKSPACE/defaultreg_target_budget_s061_s080
+      - name: Fail closed on Z0 / finite-prefix / U-all semantics
+        run: |
+          python - <<'PY'
+          import json
+          p='defaultreg_target_budget_s061_s080/target_information_budget_result.json'
+          x=json.load(open(p))
+          assert x['status']=='REAL_EEGMMIDB_S061_S080_TARGET_INFORMATION_BUDGET_PROSPECTIVE'
+          assert x['source_participants']==list(range(1,9))
+          assert x['heldout_participants']==list(range(61,81))
+          assert x['target_labels_used_for_calibration_or_model_selection'] is False
+          assert x['target_batch_statistics_used_in_Z0'] is False
+          assert len(x['per_target_subject'])==20
+          assert all(set(v['budgets'])=={'5','10','20'} for v in x['per_target_subject'].values())
+          assert all(v['budgets']['5']['evaluation_trials']==v['total_target_trials']-5 for v in x['per_target_subject'].values())
+          assert all(v['budgets']['10']['evaluation_trials']==v['total_target_trials']-10 for v in x['per_target_subject'].values())
+          assert all(v['budgets']['20']['evaluation_trials']==v['total_target_trials']-20 for v in x['per_target_subject'].values())
+          assert all(v['budgets'][k]['auc_Uk_suffix'] for v in x['per_target_subject'].values() for k in ('5','10','20'))
+          assert len(x['predeclared_contrasts'])==9
+          assert all('holm_p_deployment_family' in c for c in x['predeclared_contrasts'])
+          print('PASS_TARGET_INFORMATION_BUDGET_GATE')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-target-budget-s061-s080
+          path: |
+            research/defaultreg_eeg/FROZEN_TARGET_INFO_BUDGET_S061_S080_20261010.md
+            defaultreg_target_budget_s061_s080/**
+          if-no-files-found: warn
+          retention-days: 90
