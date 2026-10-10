@@ -6,6 +6,11 @@ on:
     paths:
       - 'research/defaultreg_eeg/**'
       - '.github/workflows/defaultreg-public-edf-feasibility.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'research/defaultreg_eeg/**'
+      - '.github/workflows/defaultreg-public-edf-feasibility.yml'
   workflow_dispatch:
 permissions:
   contents: read
