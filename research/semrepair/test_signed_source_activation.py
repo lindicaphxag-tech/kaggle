@@ -45,6 +45,7 @@ class SignedSourceActivationTests(unittest.TestCase):
             "expected_nonce":NONCE,
             "authorized_repair":"atomic",
             "actor_family":ROBOT,
+            "max_abs_input_action":2.0,
         }
 
     def signatures(self,owners=("owner-A","auditor-C"),manifest=None):
@@ -63,6 +64,7 @@ class SignedSourceActivationTests(unittest.TestCase):
             expected_nonce=nonce,
             expected_actor_family=ROBOT,
             expected_deployment_sha256=DEPLOYMENT,
+            expected_action_radius=2.0,
             threshold=2)
 
     def test_genuine_quorum_activates_actual_verified_disk_bytes(self):
@@ -141,6 +143,35 @@ class SignedSourceActivationTests(unittest.TestCase):
         m["deployment_sha256"]=sha256(b"other action contract").hexdigest()
         with self.assertRaisesRegex(ValueError,"deployment envelope"):
             self.activate(manifest=m,signatures=self.signatures(manifest=m))
+
+    def test_valid_two_signatures_cannot_install_semantically_wrong_source_patch(self):
+        bad=copy.deepcopy(NEW)
+        bad["producer"][0][1]=.25
+        replacement=_canonical(bad)
+        manifest=copy.deepcopy(self.manifest)
+        manifest["replacement_source_sha256"]=sha256(replacement).hexdigest()
+        with self.assertRaisesRegex(ValueError,"action-envelope certificate"):
+            self.activate(manifest=manifest,signatures=self.signatures(manifest=manifest),
+                          replacement=replacement)
+        self.assertEqual(self.path.read_bytes(),self.old)
+
+    def test_two_signatures_cannot_install_undersaturated_repair(self):
+        bad=copy.deepcopy(NEW)
+        bad["clip"]=.8
+        replacement=_canonical(bad)
+        manifest=copy.deepcopy(self.manifest)
+        manifest["replacement_source_sha256"]=sha256(replacement).hexdigest()
+        with self.assertRaisesRegex(ValueError,"action-envelope certificate"):
+            self.activate(manifest=manifest,signatures=self.signatures(manifest=manifest),
+                          replacement=replacement)
+        self.assertEqual(self.path.read_bytes(),self.old)
+
+    def test_deployment_radius_cannot_be_downgraded_inside_valid_signatures(self):
+        manifest=copy.deepcopy(self.manifest)
+        manifest["max_abs_input_action"]=.5
+        with self.assertRaisesRegex(ValueError,"signed deployment action envelope"):
+            self.activate(manifest=manifest,signatures=self.signatures(manifest=manifest))
+        self.assertEqual(self.path.read_bytes(),self.old)
 
     def test_source_tampering_before_install_refused(self):
         self.path.write_bytes(_canonical({
