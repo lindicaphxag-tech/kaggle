@@ -34,7 +34,10 @@ from .internal_saturation_reachability import exact_blackbox_torque_oracle
 from .strong_clipped_actuator_oracle import (
     output_reachability_polygons,optimal_clipped_output
 )
-from .observable_interface_factorization import mv, mmul, I
+from .observable_interface_factorization import (
+    mv,mmul,I,TapSample,PROBE_E1,PROBE_E2,CHECK,
+    identify_repair_from_numeric_taps,
+)
 
 # The official Farama repository commit ID, not 'main' / changing latest.
 HF_REPO="farama-minari/Reacher-v5-SAC-expert"
@@ -49,7 +52,8 @@ P=((1.,FAULT_MAGNITUDE),(0.,1.))
 C=((1.,-FAULT_MAGNITUDE),(0.,1.))
 ARMS=("healthy","compensating-fault","matched-linear-inverse",
       "full-information-inner-geometry-projection",
-      "exact-two-clip-action-oracle","correct-source-atomic-upper-bound")
+      "exact-two-clip-action-oracle","numeric-tap-source-candidate",
+      "correct-source-atomic-upper-bound")
 GOAL_DISTANCE_THRESHOLD=.075
 EXACT_REACHABILITY_POLYGONS=output_reachability_polygons(
     C,inner_bound=INNER_CONTROL_LIMIT,outer_bound=1.)
@@ -66,9 +70,25 @@ def frozen_external_checkpoint():
     return policy,raw_sha
 
 
+def blind_numeric_source_choice()->dict:
+    """Create action interface observations, withholding symbolic fault IDs.
+
+    Called before actual test rollouts. Small fitting and validation commands
+    stay in the unsaturated regime. Not a cryptographic source trust check.
+    """
+    def observe(u):
+        produced=mv(P,u)
+        passed=mv(C,tuple(float(t) for t in np.clip(
+            produced,-INNER_CONTROL_LIMIT,INNER_CONTROL_LIMIT)))
+        return TapSample(u,produced,passed)
+    fit=[observe(u) for u in (PROBE_E1,PROBE_E2)]
+    check=observe(CHECK)
+    return identify_repair_from_numeric_taps(fit,check)
+
+
 def _transform(action:np.ndarray,arm:str)->np.ndarray:
     ideal=(float(action[0]),float(action[1]))
-    if arm in ("healthy","correct-source-atomic-upper-bound"):
+    if arm in ("healthy","correct-source-atomic-upper-bound","numeric-tap-source-candidate"):
         return np.asarray(ideal,dtype=np.float32)
     if arm=="matched-linear-inverse":
         # The matched blackbox gets exact same source CP product (identity).
@@ -138,6 +158,9 @@ def run_official_reacher_external_policy()->dict:
     if mmul(C,P)!=I:
         raise AssertionError("fault must compensate only before clipping")
     policy,model_sha=frozen_external_checkpoint()
+    identified=blind_numeric_source_choice()
+    if identified["candidate_patch"]!="atomic":
+        raise AssertionError("external ABI source candidate could not be identified")
     all_rows=[]
     with gym.make(ENV_NAME) as env:
         for seed in ENV_SEEDS:
@@ -156,8 +179,11 @@ def run_official_reacher_external_policy()->dict:
     for seed in ENV_SEEDS:
         ref=next(r for r in all_rows if r["seed"]==seed and r["arm"]=="healthy")
         fixed=next(r for r in all_rows if r["seed"]==seed and r["arm"]=="correct-source-atomic-upper-bound")
+        proposed=next(r for r in all_rows if r["seed"]==seed and r["arm"]=="numeric-tap-source-candidate")
         if ref["delivered_actions"]!=fixed["delivered_actions"] or \
-           abs(ref["episode_return"]-fixed["episode_return"])>1e-10:
+           ref["delivered_actions"]!=proposed["delivered_actions"] or \
+           abs(ref["episode_return"]-fixed["episode_return"])>1e-10 or \
+           abs(ref["episode_return"]-proposed["episode_return"])>1e-10:
             raise AssertionError("source-correct arm no longer exactly matches healthy model")
     return {
         "protocol":"semrepair-external-frozen-sb3-sac-reacher-v5-v1",
@@ -167,6 +193,10 @@ def run_official_reacher_external_policy()->dict:
         "checkpoint_sha256":model_sha,
         "gymnasium_version":gym.__version__,
         "policy_frozen":True,"policy_training_steps_by_authors":0,
+        "numeric_probe_decision":identified["decision"],
+        "numeric_probe_candidate":identified["candidate_patch"],
+        "numeric_probe_count":3,
+        "numeric_probe_internal_taps_are_author_generated":True,
         "source_model_groups":1,
         "model_independent_pretrained":True,
         "seed_count":len(ENV_SEEDS),
