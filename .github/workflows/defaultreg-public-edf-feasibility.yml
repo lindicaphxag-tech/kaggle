@@ -1,0 +1,57 @@
+name: DefaultReg public EEGMMIDB strict-source feasibility
+on:
+  push:
+    branches:
+      - research/defaultreg-public-edf-baseline-feasibility-20261010
+    paths:
+      - 'research/defaultreg_eeg/**'
+      - '.github/workflows/defaultreg-public-edf-feasibility.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  official-edf-baselines:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install frozen numerical stack
+        run: python -m pip install numpy==2.3.5 scipy==1.17.0 scikit-learn==1.8.0 mne==1.11.0
+      - name: Execute pre-registered official EDF source-only baseline run
+        run: |
+          python research/defaultreg_eeg/run_official_edf_baselines.py \
+            --edf-root $RUNNER_TEMP/eegmmidb \
+            --out $GITHUB_WORKSPACE/defaultreg_public_edf_feasibility
+      - name: Validate result semantics and no trial-selection hiding
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          p=pathlib.Path('defaultreg_public_edf_feasibility/full_pilot_json.json')
+          d=json.loads(p.read_text())
+          assert d['target_data_used_for_training_or_hyperparam_selection'] is False
+          assert d['source_participants']==list(range(1,9))
+          assert d['heldout_participants']==[9,10]
+          assert d['runs']==[4,8,12]
+          assert d['no_task_cues_dropped'] is True
+          assert len(d['source_files'])==30
+          assert all(f['all_original_cues']==f['selected_and_scored'] for f in d['source_files'])
+          assert all(len(f['sha256'])==64 for f in d['source_files'])
+          assert set(d['per_target_subject'])=={'9','10'}
+          expected={'LedoitWolf_LDA','OAS_LDA','nested_source_lopo_lambda_LDA','LogisticRegression'}
+          assert all(set(x['auc'])==expected for x in d['per_target_subject'].values())
+          print('PASS: strict-source public EDF feasibility artifact is structurally complete')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-public-edf-feasibility
+          path: defaultreg_public_edf_feasibility/**
+          if-no-files-found: warn
+          retention-days: 90
