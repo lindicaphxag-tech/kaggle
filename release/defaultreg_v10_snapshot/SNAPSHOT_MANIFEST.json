@@ -1,7 +1,7 @@
 {
   "schema": "defaultreg_v10_release_snapshot_v1",
   "source_repository": "lindicaphxag-tech/cs",
-  "source_commit": "0b26a5b0853e3b136a92c17e614a3a1936673621",
+  "source_commit": "ab40f990b4158f597adca478e2eda50bec899d21",
   "source_pr": 50,
   "snapshot_purpose": "Independent clean-environment BSPC release audit; not a new scientific analysis",
   "copied_at_date": "2026-10-10",
@@ -9,5 +9,6 @@
     "No scientific result is recomputed or reselected from target data in this snapshot",
     "All tests and manuscript files are exact mirrors of the frozen source commit",
     "A green release gate certifies packaging/build consistency, not scientific universality"
-  ]
+  ],
+  "release_fix": "Wilson k=0/k=n interval endpoints made platform-exact; direct child of prior frozen source commit"
 }
