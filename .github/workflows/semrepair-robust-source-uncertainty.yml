@@ -1,0 +1,23 @@
+name: SemRepair robust uncertain-source action-envelope adversarial verification
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/robust_source_envelope_certificate.py'
+      - 'research/semrepair/test_robust_source_envelope_certificate.py'
+      - '.github/workflows/semrepair-robust-source-uncertainty.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  interval-certificate-robustness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate uncertain producer/controller repair under 6000 physical action tests
+        run: python -m unittest -v research.semrepair.test_robust_source_envelope_certificate
+      - name: Print all certified and refused configurations
+        run: python -m research.semrepair.robust_source_envelope_certificate
