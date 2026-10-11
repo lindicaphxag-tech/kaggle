@@ -1,0 +1,13 @@
+{
+  "case_id": "NVlabs/alpasim#204",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-10-11T23:57:06Z",
+  "expiry_sha256": "f5d7c210aba6d428e6b2ef733b0b16523bed4ee3d5746c40d2610faa818bf556",
+  "first_frozen_at": "2026-10-11T15:04:53Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-10-11T21:04:53Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "3b2f46fd805a4f8040661df747f3e35abcc85ba668f82693e682a4a7fb41769b"
+}
