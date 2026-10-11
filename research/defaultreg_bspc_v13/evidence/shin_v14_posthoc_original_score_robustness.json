@@ -1,0 +1,58 @@
+{
+  "schema": "defaultreg_shin2017a_post_outcome_source_target_sensitivity_v14",
+  "source_zip_sha256": "cda3210d24a8e9c7f3bf2d48490e51ad51f023beb652816a8679088cc3fb1842",
+  "source_manifest_sha256": "00d1aa5bb912aa7badcdc5f1c9d3f6e690551d4ffee4d6bff234c61c15582e9e",
+  "source_participant_pair_figure_sha256": "5b6af6db1dd09d9729fe3c819fbb9f70316063b9211d3777d1102db158617aee",
+  "role": "post-outcome descriptive sensitivity; NOT independent prospective hypothesis test",
+  "n_participants": 29,
+  "trial_denominator": 1740,
+  "source_training_pools_overlap": true,
+  "source_auc_selected_minus_cov_selected_mean": 0.026050903119868622,
+  "source_cov_nll_selected_discrimination_cost_mean": 0.7279935022425857,
+  "source_lambda_disagree_n": 29,
+  "contrasts": {
+    "covariance_NLL": {
+      "mean": 0.022222222222222213,
+      "median": 0.01777777777777778,
+      "trim10_mean": 0.02062222222222222,
+      "LOO_person_mean_range": [
+        0.017499999999999995,
+        0.02623015873015872
+      ],
+      "LOO_all_positive": true,
+      "harmed_gt_0_02": 5,
+      "MC_250k_two_sided_posthoc_p": 0.0216999132003472,
+      "frozen_Holm_p": 0.022324888375558124,
+      "Spearman_source_gain_target_gain_descriptive": -0.5429909009330565,
+      "posthoc_target_subject_bootstrap95": [
+        0.004636015325670487,
+        0.04034482758620686
+      ]
+    },
+    "LedoitWolf": {
+      "mean": 0.04865900383141762,
+      "median": 0.046666666666666745,
+      "trim10_mean": 0.04506666666666666,
+      "LOO_person_mean_range": [
+        0.042539682539682544,
+        0.05277777777777778
+      ],
+      "LOO_all_positive": true,
+      "harmed_gt_0_02": 3,
+      "MC_250k_two_sided_posthoc_p": 0.000251998992004032,
+      "frozen_Holm_p": 0.0005099974500127499,
+      "Spearman_source_gain_target_gain_descriptive": -0.43891625615763535,
+      "posthoc_target_subject_bootstrap95": [
+        0.02593869731800765,
+        0.07252873563218393
+      ]
+    }
+  },
+  "limitations": [
+    "paired sample correlation p-values invalid due overlapping source pools; no p-value used",
+    "NO raw EEG retraining",
+    "post-hoc sign flips are integrity checks, do not replace frozen Holm inference",
+    "resampling conditional on fitted source pool, not cross-dataset uncertainty",
+    "source only signature NOT validated as prospectively useful selector"
+  ]
+}
