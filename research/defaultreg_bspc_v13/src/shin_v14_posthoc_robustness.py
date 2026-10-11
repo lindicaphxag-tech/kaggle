@@ -58,6 +58,20 @@ def audit(path: str) -> dict:
         # SHA pins exactly the displayed 29-point source gain vs outcome figure.
         pairs = "".join(f"{a:.8f},{b:.8f}\n" for a, b in zip(x, ycov))
         assert hashlib.sha256(pairs.encode()).hexdigest() == PAIR_SHA
+        # Verify that the plotted 29 dots are the archived participant
+        # values, not merely a hand-drawn or visually suggestive graphic.
+        from pathlib import Path
+        import re
+        fig = Path(__file__).resolve().parents[1] / "97_v14_shin_source_target_posthoc.tex"
+        graphic = fig.read_text(encoding="utf-8")
+        dots = re.findall(r"\\fill\[(red|blue)![^\]]*\] \(([\d.]+),([\d.]+)\) circle", graphic)
+        assert len(dots) == 29, "figure count differs from 29 original folds"
+        for (colour, xx, yy), source_gain, outcome in zip(dots, x, ycov):
+            expected_x = 1.45 + 10.65 * (source_gain - .02) / .015
+            expected_y = 1.0 + 5.3 * (outcome + .11) / .28
+            assert abs(float(xx) - expected_x) <= .0006
+            assert abs(float(yy) - expected_y) <= .0006
+            assert colour == ("red" if outcome < -.020000000001 else "blue")
         contrasts = {}
         for name, base, y, seed in [
             ("covariance_NLL", "source_cov_nll_full_domain_LDA", ycov, 61011),
