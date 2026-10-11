@@ -1,0 +1,27 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "iameijaz",
+      "body": "### Description\n\nUnable to copy the output from the Script Editor in Isaac Sim, there is no option to do that.\n\n### Isaac Sim version\n\n6.1.0\n\n### Operating System (OS)\n\nWindows 11\n\n### GPU Name\n\nNot Applicable\n\n### GPU Driver and CUDA versions\n\nNot Applicable\n\n### Logs\n\n_No response_\n\n### Additional information\n\n_No response_",
+      "created_at": "2026-10-10T22:27:27Z",
+      "html_url": "https://github.com/isaac-sim/IsaacSim/issues/874",
+      "id": "isaac-sim/IsaacSim#874",
+      "issue_number": 874,
+      "labels": [
+        "isaac-sim-ov",
+        "isaac-sim-v6-1-0"
+      ],
+      "repository": "isaac-sim/IsaacSim",
+      "surface_sha256": "4b0beb02854fc34a332029b536f1a63a7b7bbe61709433559f09f2443d7bb637",
+      "title": "Script Editor won't let me copy output"
+    }
+  ],
+  "post_activation_issue_identities_observed": 72,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-11T01:15:12Z",
+  "schema_version": 1
+}
