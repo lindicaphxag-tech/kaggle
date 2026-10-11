@@ -1,0 +1,34 @@
+\begin{abstract}
+\textbf{Objective:}
+Covariance-estimation fidelity and discrimination of unseen EEG participants
+need not favour the same regularisation strength. We ask whether this
+difference changes zero-target cross-subject decoding and conclusions about
+spectral representations.
+\textbf{Methods:}
+Within a fixed covariance/tangent-space linear-discriminant family, we
+compare source-participant macro-AUC selection, source covariance
+predictive negative log-likelihood selection and analytic Ledoit--Wolf
+shrinkage over the full scalar path. All reported target comparisons use
+source-only selection. Experiments include prospectively held-out EEGMMIDB
+participants, two separately pre-data-frozen BNCI datasets, an independently
+frozen Shin2017A cohort and a distinct prespecified representation test.
+Participant-level paired inference and method-specific multiplicity
+correction are retained.
+\textbf{Results:}
+On EEGMMIDB S021--S040 (\(N=20\)), discrimination-based selection improved
+macro AUC by 0.0561 versus covariance-NLL and 0.0920 versus Ledoit--Wolf
+(both Holm \(p<0.006\)); five and four participants, respectively, suffered
+losses greater than 0.02 AUC. BNCI2014\_002 (\(N=14\)) and BNCI2015\_001
+(\(N=12\)) preserved positive effect directions but neither passed its
+predeclared Holm family. Separately frozen Shin2017A (\(N=29\)) improved
+by 0.0222 versus covariance-NLL (Holm \(p=0.0223\)), with five participants
+materially harmed. A prospective representation interaction
+(\(-0.0778\) AUC, Holm \(p=0.0133\)) refuted the original claim of a
+universally favourable filter bank. A post-outcome whole-path sensitivity
+analysis did not establish population frontier spans above 0.02 AUC.
+\textbf{Conclusion:}
+The regularisation \emph{selection objective} is a consequential
+measurement-validity choice in the studied zero-target EEG pipelines.
+The findings support neither a universal strength multiplier nor
+participant-level safety or an invariably improved spectral representation.
+\end{abstract}
