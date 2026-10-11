@@ -52,6 +52,8 @@ intervention, and harmed-participant tails. The objective is not to show
 that one numerical shrinkage value is universally optimal; it is to measure
 when a default estimation objective can invalidate a transfer comparison.
 
+\input{94_v13_prior_scope.tex}
+
 \section{Methods}
 \subsection{Datasets and target-information budgets}
 PhysioNet EEGMMIDB S001--S008 is the method-development source pool.
@@ -148,16 +150,30 @@ participant. Neither sessions nor trial counts are treated as independent
 replications. Post-primary source-pool sensitivity and post-outcome frontier
 sensitivity are not relabelled as new confirmatory tests.
 
+\input{95_v13_protocol_integrity.tex}
+
 \subsection{Regularisation validity frontier}
-On each external dense regularisation path, define the source covariance
-regret \(R_C(\lambda)\) and the observed participant-mean target AUC path
-\(\bar A(\lambda)\). The observed conditional AUC range within source
-covariance-regret budget \(\delta\) is
+In a leave-one-participant-out cohort, each held-person fold \(g\) has
+its own source-only covariance regret \(r_g(\lambda)\) and frozen target
+AUC path \(A_g(\lambda)\). We aggregate both paths by person and restore
+the common finite-grid zero by defining
+\[
+ \bar r(\lambda)=G^{-1}\sum_{g=1}^{G}r_g(\lambda),\qquad
+ \widetilde r(\lambda)=\bar r(\lambda)-\min_{\ell\in\Lambda}\bar r(\ell),
+ \quad \bar A(\lambda)=G^{-1}\sum_{g=1}^{G}A_g(\lambda).
+\]
+The observed AUC envelope within cohort-mean source-fidelity
+regret budget \(\delta\) is
 \[
  E(\delta)=
- [\min_{R_C(\lambda)\le\delta}\bar A(\lambda),
-  \max_{R_C(\lambda)\le\delta}\bar A(\lambda)].
+ \left[
+ \min_{\lambda:\widetilde r(\lambda)\le\delta}\bar A(\lambda),
+ \max_{\lambda:\widetilde r(\lambda)\le\delta}\bar A(\lambda)
+ \right].
 \]
+This cohort-mean regret is \emph{not} the raw per-person frontier
+reported in the independently frozen Shin2017A experiment; the two
+different statistics cannot be pooled.
 The descriptive threshold \(\delta_{0.02}\) is the smallest source-fidelity
 regret allowing a 0.02 AUC spread. Because the empirical range
 maximises over 405 candidates, pointwise percentile bootstrap lower
@@ -231,6 +247,8 @@ lower range bound is zero; a population-wide effect over 0.02
 cannot be claimed from these data.
 
 \input{92_table_validity_frontier.tex}
+
+\input{96_v13_robustness_and_negative_results.tex}
 
 \section{Discussion}
 The study establishes a practical inference hazard inside the tested
