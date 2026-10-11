@@ -7,7 +7,7 @@
   "files": [
     {
       "filename": "main_bspc_v13_DRAFT.tex",
-      "source_blob_sha": "53098cc769501d43e7c1f4833a64f49d8a0c0f8c",
+      "source_blob_sha": "709b2d46ac054df3a8b626a5d7fc7557e9d05876",
       "commit": "68632f4e5d9f3e4705a0acdb7039f89d1bfd5e6b",
       "bytes": 15725
     },
@@ -49,7 +49,7 @@
     },
     {
       "filename": "95_v13_protocol_integrity.tex",
-      "source_blob_sha": "4e2d30389180568611537337e94b7984dd90edbf",
+      "source_blob_sha": "3efb4588730ad1b5c19d320945125697ffc33268",
       "commit": "1ddfc31dacf80b99b9826d7d6d52a350f862a6db",
       "bytes": 3061
     },
@@ -58,6 +58,26 @@
       "source_blob_sha": "01b8a67c1b6b5caa789103c26529f7e00b18e4d1",
       "commit": "724066e72e6b774dfee2518aee54bf374dc5432d",
       "bytes": 2660
+    },
+    {
+      "filename": "verify_bspc_submission_claims.py",
+      "source_blob_sha": "1912026a340598996ebf9ac5526dac99fbdec18a"
+    },
+    {
+      "filename": "STATUS.md",
+      "source_blob_sha": "2bb604fee26a9dd0d3369b4b7a14cceb4a822b40"
+    },
+    {
+      "filename": "evidence/current_verified_results.json",
+      "source_blob_sha": "22b2ae1832a591f69f89d37d4c236ac7232d79e4"
+    },
+    {
+      "filename": "evidence/shin2017a_logged_receipt_v13.json",
+      "source_blob_sha": "2f3b91d0bf8fbfa815c29ff850b9c4e88db7b7dc"
+    },
+    {
+      "filename": "evidence/shin2017a_original_artifact_verified_v13.json",
+      "source_blob_sha": "2806a89d92a71fc48aa34a9ffb598a7397e33217"
     }
   ],
   "scope": "Source mirror for typeset build only. No reexecution of EEG data; no independent confirmation of source statistical claims."
