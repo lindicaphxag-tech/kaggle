@@ -1,0 +1,41 @@
+\begin{abstract}
+\textbf{Objective:}
+Regularisation strength selected for covariance fit may differ from
+the strength selected for discrimination of unseen EEG participants.
+We investigate the consequence for zero-target cross-subject
+decoding and the validity of spectral-representation comparisons,
+while auditing the precise source-selection objectives.
+\textbf{Methods:}
+We compare participant-grouped source macro-AUC selection with a
+class-centred held-source covariance Gaussian log score
+(the original runner's historically named covariance-NLL criterion)
+and analytic Ledoit--Wolf in a frozen covariance/tangent-LDA
+pipeline. Independent EEG cohorts, paired participant inference,
+prospectively frozen representation controls and original frozen
+trial-score audits are reported separately. We distinguish the
+original covariance log score from a genuinely predictive
+class-conditional Gaussian log score, which is proposed but
+has not yet been tested against EEG outcomes.
+\textbf{Results:}
+On EEGMMIDB S021--S040 (\(N=20\)), source-macro selection
+increased mean AUC by 0.0561 over the class-centred covariance
+score selector (Holm \(p=0.00597\)); five participants were
+harmed by more than 0.02 AUC. Two independently frozen BNCI
+cohorts had positive average directions but individually
+non-significant adjusted comparisons. Separately frozen
+Shin2017A (\(N=29\)) reported +0.0222 AUC (Holm \(p=0.0223\));
+the original score archive passed independent checksum
+verification. An additional prospective filter-bank experiment
+contradicted the originally hypothesised universal advantage.
+A new estimand audit proves that class-specific translation
+of held-source validation features leaves the frozen
+covariance score unchanged, unlike proper predictive likelihood.
+\textbf{Conclusions:}
+Objective mismatch has experimentally measurable consequences
+in the studied source-only EEG setting, but results against
+a validation-class-centred covariance score must not be
+misrepresented as results against true out-of-sample
+predictive likelihood. No universal shrinkage strength,
+target-safe switching rule or population-level spectral
+advantage is established.
+\end{abstract}
