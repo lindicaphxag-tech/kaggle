@@ -1,0 +1,63 @@
+
+\subsection{Evidence chronology, fair comparisons and provenance}
+The hierarchy of evidence matters because selecting a method
+after inspecting a prospective cohort invalidates that cohort's
+original role for the newly chosen method. Table~\ref{tab:evidence-role-v13}
+sets out which target blocks were frozen independently, what outcome
+was compared, and what conclusion each permits.
+
+\begin{table}[tb]
+\centering
+\caption{Non-interchangeable external evidence families. The table
+describes protocol roles; the significance values are interpreted
+only within their original test families.}
+\label{tab:evidence-role-v13}
+\small
+\begin{tabular}{p{0.19\linewidth}c p{0.25\linewidth} p{0.28\linewidth}}
+\toprule
+Block & Persons & Pre-outcome role & Inference permitted\\
+\midrule
+EEGMMIDB S021--S040 & 20 & Main prospective objective test &
+Two primary paired, Holm-controlled contrasts\\
+BNCI2014\_002 & 14 & Joint v5 TRUE PRE-DATA panel &
+Independent external effect direction; test inconclusive\\
+BNCI2015\_001 & 12 & Same frozen v5 family &
+Independent external effect direction; test inconclusive\\
+Shin2017A & 29 & Separate prospective PR97 family &
+Separate adjusted objective-ordering replication\\
+EEGMMIDB S041--S060 & 20 & Prespecified representation block &
+Paired representation-by-objective interaction\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The nested source pipeline has to refit feature standardisation,
+tangent reference and projection \emph{inside every inner source
+training fold}; otherwise the validation participant can influence
+its purportedly held-out geometry without contributing a class label.
+Neither target features nor target batch statistics enter the Z0
+reference or regularisation selection. Within the frozen test
+cohorts, target decisions are evaluated only after the model score
+family has been generated and bound to a checksum; score generation
+and outcome interpretation form distinct auditable steps.
+
+The exact frozen 27-point path includes strengths near the
+analytic Ledoit--Wolf optimum and both ends of the allowable
+interval. Thus the source discrimination versus covariance-NLL
+difference is not produced by excluding low shrinkage from one
+criterion's search. Nested source selection, not a target fold
+or target AUC, supplies every nominated parameter. Likewise,
+the filter-bank comparison keeps each representation's preparation
+inside available source data and preserves the same Z0 target
+information budget. Feature dimension remains a potential
+mechanistic confound, which is why the prespecified source-PCA
+and nuisance-augmented controls are reported.
+
+The exact-score and chronology claims are not interchangeable:
+the main frozen score-family evidence can be checked from
+machine-readable source artifacts, while Shin2017A's separately
+executed original job has its own signed protocol, participant
+scores and score-manifest checksum. An independent reconstruction
+of that artifact, rather than the appearance of a p-value in
+a status note, is the release criterion for reproducible
+external results.
