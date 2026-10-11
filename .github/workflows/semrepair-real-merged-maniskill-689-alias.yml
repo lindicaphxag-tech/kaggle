@@ -1,0 +1,50 @@
+name: SemRepair actual merged ManiSkill 689 hidden original-input alias mutation and minimum-copy source patch
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/real_merged_maniskill_alias_repair.py'
+      - 'research/semrepair/test_real_merged_maniskill_alias_repair.py'
+      - '.github/workflows/semrepair-real-merged-maniskill-689-alias.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actual-publisher-hidden-mutating-controller-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install original ManiSkill source native Torch helper
+        run: python -m pip install "torch==2.7.1"
+      - name: Execute real publisher original and merged methods with 4 AST code candidates and 192 calls
+        run: python -m unittest -v research.semrepair.test_real_merged_maniskill_alias_repair
+      - name: Record caller-input mutation invisible to all output equality-only tests
+        run: python -m research.semrepair.real_merged_maniskill_alias_repair > true_maniskill_689_192_input_alias_mutation.json
+      - name: Report output-only false positives, false mutation and exact independently merged source version
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('true_maniskill_689_192_input_alias_mutation.json'))
+          print('EXTERNAL_PUBLISHER_MERGED',r['upstream_publisher_merged_PR'])
+          print('REAL_CODE_BEFORE_AFTER',r['exact_before_commit'],r['exact_after_commit'])
+          print('CASES',r['tested_input_configs'])
+          print('MINIMUM_COPY_TEMPLATE',r['selected_lowest_copy_volume_author_template'])
+          for name,x in r['aggregate'].items():
+              print('PATCH',name,'OUTPUT_PASS',x['action_output_equal_original_publisher_merged_all_192'],
+                    'MUTATED_HIGH_NORM',x['violated_caller_input_immutability_high_norm'],
+                    'MUTATED_LOW_NORM',x['violated_caller_input_immutability_low_norm'],
+                    'COPIED_ELEMENTS',x['copy_elements_per_case'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semrepair-independent-merged-ManiSkill-689-alias-output-test-counterexample
+          path: true_maniskill_689_192_input_alias_mutation.json
+          if-no-files-found: warn
+          retention-days: 90

@@ -1,0 +1,50 @@
+name: SemRepair independent upstream LeRobot original-code anchor source regression
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/lerobot_temporal_anchor_case.py'
+      - 'research/semrepair/test_lerobot_temporal_anchor_case.py'
+      - '.github/workflows/semrepair-external-lerobot-anchor-reproduction.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-software-kernel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install original external PyTorch software kernel
+        run: python -m pip install "torch==2.7.1"
+      - name: Run pinned ORIGINAL LeRobot source under author-injected temporal regression
+        run: python -m unittest -v research.semrepair.test_lerobot_temporal_anchor_case
+      - name: Freeze all paired informationally ambiguous raw software examples
+        run: python -m research.semrepair.lerobot_temporal_anchor_case > original_lerobot_anchor_full.json
+      - name: Disclose source blob identity, baselines, error and boundaries
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('original_lerobot_anchor_full.json'))
+          for key in ('exact_external_git_commit','actual_external_source_git_blob',
+                      'verified_external_source_bytes_sha256','world_pairs',
+                      'scenario_worlds','nonindependent_action_rows',
+                      'mean_author_injected_stale_reference_error',
+                      'mean_minimax_lower_bound_on_current_only_error',
+                      'max_fixed_error','vendor_reported_software_bug',
+                      'physical_robot_tasks_executed'):
+              print(key,r[key])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semrepair-pinned-original-lerobot-temporal-source-128cases
+          path: original_lerobot_anchor_full.json
+          if-no-files-found: warn
+          retention-days: 90

@@ -1,0 +1,45 @@
+name: SemRepair 3-way sound hidden software-world source-and-history minimax repair
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/robust_multiworld_upstream_control.py'
+      - 'research/semrepair/test_robust_multiworld_upstream_control.py'
+      - 'research/semrepair/robust_observation_authority_optimizer.py'
+      - 'research/semrepair/test_robust_observation_authority_optimizer.py'
+      - '.github/workflows/semrepair-robust-world-observation-authority.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  bounded-upstream-physical-proof-and-source-choice:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate robust same-upstream uncertainty, witness and true authority refusals
+        run: |
+          python -m unittest -v research.semrepair.test_robust_multiworld_upstream_control
+          python -m unittest -v research.semrepair.test_robust_observation_authority_optimizer
+      - name: Export full source/evidence candidate evidence with per-world real command witnesses
+        run: python -m research.semrepair.robust_observation_authority_optimizer > true_upstream_source_evidence_joint_authority.json
+      - name: Show per-contract min-cost repair decisions and uncertainty classes
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('true_upstream_source_evidence_joint_authority.json'))
+          for name,z in r['cases'].items():
+              print(name,z['decision'],'SRC',z['source_repair'],
+                    'EVIDENCE',z['historical_evidence'],
+                    'COST',z['minimum_declared_finite_cost'])
+              for p in z['candidate_records']:
+                  print('PAIR',p['source'],p['evidence'],
+                        'DECISION',p['decision'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: semrepair-true-upstream-unknown-source-worlds-cost-and-action-certificates
+          path: true_upstream_source_evidence_joint_authority.json
+          retention-days: 90

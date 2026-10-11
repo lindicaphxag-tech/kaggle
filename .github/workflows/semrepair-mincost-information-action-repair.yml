@@ -1,0 +1,42 @@
+name: SemRepair cost-optimal authorized joint information and actuation repair
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/finite_authorized_joint_repair_planner.py'
+      - 'research/semrepair/test_finite_authorized_joint_repair_planner.py'
+      - '.github/workflows/semrepair-mincost-information-action-repair.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  true-minimax-finite-repair-decision:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Test action and information repairs and witness errors under strict / medium / loose tolerance
+        run: |
+          python -m unittest -v research.semrepair.test_joint_information_reachability_operator
+          python -m unittest -v research.semrepair.test_finite_authorized_joint_repair_planner
+      - name: Record every authority-constrained joint action and history minimax control witness
+        run: python -m research.semrepair.finite_authorized_joint_repair_planner > conditional_minimum_authority_repair.json
+      - name: Report all repair decisions, refusals and declared source costs
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('conditional_minimum_authority_repair.json'))
+          for label,r in x['results'].items():
+              print('SCENARIO',label,'DECISION',r['decision'],
+                    'SOURCE',r['selected_source_component'],
+                    'EVIDENCE',r['selected_information_component'],
+                    'MIN_DECLARED_COST',r['minimum_catalog_cost'],
+                    'WORST_ACTION_ERROR',r['worst_case_action_error_upper_bound'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: semrepair-exact-joint-information-actuation-authority-choice
+          path: conditional_minimum_authority_repair.json
+          retention-days: 90

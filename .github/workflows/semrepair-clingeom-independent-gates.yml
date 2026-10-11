@@ -1,0 +1,60 @@
+name: SemRepair ClinGeom independent evidence gates
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/blind_authority_runner.py'
+      - 'research/semrepair/test_blind_authority_runner.py'
+      - 'research/semrepair/adversarial_stopping_assay.py'
+      - 'research/semrepair/test_adversarial_stopping_assay.py'
+      - 'research/semrepair/artifact_byte_authority.py'
+      - 'research/semrepair/test_artifact_byte_authority.py'
+      - 'research/semrepair/pinned_repair_payload.py'
+      - 'research/semrepair/test_pinned_repair_payload.py'
+      - 'research/semrepair/tamper_resilient_authority.py'
+      - 'research/semrepair/test_tamper_resilient_authority.py'
+      - 'research/semrepair/provenance_bound_authorizer.py'
+      - 'research/semrepair/test_provenance_bound_authorizer.py'
+      - 'research/semrepair/bound_repair_authority.py'
+      - 'research/semrepair/test_bound_repair_authority.py'
+      - 'research/medical_geometry/patient_evidence_audit.py'
+      - 'research/medical_geometry/test_patient_evidence_audit.py'
+      - 'research/medical_geometry/paired_negative_analysis.py'
+      - 'research/medical_geometry/test_paired_negative_analysis.py'
+      - 'research/medical_geometry/frozen_source_consistency.py'
+      - 'research/medical_geometry/test_frozen_source_consistency.py'
+      - '.github/workflows/semrepair-clingeom-independent-gates.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.10', '3.12', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Hidden-world authority refusal tests
+        run: python -m unittest discover -v -s research/semrepair -p test_blind_authority_runner.py
+      - name: Digest-bound repair authorization and refusal
+        run: python -m unittest discover -v -s research/semrepair -p test_bound_repair_authority.py
+      - name: Exhaustive adversarial observation and minimax-policy replay
+        run: python -m unittest -v research.semrepair.test_adversarial_stopping_assay
+      - name: Verify concrete artifact bytes against proposed repair authority
+        run: python -m unittest -v research.semrepair.test_artifact_byte_authority
+      - name: Integrated probe-source and byte-bound repair authorizer
+        run: python -m unittest -v research.semrepair.test_provenance_bound_authorizer
+      - name: Verify immutable snapshot handoff under path replacement attacks
+        run: python -m unittest -v research.semrepair.test_pinned_repair_payload
+      - name: Exhaustive bounded-evidence substitution and selective repair-authority oracle
+        run: python -m unittest -v research.semrepair.test_tamper_resilient_authority
+      - name: Patient-level medical geometry audit tests
+        run: python -m unittest discover -v -s research/medical_geometry -p test_patient_evidence_audit.py
+      - name: Validate original six-patient real MRI source report against signed table
+        run: python -m unittest -v research.medical_geometry.test_frozen_source_consistency
+      - name: ClinGeom six-patient exploratory negative-result analysis
+        run: python -m unittest -v research.medical_geometry.test_paired_negative_analysis

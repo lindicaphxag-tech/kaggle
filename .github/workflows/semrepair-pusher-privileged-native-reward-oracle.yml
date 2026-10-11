@@ -1,0 +1,55 @@
+name: SemRepair official Pusher full-information native reward planning oracle
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/pusher_privileged_dynamics_planner.py'
+      - 'research/semrepair/test_pusher_privileged_dynamics_planner.py'
+      - '.github/workflows/semrepair-pusher-privileged-native-reward-oracle.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-reward-upper-bound:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    env:
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install official Pusher with pinned native MuJoCo and published SAC reader
+        run: python -m pip install "gymnasium[mujoco]==1.1.1" "stable-baselines3==2.6.0" "huggingface-hub==0.34.4"
+      - name: Verify planner rewards equal ACTUAL official original reward on same native state
+        run: python -m unittest -v research.semrepair.test_pusher_privileged_dynamics_planner
+      - name: Run privileged live-model one-step reward oracle on ALL sixteen originally observed seeds
+        run: python -m research.semrepair.pusher_privileged_dynamics_planner > privileged_pusher_reward_oracle_raw.json
+      - name: Report stronger controller success AND any failures without selection
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('privileged_pusher_reward_oracle_raw.json'))
+          print('SCENARIO_SHA256',r['scenario_sha256'])
+          print('TOTAL_NATIVE_REWARD_EVALUATIONS',r['oracle_model_reward_evaluations'])
+          print('ACTUAL_EPISODES',r['real_task_record_count'])
+          for name,x in sorted(r['results'].items()):
+              print('ARM',name,str(x['n']),round(x['mean_official_return'],6),
+                    round(x['mean_actual_object_goal_distance'],6))
+          for name,x in sorted(r['paired'].items()):
+              print('SOURCE_MINUS',name,round(x['mean_source_advantage_official_return'],6),
+                    'object_progress_reduction',round(x['mean_source_object_goal_distance_reduction'],6),
+                    'wins',x['source_reward_wins'],'losses',x['source_reward_losses'],
+                    'ties',x['reward_ties'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semrepair-pusher-privileged-real-model-task-reward-oracle
+          path: privileged_pusher_reward_oracle_raw.json
+          if-no-files-found: warn
+          retention-days: 90

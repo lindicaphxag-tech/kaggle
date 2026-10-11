@@ -1,0 +1,74 @@
+name: SemRepair native planar closed-loop interface task
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/native_planar_task_repair.py'
+      - 'research/semrepair/test_native_planar_task_repair.py'
+      - 'research/semrepair/observable_interface_factorization.py'
+      - 'research/semrepair/test_observable_interface_factorization.py'
+      - 'research/semrepair/deployment_validity_shield.py'
+      - 'research/semrepair/test_deployment_validity_shield.py'
+      - '.github/workflows/semrepair-planar-task.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  paired-native-task:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned native MuJoCo
+        run: python -m pip install mujoco==3.3.7
+      - name: Reexecute fixed controller and all paired task arms
+        run: |
+          python -m unittest -v research.semrepair.test_native_planar_task_repair
+          python -m research.semrepair.native_planar_task_repair > planar_task_raw.json
+      - name: Blind structural ABI recovery from two probes and unseen shear controller
+        run: |
+          python -m unittest -v research.semrepair.test_observable_interface_factorization
+          python - <<'PY'
+          import json
+          from research.semrepair.observable_interface_factorization import blind_closed_loop_planar_assay
+          r=blind_closed_loop_planar_assay()
+          with open('blind_factorization_raw.json','w') as f: json.dump(r,f,indent=2,sort_keys=True)
+          for label,value in r['results'].items():
+              print(label,value)
+          PY
+      - name: Falsify unsafe 3-probe linearity and test conditional deployment envelope
+        run: |
+          python -m unittest -v research.semrepair.test_deployment_validity_shield
+          python - <<'PY'
+          import json
+          from research.semrepair.deployment_validity_shield import nonlinear_probe_challenge, matched_seven_probe_baseline_challenge, cross_axis_equal_cost_falsification
+          result={'coordinate_cubic':nonlinear_probe_challenge(),
+                  'matched_readout_budget':matched_seven_probe_baseline_challenge(),
+                  'cross_axis_falsification':cross_axis_equal_cost_falsification()}
+          with open('nonlinear_validity_raw.json','w') as f:
+              json.dump(result,f,indent=2,sort_keys=True)
+          print('coordinate cubic:',result['coordinate_cubic']['legacy_false_linear_acceptances'],result['coordinate_cubic']['extra_probe_detected_nonlinear'])
+          print('same budget:',result['matched_readout_budget']['detection_counts'])
+          print('cross axis:',result['cross_axis_falsification']['detection_counts'])
+          PY
+      - name: Verify raw denominator and report compact actual outcomes
+        run: |
+          python - <<'PY'
+          import json
+          report=json.load(open('planar_task_raw.json'))
+          assert report['target_count']==16
+          assert report['independent_robot_families']==1
+          assert report['source_owner_oracle_uses_truth']
+          assert len(report['rows'])==16*(1+4*5)
+          for arm,out in sorted(report['results'].items()):
+              print(f"{arm}: {out['success']}/{out['trials']}, mean_distance={out['mean_goal_distance']:.5f}")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: semrepair-native-planar-task-raw
+          path: |
+            planar_task_raw.json
+            blind_factorization_raw.json
+            nonlinear_validity_raw.json
+          retention-days: 90

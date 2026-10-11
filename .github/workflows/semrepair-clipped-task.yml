@@ -1,0 +1,48 @@
+name: SemRepair native articulated task under hidden internal control clipping
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/internal_clip_task_validation.py'
+      - 'research/semrepair/test_internal_clip_task_validation.py'
+      - 'research/semrepair/two_link_cross_controller_benchmark.py'
+      - 'research/semrepair/internal_saturation_reachability.py'
+      - '.github/workflows/semrepair-clipped-task.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  clipped-closed-loop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned MuJoCo and NumPy
+        run: python -m pip install mujoco==3.3.7
+      - name: Compare blackbox oracle and source patch in native robot task
+        run: |
+          python -m unittest -v research.semrepair.test_internal_clip_task_validation
+          python -m research.semrepair.internal_clip_task_validation > clipped_task_raw.json
+      - name: Display ALL healthy and failed trials
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('clipped_task_raw.json'))
+          print('SCENARIO SHA256:',r['scenario_sha256'])
+          print('PHYSICAL FAMILIES:',r['physical_families'])
+          print('RAW EPISODES:',len(r['rows']))
+          for name,row in sorted(r['summary'].items()):
+              print(name,str(row['successes'])+'/'+str(row['goals']),
+                    'mean_task_error',round(row['mean_integrated_task_error'],5),
+                    'mean_torque_gap',round(row['mean_torque_tracking_error'],5),
+                    'max_torque_gap',round(row['max_torque_tracking_error'],5))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semrepair-clipped-task-traces-raw
+          path: clipped_task_raw.json
+          if-no-files-found: warn
+          retention-days: 90

@@ -1,0 +1,53 @@
+name: SemRepair temporal-source real LeRobot evidence-constrained authority operator
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/temporal_evidence_repair_operator.py'
+      - 'research/semrepair/temporal_evidence_repair_evaluation.py'
+      - 'research/semrepair/test_temporal_evidence_repair_evaluation.py'
+      - '.github/workflows/semrepair-lerobot-temporal-evidence-operator.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  cross-project-real-source-temporal-operator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    env:
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned PyTorch original vendor processor backend
+        run: python -m pip install "torch==2.7.1"
+      - name: Check minimax optimality, information parity, authority gating and false-source alarms
+        run: python -m unittest -v research.semrepair.test_temporal_evidence_repair_evaluation
+      - name: Run complete true upstream program two-world case and export all interventions
+        run: python -m research.semrepair.temporal_evidence_repair_evaluation > original_lerobot_evidence_operator.json
+      - name: Report original source SHA and all positive and null intervention outcomes
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('original_lerobot_evidence_operator.json'))
+          for key in ('verified_git_commit','verified_source_blob_sha1',
+                      'scenario_worlds','mean_current_only_max_error',
+                      'mean_minimax_theory_lower_bound',
+                      'max_authorized_source_error','max_history_enabled_blackbox_error',
+                      'untrusted_action_refusals','stale_epoch_refusals',
+                      'source_repair_is_not_necessary_when_valid_cache_available',
+                      'minimum_declared_cost_source_only',
+                      'minimum_declared_cost_with_valid_cache',
+                      'source_bytes_actually_modified'):
+              print(key,r[key])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semrepair-pinned-original-lerobot-full-information-authority-ablation
+          path: original_lerobot_evidence_operator.json
+          if-no-files-found: warn
+          retention-days: 90

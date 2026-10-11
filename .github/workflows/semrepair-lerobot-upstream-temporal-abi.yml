@@ -1,0 +1,51 @@
+name: SemRepair pinned independent LeRobot relative-action temporal contract
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/lerobot_temporal_anchor_case.py'
+      - 'research/semrepair/test_lerobot_temporal_anchor_case.py'
+      - '.github/workflows/semrepair-lerobot-upstream-temporal-abi.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actual-third-party-software-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned real CPU PyTorch, not an invented tensor mock
+        run: python -m pip install "torch==2.6.0" --index-url https://download.pytorch.org/whl/cpu
+      - name: Verify exact pinned genuine LeRobot Git blob and execute original conversion functions
+        run: python -m unittest -v research.semrepair.test_lerobot_temporal_anchor_case
+      - name: Run all two-world temporal reference faults against unchanged upstream code
+        run: python -m research.semrepair.lerobot_temporal_anchor_case > actual_lerobot_source_temporal_raw.json
+      - name: Report source hash, information lower bound and honest mutation provenance
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('actual_lerobot_source_temporal_raw.json'))
+          print('EXTERNAL_REPO',r['official_external_repo'])
+          print('EXTERNAL_COMMIT',r['exact_external_git_commit'])
+          print('VERIFIED_UPSTREAM_GIT_BLOB_SHA1',r['actual_external_source_git_blob'])
+          print('VERIFIED_UPSTREAM_SHA256',r['verified_external_source_bytes_sha256'])
+          print('VENDOR_DEFECT_CLAIMED',r['vendor_reported_software_bug'])
+          print('FAULT_AUTHOR_INJECTED',r['fault_is_author_mutation_of_callsite'])
+          print('PAIRED_INDISTINGUISHABLE_WORLD_GROUPS',r['world_pairs'])
+          print('RAW_ACTION_VECTORS_NOT_INDEPENDENT_ROBOT_TRIALS',r['nonindependent_action_rows'])
+          print('MAX_EXECUTABLE_SOURCE_CORRECTION_ERROR',r['max_fixed_error'])
+          print('MEAN_CURRENT_ONLY_MINIMAX_UNAVOIDABLE_ERROR',r['mean_minimax_lower_bound_on_current_only_error'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semrepair-pinned-real-lerobot-temporal-anchor-two-world-raw
+          path: actual_lerobot_source_temporal_raw.json
+          if-no-files-found: warn
+          retention-days: 90

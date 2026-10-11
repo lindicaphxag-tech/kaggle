@@ -1,0 +1,43 @@
+name: SemRepair articulated arm cross-controller task and equal-info baseline
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/two_link_cross_controller_benchmark.py'
+      - 'research/semrepair/test_two_link_cross_controller_benchmark.py'
+      - '.github/workflows/semrepair-two-link-cross-controller.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  articulated-arm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned native MuJoCo
+        run: python -m pip install mujoco==3.3.7
+      - name: All physical trials, independent baseline, and invariants
+        run: |
+          python -m unittest -v research.semrepair.test_two_link_cross_controller_benchmark
+          python -m research.semrepair.two_link_cross_controller_benchmark > two_link_full_raw.json
+      - name: Publish all case and controller outcomes without filtering failures
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('two_link_full_raw.json'))
+          print('SCENARIO HASH',r['scenario_hash'])
+          print('ALL ARMS',len(r['raw']))
+          for k,v in sorted(r['summary'].items()):
+              print(k, str(v['successes'])+'/'+str(v['goals']),round(v['mean_terminal_error'],5))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semrepair-two-link-mujoco-full-raw
+          path: two_link_full_raw.json
+          if-no-files-found: warn
+          retention-days: 90

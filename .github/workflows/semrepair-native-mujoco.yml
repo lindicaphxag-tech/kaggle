@@ -32,5 +32,71 @@ jobs:
         run: python -m pip install mujoco==3.3.7
       - name: Native physical worlds, tap synthesis and repair closure
         run: python research/semrepair/mujoco_native_authority.py
+      - name: Held-excitation MuJoCo physical blind-authority comparison
+        run: |
+          python -m unittest -v research.semrepair.test_native_measured_blind_replay
+          python -m research.semrepair.native_measured_blind_replay | tee measured_authority_result.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: measured-authority-python-${{ matrix.python }}
+          path: measured_authority_result.json
+          retention-days: 30
+      - name: Attacked actuator-force observation, incorrect repair witness and fail-closed policy
+        run: |
+          python -m unittest -v research.semrepair.test_native_tap_integrity_attack
+          python -m research.semrepair.native_tap_integrity_attack | tee tap_integrity_attack.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tap-integrity-counterexample-python-${{ matrix.python }}
+          path: tap_integrity_attack.json
+          retention-days: 45
+      - name: Open-catalog source-semantic impossibility with real unseen MuJoCo servos
+        run: |
+          python -m unittest -v research.semrepair.test_open_catalog_source_gap
+          python -m research.semrepair.open_catalog_source_gap | tee open_catalog_source_gap.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: open-catalog-native-mujoco-python-${{ matrix.python }}
+          path: open_catalog_source_gap.json
+          retention-days: 60
+      - name: Source-bound, challenge-response authentic MuJoCo sensor transcript checks
+        run: |
+          python -m unittest -v research.semrepair.test_source_attested_tap_experiment
+          python -m research.semrepair.source_attested_tap_experiment | tee source_attested_tap_result.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: source-bound-challenge-python-${{ matrix.python }}
+          path: source_attested_tap_result.json
+          retention-days: 60
+      - name: Minimum provenance evidence versus full model identity on measured MuJoCo aliases
+        run: |
+          python -m unittest -v research.semrepair.test_minimal_trusted_evidence
+          python -m research.semrepair.minimal_trusted_evidence | tee minimum_provenance_certificate.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: minimum-provenance-native-mujoco-python-${{ matrix.python }}
+          path: minimum_provenance_certificate.json
+          retention-days: 60
+      - name: Account for wrong repairs, refusals and coverage in 24 native MuJoCo conditions
+        run: |
+          python -m unittest -v research.semrepair.test_open_catalog_risk_coverage
+          python -m research.semrepair.open_catalog_risk_coverage | tee open_catalog_selective_risk_result.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: open-catalog-selective-risk-python-${{ matrix.python }}
+          path: open_catalog_selective_risk_result.json
+          retention-days: 60
+      - name: Exact physical actuator envelope with source-bound repair admissibility
+        run: python -m unittest -v research.semrepair.test_physical_repair_envelope
+      - name: High-amplitude actuator saturation transfer falsification
+        run: |
+          python -m unittest -v research.semrepair.test_saturation_transfer_challenge
+          python -m research.semrepair.saturation_transfer_challenge > saturation_transfer_result.json
+          python -c "import json; r=json.load(open('saturation_transfer_result.json')); assert r['stress_wrong_patch_trajectory_divergence_cells']==3 and r['stress_true_patch_trajectory_closure_cells']==3; print(r['protocol'], r['input_sha256'])"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: saturation-transfer-physics-python-${{ matrix.python }}
+          path: saturation_transfer_result.json
+          retention-days: 60
       - name: Independent exact-rational oracle
         run: python research/semrepair/independent_oracle.py

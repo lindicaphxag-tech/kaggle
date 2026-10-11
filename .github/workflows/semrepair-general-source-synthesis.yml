@@ -1,0 +1,42 @@
+name: SemRepair 2-to-32 channel authority-aware robust repair source synthesis
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/authority_aware_repair_synthesis.py'
+      - 'research/semrepair/test_authority_aware_repair_synthesis.py'
+      - '.github/workflows/semrepair-general-source-synthesis.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  robust-catalog-optimality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Prove full multidimensional semantics, refusal and cost selection
+        run: python -m unittest -v research.semrepair.test_authority_aware_repair_synthesis
+      - name: Display all 7-actuator source-authority regimes
+        run: |
+          python -m research.semrepair.authority_aware_repair_synthesis > 7d_robust_repair_synthesis.json
+          python - <<'PY'
+          import json
+          x=json.load(open('7d_robust_repair_synthesis.json'))
+          print('PREMISE',x['premise'])
+          for k in ('licensed_all_costs','clip_change_not_licensed','strict_motor_clip_caps'):
+              v=x[k]
+              print('MODE',k,v['decision'],'PATCH',v['selected'],'COST',v.get('minimum_declared_catalog_cost'))
+              for p in v['candidate_evaluations']:
+                  print('CANDIDATE',p['name'],p['decision'],
+                        'COST',p['cost'],
+                        'CERT',p['proof']['certified'],
+                        'STAGE',p['proof']['stage_worst_case'][0])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: semrepair-7d-authorized-minimal-source-catalog-full
+          path: 7d_robust_repair_synthesis.json
+          retention-days: 90

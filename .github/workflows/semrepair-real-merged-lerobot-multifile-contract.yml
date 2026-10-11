@@ -1,0 +1,48 @@
+name: SemRepair actual merged upstream LeRobot 3711 three-file cross-version contract regression
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/real_merged_lerobot_processor_contract.py'
+      - 'research/semrepair/test_real_merged_lerobot_processor_contract.py'
+      - '.github/workflows/semrepair-real-merged-lerobot-multifile-contract.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actual-merged-source-before-after:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Independently verify source Git blobs, execute upstream AST control flow, and test version contracts
+        run: python -m unittest -v research.semrepair.test_real_merged_lerobot_processor_contract
+      - name: Record every original before and after program branch on the six declared software scenarios
+        run: python -m research.semrepair.real_merged_lerobot_processor_contract > actual_merged_LeRobot_3711_source_contract.json
+      - name: Report external merge identity, preserved checkpoint provenance and honest stub limitations
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('actual_merged_LeRobot_3711_source_contract.json'))
+          print('EXTERNAL_MERGED_PR',r['actual_MERGED_publisher_PR'])
+          print('BEFORE_SHA',r['exact_before_git_commit'])
+          print('AFTER_SHA',r['exact_after_merge_commit'])
+          print('ACTUAL_FULL_TRAINING_STEPS',r['actual_robot_task_or_training_steps_run'])
+          print('SOURCE_AST_STATEMENTS',r['source_AST_statements_executed'])
+          print('CROSS_FILE_PROOF',r['cross_file_merged_processor_contract'])
+          for x in r['scenarios']:
+              print('SCENARIO',x['scenario'],
+                    'OLD',x['old_software_contract']['decision'],
+                    'NEW',x['new_software_contract']['decision'],
+                    'OLD_PATH',x['before']['processor_checkpoint_path_actually_used'],
+                    'NEW_PATH',x['after']['processor_checkpoint_path_actually_used'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semrepair-real-externally-merged-lerobot-3711-3file-semantic-regressions
+          path: actual_merged_LeRobot_3711_source_contract.json
+          if-no-files-found: warn
+          retention-days: 90

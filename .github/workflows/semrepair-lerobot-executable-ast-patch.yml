@@ -1,0 +1,49 @@
+name: SemRepair original LeRobot code one-AST-node source repair
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/lerobot_callsite_ast_repair.py'
+      - 'research/semrepair/test_lerobot_callsite_ast_repair.py'
+      - '.github/workflows/semrepair-lerobot-executable-ast-patch.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  typed-original-source-repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install unmodified PyTorch backend used by true LeRobot kernel
+        run: python -m pip install "torch==2.7.1"
+      - name: Test exact SHA-pinned original vendor kernel and one-node AST patch refusals
+        run: python -m unittest -v research.semrepair.test_lerobot_callsite_ast_repair
+      - name: Run all 128 source code before versus after tensor regression cases
+        run: python -m research.semrepair.lerobot_callsite_ast_repair > ast_original_vendor_128.json
+      - name: Show real source identity and measured repair metrics
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('ast_original_vendor_128.json'))
+          print('SOURCE_BLOB',r['external_git_blob_sha1'])
+          print('SOURCE_SHA256',r['external_source_sha256'])
+          print('SAMPLE_CASES',r['source_repair_comparisons'])
+          print('MEAN_ORIGINAL_AUTHOR_FAULT',r['mean_faulty_max_abs_error'])
+          print('MAX_ONE_NODE_FIXED_ERROR',r['maximum_fixed_max_abs_error'])
+          print('IMPROVED_CASES',r['improved_case_count'])
+          print('AST_NODES_CHANGED',r['author_callsite_edit_metadata']['changed_AST_argument_names'])
+          print('PATCH_DIFF',r['author_callsite_edit_metadata']['patch_unified_diff'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semrepair-le-robot-authored-one-node-AST-patch-128
+          path: ast_original_vendor_128.json
+          if-no-files-found: warn
+          retention-days: 90

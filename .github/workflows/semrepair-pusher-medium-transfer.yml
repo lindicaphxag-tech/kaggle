@@ -1,0 +1,55 @@
+name: SemRepair second frozen Pusher SAC-medium checkpoint transfer
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/external_pusher_second_checkpoint.py'
+      - 'research/semrepair/external_pusher_transfer.py'
+      - 'research/semrepair/strong_clipped_actuator_oracle.py'
+      - '.github/workflows/semrepair-pusher-medium-transfer.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  second-frozen-pusher:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    env:
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin official seven-actuator Pusher and torch actor runtime
+        run: python -m pip install "gymnasium[mujoco]==1.1.1" "stable-baselines3==2.6.0" "huggingface-hub==0.34.4"
+      - name: Execute second independent published checkpoint on ALL frozen Pusher tasks
+        run: python -m research.semrepair.external_pusher_second_checkpoint > second_pusher_full_raw.json
+      - name: Reveal all original task and goal-distance effects
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('second_pusher_full_raw.json'))
+          print('CHECKPOINT',r['source_model_commit'],r['verified_weight_sha256'])
+          print('RAW_EPISODES',r['n_paired_episodes'])
+          for key,value in sorted(r['summary'].items()):
+              print('ARM',key,'reward',round(value['mean_official_reward'],6),
+                    'object_goal_distance',round(value['mean_object_goal_distance'],6),
+                    'near_distance',round(value['mean_fingertip_object_distance'],6),
+                    'control_reward',round(value['mean_official_control_reward'],6))
+          for fault,value in sorted(r['paired'].items()):
+              print('PAIRED',fault,'original_reward_gain',round(value['source_minus_exact_instant_action_oracle_reward'],6),
+                    'object_distance_reduction',round(value['source_reduces_actual_object_goal_distance_m'],6),
+                    'wins/losses/ties',value['source_better_reward_seeds'],
+                    value['source_worse_reward_seeds'],value['source_tied_reward_seeds'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semrepair-second-pusher-medium-32seed-fivefault-full-raw
+          path: second_pusher_full_raw.json
+          if-no-files-found: warn
+          retention-days: 90

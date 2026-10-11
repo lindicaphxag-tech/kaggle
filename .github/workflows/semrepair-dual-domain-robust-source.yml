@@ -1,0 +1,25 @@
+name: SemRepair double-signed calibration and source executable robust repair
+on:
+  pull_request:
+    paths:
+      - 'research/semrepair/robust_signed_source_activation.py'
+      - 'research/semrepair/test_robust_signed_source_activation.py'
+      - 'research/semrepair/robust_source_envelope_certificate.py'
+      - 'research/semrepair/signed_source_activation.py'
+      - '.github/workflows/semrepair-dual-domain-robust-source.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  independently-signed-robust-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned cryptography and official Pusher simulator
+        run: python -m pip install "cryptography==45.0.7" "gymnasium[mujoco]==1.1.1"
+      - name: Try ten adversarial calibration + source proof-carrying activation tests
+        run: python -m unittest -v research.semrepair.test_robust_signed_source_activation
