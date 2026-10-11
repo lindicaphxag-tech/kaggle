@@ -1,0 +1,46 @@
+{
+  "schema": "defaultreg-v13-independent-pdf-build-mirror",
+  "original_repository": "lindicaphxag-tech/cs",
+  "original_branch": "submission/defaultreg-bspc-evidence-gated-20261011",
+  "mirror_repository": "lindicaphxag-tech/kaggle",
+  "mirror_branch": "submission/defaultreg-v13-pdf-proof-20261011",
+  "files": [
+    {
+      "filename": "main_bspc_v13_DRAFT.tex",
+      "source_blob_sha": "5e1f181af566bcab59a93784b37c0cdf89aa2130",
+      "commit": "45a5b4c335e946135ad402faf1dde2f15e917b1a",
+      "bytes": 15003
+    },
+    {
+      "filename": "00_abstract_evidence_locked.tex",
+      "source_blob_sha": "b8413184c0ad0bf2c98a39142fcf05629365c878",
+      "commit": "02c23e47eb969d726ddc26118e17d0ef91a782a1",
+      "bytes": 2022
+    },
+    {
+      "filename": "91_table_main_prospective_results.tex",
+      "source_blob_sha": "3f934f5a549035519a133794d6dd2ec771696c59",
+      "commit": "4df58ea8fcc02c5229749d197c8fdd8ffef6ce0c",
+      "bytes": 2155
+    },
+    {
+      "filename": "92_table_validity_frontier.tex",
+      "source_blob_sha": "b029d32f546a61d5425158d33eb1ad3f10667129",
+      "commit": "f7b543ac97a77ea7b9afe749e2b81dcb484e2145",
+      "bytes": 1502
+    },
+    {
+      "filename": "93_figure_participant_effects.tex",
+      "source_blob_sha": "8cbbf843feeb9e542bd076bd260f5fc6de5946b7",
+      "commit": "02bfdab8da38c624e8bb17b96436ed9ca7c5380d",
+      "bytes": 10468
+    },
+    {
+      "filename": "references_v10.bib",
+      "source_blob_sha": "51e1c07d69c3b6c1827a1a0f4a1a86fca5c81397",
+      "commit": "cb6c6893034b5e2af6505e78445bc36b9401b158",
+      "bytes": 3922
+    }
+  ],
+  "scope": "Source mirror for typeset build only. No reexecution of EEG data; no independent confirmation of source statistical claims."
+}
