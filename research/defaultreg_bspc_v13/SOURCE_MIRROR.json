@@ -7,9 +7,9 @@
   "files": [
     {
       "filename": "main_bspc_v13_DRAFT.tex",
-      "source_blob_sha": "826270a2c0158d5927e1077480175bea60a62cb6",
-      "commit": "f2cea5f61e5f3cef901ef83593bd7129acad1693",
-      "bytes": 15003
+      "source_blob_sha": "53098cc769501d43e7c1f4833a64f49d8a0c0f8c",
+      "commit": "68632f4e5d9f3e4705a0acdb7039f89d1bfd5e6b",
+      "bytes": 15725
     },
     {
       "filename": "00_abstract_evidence_locked.tex",
@@ -37,9 +37,27 @@
     },
     {
       "filename": "references_v10.bib",
-      "source_blob_sha": "51e1c07d69c3b6c1827a1a0f4a1a86fca5c81397",
-      "commit": "cb6c6893034b5e2af6505e78445bc36b9401b158",
-      "bytes": 3922
+      "source_blob_sha": "9106a428eb6b322e9307b799674e922702d337fc",
+      "commit": "1146dfb87a7f56964d77694110181592e7203e68",
+      "bytes": 4302
+    },
+    {
+      "filename": "94_v13_prior_scope.tex",
+      "source_blob_sha": "044688008e59bc20d720b565c80e91e1f258fada",
+      "commit": "f1a6d0cf64d55dbbca582f7014aacb63bd09221e",
+      "bytes": 2221
+    },
+    {
+      "filename": "95_v13_protocol_integrity.tex",
+      "source_blob_sha": "4e2d30389180568611537337e94b7984dd90edbf",
+      "commit": "1ddfc31dacf80b99b9826d7d6d52a350f862a6db",
+      "bytes": 3061
+    },
+    {
+      "filename": "96_v13_robustness_and_negative_results.tex",
+      "source_blob_sha": "01b8a67c1b6b5caa789103c26529f7e00b18e4d1",
+      "commit": "724066e72e6b774dfee2518aee54bf374dc5432d",
+      "bytes": 2660
     }
   ],
   "scope": "Source mirror for typeset build only. No reexecution of EEG data; no independent confirmation of source statistical claims."
