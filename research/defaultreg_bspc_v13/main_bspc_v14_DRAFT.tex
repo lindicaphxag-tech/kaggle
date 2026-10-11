@@ -22,8 +22,9 @@ motor imagery; model-selection validity; representation sensitivity.
 \section{Introduction}
 Cross-subject EEG decoding asks a model fitted on source participants to
 generalise to a different individual, often without labelled calibration.
-Tangent-space covariance features can be high dimensional even when each
-person contributes few examples. A stable covariance estimator is therefore
+Tangent-space covariance features are established in EEG decoding
+\cite{barachant2012riemannian}, and can be high dimensional even
+when each participant contributes few examples. A stable covariance estimator is therefore
 attractive, but the statistical criterion used to estimate a covariance
 matrix is not the criterion used to judge held-person classification.
 Ledoit--Wolf shrinkage is an established covariance estimator
@@ -36,7 +37,7 @@ The unresolved EEG measurement question is whether choosing between these
 objectives alters a claim that researchers draw from spectral representations
 under exactly the same target-information budget. Contemporary work proposes
 new regularisation mechanisms and multi-paradigm transfer methods
-\cite{miao2025freezing,morvay2026wbt}, while recent research highlights
+\cite{miao2025freezing,morvay2026wbt,he2026cyclic}, while recent research highlights
 how participant-level rather than trial-level evaluation can change the
 interpretation of EEG model performance \cite{gil2026subjectvalidation}.
 These contributions motivate our strict comparison but do not substitute
@@ -56,7 +57,8 @@ when a default estimation objective can invalidate a transfer comparison.
 
 \section{Methods}
 \subsection{Datasets and target-information budgets}
-PhysioNet EEGMMIDB S001--S008 is the method-development source pool.
+PhysioNet EEGMMIDB S001--S008 is the method-development source pool
+\cite{schalk2009eegmmidb,schalk2004bci2000}.
 Its S021--S040 participants form a prospectively untouched target block
 of 20 people. The primary fixed 21-channel sensorimotor montage, 8--30 Hz
 filtering and source-fitted Riemannian tangent reference generate 231
