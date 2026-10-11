@@ -43,6 +43,12 @@ jobs:
         working-directory: research/defaultreg_bspc_v13
         run: |
           PYTHONPATH=src python -m unittest discover -s tests -p 'test_conditional_transfer_identifiability.py' -v
+      - name: Label-free score-order change must upper-bound archived 29-person AUC differences
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          PYTHONPATH=src python -m unittest discover -s tests -p 'test_score_order_bridge_v15.py' -v
+          python src/shin_score_order_bridge_v15.py /tmp/defaultreg-original-shin.zip --out v15_shin_score_order.json
+          python -c 'import json; x=json.load(open("v15_shin_score_order.json")); assert x["n_participants"]==29 and x["all_29_auc_bounds_passed"]; assert abs(x["mean_trial_order_change_fraction"]-.13874926943308)<1e-9; print("ORIGINAL_FROZEN_SCORE_RANK_BOUND_PASS")'
       - name: Recompute four independent cohort effects without pooled p-values
         working-directory: research/defaultreg_bspc_v13
         run: |
@@ -70,5 +76,6 @@ jobs:
             research/defaultreg_bspc_v13/main_bspc_v15_DRAFT.bbl
             research/defaultreg_bspc_v13/v14_shin_original_score_audit.json
             research/defaultreg_bspc_v13/v15_four_cohort_posthoc.json
+            research/defaultreg_bspc_v13/v15_shin_score_order.json
             research/defaultreg_bspc_v13/SOURCE_MIRROR.json
           retention-days: 90
