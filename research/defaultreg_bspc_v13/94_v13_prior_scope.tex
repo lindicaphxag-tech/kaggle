@@ -1,0 +1,38 @@
+
+\subsection{Relation to current cross-subject EEG validation research}
+This study complements, rather than replaces, the development of
+spectral filters, classifiers and adaptation methods. Recent
+cross-subject EEG work has demonstrated that window- or trial-level
+performance estimates can differ considerably from genuine
+unseen-participant performance \cite{gil2026subjectvalidation}. A
+separate 45-person mental-workload study has shown that feature
+representation, model class and the allowance for subject-specific
+calibration can also strongly affect generalisation
+\cite{abinaya2026wavelet}. Both results caution against evaluating
+one model under a more favourable target-information budget than
+another. They do not directly answer the within-pipeline question
+of whether selecting \emph{the same} scalar regulariser by
+covariance predictive likelihood or by source-person
+discrimination changes which EEG representation appears better.
+
+We deliberately keep the comparison narrower than studies introducing
+new classifiers. The use of target-person unlabeled moments,
+target-conditional geometry, entropy minimisation or a few labeled
+calibration trials may benefit model adaptation, but changes the
+information contract. A Z0 result cannot be directly ranked against
+one of these adapted classifiers as if the procedures used the same
+information. In this article, Ledoit--Wolf, OAS and source
+covariance-NLL are estimator/objective controls; Riemannian MDM,
+tangent logistic regression and a separate CSP6 classifier
+are architectural reference points. Comparing those latter
+representations does not prove a new state-of-the-art BCI decoder.
+
+The essential methodological contrast is between \emph{estimation
+quality of a covariance operator} and \emph{out-of-person
+discrimination of a derived decision direction}. The mathematical
+non-equivalence is familiar from regularised discriminant analysis
+\cite{friedman1989}; our empirical contribution is its prospective,
+participant-level consequence, including a spectral representation
+hypothesis that the new results contradict. This framing prevents
+a conventional parameter-selection strategy from being presented
+as a newly invented learning algorithm.

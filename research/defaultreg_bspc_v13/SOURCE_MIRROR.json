@@ -1,0 +1,84 @@
+{
+  "schema": "defaultreg-v13-independent-pdf-build-mirror",
+  "original_repository": "lindicaphxag-tech/cs",
+  "original_branch": "submission/defaultreg-bspc-evidence-gated-20261011",
+  "mirror_repository": "lindicaphxag-tech/kaggle",
+  "mirror_branch": "submission/defaultreg-v13-pdf-proof-20261011",
+  "files": [
+    {
+      "filename": "main_bspc_v13_DRAFT.tex",
+      "source_blob_sha": "709b2d46ac054df3a8b626a5d7fc7557e9d05876",
+      "commit": "68632f4e5d9f3e4705a0acdb7039f89d1bfd5e6b",
+      "bytes": 15725
+    },
+    {
+      "filename": "00_abstract_evidence_locked.tex",
+      "source_blob_sha": "b8413184c0ad0bf2c98a39142fcf05629365c878",
+      "commit": "02c23e47eb969d726ddc26118e17d0ef91a782a1",
+      "bytes": 2022
+    },
+    {
+      "filename": "91_table_main_prospective_results.tex",
+      "source_blob_sha": "3f934f5a549035519a133794d6dd2ec771696c59",
+      "commit": "4df58ea8fcc02c5229749d197c8fdd8ffef6ce0c",
+      "bytes": 2155
+    },
+    {
+      "filename": "92_table_validity_frontier.tex",
+      "source_blob_sha": "b029d32f546a61d5425158d33eb1ad3f10667129",
+      "commit": "f7b543ac97a77ea7b9afe749e2b81dcb484e2145",
+      "bytes": 1502
+    },
+    {
+      "filename": "93_figure_participant_effects.tex",
+      "source_blob_sha": "8cbbf843feeb9e542bd076bd260f5fc6de5946b7",
+      "commit": "02bfdab8da38c624e8bb17b96436ed9ca7c5380d",
+      "bytes": 10468
+    },
+    {
+      "filename": "references_v10.bib",
+      "source_blob_sha": "9106a428eb6b322e9307b799674e922702d337fc",
+      "commit": "1146dfb87a7f56964d77694110181592e7203e68",
+      "bytes": 4302
+    },
+    {
+      "filename": "94_v13_prior_scope.tex",
+      "source_blob_sha": "044688008e59bc20d720b565c80e91e1f258fada",
+      "commit": "f1a6d0cf64d55dbbca582f7014aacb63bd09221e",
+      "bytes": 2221
+    },
+    {
+      "filename": "95_v13_protocol_integrity.tex",
+      "source_blob_sha": "3efb4588730ad1b5c19d320945125697ffc33268",
+      "commit": "1ddfc31dacf80b99b9826d7d6d52a350f862a6db",
+      "bytes": 3061
+    },
+    {
+      "filename": "96_v13_robustness_and_negative_results.tex",
+      "source_blob_sha": "01b8a67c1b6b5caa789103c26529f7e00b18e4d1",
+      "commit": "724066e72e6b774dfee2518aee54bf374dc5432d",
+      "bytes": 2660
+    },
+    {
+      "filename": "verify_bspc_submission_claims.py",
+      "source_blob_sha": "1912026a340598996ebf9ac5526dac99fbdec18a"
+    },
+    {
+      "filename": "STATUS.md",
+      "source_blob_sha": "2bb604fee26a9dd0d3369b4b7a14cceb4a822b40"
+    },
+    {
+      "filename": "evidence/current_verified_results.json",
+      "source_blob_sha": "22b2ae1832a591f69f89d37d4c236ac7232d79e4"
+    },
+    {
+      "filename": "evidence/shin2017a_logged_receipt_v13.json",
+      "source_blob_sha": "2f3b91d0bf8fbfa815c29ff850b9c4e88db7b7dc"
+    },
+    {
+      "filename": "evidence/shin2017a_original_artifact_verified_v13.json",
+      "source_blob_sha": "2806a89d92a71fc48aa34a9ffb598a7397e33217"
+    }
+  ],
+  "scope": "Source mirror for typeset build only. No reexecution of EEG data; no independent confirmation of source statistical claims."
+}

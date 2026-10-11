@@ -1,0 +1,850 @@
+{
+  "schema": "defaultreg_vnext_verified_evidence_v3",
+  "generated_from_verified_artifacts": true,
+  "evidence_sources": {
+    "eegmmidb_source_full_domain": {
+      "artifact_zip_sha256": "691fbe0650789ed6f75c59b8a12e098869fa6fe5b827f8455870324918c7b070",
+      "covariance_npz_sha256": "ce0ef3c184f911a1eb5b61ffb2fa8ae837c00b907d684bc57166f9fe9ac4a571",
+      "receipt": "AUTHENTIC_FULL_DOMAIN_SOURCE_RECEIPT_20261010.md"
+    },
+    "eegmmidb_s021_s040": {
+      "workflow_run": 38039997868,
+      "artifact_digest": "sha256:d60ec7a580d9b2526c26ac10a4d303cc6b11e77f39032ed10860f5c6d96ea75c",
+      "result_json_sha256": "6337c6b099f57d63b8e7c0e652a33471582dae6422b98551e9cbfeb5e3c516f5",
+      "stats_json_sha256": "dae910105201174a15ab2c93dbddf7c265f5f1e8e869aae746629beb26499323"
+    },
+    "bnci2014_001_full_domain_posthoc": {
+      "workflow_run": 38041316829,
+      "artifact_digest": "sha256:3e955e0770be162a9ed5fd6482ea9e6793e16ecbb83bc405f24400fac1ac387f",
+      "result_json_sha256": "75d0f4ed110ebea9c8b34696bdc3a8b47c52a76f5bd0ce22854a35977d9f5185",
+      "confirmation_status": "NOT_INDEPENDENT_CONFIRMATION"
+    },
+    "eegmmidb_s011_s020_cfcts": {
+      "workflow_run": 38038107956,
+      "artifact_digest": "sha256:d8478749a09da38a8a46f2e8136fd182ee05339a82bd4e5db31fef2e020aebb4"
+    },
+    "s021_posthoc_score_regeneration": {
+      "receipt": "S021_S040_POSTHOC_SCORE_REPRODUCTION_RECEIPT_20261010.md",
+      "source_covariance_npz_sha256": "88c47a5e6ce76217ea4d7f3eef8306746470cb29098eaf4ba486252ce4702c38",
+      "workflow_result_sha256": "6337c6b099f57d63b8e7c0e652a33471582dae6422b98551e9cbfeb5e3c516f5",
+      "regenerated_score_bundle_sha256": "168eb9f9d3dfaad28c1f54017a72b7deb45bc8aa40bbbd358ef6a2b4bed01180",
+      "all_20x5_auc_exact_to_stored_8dp": true,
+      "original_score_freeze_archived": false,
+      "status": "POSTHOC_DETERMINISTIC_REGENERATION_NOT_ORIGINAL_SCORE_FREEZE"
+    },
+    "eegmmidb_s021_s040_source_pool_full_reselection": {
+      "analysis_receipt": "S021_S040_SOURCE_POOL_FULL_RESELECTION_RECEIPT_20261010.md",
+      "input_workflow_run": 38039997868,
+      "input_artifact_id": 11665578868,
+      "input_artifact_sha256": "d60ec7a580d9b2526c26ac10a4d303cc6b11e77f39032ed10860f5c6d96ea75c",
+      "raw_reselection_json_sha256": "828aa24bf4d03abd938244fd4b3a6e7623e763648973467179995fcb86665f3f",
+      "confirmation_status": "POST_PRIMARY_STABILITY_SENSITIVITY"
+    },
+    "bnci2014_002_v5_true_predata": {
+      "workflow_run": 38044483573,
+      "workflow_job": 114191135589,
+      "workflow_head_sha": "2224f107b74ce1edff8c39e4521732f2acceb819",
+      "artifact_id": 11667701819,
+      "artifact_digest": "sha256:8cffd40c0e56a0af66c9970d830f7a7bc7f918e3795a7d6a4991ca3f87b79a3b",
+      "result_json_sha256": "33085a9332f52bd360d4312ce44d812e9c7e429ae1d0bbc9c37ea185fe0b353c",
+      "score_bundle_sha256": "a79ee648b67f51c5eaffee6e7de08d6a063af1c910f3d5b70a62c79eecd40843",
+      "audit": "PASS_V5_TRUE_PREDATA_CONTRACT BNCI2014_002"
+    },
+    "eegmmidb_s041_s060_representation": {
+      "workflow_run": 38041547707,
+      "workflow_job": 114182636197,
+      "workflow_head_sha": "d27092bf1646fd76fe34962e3b04067dfbf83e1c",
+      "artifact_id": 11667307724,
+      "artifact_digest": "sha256:7f5f1d6bde05678f0be4a674a0b45ac43fc307aa7f772e81d17ae7b4183aceb0",
+      "result_json_sha256": "f26606ed0175e50e6c5ee52d8fc2beb6418f509f8ca6ba07323bf08fcb0301e8",
+      "audit": "PASS_S041_S060_REPRESENTATION_REGULARISATION_GATE"
+    },
+    "bnci2015_001_v5_true_predata": {
+      "workflow_run": 38045566253,
+      "workflow_job": 114194277357,
+      "workflow_head_sha": "672c092976f86642cae47aa43a05699c711e5763",
+      "artifact_id": 11667423994,
+      "artifact_digest": "sha256:0d3afdf167112e843e6549ff637f4291de3716b2c841062a3898a6fab1831a55",
+      "result_json_sha256": "5ee6284f0f0bed1da90934587cbf2f23311bfd0a9d507a203a570d57c515f723",
+      "score_bundle_sha256": "3f96e5905a5febc0732e2e17ea6b1d88074bf04944ba96a7fd221d60f3a1b812",
+      "result_receipt_sha256": "3d24fd1369dc30903e062d24dfc3e1bbb14cf753d7676f3dab7c918c8a9e66c9",
+      "audit": "PASS_V5_TRUE_PREDATA_CONTRACT BNCI2015_001",
+      "frozen_asset_identity": "PASS_FROZEN_V5_ASSET_IDENTITY"
+    },
+    "eegmmidb_s061_s080_target_information_budget": {
+      "workflow_run": 38042669531,
+      "workflow_job": 114185862687,
+      "artifact_id": 11666929892,
+      "artifact_digest": "sha256:065333f6eea6bf6347e29c4cccb8887f4cc73a9128beedc9894c7c88ce6ef128",
+      "audit": "PASS_TARGET_INFORMATION_BUDGET_GATE",
+      "calibration_auc_estimand_warning": "All finite U-k/Uall shifts are constant within target participant under a fixed linear score; hence same-participant paired ROC AUC is algebraically invariant; zero U-Z0 differences cannot be interpreted as empirical no-benefit calibration evidence."
+    }
+  },
+  "source_objective_landscape": {
+    "dataset": "EEGMMIDB_S001_S008",
+    "source_trials": 360,
+    "lambda_discriminability": 0.8,
+    "lambda_covariance_nll": 0.075,
+    "lambda_ledoitwolf": 0.015672942128722542,
+    "lambda_oas": 0.01952806671014858,
+    "one_se_jaccard": 0.125,
+    "source_auc_regret_at_covariance_lambda": 0.05800728558880741,
+    "covariance_nll_regret_at_discriminability_lambda": 0.9223292525438131
+  },
+  "cohorts": {
+    "EEGMMIDB_S021_S040": {
+      "evidence_tier": "prospective_confirmation",
+      "target_information_budget": "Z0",
+      "n_participants": 20,
+      "macro_auc": {
+        "LedoitWolf_LDA": 0.629193722,
+        "OAS_LDA": 0.6356221375,
+        "LogisticRegression": 0.6700341925,
+        "source_cov_nll_full_domain_LDA": 0.665091521,
+        "source_macro_full_domain_LDA": 0.7211646745
+      },
+      "primary_inference": {
+        "source_macro_full_domain_LDA__vs__LedoitWolf_LDA": {
+          "mean_delta": 0.0919709525,
+          "bootstrap95": [
+            0.0410798701625,
+            0.14309646445
+          ],
+          "exact_signflip_p": 0.002552032470703125,
+          "holm_p": 0.00510406494140625,
+          "improved": 16,
+          "harmed_gt_0_02": 4,
+          "worst_delta": -0.11067193
+        },
+        "source_macro_full_domain_LDA__vs__source_cov_nll_full_domain_LDA": {
+          "mean_delta": 0.0560731535,
+          "bootstrap95": [
+            0.021848893625,
+            0.0904911505374999
+          ],
+          "exact_signflip_p": 0.00597381591796875,
+          "holm_p": 0.00597381591796875,
+          "improved": 15,
+          "harmed_gt_0_02": 5,
+          "worst_delta": -0.07312253
+        }
+      },
+      "table_reference_method": "LedoitWolf_LDA",
+      "source_pool_full_reselection": {
+        "n_source_omissions": 8,
+        "lambda_discriminability_unique": [
+          0.4,
+          0.8,
+          0.95
+        ],
+        "lambda_covariance_unique": [
+          0.075,
+          0.1
+        ],
+        "candidate_macro_auc_mean": 0.7127172834713595,
+        "candidate_macro_auc_sd": 0.009258096622429511,
+        "candidate_macro_auc_range": [
+          0.6999937260806826,
+          0.7258058065123283
+        ],
+        "candidate_minus_covariance_mean": 0.05556413317962229,
+        "candidate_minus_covariance_range": [
+          0.04329396448961664,
+          0.071721092916745
+        ],
+        "candidate_minus_covariance_positive_omissions": 8,
+        "candidate_minus_lw_mean": 0.10079468010853876,
+        "candidate_minus_lw_range": [
+          0.0706913859087771,
+          0.13740589121023894
+        ],
+        "candidate_minus_lw_positive_omissions": 8,
+        "interpretation": "post-primary training-pool stability sensitivity; not an additional confirmatory p-value"
+      },
+      "posthoc_tail_risk": {
+        "scope": "descriptive_post_primary_from_frozen_per_subject_deltas",
+        "source_macro_vs_LedoitWolf": {
+          "q05_delta": -0.0768774745,
+          "q10_delta": -0.067984184,
+          "cvar10_delta": -0.09288537,
+          "cvar25_delta": -0.05057563,
+          "harm_rate_gt_0_01": 0.2,
+          "harm_rate_gt_0_02": 0.2
+        },
+        "source_macro_vs_source_cov_nll": {
+          "q05_delta": -0.0599802385,
+          "q10_delta": -0.059288531,
+          "cvar10_delta": -0.066205535,
+          "cvar25_delta": -0.051005395,
+          "harm_rate_gt_0_01": 0.25,
+          "harm_rate_gt_0_02": 0.25
+        },
+        "interpretation": "large positive mean benefit coexists with a materially negative lower tail; these metrics motivate but do not prospectively validate later FCTR risk control"
+      },
+      "evidence_source_key": "eegmmidb_s021_s040"
+    },
+    "BNCI2014_001": {
+      "evidence_tier": "posthoc_full_domain_stress_after_target_exposure",
+      "target_information_budget": "Z0",
+      "n_participants": 9,
+      "macro_auc": {
+        "LedoitWolf_LDA": 0.7529095936213993,
+        "OAS_LDA": 0.7529471021947873,
+        "TS_LogisticRegression": 0.7647462277091907,
+        "source_cov_nll_full_domain_LDA": 0.7718192729766804,
+        "source_macro_full_domain_LDA": 0.7864583333333334
+      },
+      "table_reference_method": "LedoitWolf_LDA",
+      "evidence_source_key": "bnci2014_001_full_domain_posthoc"
+    },
+    "EEGMMIDB_S011_S020_CFCTS": {
+      "evidence_tier": "prospective_algorithm_falsification",
+      "target_information_budget": "Z0",
+      "n_participants": 10,
+      "macro_auc": {
+        "nested_source_macro_auc_LDA": 0.667304253,
+        "CFCTS": 0.633093357,
+        "LedoitWolf_LDA": 0.573120961,
+        "OAS_LDA": 0.572924899,
+        "LogisticRegression": 0.60498463,
+        "proxy_signed_squared_tail": 0.652876593
+      },
+      "primary_inference": {
+        "CFCTS__vs__nested_source_macro_auc_LDA": {
+          "mean_delta": -0.034210896,
+          "bootstrap95": [
+            -0.055928854,
+            -0.011900056
+          ],
+          "exact_signflip_p": 0.02734375,
+          "harmed_gt_0_02": 6,
+          "worst_delta": -0.08893281
+        }
+      },
+      "table_reference_method": "nested_source_macro_auc_LDA",
+      "evidence_source_key": "eegmmidb_s011_s020_cfcts"
+    },
+    "BNCI2014_002": {
+      "evidence_tier": "true_predata_external_replication",
+      "target_information_budget": "Z0",
+      "n_participants": 14,
+      "macro_auc": {
+        "LedoitWolf_LDA": 0.755234375,
+        "OAS_LDA": 0.7555022321428572,
+        "Riemannian_MDM": 0.7480691964285714,
+        "TS_LogisticRegression": 0.757310267857143,
+        "discriminability_first_LDA": 0.7694531250000001,
+        "mean_tail_fidelity_LDA": 0.7822656250000001,
+        "source_cov_nll_full_domain_LDA": 0.76046875,
+        "source_macro_full_domain_LDA": 0.7781026785714287
+      },
+      "primary_inference": {
+        "source_macro_full_domain_LDA__vs__source_cov_nll_full_domain_LDA": {
+          "mean_delta": 0.017633928571428568,
+          "bootstrap95": [
+            -0.0035831473214285796,
+            0.0372767857142857
+          ],
+          "exact_signflip_p": 0.123291015625,
+          "holm_p": 0.1396484375,
+          "improved": 8,
+          "harmed_gt_0_02": 3,
+          "worst_delta": -0.04921874999999998
+        },
+        "source_macro_full_domain_LDA__vs__LedoitWolf_LDA": {
+          "mean_delta": 0.022868303571428588,
+          "bootstrap95": [
+            0.00044642857142859223,
+            0.04401785714285712
+          ],
+          "exact_signflip_p": 0.06982421875,
+          "holm_p": 0.1396484375,
+          "improved": 8,
+          "harmed_gt_0_02": 2,
+          "worst_delta": -0.04734375000000013
+        }
+      },
+      "source_objective_separation": {
+        "outer_folds_different_lambda": 14,
+        "outer_folds_total": 14,
+        "lambda_source_macro": [
+          0.8,
+          0.9,
+          0.9,
+          0.7,
+          0.9,
+          0.9,
+          0.9,
+          0.9,
+          0.9,
+          0.9,
+          0.9,
+          0.9,
+          0.9,
+          0.9
+        ],
+        "lambda_covariance_nll": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0.02,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "interpretation": "source objective separation replicated in all outer folds; target H2/H3 directions were positive but the predeclared Holm family was not significant"
+      },
+      "secondary_mean_tail_vs_source_macro": {
+        "mean_delta": 0.004162946428571465,
+        "bootstrap95": [
+          -0.0030468749999999728,
+          0.01151785714285719
+        ],
+        "exact_signflip_p": 0.2734375,
+        "cvar25": -0.008085937500000001,
+        "harmed_gt_0_02": 1,
+        "promotion_status": "NOT_PROMOTED"
+      },
+      "validity_frontier_point_estimate": {
+        "envelope_points": 405,
+        "lambda_mean_covariance_regret_min": 0,
+        "macro_auc_at_regret_min": 0.7594196428571428,
+        "first_nonzero_budget_with_zero_in_delta_envelope": 0.0021543502512045365,
+        "maximum_auc_span": 0.0384375,
+        "first_budget_for_auc_span_ge_0_02": 0.918262967577678,
+        "uncertainty_complete": false,
+        "interpretation": "descriptive PRE-DATA point-estimate support only; frontier uncertainty gate remains open",
+        "deprecated": true,
+        "do_not_use_in_manuscript": true,
+        "superseded_by": "validity_frontier_corrected",
+        "obsolete_field_note": "generic centered-AUC zero-crossing is structurally uninformative; use corrected material-fragility frontier"
+      },
+      "table_reference_method": "LedoitWolf_LDA",
+      "evidence_source_key": "bnci2014_002_v5_true_predata",
+      "validity_frontier_corrected": {
+        "definition": "pre-outcome material-fragility correction; generic AUC zero-crossing ignored",
+        "bootstrap_reps": 20000,
+        "seed": 20261010,
+        "maximum_auc_span": 0.03843749999999968,
+        "maximum_auc_span_bootstrap95": [
+          0.027142578124999886,
+          0.06656249999999986
+        ],
+        "material_budget_delta_0_01": 0.2963998469193787,
+        "material_budget_delta_0_01_finite_fraction": 1,
+        "material_budget_delta_0_01_conditional95": [
+          0.05378425901099627,
+          1.2283823660757054
+        ],
+        "material_budget_delta_0_02": 0.9161086173264734,
+        "material_budget_delta_0_02_finite_fraction": 0.99945,
+        "material_budget_delta_0_02_conditional95": [
+          0.26092677460321806,
+          1.2969556397299962
+        ],
+        "material_budget_delta_0_05": null,
+        "material_budget_delta_0_05_finite_fraction": 0.2424,
+        "material_budget_delta_0_05_conditional95": [
+          1.0704945459209834,
+          1.3221933281035014
+        ],
+        "dense_grid_stride_1_max_span": 0.03843749999999968,
+        "dense_grid_stride_8_max_span": 0.03824776785714268,
+        "dense_grid_stride_8_delta_0_02": 0.9309719186848072,
+        "target_path_used_for_selection": false,
+        "receipt": "V5_MATERIAL_FRAGILITY_FRONTIER_RECEIPT_20261010.md"
+      },
+      "target_trials": 2240,
+      "native_channels": 15,
+      "tangent_dimension": 120
+    },
+    "BNCI2015_001": {
+      "evidence_tier": "true_predata_external_replication",
+      "target_information_budget": "Z0",
+      "n_participants": 12,
+      "target_trials": 5600,
+      "native_channels": 13,
+      "tangent_dimension": 91,
+      "macro_auc": {
+        "LedoitWolf_LDA": 0.721655787037037,
+        "OAS_LDA": 0.7215708333333333,
+        "Riemannian_MDM": 0.7582023148148148,
+        "TS_LogisticRegression": 0.7305962962962963,
+        "discriminability_first_LDA": 0.7594377314814813,
+        "mean_tail_fidelity_LDA": 0.767520138888889,
+        "source_cov_nll_full_domain_LDA": 0.7236800925925927,
+        "source_macro_full_domain_LDA": 0.7669687500000002
+      },
+      "primary_inference": {
+        "source_macro_full_domain_LDA__vs__source_cov_nll_full_domain_LDA": {
+          "mean_delta": 0.04328865740740737,
+          "bootstrap95": [
+            0.00016432291666661493,
+            0.09345425925925915
+          ],
+          "exact_signflip_p": 0.10107421875,
+          "holm_p": 0.185546875,
+          "improved": 9,
+          "harmed_gt_0_02": 2,
+          "worst_delta": -0.049449999999999994,
+          "q25": -0.002830555555555614,
+          "cvar25": -0.03789907407407411
+        },
+        "source_macro_full_domain_LDA__vs__LedoitWolf_LDA": {
+          "mean_delta": 0.04531296296296295,
+          "bootstrap95": [
+            0.002899519675925938,
+            0.09565235532407397
+          ],
+          "exact_signflip_p": 0.0927734375,
+          "holm_p": 0.185546875,
+          "improved": 9,
+          "harmed_gt_0_02": 2,
+          "worst_delta": -0.053449999999999886,
+          "q25": -0.0008493055555556239,
+          "cvar25": -0.03424074074074072
+        }
+      },
+      "source_objective_separation": {
+        "outer_folds_different_lambda": 12,
+        "outer_folds_total": 12,
+        "lambda_source_macro": [
+          0.9,
+          0.95,
+          0.9,
+          0.95,
+          0.95,
+          0.95,
+          0.9,
+          0.9,
+          0.9,
+          0.95,
+          0.9,
+          0.9
+        ],
+        "lambda_covariance_nll": [
+          0.05,
+          0.02,
+          0.015,
+          0.02,
+          0.02,
+          0.02,
+          0.015,
+          0.015,
+          0.02,
+          0.015,
+          0.02,
+          0.02
+        ],
+        "interpretation": "source objective separation replicated in all 12 outer folds; H2/H3 target directions positive with positive mean bootstrap intervals but the frozen exact sign-flip + Holm family did not cross 0.05"
+      },
+      "secondary_mean_tail_vs_source_macro": {
+        "mean_delta": 0.0005513888888889115,
+        "bootstrap95": [
+          -0.008210416666666656,
+          0.009029166666666718
+        ],
+        "exact_signflip_p": 1,
+        "cvar25": -0.013619444444444406,
+        "harmed_gt_0_02": 1,
+        "promotion_status": "NOT_PROMOTED"
+      },
+      "secondary_discriminability_first_vs_source_macro": {
+        "mean_delta": -0.007531018518518516,
+        "participant_bootstrap95": [
+          -0.0255633,
+          0.01106924
+        ],
+        "harmed_gt_0_02": 4,
+        "interpretation": "descriptive post-result audit; not promoted as a superior new selector"
+      },
+      "session_descriptive": {
+        "inferential_unit_remains": "participant",
+        "session_0A": {
+          "n_participants": 12,
+          "H2_mean": 0.06251666666666668,
+          "H2_median": 0.07080000000000009,
+          "H2_min": -0.03729999999999989,
+          "H2_max": 0.13229999999999997,
+          "H2_positive": 10,
+          "H3_mean": 0.06495000000000001,
+          "H3_median": 0.07874999999999993,
+          "H3_min": -0.045199999999999796,
+          "H3_max": 0.1318999999999999,
+          "H3_positive": 11
+        },
+        "session_1B": {
+          "n_participants": 12,
+          "H2_mean": 0.052958333333333364,
+          "H2_median": 0.00495000000000001,
+          "H2_min": -0.022399999999999975,
+          "H2_max": 0.2765000000000001,
+          "H2_positive": 8,
+          "H3_mean": 0.05431666666666667,
+          "H3_median": 0.004349999999999965,
+          "H3_min": -0.02189999999999992,
+          "H3_max": 0.29100000000000004,
+          "H3_positive": 10
+        },
+        "session_2C": {
+          "n_participants": 4,
+          "H2_mean": 0.06269999999999998,
+          "H2_median": 0.02080000000000004,
+          "H2_min": -0.10170000000000001,
+          "H2_max": 0.31089999999999984,
+          "H2_positive": 3,
+          "H3_mean": 0.06657499999999997,
+          "H3_median": 0.019799999999999984,
+          "H3_min": -0.09640000000000004,
+          "H3_max": 0.32309999999999994,
+          "H3_positive": 3
+        }
+      },
+      "validity_frontier_corrected": {
+        "definition": "pre-outcome material-fragility correction; generic AUC zero-crossing ignored",
+        "bootstrap_reps": 20000,
+        "seed": 20261010,
+        "maximum_auc_span": 0.050105555555555625,
+        "maximum_auc_span_bootstrap95": [
+          0.022384189814814798,
+          0.10335051504629611
+        ],
+        "material_budget_delta_0_01": 0.055986992015985004,
+        "material_budget_delta_0_01_finite_fraction": 1,
+        "material_budget_delta_0_01_conditional95": [
+          0.006169696010428087,
+          0.38350358718292404
+        ],
+        "material_budget_delta_0_02": 0.1751917494709243,
+        "material_budget_delta_0_02_finite_fraction": 0.9877,
+        "material_budget_delta_0_02_conditional95": [
+          0.04263083988164305,
+          0.6168547772117643
+        ],
+        "material_budget_delta_0_05": 0.5738965273163004,
+        "material_budget_delta_0_05_finite_fraction": 0.5388,
+        "material_budget_delta_0_05_conditional95": [
+          0.21781631224816236,
+          0.639685635393809
+        ],
+        "dense_grid_stride_1_max_span": 0.050105555555555625,
+        "dense_grid_stride_8_max_span": 0.05004444444444456,
+        "dense_grid_stride_8_delta_0_02": 0.17787625620700365,
+        "target_path_used_for_selection": false,
+        "receipt": "V5_MATERIAL_FRAGILITY_FRONTIER_RECEIPT_20261010.md"
+      },
+      "table_reference_method": "LedoitWolf_LDA",
+      "evidence_source_key": "bnci2015_001_v5_true_predata"
+    }
+  },
+  "manual_derived_effect_fields_forbidden": true,
+  "evidence_chronology": {
+    "EEGMMIDB_S021_S040": {
+      "prospective_for": [
+        "full-domain source-discriminability vs LedoitWolf consequence",
+        "full-domain source-discriminability vs source covariance-NLL consequence"
+      ],
+      "not_prospective_for": [
+        "Regularisation Validity Frontier",
+        "critical fidelity regret",
+        "FCTR"
+      ],
+      "reason": "frontier/FCTR were developed after S021-S040 outcomes were opened"
+    },
+    "BNCI2014_001": {
+      "prospective_for": [],
+      "not_prospective_for": [
+        "full-domain confirmation",
+        "Regularisation Validity Frontier",
+        "FCTR"
+      ],
+      "reason": "all nine target outcomes were exposed before the full-domain post-hoc stress test"
+    },
+    "BNCI2014_002": {
+      "prospective_for": [
+        "true PRE-DATA external source objective separation",
+        "source-macro vs source covariance-NLL target consequence",
+        "source-macro vs LedoitWolf target consequence",
+        "post-S021 validity-frontier point-estimate test",
+        "post-S021 lexicographic selector test"
+      ],
+      "not_prospective_for": [
+        "any post-BNCI2014_002 method modification"
+      ],
+      "reason": "v5 protocol and two-phase score freeze were committed before project access to BNCI2014_002 outcomes"
+    },
+    "EEGMMIDB_S041_S060": {
+      "prospective_for": [
+        "representation by regularisation interaction",
+        "filter-bank versus label-independent nuisance dimensionality control",
+        "source-PCA matched-dimension spectral comparison",
+        "fixed-representation source-budget mechanism sensitivity"
+      ],
+      "reason": "representations, contrasts, full shrinkage grid and source-budget extension were frozen before S041-S060 target outcomes"
+    },
+    "BNCI2015_001": {
+      "prospective_for": [
+        "true PRE-DATA external source objective separation",
+        "source-macro vs source covariance-NLL target consequence",
+        "source-macro vs LedoitWolf target consequence",
+        "post-S021 validity-frontier material-fragility test",
+        "post-S021 secondary selector tests",
+        "predeclared descriptive cross-session robustness"
+      ],
+      "not_prospective_for": [
+        "any post-BNCI2015_001 method modification"
+      ],
+      "reason": "v5 protocol and scientific runner were frozen before BNCI2014_002 outcomes and executed byte-identically for BNCI2015_001; CI-only PR #102 changed only the trigger file"
+    }
+  },
+  "prospective_representation_block": {
+    "cohort": "EEGMMIDB_S041_S060",
+    "evidence_tier": "prospective_representation_by_regularisation_falsification",
+    "target_information_budget": "Z0",
+    "n_participants": 20,
+    "evidence_source_key": "eegmmidb_s041_s060_representation",
+    "macro_auc_by_representation": {
+      "WIDE231": {
+        "LedoitWolf": 0.6150609354413702,
+        "OAS": 0.6205961007591442,
+        "source_macro_auc": 0.7446091348265262,
+        "source_cov_nll": 0.6670611393437481
+      },
+      "FB8_1848": {
+        "LedoitWolf": 0.6102837380011293,
+        "OAS": 0.6103817679904636,
+        "source_macro_auc": 0.6620216136520484,
+        "source_cov_nll": 0.627595441997616
+      },
+      "FB8_SOURCE_PCA231": {
+        "LedoitWolf": 0.6584760649978041,
+        "OAS": 0.6586736934563022,
+        "source_macro_auc": 0.6888359526946485,
+        "source_cov_nll": 0.6544199761591065
+      },
+      "WIDE_NUISANCE1848": {
+        "LedoitWolf": 0.5915776554363512,
+        "OAS": 0.5917748917748918,
+        "source_macro_auc": 0.6200185080619862,
+        "source_cov_nll": 0.6148942844595018
+      }
+    },
+    "predeclared_contrasts": {
+      "C1_FB8xRegularisation_LW_PRIMARY": {
+        "mean": -0.07781032373423677,
+        "bootstrap95": [
+          -0.12415295227115879,
+          -0.03450881093544138
+        ],
+        "exact_signflip_p": 0.00331878662109375,
+        "holm_p": 0.013275146484375,
+        "improved": 8,
+        "harmed_gt_0_02": 12
+      },
+      "C2_FB8_minus_WIDE_NUISANCE1848": {
+        "mean": 0.04200310559006211,
+        "bootstrap95": [
+          -0.005435184531651927,
+          0.08413041517661077
+        ],
+        "exact_signflip_p": 0.08661079406738281,
+        "holm_p": 0.08661079406738281,
+        "improved": 14,
+        "harmed_gt_0_02": 5
+      },
+      "C3_FB8_PCA231_minus_WIDE231": {
+        "mean": -0.05577318213187775,
+        "bootstrap95": [
+          -0.09991501780224607,
+          -0.013795407491059666
+        ],
+        "exact_signflip_p": 0.023162841796875,
+        "holm_p": 0.04632568359375,
+        "improved": 7,
+        "harmed_gt_0_02": 13
+      },
+      "C4_FB8xRegularisation_covNLL": {
+        "mean": -0.043121823828345555,
+        "bootstrap95": [
+          -0.06794158588995546,
+          -0.01740734205408118
+        ],
+        "exact_signflip_p": 0.00583648681640625,
+        "holm_p": 0.01750946044921875,
+        "improved": 5,
+        "harmed_gt_0_02": 13
+      }
+    },
+    "source_budget_intervention": {
+      "0.25": {
+        "source_trials": 82,
+        "lambda_source_macro": 0.8,
+        "lambda_covariance_nll": 0.1,
+        "macro_auc_source_macro": 0.7491757638496769,
+        "macro_auc_covariance_nll": 0.7054736024844721,
+        "macro_auc_ledoitwolf": 0.6978582407930233
+      },
+      "0.50": {
+        "source_trials": 176,
+        "lambda_source_macro": 0.9,
+        "lambda_covariance_nll": 0.1,
+        "macro_auc_source_macro": 0.7445060072777463,
+        "macro_auc_covariance_nll": 0.6593532373423676,
+        "macro_auc_ledoitwolf": 0.6133885438233264
+      },
+      "0.75": {
+        "source_trials": 264,
+        "lambda_source_macro": 0.95,
+        "lambda_covariance_nll": 0.075,
+        "macro_auc_source_macro": 0.726208905828471,
+        "macro_auc_covariance_nll": 0.6569750298011169,
+        "macro_auc_ledoitwolf": 0.622555524185959
+      },
+      "1.00": {
+        "source_trials": 360,
+        "lambda_source_macro": 0.8,
+        "lambda_covariance_nll": 0.075,
+        "macro_auc_source_macro": 0.7446091348265262,
+        "macro_auc_covariance_nll": 0.6670611393437481,
+        "macro_auc_ledoitwolf": 0.6150609354413702
+      }
+    },
+    "interpretation": "the preregistered representation-by-regularisation interaction is real but opposite to the historical hidden-filter-bank narrative; WIDE is strengthened, not reversed, under source-discriminability tuning; simple monotonic p/n mechanism is not supported"
+  },
+  "prospective_calibration_rank_invariance_audit": {
+    "cohort": "EEGMMIDB_S061_S080",
+    "n_participants": 20,
+    "source_only_discrimination_minus_LedoitWolf": {
+      "mean_delta": 0.07462787816048688,
+      "bootstrap95": [
+        0.03694899303594959,
+        0.11042324447895097
+      ],
+      "exact_signflip_p": 0.0014400482177734375,
+      "holm_p": 0.012960433959960938,
+      "improved": 17,
+      "harmed_gt_0_02": 2
+    },
+    "constant_subject_shift_identity": "score_Uk(i)=score_Z0(i)-w^T shift_k, for every future trial i in that target subject",
+    "all_Uk_and_Uall_AUC_differences_zero": true,
+    "validity_of_null": "ALGEBRAICALLY_FORCED_NOT_EMPIRICAL_CALIBRATION_NULL",
+    "corrective_metric": "source-frozen decision threshold balanced accuracy / confusion and label-free operating point, with S061-S080 post-hoc only"
+  },
+  "true_predata_external_summary": {
+    "datasets": [
+      "BNCI2014_002",
+      "BNCI2015_001"
+    ],
+    "n_datasets": 2,
+    "n_participants_total_descriptive": 26,
+    "objective_separation_outer_folds": 26,
+    "objective_separation_outer_folds_total": 26,
+    "H2_dataset_mean_deltas": [
+      0.017633928571428568,
+      0.04328865740740737
+    ],
+    "H2_equal_dataset_mean_delta": 0.03046129298941797,
+    "H2_positive_direction_datasets": 2,
+    "H2_frozen_Holm_significant_datasets": 0,
+    "H3_dataset_mean_deltas": [
+      0.022868303571428588,
+      0.04531296296296295
+    ],
+    "H3_equal_dataset_mean_delta": 0.03409063326719577,
+    "H3_positive_direction_datasets": 2,
+    "H3_frozen_Holm_significant_datasets": 0,
+    "corrected_frontier_max_span": [
+      0.03843749999999968,
+      0.050105555555555625
+    ],
+    "corrected_frontier_max_span_bootstrap_lower": [
+      0.027142578124999886,
+      0.022384189814814798
+    ],
+    "interpretation": "source-objective separation replicated in 26/26 external outer folds; H2/H3 target effect directions are positive in both TRUE PRE-DATA datasets, while each dataset's frozen exact sign-flip + Holm superiority family remains individually inconclusive; corrected frontier magnitude is reproducible but critical fidelity budgets are cohort-dependent"
+  },
+  "post_primary_comparators": {
+    "CSP6_LogisticRegression": {
+      "evidence_role": "post_primary_classical_comparator_only",
+      "design": {
+        "csp_components": 6,
+        "filter_ranking": "absolute generalized eigenvalue distance from 0.5",
+        "features": "log normalized CSP projected covariance diagonal",
+        "classifier": "LogisticRegression(C=1, lbfgs)",
+        "target_information_budget": "Z0",
+        "outer_evaluation": "leave-one-participant-out",
+        "target_score_freeze_before_auc": true,
+        "prospective_claim_upgrade_allowed": false
+      },
+      "implementation_correction": {
+        "type": "tensor_index_only",
+        "before_any_comparator_auc": true,
+        "original_error": "einsum pi,nij,jq->npq",
+        "corrected": "einsum ip,nij,jq->npq",
+        "scientific_design_changed": false
+      },
+      "BNCI2014_002": {
+        "workflow_run": 38063616580,
+        "workflow_job": 114246688362,
+        "artifact_id": 11673969304,
+        "artifact_digest": "sha256:10caa3f2f19e245e4737e1db86a68e0ab799e0dcf96114b49a2ae1ee94178800",
+        "result_json_sha256": "412c86ce4c466b4def654ec5c0fd304d28c1bfbbff836c31bb6ea6663f036a11",
+        "score_bundle_sha256": "9cdcdb35dec800d5e6a2573d62d5ef663bcdc15b6b329bdd411d813f70067827",
+        "receipt_json_sha256": "5cb3f8d4288959d01b7b1b3b45893f19dd199e7ae8252aaaa3edb5cbf4cd8057",
+        "n_participants": 14,
+        "target_trials": 2240,
+        "macro_auc": 0.7310714285714285,
+        "paired_source_macro_minus_csp": {
+          "mean_delta": 0.047031250000000004,
+          "median_delta": 0.024765625000000013,
+          "q25_delta": 0.0007031249999998879,
+          "q10_delta": -0.04326562499999994,
+          "worst_delta": -0.15265625000000016,
+          "best_delta": 0.2048437500000001,
+          "improved": 11,
+          "csp_better_by_gt_0_02": 2,
+          "participant_bootstrap95": [
+            -0.002913504464285776,
+            0.09573716517857138
+          ],
+          "inference_role": "descriptive_post_primary_no_confirmatory_p_value"
+        }
+      },
+      "BNCI2015_001": {
+        "workflow_run": 38063616580,
+        "workflow_job": 114246688587,
+        "artifact_id": 11673599802,
+        "artifact_digest": "sha256:d4fb2fb39e33e7c720c68e5c3a93e9604653738564060929d00537eeb8a99439",
+        "result_json_sha256": "ca80b196239fb0730be95568e97fb2c8644896f8d194f4cc22bcb046fbbaa4a9",
+        "score_bundle_sha256": "298191d99a7ea31f6e68bef665e59a37018d42194fb78b587fdb6b6d6a345581",
+        "receipt_json_sha256": "9fb0b9d6e92ab2e54ffd65e2bdf0a5573922377e64a318553447090472ad2301",
+        "n_participants": 12,
+        "target_trials": 5600,
+        "macro_auc": 0.7133731481481481,
+        "paired_source_macro_minus_csp": {
+          "mean_delta": 0.05359560185185186,
+          "median_delta": 0.03639722222222219,
+          "q25_delta": 0.004243749999999935,
+          "q10_delta": -0.02327499999999992,
+          "worst_delta": -0.04932499999999984,
+          "best_delta": 0.26182500000000003,
+          "improved": 9,
+          "csp_better_by_gt_0_02": 2,
+          "participant_bootstrap95": [
+            0.012198495370370398,
+            0.10410496527777767
+          ],
+          "inference_role": "descriptive_post_primary_no_confirmatory_p_value"
+        }
+      },
+      "interpretation": "CSP6+LR is a chronology-qualified classical MI comparator. Source-macro has higher macro AUC in both completed v5 cohorts, but this post-primary extension does not upgrade prospective superiority claims."
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "schema": "defaultreg_shin2017a_original_artifact_integrity_audit_v13",
+  "audit_date": "2026-10-11",
+  "status": "PASS_ORIGINAL_FROZEN_SCORE_ARTIFACT_INTEGRITY_AND_FOLD_AUC_ARITHMETIC",
+  "source": "lindicaphxag-tech/kaggle run 38065081504 artifact 11674238395, PR97",
+  "original_artifact_zip_sha256": "cda3210d24a8e9c7f3bf2d48490e51ad51f023beb652816a8679088cc3fb1842",
+  "protocol_sha256": "dfc9c488b1f3e68fd4a8555c4a8e74aef0519b6dcb78d4e23e48ead7ed733f1f",
+  "outcome_interpretation_sha256": "65e4b8f5e9b53432e50be457e7051cffc57e1dd37409580b93bd1dcae6adc723",
+  "score_manifest_sha256": "00d1aa5bb912aa7badcdc5f1c9d3f6e690551d4ffee4d6bff234c61c15582e9e",
+  "n_subjects": 29,
+  "trial_denominator": 1740,
+  "checked_score_npz_sha256": 29,
+  "fold_aggregate_auc_models_checked": 7,
+  "contrasts": [
+    {
+      "baseline": "source_cov_nll_full_domain_LDA",
+      "mean_delta_auc": 0.022222222222222213,
+      "improved_count": 19,
+      "harmed_gt_0_02_count": 5,
+      "holm_p_from_original_not_recomputed": 0.022324888375558124
+    },
+    {
+      "baseline": "LedoitWolf_LDA",
+      "mean_delta_auc": 0.04865900383141762,
+      "improved_count": 23,
+      "harmed_gt_0_02_count": 3,
+      "holm_p_from_original_not_recomputed": 0.0005099974500127499
+    }
+  ],
+  "verification_scope": "Original ZIP SHA, all 29 stored NPZ byte hashes, combined canonical score manifest, both freeze documents, source and outcome grid digests, 7 model macro AUC means and participant-level delta/harm counts. This is NOT raw EEG retraining, independently rederived target-label AUC, bootstrap CI or Monte Carlo sign-flip replication.",
+  "raw_eeg_retraining_run_in_this_audit": false,
+  "fresh_target_label_inference_run_in_this_audit": false
+}

@@ -1,0 +1,46 @@
+\begin{table*}[t]
+\centering
+\caption{Prospective and TRUE PRE-DATA Z0 evidence for regularisation-objective mismatch. AUC values are participant-macro averages. $\Delta_{\mathrm{cov}}$ compares full-domain source participant-discrimination selection with source covariance-NLL selection; $\Delta_{\mathrm{LW}}$ compares it with analytic Ledoit--Wolf. Confidence intervals are participant bootstrap intervals. Holm $p$ values belong to the frozen two-comparison family within each cohort. External cohorts are replication strata and are not pooled for significance.}
+\label{tab:main-prospective-results}
+\scriptsize
+\setlength{\tabcolsep}{3.2pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular}{lrrrrcrcr}
+\toprule
+Cohort & $N$ & Macro & Cov-NLL & LW &
+\shortstack{$\Delta_{\mathrm{cov}}$\\95\% CI} &
+Holm $p$ &
+\shortstack{$\Delta_{\mathrm{LW}}$\\95\% CI} &
+Holm $p$ \\
+\midrule
+EEGMMIDB S021--S040
+& 20 & 0.7212 & 0.6651 & 0.6292
+& \shortstack{+0.0561\\\mbox{[0.0218, 0.0905]}}
+& 0.0060
+& \shortstack{+0.0920\\\mbox{[0.0411, 0.1431]}}
+& 0.0051 \\
+BNCI2014\_002
+& 14 & 0.7781 & 0.7605 & 0.7552
+& \shortstack{+0.0176\\\mbox{[-0.0036, 0.0373]}}
+& 0.1396
+& \shortstack{+0.0229\\\mbox{[0.0004, 0.0440]}}
+& 0.1396 \\
+BNCI2015\_001
+& 12 & 0.7670 & 0.7237 & 0.7217
+& \shortstack{+0.0433\\\mbox{[0.0002, 0.0935]}}
+& 0.1855
+& \shortstack{+0.0453\\\mbox{[0.0029, 0.0957]}}
+& 0.1855 \\
+Shin2017A (separate family)
+& 29 & 0.7859 & 0.7637 & 0.7372
+& \shortstack{+0.0222\\\mbox{[0.0046, 0.0405]}}
+& 0.0223
+& \shortstack{+0.0487\\\mbox{[0.0259, 0.0726]}}
+& 0.0005 \\
+\bottomrule
+\end{tabular}
+
+\vspace{1mm}
+\footnotesize
+S021--S040 is the original prospectively frozen within-database confirmation. BNCI2014\_002 and BNCI2015\_001 belong to the unchanged v5 TRUE PRE-DATA family and neither individual external family passed its exact sign-flip/Holm tests. Shin2017A was frozen in a \emph{different} PR~97 protocol before its target outcome, uses its own two-comparison Holm family, and is \emph{not pooled} into v5. Intervals are participant bootstrap; the source model is shared within each cohort. Harmed-participant tails remain reported separately.
+\end{table*}

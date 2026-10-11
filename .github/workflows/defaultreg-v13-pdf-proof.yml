@@ -1,0 +1,57 @@
+name: DefaultReg V13 isolated publisher-review PDF build
+on:
+  push:
+    branches:
+      - submission/defaultreg-v13-pdf-proof-20261011
+    paths:
+      - 'research/defaultreg_bspc_v13/**'
+      - '.github/workflows/defaultreg-v13-pdf-proof.yml'
+  pull_request:
+    paths:
+      - 'research/defaultreg_bspc_v13/**'
+      - '.github/workflows/defaultreg-v13-pdf-proof.yml'
+permissions:
+  contents: read
+jobs:
+  latex-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install LaTeX & PDF text audit dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-pictures texlive-fonts-recommended lmodern poppler-utils
+      - name: Verify exact source manifest lists all files
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          x=json.loads(pathlib.Path('SOURCE_MIRROR.json').read_text())
+          for file in x['files']:
+              p=pathlib.Path(file['filename'])
+              assert p.is_file() and p.stat().st_size>100, file
+          print('SOURCE_MIRROR_PATHS_PASS; source hash attestation remains in JSON')
+          PY
+      - name: Audit V13 canonical data table and independent Shin receipt (fail on mismatches)
+        working-directory: research/defaultreg_bspc_v13
+        run: python verify_bspc_submission_claims.py --check-consistency
+      - name: Compile full V13 main article and bibliography
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_bspc_v13_DRAFT.tex
+          test -s main_bspc_v13_DRAFT.pdf
+          pdftotext main_bspc_v13_DRAFT.pdf compiled.txt
+          grep -q 'Regularisation Objective Mismatch' compiled.txt
+          test "$(wc -c < compiled.txt)" -gt 7000
+          echo "V13_PDF_BUILD_SUCCEEDED"
+          pdfinfo main_bspc_v13_DRAFT.pdf | grep Pages
+      - uses: actions/upload-artifact@v4
+        with:
+          name: defaultreg-v13-review-pdf-not-submitted
+          path: |
+            research/defaultreg_bspc_v13/main_bspc_v13_DRAFT.pdf
+            research/defaultreg_bspc_v13/main_bspc_v13_DRAFT.log
+            research/defaultreg_bspc_v13/main_bspc_v13_DRAFT.bbl
+            research/defaultreg_bspc_v13/SOURCE_MIRROR.json
+          retention-days: 90
