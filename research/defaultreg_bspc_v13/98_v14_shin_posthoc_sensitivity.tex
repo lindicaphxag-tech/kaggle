@@ -1,0 +1,67 @@
+\subsection{Why source objective separation is not a validated switching rule}
+\label{sec:source-target-not-predictor}
+A limitation of objective-alignment scores is that they can appear
+actionable without having been tested as prospective predictors of an
+unseen person's gain. We therefore performed a clearly labelled
+\emph{post-outcome descriptive} check using the \emph{original}
+independently frozen Shin2017A score artifact. For each of the 29
+outer participant folds, we read the original source-person AUC
+path, its covariance-NLL path and the \emph{unchanged} held-person
+model comparisons. Each source path was produced without the
+held person's labels or feature statistics. The outer training pools
+overlap heavily, so the 29 pairs do not constitute independent
+source-to-deployment experiments.
+
+The chosen discrimination criterion exceeded the AUC of the
+source covariance-optimal candidate in all 29 folds, by
+0.02605 source macro-AUC on average; it incurred a mean
+source covariance-NLL cost of 0.72799 in the corresponding
+per-dimension units. Both source-selected and
+covariance-selected values came from the original same-grid
+source validation. Yet that within-source separation was
+\emph{not} proportional to the held-person benefit
+(Fig.~\ref{fig:shin-posthoc-source-target}): the post-outcome
+rank association of source AUC advantage with the target
+AUC contrast was descriptively negative (Spearman
+$\rho=-0.543$). A conventional independent-pairs
+$p$-value is invalid here because most folds reuse the same
+source participants. We make no general predictive or causal
+claim from this exploratory association, and specify no
+decision threshold using target outcomes.
+
+\begin{table}[tb]
+\centering
+\small
+\caption{Post-outcome robustness of the \emph{separately frozen}
+Shin2017A (29 people). All contrasts refer to the same
+original participant score family. Monte Carlo checks were
+repeated for integrity only; the original family-adjusted
+$p$-values remain the primary inference.}
+\label{tab:shin-posthoc-robust}
+\begin{tabular}{lcc}
+\toprule
+Post-outcome summary & vs Cov-NLL & vs Ledoit--Wolf\\
+\midrule
+Mean $\Delta$AUC (original) & +0.02222 & +0.04866\\
+Median $\Delta$AUC & +0.01778 & +0.04667\\
+10\% trimmed mean & +0.02062 & +0.04507\\
+Minimum 1-person-deletion mean & +0.01750 & +0.04254\\
+Maximum 1-person-deletion mean & +0.02623 & +0.05278\\
+People harmed by $>0.02$ AUC & 5/29 & 3/29\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Every one-person omission retained a positive cohort mean,
+but even a bootstrap or deletion check conditional on these
+overlapping source fits does not establish a participant-safe
+adaptive policy. In particular, the harmed fraction against
+covariance-NLL was 17.2\% (5/29), with an exploratory Wilson
+95\% interval of approximately 7.6--34.5\%;
+the comparable Ledoit--Wolf fraction was 10.3\% (3/29).
+Those intervals do not account for variation across new
+EEG acquisition sites or independently retrained source pools.
+They express uncertainty under a much narrower sampling
+model, and are not medical safety intervals.
+
+\input{97_v14_shin_source_target_posthoc.tex}
