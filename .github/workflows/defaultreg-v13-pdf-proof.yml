@@ -33,6 +33,9 @@ jobs:
               assert p.is_file() and p.stat().st_size>100, file
           print('SOURCE_MIRROR_PATHS_PASS; source hash attestation remains in JSON')
           PY
+      - name: Audit V13 canonical data table and independent Shin receipt (fail on mismatches)
+        working-directory: research/defaultreg_bspc_v13
+        run: python verify_bspc_submission_claims.py --check-consistency
       - name: Compile full V13 main article and bibliography
         working-directory: research/defaultreg_bspc_v13
         run: |
