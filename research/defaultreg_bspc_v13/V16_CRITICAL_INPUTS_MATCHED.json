@@ -1,0 +1,46 @@
+{
+  "schema": "defaultreg_v16_critical_changed_input_7_file_sha1_attestation",
+  "source_repository": "lindicaphxag-tech/cs",
+  "source_branch": "research/defaultreg-v16-estimand-audit-20261011",
+  "mirror_repository": "lindicaphxag-tech/kaggle",
+  "mirror_branch": "submission/defaultreg-v16-estimand-audit-20261011",
+  "status": "ALL_SEVEN_CRITICAL_SOURCE_BLOB_BYTES_MATCH_MIRROR_BY_INDEPENDENT_GITHUB_FETCH",
+  "limits": "Records seven NEW OR MODIFIED V16 inputs; does not replace the previously attested V14/V15 base files. This is not raw EEG retraining.",
+  "files": [
+    {
+      "source_path": "papers/eeg-default-regularisation/paper_vnext/main_bspc_v16_DRAFT.tex",
+      "mirror_path": "research/defaultreg_bspc_v13/main_bspc_v16_DRAFT.tex",
+      "git_blob_sha1": "09ac3b0795c1321d2c6acb74730179b5c9a07a84"
+    },
+    {
+      "source_path": "papers/eeg-default-regularisation/paper_vnext/00_abstract_v16_estimand_locked.tex",
+      "mirror_path": "research/defaultreg_bspc_v13/00_abstract_v16_estimand_locked.tex",
+      "git_blob_sha1": "1d378febc9dfdec656cebb660837849439d26cc6"
+    },
+    {
+      "source_path": "papers/eeg-default-regularisation/paper_vnext/101_v16_covscore_estimand_audit.tex",
+      "mirror_path": "research/defaultreg_bspc_v13/101_v16_covscore_estimand_audit.tex",
+      "git_blob_sha1": "a3e9fc62915a3bafe3ecc38d616ffa2d2af4f2c2"
+    },
+    {
+      "source_path": "papers/eeg-default-regularisation/paper_vnext/91_table_main_prospective_results.tex",
+      "mirror_path": "research/defaultreg_bspc_v13/91_table_main_prospective_results.tex",
+      "git_blob_sha1": "1896de59c293932fe4954e2464f2ea5144afdca1"
+    },
+    {
+      "source_path": "papers/eeg-default-regularisation/paper_vnext/94_v13_prior_scope.tex",
+      "mirror_path": "research/defaultreg_bspc_v13/94_v13_prior_scope.tex",
+      "git_blob_sha1": "244cbd827f386bd4a39d1f2b872ec388f14b4c70"
+    },
+    {
+      "source_path": "papers/eeg-default-regularisation/src/covariance_estimand_contract_v16.py",
+      "mirror_path": "research/defaultreg_bspc_v13/src/covariance_estimand_contract_v16.py",
+      "git_blob_sha1": "b2cab84a9eee572657b25518c399d30de6c595fd"
+    },
+    {
+      "source_path": "papers/eeg-default-regularisation/tests/test_covariance_estimand_contract_v16.py",
+      "mirror_path": "research/defaultreg_bspc_v13/tests/test_covariance_estimand_contract_v16.py",
+      "git_blob_sha1": "b95ad9cfc891ec20dc91988168255da2ce99d6d7"
+    }
+  ]
+}
