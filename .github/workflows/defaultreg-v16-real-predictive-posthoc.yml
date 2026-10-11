@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - submission/defaultreg-v16-estimand-audit-20261011
+      - experiment/defaultreg-v16-cpred-posthoc-20261011
     paths:
       - 'research/defaultreg_proper_predictive/**'
       - '.github/workflows/defaultreg-v16-real-predictive-posthoc.yml'
