@@ -85,9 +85,14 @@ covariance predictive negative log-likelihood \(C_s(\lambda)\), minimised for
 covariance fidelity. Analytic Ledoit--Wolf and OAS shrinkage use the same
 source feature pool; tangent-space logistic regression and Riemannian
 MDM serve as additional non-identical algorithm controls. Full-domain
-selection refers to a \emph{finite} 27-point candidate set
-including \(\{0,.0005,.001,.002,.003,.005,.0075,.01,.015,.02,.03,
-.05,.075,.10,.15,.20,.30,.40,.50,.60,.70,.80,.90,.95,.98,.99,1\}\).
+selection refers to the \emph{finite} 27-point candidate grid
+\[
+\begin{aligned}
+\Lambda=\{&0,.0005,.001,.002,.003,.005,.0075,.01,.015,\\
+&.02,.03,.05,.075,.10,.15,.20,.30,.40,.50,\\
+&.60,.70,.80,.90,.95,.98,.99,1\}.
+\end{aligned}
+\]
 Singular candidates are declared infeasible, not silently replaced by
 a target-informed rule. Target scores are frozen before their
 label-based performance is calculated.
