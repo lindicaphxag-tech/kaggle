@@ -21,7 +21,7 @@ jobs:
       - name: Install LaTeX & PDF text audit dependencies
         run: |
           sudo apt-get update -qq
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-pictures texlive-fonts-recommended poppler-utils
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-pictures texlive-fonts-recommended lmodern poppler-utils
       - name: Verify exact source manifest lists all files
         working-directory: research/defaultreg_bspc_v13
         run: |
