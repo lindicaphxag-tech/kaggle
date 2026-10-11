@@ -1,0 +1,117 @@
+\subsection{What the source observations cannot guarantee}
+\label{sec:v15-identifiability}
+A disparity between source-optimal covariance fidelity and source-optimal
+held-source AUC does not by itself identify the sign of the
+\emph{future} participant's discrimination difference. We formalise
+this issue rather than proposing a target-performance predictor from
+the observed source-regret ratio.
+
+\paragraph{Proposition 1 (failure of universal source-only dominance).}
+Let $w_D$ and $w_C$ be two nonzero discriminant directions learned from
+\emph{the same fixed source cohort}. Fix any common target within-class
+covariance $\Sigma\succ0$. Define their $\Sigma$-normalised difference
+\[
+ a=\frac{w_D}{\sqrt{w_D^\top\Sigma w_D}}
+   -\frac{w_C}{\sqrt{w_C^\top\Sigma w_C}}.
+\]
+If $a\ne0$, there exist two binary equal-covariance Gaussian target
+populations with \emph{identical covariance and unchanged source data}
+for which the relative target AUC of the two discriminants has opposite
+signs. Consequently, an observed source-only regularisation-objective
+gap cannot uniformly certify which direction improves target AUC
+without assumptions restricting the unseen target distribution.
+
+\emph{Proof.}
+For a Gaussian target with class-mean contrast $d_g$ and within-class
+covariance $\Sigma$, the AUC of direction $w$ is
+$\Phi\!\left(w^\top d_g/\sqrt{2w^\top\Sigma w}\right)$.
+Because $\Phi$ is increasing, the difference in standardised
+separation between $w_D$ and $w_C$ has sign
+$\operatorname{sign}(a^\top d_g)$. The two contrasts
+$d_g^{(+)}=a$ and $d_g^{(-)}=-a$ give $a^\top d_g^{(+)}
+=\|a\|^2>0$ and $a^\top d_g^{(-)}=-\|a\|^2<0$.
+Both are valid Gaussian class-mean differences under the same
+positive definite covariance. If $a=0$, the directions coincide
+after positive $\Sigma$-normalisation and the corresponding
+Gaussian AUCs are identical for every $d_g$.\hfill$\square$
+
+\paragraph{Proposition 2 (exact conditional contrast-shift certificate).}
+Suppose, \emph{additionally}, that the evaluation population has exactly
+the declared shared covariance $\Sigma$ and its unknown class contrast
+belongs to the ellipsoid
+\[
+ \mathcal D_\rho=
+ \{d:\,(d-d_s)^\top\Sigma^{-1}(d-d_s)\le\rho^2\},
+\]
+where $d_s$ is a source-only anchor. The worst possible signed
+standardised-margin advantage of $w_D$ over $w_C$ is
+\[
+ \boxed{
+ \inf_{d\in\mathcal D_\rho}
+ a^\top d
+ =
+ a^\top d_s-\rho\sqrt{a^\top\Sigma a}.
+ }
+\]
+If this bound is strictly positive, $w_D$ has greater AUC than
+$w_C$ for \emph{every Gaussian evaluation population satisfying
+these stated assumptions}. If $a\ne0$, the lower bound is attained
+by $d^*=d_s-\rho\,\Sigma a/\sqrt{a^\top\Sigma a}$.
+The critical ellipsoid radius is
+$\rho^*=(a^\top d_s)/\sqrt{a^\top\Sigma a}$ when
+$a^\top d_s>0$.
+
+\emph{Proof.}
+Writing $d=d_s+\Sigma^{1/2}z$ with $\|z\|_2\le\rho$,
+Cauchy--Schwarz gives
+$\min_z a^\top\Sigma^{1/2}z=-\rho\|\Sigma^{1/2}a\|_2$,
+with equality at the supplied witness.\hfill$\square$
+
+This result is an \emph{assumption-conditional sensitivity
+identity}, not a bound on an arbitrary EEG target population.
+In particular, strict Z0 does not let us check a future target's
+class contrast or its membership in $\mathcal D_\rho$.
+Estimating the radius solely from the observed source cohort
+does not establish future coverage. Allowing an unknown covariance
+shift or non-Gaussian class distributions additionally invalidates
+this simple AUC equivalence. Our implementation therefore emits a
+\texttt{CONDITIONAL\_GAUSSIAN\_MATH\_NOT\_EEG\_SAFETY} status
+and is kept as a falsification/sensitivity tool rather than a
+promoted online policy. A deterministic verification compares
+the formula and constructive worst-case witness over 500 randomly
+generated positive definite covariances and admissible contrasts.
+No new target-subject decoding results come from that test.
+
+\subsection{Four cohorts do not establish universal positive transfer}
+\label{sec:v15-four-cohorts}
+For a separate, explicitly \emph{post-outcome} external evidence
+check, we retained the mean paired discrimination-versus-covariance
+contrast of each frozen cohort as one descriptive unit.
+The mean AUC differences are $+0.05607$ (EEGMMIDB,
+$N=20$), $+0.01763$ (BNCI2014\_002, $N=14$),
+$+0.04329$ (BNCI2015\_001, $N=12$), and
+$+0.02222$ (Shin2017A, $N=29$). The unweighted
+\emph{dataset-mean} effect is $+0.03480$ AUC, with
+leave-one-dataset-out means ranging from $+0.02771$ to
+$+0.04053$ AUC. Weighting each trial or each overlapping
+outer fold as an independent deployment replication would
+be inappropriate.
+
+Four positive dataset means would yield a two-sided
+$p=0.125$ \emph{if} four independent datasets were
+an exchangeable random sample with symmetric null
+effect directions. They were \emph{not} drawn under that
+sampling design, so this number is a diagnostic
+rather than a valid confirmation of improvement in
+the population of EEG databases. It cannot replace,
+combine or retroactively strengthen the original
+separate Holm-controlled test families. The
+source-training-pool and participant-harm limitations
+in the preceding sections remain in force.
+
+The two propositions explain why a source-only mismatch
+can be real and repeatable while providing no
+unconditional safe switch for a new individual.
+The empirical cross-cohort pattern is
+\emph{consistent with} the mechanism but does
+not resolve its distributional identifiability gap.
