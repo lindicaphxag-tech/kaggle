@@ -1,7 +1,7 @@
 {
   "schema": "defaultreg-v13-independent-pdf-build-mirror",
   "original_repository": "lindicaphxag-tech/cs",
-  "original_branch": "submission/defaultreg-bspc-evidence-gated-20261011",
+  "original_branch": "research/defaultreg-v14-source-target-limits-20261011",
   "mirror_repository": "lindicaphxag-tech/kaggle",
   "mirror_branch": "submission/defaultreg-v13-pdf-proof-20261011",
   "files": [
@@ -37,13 +37,13 @@
     },
     {
       "filename": "references_v10.bib",
-      "source_blob_sha": "9106a428eb6b322e9307b799674e922702d337fc",
+      "source_blob_sha": "9e119e943e9703d62cd3ce87df2e5571846ac27e",
       "commit": "1146dfb87a7f56964d77694110181592e7203e68",
       "bytes": 4302
     },
     {
       "filename": "94_v13_prior_scope.tex",
-      "source_blob_sha": "044688008e59bc20d720b565c80e91e1f258fada",
+      "source_blob_sha": "eb67808037e9e60de46eee292fa00862e2a8ee25",
       "commit": "f1a6d0cf64d55dbbca582f7014aacb63bd09221e",
       "bytes": 2221
     },
@@ -78,7 +78,33 @@
     {
       "filename": "evidence/shin2017a_original_artifact_verified_v13.json",
       "source_blob_sha": "2806a89d92a71fc48aa34a9ffb598a7397e33217"
+    },
+    {
+      "filename": "main_bspc_v14_DRAFT.tex",
+      "source_blob_sha": "dc037996da00fd0682d656ac8c101bdfa5f23a3a",
+      "bytes": 15876
+    },
+    {
+      "filename": "97_v14_shin_source_target_posthoc.tex",
+      "source_blob_sha": "36775c838af8f1864284109e9ec4b436a58dbcf6",
+      "bytes": 4108
+    },
+    {
+      "filename": "98_v14_shin_posthoc_sensitivity.tex",
+      "source_blob_sha": "03f1876ce35873351ee54eaba8a04d62d959b445",
+      "bytes": 3132
+    },
+    {
+      "filename": "src/shin_v14_posthoc_robustness.py",
+      "source_blob_sha": "62feabfc8ef66d186b06b94aa8021122e8656606",
+      "bytes": 6014
+    },
+    {
+      "filename": "evidence/shin_v14_posthoc_original_score_robustness.json",
+      "source_blob_sha": "daa9102a71725277c0d3bfbcfbffe7455b23d675",
+      "bytes": 2349
     }
   ],
-  "scope": "Source mirror for typeset build only. No reexecution of EEG data; no independent confirmation of source statistical claims."
+  "scope": "Source mirror for typeset build only. No reexecution of EEG data; no independent confirmation of source statistical claims.",
+  "note": "V13 SHA entries preserved; V14 entries reference research/defaultreg-v14-source-target-limits-20261011"
 }
