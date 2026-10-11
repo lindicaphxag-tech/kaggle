@@ -1,0 +1,119 @@
+\subsection{A critical estimand distinction: class-centred covariance score versus predictive NLL}
+\label{sec:v16-estimand-audit}
+
+An audit of the \emph{original executed} Shin2017A/BNCI2014\_002
+source-selection code found a material distinction between the
+frozen baseline's historical name and its actual measurement
+quantity. The original program performs source-participant-grouped
+validation, forms within-class residuals from \emph{the held source
+validation participant's own labelled class means}, and evaluates
+a covariance Gaussian log score on those residuals.
+These source-participant labels are permitted for model development
+and do \emph{not} imply outer target-subject label leakage.
+However, the resulting number is not a proper predictive
+class-conditional log likelihood under source-fitted class means.
+
+To be precise, write the source-trained regularised within-class
+covariance as $A_\lambda$, and for held source participant $g$
+let $\widehat\mu_{g,c}$ be the \emph{held} participant's
+empirical mean for class $c$. Up to additive constants, the
+original finite-sample validation score is
+\begin{equation}
+\label{eq:v16-centred-score}
+ C_{\mathrm{cent},g}(\lambda)=\frac{1}{p}
+ \left[
+  \log|A_\lambda|+
+  \frac{1}{n_g}\sum_{i=1}^{n_g}
+  (x_{gi}-\widehat\mu_{g,y_{gi}})^\top
+  A_\lambda^{-1}(x_{gi}-\widehat\mu_{g,y_{gi}})
+ \right].
+\end{equation}
+The source criterion in the frozen experiments is the
+grouped average of $C_{\mathrm{cent},g}(\lambda)$,
+and all existing performance tables retain its original
+method identifier \texttt{source\_cov\_nll\_full\_domain\_LDA}.
+For readability we call it the
+\emph{class-centred covariance-score selector (CovScore)}
+hereafter. Historical Cov-NLL column labels refer
+to this exact frozen estimator, not to the new comparator below.
+
+A \emph{genuinely held-source predictive} Gaussian
+class-conditional score would instead evaluate
+\begin{equation}
+\label{eq:v16-conditional-prediction}
+ C_{\mathrm{pred},g}(\lambda)=\frac{1}{p}
+ \left[
+  \log|A_\lambda|+
+  \frac{1}{n_g}\sum_{i=1}^{n_g}
+  (x_{gi}-\widehat\mu_{\mathrm{train},y_{gi}})^\top
+  A_\lambda^{-1}(x_{gi}-\widehat\mu_{\mathrm{train},y_{gi}})
+ \right],
+\end{equation}
+with the class means and covariance fitted from
+\emph{the source training groups only}, without refitting
+the held group's means. The source-validation labels
+index the corresponding training-class mean; they are
+not used to estimate it. Equation~\eqref{eq:v16-conditional-prediction}
+is a proposed new comparison protocol, \emph{not}
+the estimand evaluated in the original frozen
+EEGMMIDB/BNCI/Shin result tables. Neither its chosen
+$\lambda$ nor its held-person AUC is currently claimed
+or inferred from those archived tables.
+
+\paragraph{Proposition (class-contrast shift blind spot).}
+Consider any fixed held-source validation data with
+at least one observation in each class, and apply an
+arbitrary class-specific feature translation
+$x'_{gi}=x_{gi}+b_{y_{gi}}$.
+Then \emph{for every feasible} $\lambda$,
+\[
+ C'_{\mathrm{cent},g}(\lambda)
+ = C_{\mathrm{cent},g}(\lambda).
+\]
+In contrast, $C_{\mathrm{pred},g}$ is generally changed
+because the source-trained class means stay fixed.
+Consequently, $C_{\mathrm{cent}}$ by construction
+cannot measure conditional mean-contrast drift through
+its held-source covariance log score.
+
+\emph{Proof.} After translation,
+$\widehat\mu'_{g,c}=\widehat\mu_{g,c}+b_c$,
+so each residual
+$x'_{gi}-\widehat\mu'_{g,y_{gi}}=
+x_{gi}-\widehat\mu_{g,y_{gi}}$
+is identical to its original value. The log-determinant
+term does not depend on the held means. For the
+predictive score, the source-fitted
+$\widehat\mu_{\mathrm{train},c}$ does not shift and
+the residual gains $b_c$ in general, changing its
+quadratic form.\hfill$\square$
+
+An exact numerical regression now computes both quantities
+on identical synthetic training/validation splits, then
+imposes class-conditional shifts. The historical
+class-centred score remains equal to floating-point
+precision along the entire $\lambda$ path, while
+proper predictive log score changes. This
+\emph{does not} prove that one of the two selectors
+will improve EEG transfer; such a claim would require
+a fresh source-only, pre-specified, held-person
+experiment with the new comparator.
+
+\paragraph{Interpretational consequence.}
+The prospective finding in the present paper remains
+a comparison of \emph{source participant discrimination}
+against \emph{class-centred covariance fit} and
+against analytic Ledoit--Wolf. The measured gain
+relative to the frozen Cov-NLL code remains
+numerically unchanged, but should no longer be described
+as showing superiority over every possible covariance
+predictive likelihood criterion.
+This distinction also restricts the operator mechanism:
+the derivative of the covariance quadratic form
+is a conditional calculation at a fixed covariance,
+not evidence that Eq.~\eqref{eq:v16-centred-score}
+evaluates out-of-sample class-conditional density
+with source-only class means. Source-only diagnostics
+from the two definitions must never share an
+ambiguous NLL field without their
+residual-centring provenance.
