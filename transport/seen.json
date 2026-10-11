@@ -1210,6 +1210,28 @@
       "source": "inbox/FIRST_SEEN_20261011T150453Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "8df5f99c99b76efc5a7054e4489a947342c1989a83c3a352c7435c59f4f631b4"
+    },
+    {
+      "created_at": "2026-10-11T15:38:31Z",
+      "first_frozen_at": "2026-10-11T19:42:42Z",
+      "id": "facebookresearch/habitat-sim#2645",
+      "issue_number": 2645,
+      "prediction_deadline_at": "2026-10-12T01:42:42Z",
+      "repository": "facebookresearch/habitat-sim",
+      "source": "inbox/FIRST_SEEN_20261011T194242Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "a269873f658a56384f95d531f2bbdd0584bb069b999b7104183a3ef9f92252d7"
+    },
+    {
+      "created_at": "2026-10-11T16:03:03Z",
+      "first_frozen_at": "2026-10-11T19:42:42Z",
+      "id": "ros-navigation/navigation2#6647",
+      "issue_number": 6647,
+      "prediction_deadline_at": "2026-10-12T01:42:42Z",
+      "repository": "ros-navigation/navigation2",
+      "source": "inbox/FIRST_SEEN_20261011T194242Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "9c526eec41e58a4d922670af594c1c5716af04d43cedc628ca977ad0ee7ea496"
     }
   ]
 }

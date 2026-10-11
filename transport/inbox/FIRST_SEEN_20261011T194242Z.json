@@ -1,0 +1,36 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "Mechazo11",
+      "body": "Hello\n\nEarlier today I was trying to install the stable release of `habitat-sim`, version 0.3.3. My computer is an Ubuntu 24.04 machine with RTX 3080.\n\nDuring my initial attempt, I had CUDA `13.1` installed and set in my `PATH` variable.  However the build fails with the following error message (Debug steps reproduced with Claude Sonnet 5.5's instructions)\n\n```bash\nazmyin-ubuntu2404:~/habitat-sim$ grep -n \"error:\\|FAILED\\|Error 1\\|CMake Error\" build.log | head -20\n2639:  FAILED: esp/CMakeFiles/habitat_sim.dir/gfx/RenderTarget.cpp.o\n3213:  /home/az-dev/habitat-sim/src/esp/gfx_batch/cuda_helpers/HelperCuda.h:1059:18: error: \u2018struct cudaDeviceProp\u2019 has no member named \u2018computeMode\u2019\n3217:  /home/az-dev/habitat-sim/src/esp/gfx_batch/cuda_helpers/HelperCuda.h:1103:20: error: \u2018struct cudaDeviceProp\u2019 has no member named \u2018computeMode\u2019\n3220:  /home/az-dev/habitat-sim/src/esp/gfx_batch/cuda_helpers/HelperCuda.h:1129:20: error: \u2018struct cudaDeviceProp\u2019 has no member named \u2018computeMode\u2019\n3229:  /home/az-dev/habitat-sim/src/esp/gfx_batch/cuda_helpers/HelperCuda.h:1139:41: error: \u2018struct cudaDeviceProp\u2019 has no member named \u2018clockRate\u2019\n3345:  error: subprocess-exited-with-error\n3357:error: failed-wheel-build-for-install\n```\n\nAs suggested by Claude, changing out the CUDA runtime library to older `12.8` solved the problem.  Here is h ow that was achieved\n\n```bash\n# Open a terminal\nexport PATH=/usr/local/cuda-12.8/bin:$PATH\nexport LD_LIBRARY_PATH=/usr/local/cuda-12.8/lib64:$LD_LIBRARY_PATH\n```\n\nIf I had understood the requirements correctly, this hard requirement was not mentioned in the official documentation: https://github.com/facebookresearch/habitat-sim/blob/main/BUILD_FROM_SOURCE.md\n\nHope this information helps.\n\nBest,\n@Mechazo11",
+      "created_at": "2026-10-11T15:38:31Z",
+      "html_url": "https://github.com/facebookresearch/habitat-sim/issues/2645",
+      "id": "facebookresearch/habitat-sim#2645",
+      "issue_number": 2645,
+      "labels": [],
+      "repository": "facebookresearch/habitat-sim",
+      "surface_sha256": "a269873f658a56384f95d531f2bbdd0584bb069b999b7104183a3ef9f92252d7",
+      "title": "Kindly pin CUDA 12.X as required toolkit for stable release v0.3.3 compilation in CUDA systems"
+    },
+    {
+      "author_login": "SuadOcado",
+      "body": "## Feature request\n\n#### Feature description\nIn many real world scenarios, some robots will need to adjust their behavior when approaching a node, not only when achieving it. i.e. triggering automatic doors or elevators to open smoothly before the robot arrives to maintain cruising velocity, requesting traffic locks for shared intersections in multi-robot environments, flashing warning lights before a blind corner, or moving a manipulator arm into a \"ready\" position as it nears a workstation.\n\nThis issue proposes a new node operation (e.g `ON_APPROACH`) that would trigger when a robot is approaching a node within a configured distance. This would track the robot's progress along the current route and publish an update via the action server feedback once that distance threshold is crossed.\n\n#### Implementation considerations\nTo achieve this behavior currently, we need to either:\n1. Add intermediate nodes that act as \"approach nodes\" and monitor them for the `ON_ENTER` node operation. This makes graph generation significantly harder and less dynamic in complex scenarios, as the slightest change to the desired approach distance requires modifying the graph itself. It also pollutes the graph semantics; if the rest of the software stack expects a node to represent an explicit trigger for a behavior or task, adding \"fake\" nodes breaks that assumption.\n2. Bump up the `radius_to_achieve_node` and monitor for `ON_ENTER` instead. However, inflating this radius can lead to very poor planner behavior. We lose the ability to have actual arrival behaviors, and the system starts treating nodes as \"reached\" prematurely.\n\nTo implement this cleanly, we could instead:\n\n- Introduce an `approach_radius` parameter, either as a global route setting or a per-node property (since currently all the operation parameters are global, I would add this as a global parameter instead of a per-node property. In the future, if we feel the need to, we could have global parameters as \"preferences\" and have node properties override them).\n- Within the route tracking loop (`RouteTracker::trackRoute`), calculate the distance to the upcoming target node alongside the existing checks.\n- When `distance_to_target < approach_radius`, trigger the new `ON_APPROACH` node operation.\n- Update the action server feedback to publish this approach state.\n",
+      "created_at": "2026-10-11T16:03:03Z",
+      "html_url": "https://github.com/ros-navigation/navigation2/issues/6647",
+      "id": "ros-navigation/navigation2#6647",
+      "issue_number": 6647,
+      "labels": [],
+      "repository": "ros-navigation/navigation2",
+      "surface_sha256": "9c526eec41e58a4d922670af594c1c5716af04d43cedc628ca977ad0ee7ea496",
+      "title": "[nav2_route] Approaching node notifier"
+    }
+  ],
+  "post_activation_issue_identities_observed": 84,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-11T19:42:42Z",
+  "schema_version": 1
+}
