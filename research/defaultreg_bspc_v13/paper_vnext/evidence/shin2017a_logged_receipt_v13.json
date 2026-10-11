@@ -1,0 +1,113 @@
+{
+  "schema": "defaultreg_shin2017a_runner_log_receipt_v13",
+  "claim_scope": "Original successful Kaggle workflow stdout, not a second independent reexecution or direct per-subject ZIP inspection.",
+  "source": {
+    "repository": "lindicaphxag-tech/kaggle",
+    "pr_number": 97,
+    "workflow_run_id": 38065081504,
+    "workflow_job_id": 114251125001,
+    "artifact_id": 11674238395,
+    "artifact_zip_sha256": "cda3210d24a8e9c7f3bf2d48490e51ad51f023beb652816a8679088cc3fb1842",
+    "job_outcome": "success",
+    "source_job_log": "https://github.com/lindicaphxag-tech/kaggle/actions/runs/38065081504/job/114251125001",
+    "artifact_url": "https://github.com/lindicaphxag-tech/kaggle/actions/runs/38065081504/artifacts/11674238395"
+  },
+  "execution_summary": {
+    "status": "UNTOUCHED_FRONTIER_CONFIRMATION_EXECUTED",
+    "dataset": "Shin2017A",
+    "n_subjects": 29,
+    "channels": 30,
+    "feature_dimension": 465,
+    "mean_auc_by_method": {
+      "LedoitWolf_LDA": 0.7372413793103451,
+      "OAS_LDA": 0.7322605363984674,
+      "Riemannian_MDM": 0.7486590038314178,
+      "TS_LogisticRegression": 0.768352490421456,
+      "discriminability_first_lexicographic_LDA": 0.7761685823754791,
+      "source_cov_nll_full_domain_LDA": 0.76367816091954,
+      "source_macro_full_domain_LDA": 0.7859003831417626
+    },
+    "primary_comparisons": [
+      {
+        "candidate": "source_macro_full_domain_LDA",
+        "baseline": "source_cov_nll_full_domain_LDA",
+        "n_participants": 29,
+        "mean_delta_auc": 0.022222222222222213,
+        "median_delta_auc": 0.01777777777777778,
+        "q25_delta_auc": -0.011111111111111183,
+        "min_delta_auc": -0.09000000000000008,
+        "max_delta_auc": 0.15444444444444427,
+        "improved": 19,
+        "tied": 0,
+        "harmed_gt_0_02": 5,
+        "participant_bootstrap_ci95": [
+          0.004558429118773918,
+          0.04053639846743295
+        ],
+        "signflip_p_two_sided": 0.022324888375558124,
+        "signflip_mode": "monte_carlo",
+        "signflip_draws": 200000,
+        "holm_p_primary_family": 0.022324888375558124
+      },
+      {
+        "candidate": "source_macro_full_domain_LDA",
+        "baseline": "LedoitWolf_LDA",
+        "n_participants": 29,
+        "mean_delta_auc": 0.04865900383141762,
+        "median_delta_auc": 0.046666666666666745,
+        "q25_delta_auc": 0.009999999999999898,
+        "min_delta_auc": -0.06666666666666665,
+        "max_delta_auc": 0.21999999999999997,
+        "improved": 23,
+        "tied": 0,
+        "harmed_gt_0_02": 3,
+        "participant_bootstrap_ci95": [
+          0.025862068965517227,
+          0.07264463601532559
+        ],
+        "signflip_p_two_sided": 0.00025499872500637496,
+        "signflip_mode": "monte_carlo",
+        "signflip_draws": 200000,
+        "holm_p_primary_family": 0.0005099974500127499
+      }
+    ],
+    "frontier_summary": {
+      "n_participants": 29,
+      "full_path_span_mean": 0.10559386973180075,
+      "full_path_span_median": 0.08222222222222231,
+      "full_path_span_q25": 0.06666666666666665,
+      "full_path_span_max": 0.2966666666666665,
+      "full_path_fraction_gt_0_02": 1,
+      "full_path_fraction_gt_0_05": 0.7931034482758621,
+      "full_path_span_bootstrap_mean_ci95": [
+        0.08340996168582378,
+        0.13003831417624517
+      ],
+      "source_1se_span_mean": 0.03984674329501919,
+      "source_1se_span_median": 0.02777777777777779,
+      "source_1se_span_max": 0.1399999999999999,
+      "source_1se_fraction_gt_0_02": 0.6551724137931034,
+      "source_1se_fraction_gt_0_05": 0.2413793103448276,
+      "source_1se_span_bootstrap_mean_ci95": [
+        0.029156130268199257,
+        0.051877394636015366
+      ],
+      "fraction_with_harm_0_02_reachable": 0.9655172413793104,
+      "fraction_with_harm_0_05_reachable": 0.6206896551724138,
+      "bootstrap_reps": 20000,
+      "raw_fidelity_budgets_not_pooled_across_participants": true
+    },
+    "trial_denominator": 1740,
+    "code_commit": "afa29ed17983cb3cff333d127b7dfe1da470cca1",
+    "protocol_sha256": "dfc9c488b1f3e68fd4a8555c4a8e74aef0519b6dcb78d4e23e48ead7ed733f1f",
+    "outcome_interpretation_sha256": "65e4b8f5e9b53432e50be457e7051cffc57e1dd37409580b93bd1dcae6adc723",
+    "score_manifest_sha256": "00d1aa5bb912aa7badcdc5f1c9d3f6e690551d4ffee4d6bff234c61c15582e9e",
+    "wall_seconds": 935.71
+  },
+  "release_limitations": [
+    "Original participant-level score ZIP remains to be independently extracted and checksum-verified",
+    "The separately frozen Shin inference family must not be pooled into the v5 BNCI family",
+    "Monte Carlo sign-flip uses 200000 draws, not exact enumeration for N=29",
+    "No fresh EEG data analysis executed in generating this receipt"
+  ]
+}
