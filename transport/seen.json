@@ -1095,25 +1095,121 @@
     },
     {
       "created_at": "2026-10-11T02:01:13Z",
+      "expiry_recorded_at": "2026-10-11T15:03:31Z",
+      "expiry_sha256": "c0b0c37007333d172908d187c8ab3b4d9809fedecf451d685c6c83edc9acc1ac",
+      "expiry_source": "expirations/eProsima__Fast-DDS__6569.json",
       "first_frozen_at": "2026-10-11T07:49:14Z",
       "id": "eProsima/Fast-DDS#6569",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 6569,
       "prediction_deadline_at": "2026-10-11T13:49:14Z",
       "repository": "eProsima/Fast-DDS",
       "source": "inbox/FIRST_SEEN_20261011T074914Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "4ccf0e2267d799e89506e640f2a0da4e6223f526e9b094d2a7385e7ec77d6fe0"
     },
     {
       "created_at": "2026-10-11T05:35:45Z",
+      "expiry_recorded_at": "2026-10-11T15:03:31Z",
+      "expiry_sha256": "dfd139dcb62044987afe77ce815dd8148ddfb19852d8b91d158b31f7b7c8528d",
+      "expiry_source": "expirations/huggingface__lerobot__4919.json",
       "first_frozen_at": "2026-10-11T07:49:14Z",
       "id": "huggingface/lerobot#4919",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 4919,
       "prediction_deadline_at": "2026-10-11T13:49:14Z",
       "repository": "huggingface/lerobot",
       "source": "inbox/FIRST_SEEN_20261011T074914Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "bff7255b003a36829c9009ef077b51ff27d5608a664d2f9b56f957724ab5f330"
+    },
+    {
+      "created_at": "2026-10-11T09:35:32Z",
+      "first_frozen_at": "2026-10-11T15:04:53Z",
+      "id": "NVlabs/alpasim#202",
+      "issue_number": 202,
+      "prediction_deadline_at": "2026-10-11T21:04:53Z",
+      "repository": "NVlabs/alpasim",
+      "source": "inbox/FIRST_SEEN_20261011T150453Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "d906e7f2f29eb11d003b163cccd6189bc4adac56123e9c7368c1a7bfebc4a4f9"
+    },
+    {
+      "created_at": "2026-10-11T13:13:06Z",
+      "first_frozen_at": "2026-10-11T15:04:53Z",
+      "id": "NVlabs/alpasim#203",
+      "issue_number": 203,
+      "prediction_deadline_at": "2026-10-11T21:04:53Z",
+      "repository": "NVlabs/alpasim",
+      "source": "inbox/FIRST_SEEN_20261011T150453Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "793ae5d537c5b62786c45bef95e8cc740993426ac11a024623fa8b3c49cb1695"
+    },
+    {
+      "created_at": "2026-10-11T14:52:11Z",
+      "first_frozen_at": "2026-10-11T15:04:53Z",
+      "id": "NVlabs/alpasim#204",
+      "issue_number": 204,
+      "prediction_deadline_at": "2026-10-11T21:04:53Z",
+      "repository": "NVlabs/alpasim",
+      "source": "inbox/FIRST_SEEN_20261011T150453Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "3b2f46fd805a4f8040661df747f3e35abcc85ba668f82693e682a4a7fb41769b"
+    },
+    {
+      "created_at": "2026-10-11T12:54:36Z",
+      "first_frozen_at": "2026-10-11T15:04:53Z",
+      "id": "huggingface/lerobot#4921",
+      "issue_number": 4921,
+      "prediction_deadline_at": "2026-10-11T21:04:53Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261011T150453Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "9a78cb78dbcf913fb9b9be64298d4bb0bd893da24bb2e3c02b63173e59fecf9a"
+    },
+    {
+      "created_at": "2026-10-11T12:55:00Z",
+      "first_frozen_at": "2026-10-11T15:04:53Z",
+      "id": "huggingface/lerobot#4922",
+      "issue_number": 4922,
+      "prediction_deadline_at": "2026-10-11T21:04:53Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261011T150453Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "d4c855c3fec7643ba93d8c27dcce26efd7c982d4ab775b0dc614fceed22135ba"
+    },
+    {
+      "created_at": "2026-10-11T12:02:21Z",
+      "first_frozen_at": "2026-10-11T15:04:53Z",
+      "id": "ros2/rclcpp#3320",
+      "issue_number": 3320,
+      "prediction_deadline_at": "2026-10-11T21:04:53Z",
+      "repository": "ros2/rclcpp",
+      "source": "inbox/FIRST_SEEN_20261011T150453Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "034c4d98c12cc960f5482e751292a98d3db11afd24aa1956e70ad273a4eff1ff"
+    },
+    {
+      "created_at": "2026-10-11T10:17:41Z",
+      "first_frozen_at": "2026-10-11T15:04:53Z",
+      "id": "tesseract-robotics/tesseract#1382",
+      "issue_number": 1382,
+      "prediction_deadline_at": "2026-10-11T21:04:53Z",
+      "repository": "tesseract-robotics/tesseract",
+      "source": "inbox/FIRST_SEEN_20261011T150453Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "8e53e2889d7a3fb11078caf3b299d12201197e1719307642f1bd426f129ce843"
+    },
+    {
+      "created_at": "2026-10-11T10:32:40Z",
+      "first_frozen_at": "2026-10-11T15:04:53Z",
+      "id": "tesseract-robotics/tesseract#1383",
+      "issue_number": 1383,
+      "prediction_deadline_at": "2026-10-11T21:04:53Z",
+      "repository": "tesseract-robotics/tesseract",
+      "source": "inbox/FIRST_SEEN_20261011T150453Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "8df5f99c99b76efc5a7054e4489a947342c1989a83c3a352c7435c59f4f631b4"
     }
   ]
 }
