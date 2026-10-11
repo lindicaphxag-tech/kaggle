@@ -1,0 +1,64 @@
+name: DefaultReg V14 original archive and PDF verification
+on:
+  push:
+    branches:
+      - submission/defaultreg-v14-robustness-pdf-20261011
+    paths:
+      - 'research/defaultreg_bspc_v13/**'
+      - '.github/workflows/defaultreg-v14-archive-and-pdf.yml'
+  pull_request:
+    paths:
+      - 'research/defaultreg_bspc_v13/**'
+      - '.github/workflows/defaultreg-v14-archive-and-pdf.yml'
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  eeg-manuscript-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install numerical test and LaTeX dependencies
+        run: |
+          python -m pip install --quiet numpy scipy
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-pictures texlive-fonts-recommended lmodern poppler-utils
+      - name: Download ORIGINAL private Kaggle frozen-score artifact by immutable ID
+        run: |
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11674238395/zip > /tmp/defaultreg-original-shin.zip
+          test -s /tmp/defaultreg-original-shin.zip
+          sha256sum /tmp/defaultreg-original-shin.zip
+      - name: Independently verify archived data, posthoc effects, every figure point
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          python src/shin_v14_posthoc_robustness.py /tmp/defaultreg-original-shin.zip | tee v14_shin_original_score_audit.json
+      - name: Check original prospective results against V14 paper
+        working-directory: research/defaultreg_bspc_v13
+        run: python verify_bspc_submission_claims.py --check-consistency
+      - name: Compile clean V14 manuscript, crossrefs and bibliography
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_bspc_v14_DRAFT.tex
+          test -s main_bspc_v14_DRAFT.pdf
+          pdftotext main_bspc_v14_DRAFT.pdf main_bspc_v14_DRAFT.txt
+          grep -q "Regularisation Objective Mismatch" main_bspc_v14_DRAFT.txt
+          grep -q "source objective separation" main_bspc_v14_DRAFT.txt
+          echo 'V14_PDF_BUILD_AND_DATA_AUDIT_SUCCEEDED'
+          pdfinfo main_bspc_v14_DRAFT.pdf | grep Pages
+      - uses: actions/upload-artifact@v4
+        with:
+          name: defaultreg-v14-posthoc-audited-review-manuscript
+          path: |
+            research/defaultreg_bspc_v13/main_bspc_v14_DRAFT.pdf
+            research/defaultreg_bspc_v13/main_bspc_v14_DRAFT.log
+            research/defaultreg_bspc_v13/main_bspc_v14_DRAFT.bbl
+            research/defaultreg_bspc_v13/v14_shin_original_score_audit.json
+            research/defaultreg_bspc_v13/SOURCE_MIRROR.json
+          retention-days: 90
