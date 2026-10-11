@@ -1,0 +1,60 @@
+\subsection{A necessary score-order bridge from regularisation to AUC}
+\label{sec:v15-score-bridge}
+An alternative explanation for a large numerical shrinkage difference
+is that two discriminants merely rescale the same test scores.
+A positive affine score transformation does not change ROC--AUC.
+We therefore audited the untouched Shin2017A \emph{frozen
+trial-score arrays} rather than relying on the fitted $\lambda$
+values alone.
+
+\paragraph{Proposition 3 (a label-free AUC-change upper bound).}
+For $n_0$ negative and $n_1$ positive examples, let
+$K_{\mathrm{all}}(s_D,s_C)$ be the number of \emph{all unordered trial
+pairs} whose pairwise order differs between score arrays $s_D$ and
+$s_C$, with ties treated as a separate order. For any fixed unknown
+assignment of binary labels with these class counts,
+\[
+ \left|\mathrm{AUC}(s_D)-\mathrm{AUC}(s_C)\right|
+ \le\min\left\{1,\frac{K_{\mathrm{all}}(s_D,s_C)}{n_0n_1}\right\}.
+\]
+In particular, if $K_{\mathrm{all}}=0$, the two methods have exactly
+the same ROC--AUC under \emph{every} labeling.
+
+\emph{Proof.}
+ROC--AUC averages the pairwise ordering indicator over the
+$n_0n_1$ between-class pairs, assigning $1/2$ to ties.
+Each between-class pair contributes the same amount under
+both score arrays unless its pairwise order changes; a
+changed pair alters that contribution by at most one.
+The changed between-class pairs are a subset of the
+$K_{\mathrm{all}}$ changed pairs computable without labels.
+The triangle inequality and $0\le\mathrm{AUC}\le1$
+give the stated bound.\hfill$\square$
+
+Using the original checksum-locked Shin2017A score arrays
+($N=29$, 60 trials per participant, 30 per class), the
+source-macro-selected versus covariance-NLL-selected
+discriminants changed the order of, on average,
+\textbf{13.87\%} of all within-participant trial pairs
+(range 3.95--30.23\%). The median trial-score Spearman
+correlation was 0.894. Every one of the 29 published
+held-person AUC contrasts satisfies the label-free
+necessary upper bound, and no participant has
+identical trial-score rankings across the two selections.
+Thus the changed fitted shrinkage region is not
+\emph{merely} a positive score rescaling on the observed
+trials.
+
+The inversion count is a \emph{necessary consistency
+mechanism}, not a sufficient predictor of gain, since
+only between-class ordering enters AUC and the
+label-free count also includes within-class pairs.
+It is not a newly tuned classifier, a new prospective
+experiment or evidence that target-specific class
+structure can be identified without labels. The
+29 per-person comparisons share substantial source
+training data and must not be treated as independent
+mechanistic replications. The verification script
+independently reads the original ZIP and fails if
+any reported AUC change exceeds its mathematically
+permitted ordering bound.
