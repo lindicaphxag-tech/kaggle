@@ -1,8 +1,8 @@
-name: DefaultReg V16 covariance estimand correctness and PDF
+name: DefaultReg V17 exact-source-drift covariance decomposition and PDF
 on:
   push:
     branches:
-      - submission/defaultreg-v16-estimand-audit-20261011
+      - submission/defaultreg-v17-mean-shift-paper-20261012
     paths:
       - 'research/defaultreg_bspc_v13/**'
       - '.github/workflows/defaultreg-v16-estimand-audit.yml'
@@ -63,26 +63,38 @@ jobs:
       - name: Check original prospective results against V15 paper
         working-directory: research/defaultreg_bspc_v13
         run: python verify_bspc_submission_claims.py --check-consistency
-      - name: Compile clean V16 manuscript, crossrefs and bibliography
+      - name: Audit exact source validation mean-shift identity on 300 SPD cases
         working-directory: research/defaultreg_bspc_v13
         run: |
-          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_bspc_v16_DRAFT.tex
-          test -s main_bspc_v16_DRAFT.pdf
-          pdftotext main_bspc_v16_DRAFT.pdf main_bspc_v16_DRAFT.txt
-          grep -q "Regularisation Objective Mismatch" main_bspc_v16_DRAFT.txt
-          grep -q "source objective separation" main_bspc_v16_DRAFT.txt
-          echo 'V16_PDF_AND_COVARIANCE_ESTIMAND_TESTS_PASSED'
-          pdfinfo main_bspc_v16_DRAFT.pdf | grep Pages
+          python src/predictive_minus_centered_identity_v17.py | tee v17_source_shift_exact_identity.json
+          python -c 'import json;d=json.load(open("v17_source_shift_exact_identity.json")); assert d["random_spd_cases"]==300; print("EXACT_SOURCE_SHIFT_DECOMPOSITION_PASS")'
+      - name: Verify original Shin 29-person finite-grid outcome envelope
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          python src/frozen_grid_feasibility_envelope_v17.py /tmp/defaultreg-original-shin.zip --out v17_frozen_path_envelope.json
+          python -c 'import json;d=json.load(open("v17_frozen_path_envelope.json"));assert d["subjects"]==29;assert abs(d["hindsight_any_selector_auc_upper"]-.803831417624521)<1e-8; print("ORIGINAL_SCORE_ENVELOPE_PASS")'
+      - name: Compile clean V17 manuscript, crossrefs and bibliography
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_bspc_v17_DRAFT.tex
+          test -s main_bspc_v17_DRAFT.pdf
+          pdftotext main_bspc_v17_DRAFT.pdf main_bspc_v17_DRAFT.txt
+          grep -q "Regularisation Objective Mismatch" main_bspc_v17_DRAFT.txt
+          grep -q "source objective separation" main_bspc_v17_DRAFT.txt
+          echo 'V17_PDF_AND_MEAN_SHIFT_IDENTITY_CHECKS_PASSED'
+          pdfinfo main_bspc_v17_DRAFT.pdf | grep Pages
       - uses: actions/upload-artifact@v4
         with:
-          name: defaultreg-v16-estimand-corrected-review-pdf
+          name: defaultreg-v17-mean-shift-research-review-pdf
           path: |
-            research/defaultreg_bspc_v13/main_bspc_v16_DRAFT.pdf
-            research/defaultreg_bspc_v13/main_bspc_v16_DRAFT.log
-            research/defaultreg_bspc_v13/main_bspc_v16_DRAFT.bbl
+            research/defaultreg_bspc_v13/main_bspc_v17_DRAFT.pdf
+            research/defaultreg_bspc_v13/main_bspc_v17_DRAFT.log
+            research/defaultreg_bspc_v13/main_bspc_v17_DRAFT.bbl
             research/defaultreg_bspc_v13/v14_shin_original_score_audit.json
             research/defaultreg_bspc_v13/v15_four_cohort_posthoc.json
             research/defaultreg_bspc_v13/v16_covariance_estimand_synthetic.json
+            research/defaultreg_bspc_v13/v17_source_shift_exact_identity.json
+            research/defaultreg_bspc_v13/v17_frozen_path_envelope.json
             research/defaultreg_bspc_v13/v15_shin_score_order.json
             research/defaultreg_bspc_v13/SOURCE_MIRROR.json
           retention-days: 90

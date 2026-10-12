@@ -1,0 +1,77 @@
+\subsection{The exact missing term in the historical covariance-score criterion}
+\label{sec:v17-mean-shift-decomposition}
+The distinction between a validation-class-centred Gaussian
+covariance score and a genuine source-trained-mean predictive
+log score can be made \emph{exact}, rather than relying only
+on a synthetic translation counterexample.
+
+For one held \emph{source} validation person $g$ with $n_g$
+examples in $p$ dimensions, let
+$\widehat\mu_{g,c}$ denote its empirical class means,
+$\widehat\mu_{\mathrm{train},c}$ the means fitted exclusively
+on the source-training people, and
+$\Delta_{g,c}=\widehat\mu_{g,c}-
+\widehat\mu_{\mathrm{train},c}$. For any common,
+source-fitted positive definite regularised covariance
+$A_\lambda$, the two V16 criteria satisfy
+\begin{equation}
+\boxed{
+ C_{\mathrm{pred},g}(\lambda)
+ =
+ C_{\mathrm{cent},g}(\lambda)
+ +\frac{1}{p}\sum_{c\in\{0,1\}}
+ \frac{n_{g,c}}{n_g}
+ \Delta_{g,c}^\top A_\lambda^{-1}\Delta_{g,c}.
+}
+\label{eq:v17-exact-nll-shift}
+\end{equation}
+The additional term is \emph{nonnegative} and
+becomes zero exactly when the validation class means
+match the training class means, for all classes present.
+It is a covariance-weighted \emph{source-person
+class-mean shift penalty}, not a regularisation
+term chosen by target data.
+
+\emph{Proof.} For each validation trial of class $c$,
+decompose
+$x_{gi}-\widehat\mu_{\mathrm{train},c}=
+(x_{gi}-\widehat\mu_{g,c})+\Delta_{g,c}$.
+Expand the quadratic form under $A_\lambda^{-1}$.
+The cross term vanishes within each class because
+$\sum_{i:y_i=c}(x_{gi}-\widehat\mu_{g,c})=0$.
+Both log-determinant terms agree, and the remaining
+class-mean quadratic terms give
+Eq.~\eqref{eq:v17-exact-nll-shift}.\hfill$\square$
+
+The penalty is $\lambda$-dependent because it measures
+class-mean drift in the metric induced by $A_\lambda^{-1}$.
+Its derivative can have \emph{either} sign:
+\[
+ \frac{\partial}{\partial\lambda}
+ \bigl(C_{\mathrm{pred},g}-C_{\mathrm{cent},g}\bigr)
+ =-\frac1p\sum_c\frac{n_{g,c}}{n_g}
+ \Delta_{g,c}^\top A_\lambda^{-1}
+ (\nu I-S)A_\lambda^{-1}\Delta_{g,c}.
+\]
+It follows that the proper predictive criterion
+can select more \emph{or} less shrinkage than
+the class-centred comparator. Merely asserting
+that predictive selection is stronger or always
+more regularised is unsupported. An independent
+executable test verifies the identity for 300
+randomly generated full-rank covariance operators,
+multiple feature dimensions and source/validation
+class-mean shifts, without using any held outer
+target EEG data.
+
+The identity provides a mechanistic interpretation
+of the V16 estimand audit: the old frozen covariance
+selection scores how well $A_\lambda$ describes
+\emph{within-class residual fluctuations} in a
+held source person; the correctly predictive version
+also penalises \emph{between-source-person class-mean
+misalignment}. This is not a newly invented
+covariance estimator, and it does not establish that
+minimising the added penalty improves held-person AUC.
+A real, correctly nested evaluation of this second
+source-selection criterion remains essential.

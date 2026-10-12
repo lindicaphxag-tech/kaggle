@@ -1,0 +1,85 @@
+\subsection{An empirical feasibility bound for the untested proper predictive comparator}
+\label{sec:v17-predictive-feasibility}
+The V16 estimand audit leaves an important empirical question unresolved:
+could a correctly implemented, source-mean predictive likelihood
+selector match or exceed the source-macro-selected discriminant?
+The original Shin2017A result archive does not contain the newly
+defined selector's source-loss path and cannot answer its achieved
+performance. It does, however, contain a frozen target AUC path for
+every originally \emph{source-feasible} scalar shrinkage candidate
+for each outer participant. We use these outcome paths to calculate
+an \emph{explicitly post-outcome} feasibility envelope, without
+inventing new training results or target-safe parameter choices.
+
+For each target participant $g$, let $\Lambda_g$ denote the original
+source-feasible full-domain scalar candidates and $A_g(\lambda)$
+the \emph{frozen} held-person AUC corresponding to that participant's
+original trained source model. Define the hindsight extremes
+\[
+ L_g=\min_{\lambda\in\Lambda_g} A_g(\lambda),
+ \qquad U_g=\max_{\lambda\in\Lambda_g} A_g(\lambda).
+\]
+For \emph{any} later selection rule that returns one of the
+original $\Lambda_g$ values without altering source training,
+representations, model scoring or target trial definitions, its
+mean evaluated AUC must satisfy the deterministic inequality
+\[
+ \frac{1}{G}\sum_gL_g\le
+ \frac{1}{G}\sum_gA_g(\widehat\lambda_g)
+ \le\frac{1}{G}\sum_gU_g.
+\]
+This inequality holds regardless of how that rule uses
+available \emph{source} data to choose its candidate. It
+does \emph{not} cover methods with different representations,
+retrained architectures, different target scoring functions,
+or a continuous regularisation search outside the archived grid.
+
+For the 29-person Shin2017A study, the original source-macro
+selection attained $0.78590$ AUC; the original
+validation-class-centred covariance score selector attained
+$0.76368$. The deterministic hindsight mean interval
+from the 29 frozen paths is \emph{[0.70011, 0.80383]}
+AUC. Hence the observed source-macro score is at most
+$0.01793$ AUC below a per-participant \emph{target-label-informed
+oracle} over the same finite scalar path, while an arbitrary
+source-selected future comparator could occupy many different
+locations inside that range. Thirteen of the 29 subjects
+had an oracle AUC at least 0.01 above the original
+source-macro choice.
+
+\begin{table}[tb]
+\centering
+\small
+\caption{Shin2017A original finite-grid AUC feasibility analysis
+($G=29$). The min/max envelope uses held-person outcomes after
+the experiment; it is not an implementable zero-target predictor
+or a confidence interval. No new EEG selector was executed.}
+\label{tab:v17-feasible-envelope}
+\begin{tabular}{lr}
+\toprule
+Method or hindsight quantity & Person-macro AUC\\
+\midrule
+Original source-macro selection & 0.78590\\
+Original class-centred covariance selection & 0.76368\\
+Minimum per-person frozen-path AUC (hindsight) & 0.70011\\
+Maximum per-person frozen-path AUC (hindsight) & 0.80383\\
+Oracle mean headroom above source-macro & 0.01793\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+This is an informative \emph{negative identifiability result}:
+the archived trials alone cannot establish whether the
+new proper predictive-likelihood criterion wins or loses
+against source-macro selection. Specifically, source-macro
+superiority over the old class-centred covariance score
+does not imply superiority over all source-only estimators
+within the same original shrinkage family. The newly specified
+proper-predictive objective requires real source-only
+cross-validation and an immutable choice vector before joining
+held-person outcomes, as documented in the separate V17
+secondary-analysis protocol. Since the source cohort outcomes
+have already been inspected, any such run is retrospective,
+even with a correctly executed information firewall; a
+genuinely independent pre-data cohort would be needed
+for new confirmatory inference.
