@@ -1,0 +1,9 @@
+BSPC research manuscript — draft highlights (author approval required)
+
+- Class-centred EEG covariance scoring is not source-mean predictive likelihood.
+- Its missing mean-shift term has three exact nonnegative components.
+- Three EEG acquisitions show a strongly location-driven predictive-score gap.
+- Source discrimination can help yet harm individual held-out participants.
+- More precise source-only regularisation selection need not improve transfer.
+
+These are working highlights for the evidence-gated manuscript, not publisher-submitted copy.
