@@ -1,0 +1,46 @@
+name: DefaultReg V24 independent acute-stroke EEG no-outcome preflight
+on:
+  push:
+    branches:
+      - experiment/defaultreg-v24-liu2024-stroke-eeg-20261013
+    paths:
+      - '.github/workflows/defaultreg-v24-liu-stroke-preflight.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pure-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MNE_DATA: /tmp/defaultreg-v24-eeg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin original EEG package family
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Fetch and verify one public acute-stroke patient's nonoutcome EEG structure
+        run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_proper_predictive/preflight_liu2024_stroke_20261013.py
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/defaultreg-v24-liu2024/preflight.json'))
+          assert d['status']=='LIU2024_ONLY_ONE_PATIENT_STRUCTURAL_PREFLIGHT_NO_AUC'
+          assert not d['any_target_AUC_computed']
+          assert not d['source_selection_performed']
+          assert d['channels_EEG']==29
+          print('PASS_LIU2024_29EEG_40TRIAL_NO_OUTCOME_PREFLIGHT')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-v24-acute-stroke-structural-no-outcome-preflight
+          path: /tmp/defaultreg-v24-liu2024/**
+          if-no-files-found: warn
+          retention-days: 90
