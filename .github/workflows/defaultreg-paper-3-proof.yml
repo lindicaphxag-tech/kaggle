@@ -1,0 +1,45 @@
+name: Default EEG Paper 3 separate manuscript PDF proof
+on:
+  push:
+    branches: [publication/default-eeg-p3-transfer-negative-20261013]
+    paths:
+      - '.github/workflows/defaultreg-paper-3-proof.yml'
+      - 'research/defaultreg_bspc_v13/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pdf-evidence-gated:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install LaTeX and PDF tooling
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended lmodern poppler-utils
+      - name: Compile independent Paper 3 research manuscript
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_p3_source_only_optimisation_NEGATIVE_UNREADY.tex
+          test -s main_p3_source_only_optimisation_NEGATIVE_UNREADY.pdf
+          pdftotext -layout main_p3_source_only_optimisation_NEGATIVE_UNREADY.pdf /tmp/paper-3-text.txt
+          grep -q '0.731405' /tmp/paper-3-text.txt
+          grep -q '0.754100' /tmp/paper-3-text.txt
+          grep -q 'SHA' /tmp/paper-3-text.txt
+          ! grep -Eq 'Citation.*undefined|Reference.*undefined|Undefined control sequence' main_p3_source_only_optimisation_NEGATIVE_UNREADY.log
+          pdfinfo main_p3_source_only_optimisation_NEGATIVE_UNREADY.pdf | grep Pages
+          mkdir -p /tmp/defaultreg-paper-3-firstpage
+          pdftoppm -f 1 -l 1 -png -r 120 main_p3_source_only_optimisation_NEGATIVE_UNREADY.pdf /tmp/defaultreg-paper-3-firstpage/p1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-P3-SEPARATE-RESEARCH-DRAFT-NOT-SUBMITTED
+          path: |
+            research/defaultreg_bspc_v13/main_p3_source_only_optimisation_NEGATIVE_UNREADY.tex
+            research/defaultreg_bspc_v13/main_p3_source_only_optimisation_NEGATIVE_UNREADY.pdf
+            research/defaultreg_bspc_v13/main_p3_source_only_optimisation_NEGATIVE_UNREADY.log
+            research/defaultreg_bspc_v13/P3_*.md
+            /tmp/defaultreg-paper-3-firstpage/**
+          if-no-files-found: warn
+          retention-days: 90
