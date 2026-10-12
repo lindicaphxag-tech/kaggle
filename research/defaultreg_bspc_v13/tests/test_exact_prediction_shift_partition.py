@@ -51,8 +51,8 @@ def test_class_contrast_shift_can_be_auc_invisible_when_orthogonal():
     n=44
     v=np.linspace(-1,1,n)
     # Equal x2 class means in the fitted TRAIN pool, so w is exactly x1.
-    T=np.vstack([np.stack([-np.ones(n)+v,v],axis=1),
-                 np.stack([np.ones(n)+v,v],axis=1)])
+    T=np.vstack([np.stack([-2*np.ones(n)+v,v],axis=1),
+                 np.stack([2*np.ones(n)+v,v],axis=1)])
     y=np.r_[np.zeros(n,int),np.ones(n,int)]
     V=T.copy();yv=y.copy()
     V[yv==1,1]+=9.0
