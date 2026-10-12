@@ -9,8 +9,10 @@ optimisation or source-contrast robustness resolves the discrepancy.
 We study source-fitted tangent-space regularised LDA under a
 zero-target-information protocol, correct a validation-class-centred
 covariance score to source-mean Gaussian predictive likelihood,
-and examine exact pairwise rank transitions and conditional
-spectral shrinkage bounds. An exploratory source-only
+and examine exact pairwise rank transitions, conditional
+spectral shrinkage bounds, and an exact decomposition of the
+proper predictive mean-shift penalty into AUC-invariant
+participant location and class-contrast components. An exploratory source-only
 contrast-uncertainty-envelope criterion was evaluated against
 the original grouped 27-point source-AUC selector on an
 unchanged classifier path. All target results were retained.
@@ -33,8 +35,11 @@ $[-0.003218,0.002973]$). The envelope selected
 full shrinkage $\lambda=1$, algebraically identical to a fixed
 full-shrinkage LDA classifier.
 \textbf{Conclusion:}
-More precise or conditionally robust source selection did not
-produce stable transfer gains in these tests. Explicit
+The prediction--classification objective mismatch includes
+a nonnegative participant-location term to which the
+within-person rank AUC is exactly invariant. More precise or
+conditionally robust source selection did not produce stable
+transfer gains in these tests. Explicit
 validation estimands, strict selection boundaries and
 honest adverse-person evidence are essential; no universally
 superior regularisation rule is established.
