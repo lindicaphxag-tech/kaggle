@@ -6,6 +6,7 @@ on:
       - '.github/workflows/defaultreg-bspc-real-source-shift-factors.yml'
       - 'research/defaultreg_bspc_v13/tests/test_exact_prediction_shift_partition.py'
       - 'research/defaultreg_bspc_v13/src/exact_prediction_shift_partition.py'
+      - 'research/defaultreg_bspc_v13/src/run_bspc_source_only_twofactor_datasets.py'
   workflow_dispatch:
 permissions:
   contents: read
