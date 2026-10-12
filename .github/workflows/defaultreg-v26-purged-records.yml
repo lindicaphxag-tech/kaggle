@@ -1,0 +1,77 @@
+name: DefaultReg V26 record-identity-purged public Liu EEG
+on:
+  push:
+    branches: [research/defaultreg-v26-record-identity-purged-lopo-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/record_identity_groups_v26.py'
+      - 'research/defaultreg_bspc_v13/src/run_liu2024_purged_lopo_v26.py'
+      - 'research/defaultreg_bspc_v13/tests/test_record_identity_groups_v26.py'
+      - '.github/workflows/defaultreg-v26-purged-records.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  fail-closed-identity-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy
+      - name: Assert exact identity and group-safe held-record separation
+        run: |
+          python -m py_compile research/defaultreg_bspc_v13/src/record_identity_groups_v26.py research/defaultreg_bspc_v13/src/run_liu2024_purged_lopo_v26.py
+          python -m unittest discover -v -s research/defaultreg_bspc_v13/tests -p 'test_record_identity_groups_v26.py'
+  real-record-grouped-refit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MNE_DATA: /tmp/defaultreg-v26-liu-unique-eeg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Pin original public EEG research environment
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Run exact record-level grouping and fully refit source policies before any target AUC
+        run: |
+          mkdir -p "$MNE_DATA" /tmp/defaultreg-v26
+          python research/defaultreg_bspc_v13/src/run_liu2024_purged_lopo_v26.py --out /tmp/defaultreg-v26
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          p=Path('/tmp/defaultreg-v26')
+          source=p/'PURGED_RECORD_IDENTITY_SOURCE_POLICIES_BEFORE_TARGET_AUC.json'
+          groups=p/'FULL_COHORT_EXACT_SIGNAL_GROUPS_AFTER_GLOBAL_AUDIT.json'
+          result=p/'PURGED_LIU2024_RECORD_INDEPENDENT_RETROSPECTIVE_RESULTS.json'
+          s=json.loads(source.read_text())
+          g=json.loads(groups.read_text())
+          d=json.loads(result.read_text())
+          assert g['duplicate_groups']==[[4,5]]
+          assert g['independent_processed_record_count']==49
+          assert g['global_target_signal_access_for_grouping']
+          assert d['n_exact_processed_recording_groups']==49
+          assert d['total_evaluated_trials']==1960
+          assert d['no_strict_Z0_because_record_identity_used_target_signals']
+          assert d['source_policy_SHA_before_held_record_auc']==hashlib.sha256(source.read_bytes()).hexdigest()
+          assert d['global_record_identity_SHA_before_selection']==hashlib.sha256(groups.read_bytes()).hexdigest()
+          assert len(s)==len(d['target_outcomes'])==49
+          assert all(x['n_source_unique_recordings']==48 and x['n_source_trials']==1920 for x in s)
+          assert all(x['source_held_record_group_disjoint'] for x in s)
+          assert set(int(x['target_recording_representative']) for x in s)==set(g['representative_ids'])
+          assert all(int(x['held_trials'])==40 for x in d['target_outcomes'])
+          print('PASS_V26_ORIGINAL_EEG_49_UNIQUE_RECORDS_FULL_REFIT_REANALYSIS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-v26-49-unique-records-purged-full-retrain-audit
+          path: |
+            /tmp/defaultreg-v26/**
+            research/defaultreg_bspc_v13/V26_RECORD_IDENTITY_PURGED_PRECOMMITTED_RETROSPECTIVE_PROTOCOL.md
+          if-no-files-found: warn
+          retention-days: 90
