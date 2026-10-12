@@ -46,15 +46,20 @@ new regularisation mechanisms and multi-paradigm transfer methods
 \cite{miao2025freezing,morvay2026wbt,he2026cyclic}, while recent research highlights
 how participant-level rather than trial-level evaluation can change the
 interpretation of EEG model performance \cite{gil2026subjectvalidation}.
-Qin and colleagues, in a recent study published in this journal,
-evaluated spatial normalization with SVM decoding across nine
-distinct EEG paradigms under within- and between-subject validation
-\cite{qin2026spatialnorm}. That study provides stronger
-cross-paradigm breadth than the fixed tangent-LDA family examined here.
-Our narrower, complementary question is how the \emph{source
-validation likelihood itself} changes the selected
-regularisation regime; this is a measurement problem rather
-than evidence of a superior novel classifier.
+Eder and colleagues compared Riemannian and convolutional
+decoders under multiple EEG paradigms and evaluation designs in
+Journal of Neural Engineering \cite{eder2024jnebenchmark}.
+Seibel and colleagues quantified the training-data requirements
+of EEG convolutional models \cite{seibel2026jnedata}.
+Both studies are quantitatively actionable, unlike a purely
+algebraic decomposition. Their broad validation scope is a
+stringent comparison standard for our narrower examination
+of \emph{which source validation likelihood} is being
+optimised before cross-person decoding. We test a fixed
+tangent-LDA family; we do not claim new decoding
+architectures or stable superiority to the classical
+proper-predictive objective.
+
 These contributions motivate our strict comparison but do not substitute
 for an objective-controlled study.
 
@@ -79,7 +84,7 @@ how an incorrectly described covariance-validation estimand can change
 the interpretation of a transfer comparison.
 
 
-\input{134_bspc_accepted_head_to_head_evidence_and_budgets.tex}
+\input{P1_jne_methods_peer_and_correction_appendix.tex}
 
 \section{Methods}
 \subsection{Datasets and target-information budgets}
