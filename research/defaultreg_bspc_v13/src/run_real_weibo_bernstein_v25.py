@@ -11,6 +11,10 @@ import hashlib
 import json
 from pathlib import Path
 import numpy as np
+import sys
+
+ROOT = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(ROOT / 'research' / 'defaultreg_proper_predictive'))
 
 import original_frozen_runner as old
 from run_new_weibo_v24 import load_public, source_models
