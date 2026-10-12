@@ -1,0 +1,69 @@
+name: DefaultReg BSPC accepted-peer-audit revised manuscript and PDF
+on:
+  push:
+    branches: [research/defaultreg-bspc-accepted-topline-benchmark-20261013]
+    paths:
+      - '.github/workflows/defaultreg-bspc-twofactor-paper.yml'
+      - 'research/defaultreg_bspc_v13/main_bspc_v31_EVIDENCE_GATED_CANDIDATE.tex'
+      - 'research/defaultreg_bspc_v13/00_abstract_v31_CHO40_negative.tex'
+      - 'research/defaultreg_bspc_v13/131_bspc_twofactor_auc_invariant_transfer_mechanism.tex'
+      - 'research/defaultreg_bspc_v13/132_bspc_3acquisition_source_only_anatomy_results.tex'
+      - 'research/defaultreg_bspc_v13/00_abstract_bspc_threefactor_focused.tex'
+      - 'research/defaultreg_bspc_v13/91_table_main_prospective_results.tex'
+      - 'research/defaultreg_bspc_v13/134_bspc_accepted_head_to_head_evidence_and_budgets.tex'
+      - 'research/defaultreg_bspc_v13/references_v10.bib'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compile-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install LaTeX and high-resolution vector PDF validation
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended lmodern poppler-utils
+      - name: Assemble and audit source-claim-aligned BSPC manuscript
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_bspc_v31_EVIDENCE_GATED_CANDIDATE.tex
+          test -s main_bspc_v31_EVIDENCE_GATED_CANDIDATE.pdf
+          pdftotext -layout main_bspc_v31_EVIDENCE_GATED_CANDIDATE.pdf /tmp/defaultreg-bspc-twofactor-text.txt
+          grep -q '0.618230' /tmp/defaultreg-bspc-twofactor-text.txt
+          grep -q '0.616996' /tmp/defaultreg-bspc-twofactor-text.txt
+          grep -q '0.619261' /tmp/defaultreg-bspc-twofactor-text.txt
+          grep -q '0.0561' /tmp/defaultreg-bspc-twofactor-text.txt
+          grep -q '98.59' /tmp/defaultreg-bspc-twofactor-text.txt
+          grep -q '99.29' /tmp/defaultreg-bspc-twofactor-text.txt
+          grep -q '99.77' /tmp/defaultreg-bspc-twofactor-text.txt
+          grep -q 'Gil and' /tmp/defaultreg-bspc-twofactor-text.txt
+          grep -q 'target adaptation' /tmp/defaultreg-bspc-twofactor-text.txt
+          grep -q '71.19' /tmp/defaultreg-bspc-twofactor-text.txt
+          grep -q 'AUC-invariant' /tmp/defaultreg-bspc-twofactor-text.txt
+          grep -q 'contrast' /tmp/defaultreg-bspc-twofactor-text.txt
+          if grep -Eq 'Reference.*undefined|Citation.*undefined|Undefined control sequence|multiply defined' main_bspc_v31_EVIDENCE_GATED_CANDIDATE.log; then exit 3; fi
+          python - <<'PY'
+          import re,subprocess
+          d=subprocess.check_output(['pdfinfo','main_bspc_v31_EVIDENCE_GATED_CANDIDATE.pdf'],text=True)
+          n=int(re.search(r'Pages:\s+(\d+)',d).group(1))
+          assert 9<=n<=28,n
+          print('BSPC_FOCUSED_SUBMISSION_RESEARCH_DRAFT_PAGES',n)
+          PY
+          mkdir -p /tmp/defaultreg-bspc-preview
+          pdftoppm -f 1 -l 1 -png -r 130 main_bspc_v31_EVIDENCE_GATED_CANDIDATE.pdf /tmp/defaultreg-bspc-preview/first
+          test -n "$(find /tmp/defaultreg-bspc-preview -name 'first*.png' -size +0c -print -quit)"
+          echo 'BSPC_FOCUSED_RESEARCH_DRAFT_PDF_COMPILED_EVIDENCE_CHECKED'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-BSPC-accepted-paper-headtohead-reviewed-research-manuscript
+          path: |
+            research/defaultreg_bspc_v13/main_bspc_v31_EVIDENCE_GATED_CANDIDATE.tex
+            research/defaultreg_bspc_v13/main_bspc_v31_EVIDENCE_GATED_CANDIDATE.pdf
+            research/defaultreg_bspc_v13/main_bspc_v31_EVIDENCE_GATED_CANDIDATE.log
+            research/defaultreg_bspc_v13/main_bspc_v31_EVIDENCE_GATED_CANDIDATE.bbl
+            /tmp/defaultreg-bspc-preview/**
+          if-no-files-found: warn
+          retention-days: 90
