@@ -1,11 +1,14 @@
-\subsection{An empirical feasibility bound for the untested proper predictive comparator}
+\subsection{Retrospective finite-path envelope and its interpretation}
 \label{sec:v17-predictive-feasibility}
 The V16 estimand audit leaves an important empirical question unresolved:
 could a correctly implemented, source-mean predictive likelihood
 selector match or exceed the source-macro-selected discriminant?
-The original Shin2017A result archive does not contain the newly
-defined selector's source-loss path and cannot answer its achieved
-performance. It does, however, contain a frozen target AUC path for
+The original Shin2017A result archive alone does not contain the
+newly defined selector's source-loss path and cannot establish its
+achieved performance. The independent retrospective execution
+reported in Section~\ref{sec:v18-fair-predictive} now supplies
+such a source-only selection vector. The historical archive also
+contains a frozen target AUC path for
 every originally \emph{source-feasible} scalar shrinkage candidate
 for each outer participant. We use these outcome paths to calculate
 an \emph{explicitly post-outcome} feasibility envelope, without
@@ -74,11 +77,13 @@ new proper predictive-likelihood criterion wins or loses
 against source-macro selection. Specifically, source-macro
 superiority over the old class-centred covariance score
 does not imply superiority over all source-only estimators
-within the same original shrinkage family. The newly specified
-proper-predictive objective requires real source-only
-cross-validation and an immutable choice vector before joining
-held-person outcomes, as documented in the separate V17
-secondary-analysis protocol. Since the source cohort outcomes
+within the same original shrinkage family. The newly executed
+proper-predictive objective underwent source-only
+cross-validation and an immutable 29-choice SHA-256 lock before
+joining held-person outcomes, as documented in
+Section~\ref{sec:v18-fair-predictive}. The interval in this
+section remains a target-label-informed hindsight envelope,
+not an achieved model performance interval. Since the source cohort outcomes
 have already been inspected, any such run is retrospective,
 even with a correctly executed information firewall; a
 genuinely independent pre-data cohort would be needed
