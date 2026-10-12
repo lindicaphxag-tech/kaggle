@@ -1,0 +1,70 @@
+name: DefaultReg BCI2b 3-channel cross-geometry external EEG
+on:
+  push:
+    branches:
+      - experiment/defaultreg-geometry-domain-shift-2b-20261012
+    paths:
+      - 'research/defaultreg_proper_predictive/**'
+      - '.github/workflows/defaultreg-cross-geometry-BCI2b.yml'
+  pull_request:
+    paths:
+      - 'research/defaultreg_proper_predictive/**'
+      - '.github/workflows/defaultreg-cross-geometry-BCI2b.yml'
+permissions:
+  contents: read
+jobs:
+  new-multi-session-EEG:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MNE_DATA: /tmp/defaultreg_mne_data
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install original public EEG dependency family
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Check frozen scientific protocol and source operator regression
+        run: |
+          test -s research/defaultreg_proper_predictive/BNCI2014_004_GEOMETRY_SHIFT_PROTOCOL_20261012.md
+          python -m py_compile research/defaultreg_proper_predictive/run_new_bnci2014_004_geometry_shift.py
+          cd research/defaultreg_proper_predictive
+          python -m unittest -v test_proper_predictive_source_only
+      - name: Execute 9 held-subject source-only selection on 3-channel BCI IV 2b
+        run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_proper_predictive/run_new_bnci2014_004_geometry_shift.py \
+            --out /tmp/defaultreg-geometry-2b
+      - name: Validate all participants sessions estimands and SHA lock
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,numpy as np
+          root=Path('/tmp/defaultreg-geometry-2b')
+          src=root/'SOURCE_ONLY_LAMBDA_CHOICES_SHA_LOCK_BEFORE_TARGET_EVALUATION.json'
+          r=root/'BNCI2014_004_SOURCE_ONLY_EXTERNAL_RESULTS.json'
+          d=json.loads(r.read_text()); rows=json.loads(src.read_text())
+          assert d['n_outer_people']==9 and d['all_participants_retained']
+          assert d['source_lambda_choices_sha256_before_target_outcomes']==hashlib.sha256(src.read_bytes()).hexdigest()
+          assert d['n_channels']==3 and d['target_information_track']=='Z0'
+          assert d['n_session_cells']>=18 and len(d['per_subject_AUC'])==9
+          assert all(len(s['source_people'])==8 and s['no_outer_target_data_in_source_selector'] for s in rows)
+          assert all(x['n_classes']==2 and len(x['per_session_auc'])>=2 for x in d['per_subject_AUC'])
+          assert np.isfinite(list(d['mean_AUC'].values())).all()
+          assert d['new_confirmatory_p_values'] is None
+          print('PASS_NEW_NINE_PERSON_3_CHANNEL_MULTI_SESSION_SOURCE_ONLY_EEG')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-BCI2b-n9-three-channel-multi-session-outcomes
+          path: |
+            /tmp/defaultreg-geometry-2b/**
+            research/defaultreg_proper_predictive/BNCI2014_004_GEOMETRY_SHIFT_PROTOCOL_20261012.md
+            research/defaultreg_proper_predictive/run_new_bnci2014_004_geometry_shift.py
+          if-no-files-found: warn
+          retention-days: 90
