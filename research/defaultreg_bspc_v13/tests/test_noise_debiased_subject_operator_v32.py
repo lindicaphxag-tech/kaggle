@@ -83,3 +83,40 @@ def test_eeg_covariance_path_matches_existing_original_cv():
                       grid["criteria_by_lambda"][str(grid["lambda_source_macro"])]["source_macro_auc"],
                       atol=1e-10,rtol=0)
     assert result["mean_best"]["macro_auc"]>=result["baseline"]["macro_auc"]-1e-12
+
+
+def test_gaussian_random_contrast_expected_auc_optimum_is_anisotropic():
+    """Exact conditional Gaussian model, NOT an EEG target performance claim."""
+    from scipy.special import ndtr
+    S=np.diag([1.,2.])
+    B=np.diag([12.,.2])
+    d=np.array([2.,1.])
+    w_fisher=np.linalg.solve(S,d)
+    w_new=np.linalg.solve(2*S+B,d)
+    def expected_auc(w):
+        return float(ndtr((w@d)/np.sqrt(2*w@S@w+w@B@w)))
+    # Gaussian random-effect transfer model admits an *analytical*
+    # optimum different from standard pooled-LDA even with known Sigma.
+    assert expected_auc(w_new)>expected_auc(w_fisher)+.02
+    assert np.linalg.norm(w_new/np.linalg.norm(w_new)-
+                          w_fisher/np.linalg.norm(w_fisher))>.1
+    rng=np.random.default_rng(313)
+    draws=rng.multivariate_normal(d,B,size=40000)
+    monte=float(ndtr((draws@w_new)/np.sqrt(2*w_new@S@w_new)).mean())
+    assert abs(monte-expected_auc(w_new))<.008
+
+def test_debiased_matrix_is_not_unbiased_after_psd_projection():
+    """Detect the theoretical caveat: eigenclipping adds finite-G bias."""
+    rng=np.random.default_rng(31)
+    traces=[]
+    for seed in range(18):
+        X=[];y=[];g=[]
+        for group in range(6):
+            # Exactly common true class difference across SOURCE groups.
+            for cls in [0,1]:
+                x=rng.normal(0,1,(16,3))+cls*np.array([.9,.2,.3])
+                X.append(x);y.extend([cls]*16);g.extend([group]*16)
+        m=fit(np.concatenate(X),np.asarray(y),np.asarray(g))
+        traces.append(np.trace(m.between_debiased_psd))
+    assert all(v>=-1e-10 for v in traces)
+    assert float(np.mean(traces))>0, "PSD clipping is biased upward in finite samples"
