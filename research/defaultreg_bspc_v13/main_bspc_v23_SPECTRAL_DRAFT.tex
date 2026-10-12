@@ -1,0 +1,396 @@
+% BSPC V23 CERTIFIED SPECTRAL-CONTINUUM RESEARCH DRAFT — NOT SUBMITTED; no new TARGET improvement claimed.
+% Original frozen cohorts and one newly executed but post-outcome Shin2017A comparator; see evidence hierarchy.
+% Compile in paper_vnext, source files remain original and editable.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=0.92in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,booktabs,graphicx}
+\usepackage{tikz}
+\usepackage[hidelinks]{hyperref}
+\usepackage{lmodern}
+\usepackage[protrusion=true,expansion=false]{microtype}
+\title{When Regularisation Choices Matter:\\
+From Covariance Validation to Spectral Rank-Stability in EEG Transfer}
+\author{AUTHOR IDENTITIES AND AFFILIATIONS TO BE APPROVED}
+\date{}
+\begin{document}
+\maketitle
+\input{00_abstract_v22_source_rank.tex}
+\noindent\textbf{Keywords:} EEG; covariance shrinkage; cross-subject decoding;
+motor imagery; model-selection validity; representation sensitivity.
+
+\section{Introduction}
+Cross-subject EEG decoding asks a model fitted on source participants to
+generalise to a different individual, often without labelled calibration.
+Tangent-space covariance features are established in EEG decoding
+\cite{barachant2012riemannian}, and can be high dimensional even
+when each participant contributes few examples. A stable covariance estimator is therefore
+attractive, but the statistical criterion used to estimate a covariance
+matrix is not the criterion used to judge held-person classification.
+Ledoit--Wolf shrinkage is an established covariance estimator
+\cite{ledoit2004}; regularised discriminant analysis selected against
+predictive discrimination is also classical \cite{friedman1989}.
+Consequently, selecting a shrinkage parameter by source discrimination
+is not, in itself, our claimed methodological invention.
+
+A more basic measurement question is what is actually being scored:
+centring held source participants with their own class means produces a
+covariance log score that does not equal the predictive Gaussian log score
+under source-trained means. Confusing these objectives can create an
+apparent advantage for discrimination-based selection. A corrected
+comparator must be run on real EEG to determine whether the original
+objective comparison survives. A separate prospective intervention asks
+whether the selection criterion can alter a spectral representation
+conclusion under the same target-information budget. Contemporary work proposes
+new regularisation mechanisms and multi-paradigm transfer methods
+\cite{miao2025freezing,morvay2026wbt,he2026cyclic}, while recent research highlights
+how participant-level rather than trial-level evaluation can change the
+interpretation of EEG model performance \cite{gil2026subjectvalidation}.
+Qin and colleagues, in a recent study published in this journal,
+evaluated spatial normalization with SVM decoding across nine
+distinct EEG paradigms under within- and between-subject validation
+\cite{qin2026spatialnorm}. That study provides stronger
+cross-paradigm breadth than the fixed tangent-LDA family examined here.
+Our narrower, complementary question is how the \emph{source
+validation likelihood itself} changes the selected
+regularisation regime; this is a measurement problem rather
+than evidence of a superior novel classifier.
+These contributions motivate our strict comparison but do not substitute
+for an objective-controlled study.
+
+We study a fixed tangent-space linear discriminant family, separating
+three source-only selection targets: held-source-participant
+macro-AUC, a validation-class-centred covariance score, and a true
+Gaussian predictive score using only source-training class means.
+The third comparator was executed on Shin2017A only after its original
+target results had been seen; this is retrospective and is not part of
+the frozen confirmatory family. All target labels, target feature
+moments and target-fitted geometry are excluded from primary source-only
+(Z0) selection. We preserve the original predeclared finite shrinkage grid,
+frozen prospective test cohorts, the representation falsification,
+individual harms, and the newly verified posterior comparator. An additional acquisition dataset, BNCI2014\_001, was evaluated
+under a repository-frozen first-run protocol only after the V19
+analyses had been specified. This new cohort is not treated as
+an independently preregistered trial.
+
+The objective is not to show
+that one numerical shrinkage value is universally optimal; it is to measure
+how an incorrectly described covariance-validation estimand can change
+the interpretation of a transfer comparison.
+
+\input{94_v13_prior_scope.tex}
+
+\section{Methods}
+\subsection{Datasets and target-information budgets}
+PhysioNet EEGMMIDB S001--S008 is the method-development source pool
+\cite{schalk2009eegmmidb,schalk2004bci2000}.
+Its S021--S040 participants form a prospectively untouched target block
+of 20 people. The primary fixed 21-channel sensorimotor montage, 8--30 Hz
+filtering and source-fitted Riemannian tangent reference generate 231
+wide-band coordinates. The independently frozen BNCI2014\_002
+(\(N=14\), 15 channels, 120 features) and BNCI2015\_001
+(\(N=12\), 13 channels, 91 features) protocols use native montage,
+8--30 Hz processing and leave-one-person-out evaluation. Shin2017A
+(\(N=29\), 30 channels, 465 features) was frozen under a \emph{separate}
+prospective protocol before that cohort's target outcomes and is not a
+retrospective addition to the original BNCI inference family.
+
+All main effects use Z0: no target labels, target feature means, target
+covariance, target normalisation statistics or target-selected feature
+configuration. Within each source-validation fold, tangent references and
+other representation-dependent operations are refitted using available
+source participants only. Repeated trials and sessions do not become
+independent inferential units.
+
+\subsection{Paired objectives on one scalar shrinkage path}
+For source within-class covariance \(S\), let
+\[
+ A_\lambda=(1-\lambda)S+\lambda\nu I,\qquad
+ \nu=\mathrm{tr}(S)/p,\quad \lambda\in[0,1].
+\]
+Two source objectives are evaluated on the same participant-grouped folds:
+macro-AUC \(A_s(\lambda)\), maximised for discrimination, and held-source validation-class-centred covariance log score
+\(C_s(\lambda)\), minimised for within-class covariance fit.
+This frozen estimator historically appears in logs and tables as
+Cov-NLL, but it uses each held-source validation participant's own
+class-centred residuals; it is not a source-mean predictive likelihood
+(Section~\ref{sec:v16-estimand-audit}). Analytic Ledoit--Wolf and OAS shrinkage use the same
+source feature pool; tangent-space logistic regression and Riemannian
+MDM serve as additional non-identical algorithm controls. Full-domain
+selection refers to the \emph{finite} 27-point candidate grid
+\[
+\begin{aligned}
+\Lambda=\{&0,.0005,.001,.002,.003,.005,.0075,.01,.015,\\
+&.02,.03,.05,.075,.10,.15,.20,.30,.40,.50,\\
+&.60,.70,.80,.90,.95,.98,.99,1\}.
+\end{aligned}
+\]
+Singular candidates are declared infeasible, not silently replaced by
+a target-informed rule. Target scores are frozen before their
+label-based performance is calculated.
+
+\input{101_v16_covscore_estimand_audit.tex}
+
+\input{103_v17_exact_class_mean_shift_decomposition.tex}
+
+\subsection{Operator explanation and safe diagnostics}
+Writing source class contrast \(d_s\), the discriminant is
+\(w_\lambda=A_\lambda^{-1}d_s\) and
+\[
+ w_\lambda'=-A_\lambda^{-1}(\nu I-S)w_\lambda.
+\]
+For held-participant covariance \(\Sigma_g\) and class contrast \(d_g\),
+consider standardized signed margin
+\(m_g=w_\lambda^\top d_g/\sqrt{w_\lambda^\top\Sigma_gw_\lambda}\).
+Subtract the component of \(w_\lambda'\) that merely rescales the
+discriminant in the \(\Sigma_g\) metric, defining
+\[
+ r_g=w_\lambda'-
+ \frac{w_\lambda'^\top\Sigma_gw_\lambda}
+ {w_\lambda^\top\Sigma_gw_\lambda}w_\lambda.
+\]
+Differentiation yields
+\[
+ m_g'(\lambda)=
+ \frac{r_g^\top d_g}{\sqrt{w_\lambda^\top\Sigma_gw_\lambda}}.
+\]
+The covariance quadratic-form derivative contains covariance operators but
+not class contrast, conditional on a fixed covariance; the empirical
+validation-class-centred score must not be called predictive likelihood. Thus a stationary covariance-fidelity optimum need not
+be stationary for the held-person margin. Around an \emph{interior} covariance
+optimum, covariance regret can be second-order while margin change is
+first-order; this local statement is not assumed at boundary optima.
+
+To describe objective disagreement without constructing an unstable ratio,
+we preserve both source-only regret paths:
+\[
+ R_C(\lambda)=C_s(\lambda)-\min_\ell C_s(\ell),\quad
+ R_D(\lambda)=\max_\ell A_s(\ell)-A_s(\lambda).
+\]
+Their cross-optimum values, together with source-only covariance-metric
+discriminant rotation, quantify a descriptive conflict.
+These are \emph{not} validated target-gain predictors. A new auditable
+implementation is provided separately with synthetic unit tests; no
+target outcomes are used to set its threshold.
+
+\input{109_v22_rank_crossing_mechanism.tex}
+\input{111_v23_spectral_rank_certificate.tex}
+
+\subsection{Prospective hierarchy and statistics}
+The frozen EEGMMIDB block tests two primary comparisons: source macro-AUC
+selection versus the originally executed validation-class-centred
+covariance-score criterion and versus Ledoit--Wolf. The corrected
+proper-predictive criterion is a new, retrospective Shin2017A-only
+comparison, and does not enter any original Holm family.
+The two original BNCI datasets form an independent TRUE PRE-DATA family;
+Shin2017A is separately frozen and its Holm family remains independent.
+The participant is the unit for paired sign-flip inference, paired bootstrap
+confidence intervals and within-family Holm adjustment. An AUC loss
+greater than 0.02 relative to the comparator defines a materially harmed
+participant. Neither sessions nor trial counts are treated as independent
+replications. Post-primary source-pool sensitivity and post-outcome frontier
+sensitivity are not relabelled as new confirmatory tests.
+
+\input{95_v13_protocol_integrity.tex}
+
+\subsection{Regularisation validity frontier}
+In a leave-one-participant-out cohort, each held-person fold \(g\) has
+its own source-only covariance regret \(r_g(\lambda)\) and frozen target
+AUC path \(A_g(\lambda)\). We aggregate both paths by person and restore
+the common finite-grid zero by defining
+\[
+ \bar r(\lambda)=G^{-1}\sum_{g=1}^{G}r_g(\lambda),\qquad
+ \widetilde r(\lambda)=\bar r(\lambda)-\min_{\ell\in\Lambda}\bar r(\ell),
+ \quad \bar A(\lambda)=G^{-1}\sum_{g=1}^{G}A_g(\lambda).
+\]
+The observed AUC envelope within cohort-mean source-fidelity
+regret budget \(\delta\) is
+\[
+ E(\delta)=
+ \left[
+ \min_{\lambda:\widetilde r(\lambda)\le\delta}\bar A(\lambda),
+ \max_{\lambda:\widetilde r(\lambda)\le\delta}\bar A(\lambda)
+ \right].
+\]
+This cohort-mean regret is \emph{not} the raw per-person frontier
+reported in the independently frozen Shin2017A experiment; the two
+different statistics cannot be pooled.
+The descriptive threshold \(\delta_{0.02}\) is the smallest source-fidelity
+regret allowing a 0.02 AUC spread. Because the empirical range
+maximises over 405 candidates, pointwise percentile bootstrap lower
+endpoints cannot establish a population range exceeding 0.02. We report
+a separate post-outcome translation-invariant whole-path bootstrap
+oscillation sensitivity analysis, explicitly conditional on source-path
+estimation and shared participant fits.
+
+\section{Results}
+\subsection{Objective conflict remains after restoring the near-zero region}
+In EEGMMIDB S001--S008, held-source macro AUC selected
+\(\lambda_D=0.8\) while covariance-NLL selected \(\lambda_C=0.075\).
+Analytic Ledoit--Wolf selected about 0.01567. Source macro AUC reached
+0.67833 at 0.8; moving from 0.075 to 0.8 improved this source macro
+score by 0.05801 and increased held-source class-centred covariance score by 0.92233.
+This is source evidence of disagreement, not evidence that 0.8 is a
+universally correct EEG parameter.
+
+\subsection{Held-out discrimination gains coexist with individual harm}
+On the prospective EEGMMIDB S021--S040 target block (\(N=20\)),
+source-macro selection obtained 0.72116 macro AUC, source
+covariance-NLL 0.66509, and Ledoit--Wolf 0.62919.
+The paired mean gains were +0.05607 (95\% participant-bootstrap
+[0.02185,0.09049], Holm \(p=0.00597\)) against covariance-NLL and
++0.09197 ([0.04108,0.14310], Holm \(p=0.00510\)) against
+Ledoit--Wolf. Five and four participants, respectively, lost more
+than 0.02 AUC. After completely reselecting the method and refitting
+source geometry under eight separate source-participant omissions,
+the mean contrast direction stayed positive in 8/8 omissions.
+Selected discriminative strengths varied between 0.4 and 0.95,
+supporting objective-order stability under these perturbations,
+not a single stable regularisation constant.
+
+\subsection{External evidence distinguishes direction from adjusted significance}
+BNCI2014\_002 (\(N=14\)) showed +0.01763 macro AUC over
+covariance-NLL, with adjusted \(p=0.13965\).
+BNCI2015\_001 (\(N=12\)) showed +0.04329, \(p=0.18555\).
+Both effect directions were positive and the source optima differed in
+26/26 outer folds; these folds are not 26 independent study replications.
+Neither BNCI cohort passed its own frozen family-wise superiority test.
+Separately frozen Shin2017A (\(N=29\)) reported +0.02222 over
+covariance-NLL (Holm \(p=0.02232\)) and +0.04866 over Ledoit--Wolf
+(Holm \(p=0.00051\)), with five and three materially harmed
+participants. The original Kaggle PR97 execution and 29 frozen per-person
+score files have now been independently checksum-checked, with
+the stored per-person AUC arithmetic reconciled. This is
+an artifact-level reproduction audit, not a fresh raw-EEG rerun.
+
+\input{91_table_main_prospective_results.tex}
+\input{93_figure_participant_effects.tex}
+
+\input{104_v18_shin_concise.tex}
+
+\input{105_v18_second_cohort_proper_predictive.tex}
+
+\input{106_v19_estimand_homotopy_exact.tex}
+
+\input{107_v20_external_first_run_bnci2014_001.tex}
+
+\input{108_v21_low_rank_cvar_negative.tex}
+\input{110_v22_full_source_rank_results.tex}
+
+\subsection{The key prospective spectral-representation prediction fails}
+On the separate untouched S041--S060 block, four prespecified
+configurations compared WIDE231, FB8-1848, source-PCA-matched
+FB8-231 and nuisance-augmented WIDE-1848. The primary
+difference-in-differences for FB8-vs-WIDE under discrimination versus
+Ledoit--Wolf regularisation was \(-0.07781\) AUC
+(95\% [-0.12415,-0.03451], Holm \(p=0.01328\)).
+The selection objective materially affected the representation
+conclusion, but in the \emph{opposite} direction to the historical
+claim that discrimination-oriented regularisation would reveal a
+universal filter-bank advantage. Dimensionality-matched and nuisance
+controls also contradicted a monotonic feature-dimension explanation.
+
+\subsection{External path variation lacks a confirmed population lower bound}
+Observed BNCI2014\_002 and BNCI2015\_001 AUC-path ranges were
+0.03844 and 0.05011, with empirical \(\delta_{0.02}\) equal
+to 0.91611 and 0.17519 per-dimension source NLL-regret units.
+Post-outcome path-wide bootstrap oscillation radii were 0.04035
+and 0.05923. In both cohorts, the resulting conservative
+lower range bound is zero; a population-wide effect over 0.02
+cannot be claimed from these data.
+
+\input{92_table_validity_frontier.tex}
+
+
+
+
+
+\section{Discussion}
+The corrected experiment changes the causal interpretation of the
+original ranking of regularisation selectors. Source discrimination
+outperformed the historically named Cov-NLL selector in the frozen
+EEGMMIDB and Shin2017A studies. But that historical criterion removes
+validation participants' class-mean shifts before assessing covariance
+fit; it was not a proper source-mean predictive density score.
+The new, genuinely predictive Gaussian baseline nearly ties
+the discrimination policy on Shin2017A, whereas source-macro
+selection remains modestly higher on a second, retrospective
+BNCI2014\_002 evaluation. Both newly corrected comparisons
+were performed after the corresponding target outcomes
+were known, so neither can be treated as a new pre-data
+confirmation. The paper therefore does
+\emph{not} establish that optimizing discriminability dominates
+predictive covariance fitting. Its more specific contribution is
+identifying the exact difference between two validation estimands,
+deriving the omitted nonnegative mean-shift term, and documenting
+the resulting reversal of an earlier experimental interpretation.
+The classical principle that discriminative risk and covariance
+estimation differ is prior art \cite{friedman1989,tomioka2010regularized}.
+
+The evidence is heterogeneous rather than universal. Two independently
+pre-data-frozen BNCI cohorts have positive mean directions but individually
+non-significant adjusted tests. Shin2017A's old comparisons were frozen
+separately; the new proper-predictive criterion was specified and executed
+only after that dataset's results were exposed.
+The cross-representation intervention directly falsifies the originally
+expected filter-bank improvement, and none of the proposed follow-up
+source-only tail/fidelity heuristics has passed a promotion rule.
+The post-outcome frontier correction removes the earlier population
+span interpretation. These adverse findings constrain the contribution
+and should remain visible rather than be suppressed.
+
+The new source-only regret/rotation diagnostic is a measurement instrument,
+not a validated alarm threshold or a new covariance estimator. Its
+prospective predictive value and decision safety remain untested. Nor do
+these offline AUC results establish clinically relevant operating thresholds,
+reduced labelled calibration burden or superior modern deep EEG decoding.
+The data contain few independent acquisition laboratories, while
+test-participant bootstrap inference does not capture overlapping
+source-fit variation or future domain shifts. Broad clinical claims
+would require a separate pre-registered device/session/threshold utility study.
+
+
+
+
+
+
+
+\paragraph{Extended technical analyses.}
+The accompanying full manuscript preserves post-outcome source--target
+rank diagnostics, formal identifiability examples, original CSP reference
+comparisons and the historical finite-grid hindsight envelope. None
+of these supplementary results creates a new confirmatory family.
+
+\section{Conclusion}
+Different covariance-validation targets can yield different
+regularisation settings in source-only cross-subject EEG. An originally observed
+discrimination-selector advantage against a validation-class-centred
+covariance score is not evidence of advantage over predictive
+likelihood: the corrected Gaussian predictive source selector
+nearly tied discrimination-based selection in retrospective
+Shin2017A analysis and trailed by 0.00682 AUC on
+retrospective BNCI2014\_002. These observations are
+not independent prospective superiority tests. The exact missing class-mean-shift term, adverse
+participant results, individually inconclusive external BNCI
+tests and prospective spectral falsification constrain the
+scientific conclusion. An additional protocol-locked BNCI2014\_001 dataset gives a
+small mean discrimination-over-predictive difference whose
+participant-level uncertainty spans zero; this is a new
+dataset-specific check, not a globally pre-registered validation.
+No universal shrinkage rule, patient-safe
+switch, or population-wide superiority is demonstrated.
+Transparent source-estimand definitions and genuinely untouched
+external replication are necessary before recommending a selector.
+
+\section*{Statements and Declarations}
+\textbf{Data availability:} The EEG cohorts are publicly distributed.
+Original participant score receipts, repository commit hashes and code
+availability must be confirmed in the final submission package.
+
+\textbf{Author contribution, funding, competing interests, ethics and
+AI-assisted writing:} To be completed and confirmed by all authors before
+publisher upload. No declaration is made on an author's behalf.
+
+\bibliographystyle{unsrt}
+\bibliography{references_v10}
+\end{document}
