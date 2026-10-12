@@ -1,4 +1,4 @@
-name: DefaultReg V23 original EEG continuous source selector benchmark
+name: DefaultReg V23 Taylor-tightened continuous source selector benchmark
 on:
   push:
     branches:
