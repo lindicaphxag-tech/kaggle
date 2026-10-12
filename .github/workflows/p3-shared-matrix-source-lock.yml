@@ -1,0 +1,30 @@
+name: P3 source-only manifest fail-closed contract
+on:
+  push:
+    branches: [publication/default-eeg-p3-transfer-negative-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/p3_shared_candidate_matrix_gate.py'
+      - '.github/workflows/p3-shared-matrix-source-lock.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  source-only-manifest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python research/defaultreg_bspc_v13/src/p3_shared_candidate_matrix_gate.py > p3_contract.json
+      - run: |
+          python - <<'PY'
+          import json
+          a=json.load(open("p3_contract.json"))
+          assert a["drift_and_information_leak_blocked"]
+          assert a["independent_external_acquisitions_completed"]==0
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p3-source-lock-contract-synthetic-only
+          path: p3_contract.json
+          retention-days: 90
