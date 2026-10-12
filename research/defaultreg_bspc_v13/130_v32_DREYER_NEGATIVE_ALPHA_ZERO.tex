@@ -1,0 +1,97 @@
+% V32 independently audited real Dreyer EEG negative research companion.
+% NOT evidence of a novel selected anisotropic classifier.
+\subsection{Source-derived contrast-heterogeneity correction is not selected on Dreyer2023A}
+\label{sec:v32-dreyer-negative}
+An exploratory, repository-protocol-first Dreyer2023A acquisition
+provided an external diagnostic of the noise-debiased
+source-group contrast-heterogeneity operator.
+On 12 fixed source persons, we computed class-contrast
+dispersion with finite-trial within-source class-mean
+sampling-noise subtraction and PSD projection.
+The resulting correction matrix had positive trace
+$0.015919$, but the fully specified source-only
+risk criterion (group-macro AUC minus $0.25$ times
+source-group AUC standard deviation) chose
+$\alpha=0$ and $\lambda=0.1$.
+The original grouped source-macro selector chose
+$\lambda=0.3$; the alpha-zero-only risk ablation
+and correctly predictive Gaussian source NLL also
+chose $\lambda=0.1$.
+Therefore, before opening any held target results,
+the claimed new matrix operator had \emph{not} been
+selected: the resulting discriminant is exactly
+the original pooled scalar-LDA with a different
+regularisation parameter. The source-model
+structural-novelty promotion criterion FAILED.
+
+The original runner froze source choices with SHA-256 prefix
+\texttt{9bfc60e1da10} prior to opening held EEG.
+Its first workflow processed five held persons and
+was interrupted while downloading the sixth OSF
+target file. A transparent transport-only continuation
+reproduced the original source choice file byte-identically
+\emph{before} any resumed target access; all 12 precommitted
+held targets 13--24 were then evaluated without modifying
+numerical code, parameters or source groups.
+The continuation is not a second independent
+experiment or an independent preregistration.
+An independent GitHub Actions workflow re-read
+immutable source/target outcome artifacts and
+recomputed all individual AUC comparisons, the
+complete $2^{12}$ sign-flip distribution and
+bootstrap uncertainty without re-fitting EEG.
+
+\begin{table}[ht]\centering\small
+\caption{Dreyer2023A source-locked held-person macro ROC-AUC:
+12 new-acquisition held persons, 2,880 target trials,
+identical C3/Cz/C4 processing. The selected V32 policy
+never activates the anisotropic penalty ($\alpha=0$).
+Differences outside the predeclared primary comparison
+are descriptive and are not tested as new superiority claims.}
+\label{tab:v32-dreyer-audit}
+\begin{tabular}{lr}
+\toprule
+Source-only model/regularisation choice & Macro AUC\\
+\midrule
+Original group macro-AUC, $\lambda=0.3$ & 0.766453\\
+V32 risk, $\lambda=0.1,\alpha=0$ & 0.765365\\
+Scalar risk ablation, $\lambda=0.1$ & 0.765365\\
+Proper Gaussian source NLL, $\lambda=0.1$ & 0.765365\\
+Matrix source-macro candidate, $\alpha=0$ & 0.766453\\
+Riemannian MDM & 0.770278\\
+Tangent-space logistic regression & 0.762720\\
+Ledoit--Wolf & 0.764022\\
+OAS & 0.763929\\
+Historical class-centred likelihood & 0.763976\\
+Fixed full shrinkage, $\lambda=1$ & 0.744699\\
+\bottomrule
+\end{tabular}
+\end{table}
+The predeclared new-risk minus original-source-macro
+difference is $-0.001088$ held-person macro AUC.
+The paired participant-bootstrap 95\% descriptive
+interval is $[-0.002969,0.000880]$ and the exact
+two-sided sign-flip reference is $p=0.313477$.
+Five subjects gained, seven declined, and no
+individual lost more than 0.02 AUC.
+This fails the method-performance gate, independently
+of the already failed structural-novelty gate.
+No newly beneficial anisotropic EEG operator
+is established by this experiment.
+
+\paragraph{Mechanistic interpretation.}
+The difference between predictive Gaussian likelihood,
+variance-penalized source ranking, and original source
+macro-AUC remains a legitimate scientific measurement
+problem. However, the particular source-group contrast
+matrix is not supported as a useful novel intervention:
+all best source choices retain $\alpha=0$ on the new
+Dreyer recording conditions. The exact pooled covariance
+ANOVA decomposition distinguishes within-person
+class residual noise from between-person class-mean
+translation, but that algebra alone cannot identify
+which future subject distributions will make an
+anisotropic penalty improve classification.
+The experiment therefore strengthens a \emph{negative}
+transfer interpretation rather than a superior
+decoder claim.
