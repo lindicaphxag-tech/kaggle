@@ -26,6 +26,9 @@ jobs:
           grep -q '0.614835' /tmp/v31-bspc-fulltext.txt
           grep -q '0.003395' /tmp/v31-bspc-fulltext.txt
           grep -q '0.0930843' /tmp/v31-bspc-fulltext.txt
+          grep -q '0.619261' /tmp/v31-bspc-fulltext.txt
+          grep -q '0.616996' /tmp/v31-bspc-fulltext.txt
+          grep -q '0.003500' /tmp/v31-bspc-fulltext.txt
           grep -q 'negative' /tmp/v31-bspc-fulltext.txt
           if grep -Eq 'Reference.*undefined|Citation.*undefined|Undefined control sequence|multiply defined' main_bspc_v31_EVIDENCE_GATED_CANDIDATE.log; then exit 3; fi
           python - <<'PY'
@@ -37,7 +40,7 @@ jobs:
           PY
           mkdir -p /tmp/defaultreg-v31-page-preview
           pdftoppm -f 1 -l 1 -png -r 130 main_bspc_v31_EVIDENCE_GATED_CANDIDATE.pdf /tmp/defaultreg-v31-page-preview/cover
-          test -s /tmp/defaultreg-v31-page-preview/cover-1.png
+          test -n "$(find /tmp/defaultreg-v31-page-preview -name 'cover*.png' -size +0c -print -quit)"
           echo "V31_BSPC_DRAFT_PDF_BUILD_AND_EVIDENCE_LOCK_PASS"
       - uses: actions/upload-artifact@v4
         if: always()
