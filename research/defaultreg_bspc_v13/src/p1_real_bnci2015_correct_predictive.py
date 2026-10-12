@@ -122,6 +122,24 @@ def main():
         summary["macro_minus_"+alternative+"_paired_mean"]=float(x.mean())
         summary["macro_vs_"+alternative+"_harmed_gt002"]=int(np.sum(x<-.0200000001))
         summary["macro_vs_"+alternative+"_helped_gt002"]=int(np.sum(x>.0200000001))
+    # Post-outcome descriptive/exploratory exact paired sign-flip
+    # versus corrected proper source-train mean predictive comparator.
+    paired=np.asarray([r["auc"]["source_macro"]-
+                       r["auc"]["true_source_train_mean_predictive"] for r in rows])
+    observed=float(paired.mean())
+    n=len(paired)
+    signs=1-2*((np.arange(1<<n)[:,None] >> np.arange(n)[None,:])&1)
+    exact=float(np.mean(np.abs((signs*paired).mean(axis=1))>=abs(observed)-1e-12))
+    rng=np.random.default_rng(20261013)
+    draw=rng.integers(0,n,size=(20000,n))
+    percentile=np.quantile(paired[draw].mean(axis=1),[.025,.975])
+    summary["retrospective_macro_minus_proper_exact_signflip_two_sided_p"]=exact
+    summary["retrospective_macro_minus_proper_bootstrap_95"]=[float(x) for x in percentile]
+    summary["paired_nonzero"]=int(np.sum(np.abs(paired)>1e-12))
+    summary["inference_not_original_prospective"]=True
+    print("P1_BNCI2015_CORRECT_PROPER_EXPLORATORY_STATISTICS",
+          json.dumps({"mean":observed,"exact_two_sided_p":exact,
+                      "descriptive_bootstrap_95":percentile.tolist()},sort_keys=True),flush=True)
     outdata={"status":"RETROSPECTIVE_CORRECT_SOURCE_NLL_BNCI2015_001",
        "source_lock_sha":lock,"n_subjects":12,
        "new_model_family_improvement_claimed":False,
