@@ -1,0 +1,45 @@
+\subsection{Continuous source-only regularisation search with an auditable optimisation gap}
+\label{sec:v23-continuous-search}
+The source rank enclosure in Eq.~\eqref{eq:v23-interval} also
+makes it possible to search a \emph{continuous} shrinkage interval,
+instead of interpreting success on a finite grid as
+optimality across $\lambda\in[0,1]$.
+This is a computational claim about the \emph{fixed,
+held-source-validation} macro-AUC, not a generalisation bound
+for unseen participants.
+
+For each grouped source fold, fix the source-fitted
+covariance eigensystem, contrast and held-source feature/label
+pairs. On subinterval $I=[l,r]$, identify the uncertified
+positive--negative pairs with indicator $J_{pn}(I)$.
+Let $c_{pn}(l)\in\{0,\tfrac12,1\}$ be their AUC credit
+at the left endpoint. For every $\lambda\in I$,
+\begin{equation}
+ A_g(\lambda)\le A_g(l)+
+ \frac{\sum_{pn}J_{pn}(I)[1-c_{pn}(l)]}{|P_g||N_g|}.
+ \label{eq:v23-one-sided-auc-upper}
+\end{equation}
+The corresponding lower bound subtracts
+$\sum_{pn}J_{pn}(I)c_{pn}(l)/(|P_g||N_g|)$.
+Averaging bounds \emph{per source person} encloses
+the macro-AUC objective across the full interval,
+including nonsampled shrinkage parameters.
+
+A reproducible branch-and-bound search bisects
+the interval with largest remaining source-macro upper
+bound, evaluates AUC at a midpoint, and updates the
+incumbent. It stops with an $\epsilon$-source
+optimality certificate only if the best unresolved
+interval bound exceeds the best evaluated source AUC
+by at most $\epsilon$. Exhausting an evaluation
+budget earlier yields an \emph{inconclusive} result,
+with its unclosed gap reported.
+No held target label enters any selection or stopping rule.
+
+Classical interval arithmetic, branch-and-bound and LDA
+shrinkage are prior art. The domain-specific methodological
+extension is an inspectable finite-\emph{source}-AUC
+optimality gap across a continuous shrinkage range,
+rather than an automatically superior EEG classifier.
+The scientific question of future-person generalisation
+remains open until a frozen external EEG test.
