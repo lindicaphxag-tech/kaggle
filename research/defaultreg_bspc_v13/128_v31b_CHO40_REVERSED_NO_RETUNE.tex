@@ -1,0 +1,71 @@
+% V31B reserved block was SEQUENTIAL/POST-FIRST-BLOCK protocol,
+% NOT a second acquisition or independent preregistration.
+\subsection{The identical frozen SCE choice reverses on reserved participants}
+\label{sec:v31b-cho40}
+After seeing the initial Cho2017 participant outcomes, we
+committed a \emph{sequential, exploratory} reserved-person protocol
+for the 20 remaining identifiers 33--52. The original
+source IDs 1--12, source preprocessing, and algorithm code
+were reused without any tuning or changed feature
+configuration. Before reading any reserved target EEG,
+the source-choice manifest was regenerated and required
+to be byte-identical to the first-run manifest
+(SHA-256 prefix \texttt{677f848de0e3}).
+All selected parameters matched exactly; in particular
+the SCE $\rho=1$ choice stayed $\lambda=1.0$ and the
+original source-macro grid stayed $\lambda=0.5$.
+
+\begin{table}[ht]
+\centering
+\small
+\caption{Cho2017 held-person ROC-AUC under the same source-only
+classifier fit and choices. The second block is a
+\emph{sequential follow-up within one acquisition},
+not a newly independent dataset. The primary original
+first-run outcome did not attain its planned threshold.}
+\label{tab:v31b-cho40}
+\begin{tabular}{lccc}
+\toprule
+Method & First 20 & Reserved 20 & All 40\\
+\midrule
+Source envelope $\rho=1$ & 0.618230 & 0.615761 & 0.616996\\
+Original source-macro grid & 0.614835 & 0.619261 & 0.617048\\
+Envelope $\rho=0$ & 0.610300 & 0.618997 & 0.614648\\
+Proper Gaussian source NLL & 0.601830 & 0.615487 & 0.608658\\
+Analytic Ledoit--Wolf & 0.593535 & 0.609938 & 0.601736\\
+Analytic OAS & 0.593580 & 0.609954 & 0.601767\\
+Historical class-centred NLL & 0.593355 & 0.609807 & 0.601581\\
+\midrule
+SCE minus original grid & +0.003395 & -0.003500 & -0.000053\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The 20 reserved persons contributed another 4,040 held EEG
+trials. SCE lost $0.003500$ participant-macro AUC relative
+to the unchanged baseline and harmed one participant by
+more than $0.02$ AUC. The within-block descriptive
+two-sided paired sign-flip reference was $p=0.166742$.
+The original first-block gain was only $+0.003395$.
+Together all 40 held persons (8,040 trials) show
+a near-zero macro contrast, $-0.00005264$ AUC,
+with a descriptive participant-bootstrap 95\% interval
+$[-0.003218,0.002973]$ and an exploratory
+Monte Carlo sign-flip reference of approximately $0.974$.
+The latter is \emph{not} a predeclared independent
+confirmatory $p$ value because the follow-up itself was
+specified after the first block was seen.
+The two target blocks share the same source model and
+acquisition; they cannot be counted as two independently
+collected experiments.
+
+The source-group ellipsoid and a pre-outcome locked
+choice therefore did not suffice to predict a stable
+advantage in this public acquisition. Even though the
+first 20-person result was positive, it did not survive
+an identical-code no-retuning follow-up. This falsifies
+promotion of SCE as a reliably better regularisation
+selector based on the current evidence. The exact
+ellipsoid minimum and worst-case witness remain
+\emph{conditional theoretical tools}, not empirical
+cross-subject performance certificates.
