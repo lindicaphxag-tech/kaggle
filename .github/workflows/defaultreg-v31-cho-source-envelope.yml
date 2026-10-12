@@ -1,0 +1,63 @@
+name: DefaultReg V31 source-only Cho2017 first-run envelope
+on:
+  push:
+    branches: [research/defaultreg-contrast-envelope-20261013]
+    paths:
+      - '.github/workflows/defaultreg-v31-cho-source-envelope.yml'
+      - 'research/defaultreg_bspc_v13/src/source_contrast_envelope_v31.py'
+      - 'research/defaultreg_bspc_v13/src/run_v31_cho_source_envelope.py'
+      - 'research/defaultreg_bspc_v13/tests/test_source_contrast_envelope_v31.py'
+      - 'research/defaultreg_bspc_v13/V31_CHO2017_SOURCE_ENVELOPE_FIRST_RUN_PROTOCOL.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  theory-and-real-eeg:
+    runs-on: ubuntu-latest
+    timeout-minutes: 175
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MNE_DATA: /tmp/defaultreg-cho-v31-data
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Install pinned original EEG benchmark tools
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2 pytest
+      - name: Mathematical contract tests before EEG I/O
+        run: |
+          python -m py_compile research/defaultreg_bspc_v13/src/source_contrast_envelope_v31.py research/defaultreg_bspc_v13/src/run_v31_cho_source_envelope.py
+          python -m pytest -q research/defaultreg_bspc_v13/tests/test_source_contrast_envelope_v31.py
+      - name: First-run strict source SHA lock then held EEG
+        run: |
+          mkdir -p "$MNE_DATA" /tmp/defaultreg-v31-cho-results
+          python research/defaultreg_bspc_v13/src/run_v31_cho_source_envelope.py --out /tmp/defaultreg-v31-cho-results
+          python - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          p=Path("/tmp/defaultreg-v31-cho-results")
+          a=p/"CHO2017_V31_SOURCE_CHOICES_BEFORE_ANY_TARGET_READ.json"
+          b=p/"CHO2017_V31_REAL_FIRST_RUN_TARGET_AUC.json"
+          src=json.loads(a.read_bytes())
+          res=json.loads(b.read_bytes())
+          assert res["source_choice_sha256"]==hashlib.sha256(a.read_bytes()).hexdigest()
+          assert src["held_subjects_unread"]==list(range(13,33))
+          assert src["source_subjects"]==list(range(1,13))
+          assert res["n_source_subjects"]==12 and res["n_held_subjects"]==20
+          assert set(x["subject"] for x in res["participant_rows"])==set(range(13,33))
+          assert res["all_target_data_read_after_source_lock"]
+          assert res["no_unconditional_transfer_guarantee"]
+          assert len(res["macro_auc_by_method"])==7
+          print("V31_CHOICE_HASH_AND_ALL_20_HELD_RESULTS_CHECKED")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-v31-cho-source-locked-first-run
+          path: |
+            /tmp/defaultreg-v31-cho-results/**
+            research/defaultreg_bspc_v13/V31_CHO2017_SOURCE_ENVELOPE_FIRST_RUN_PROTOCOL.md
+          if-no-files-found: warn
+          retention-days: 90
