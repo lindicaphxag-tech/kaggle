@@ -1,0 +1,47 @@
+name: DefaultReg V24 source-only 50-patient acute-stroke feasibility pilot
+on:
+  push:
+    branches:
+      - experiment/defaultreg-v24-liu2024-stroke-eeg-20261013
+    paths:
+      - '.github/workflows/defaultreg-v24-liu-source-feasibility.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-only-outer-1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MNE_DATA: /tmp/defaultreg-v24-clinical-eeg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Read all 50 patients and fit ONLY the 49 source participants
+        run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_proper_predictive/run_liu2024_source_only_preoutcome_v24.py
+          python - <<'PY'
+          import json
+          path='/tmp/defaultreg-v24-liu2024/outer1_source_only.json'
+          d=json.load(open(path))
+          assert d['all_50_subjects_retained']
+          assert d['target_person_labels_or_features_passed_to_selection'] is False
+          assert d['target_predictions_or_target_auc_computed'] is False
+          assert len(d['source_people'])==49
+          assert d['original_grid_feasible_points']>1
+          print('PASS_50_PATIENTS_SOURCE_ONLY_OUTER1_FEASIBILITY_NO_TARGET')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-v24-50acute-stroke-source-only-feasibility
+          path: /tmp/defaultreg-v24-liu2024/**
+          if-no-files-found: warn
+          retention-days: 90
