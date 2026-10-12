@@ -15,37 +15,54 @@ A Matched Audit of Validation Denominators, Model Refitting and Regularisation}
 \date{}
 \begin{document}\maketitle
 \begin{abstract}
-\textbf{Objective.} Subject-disjoint EEG validation assumes that released subject
-identifiers correspond to independent recordings. We test this assumption in
-a public acute-stroke motor-imagery acquisition and quantify how record-content
-purging interacts with source-model fitting and regularisation choice.
-\textbf{Methods.} Under pinned MOABB 1.7.2 processing, exact cross-ID EEG
-epoch/label fingerprints define record-content groups. All recording groups
-are checked in three public acquisitions. In the affected cohort, we
-reproduce original and fully purged held-record AUC values, then evaluate
-a frozen $2\times2$ model-fit by shrinkage-selection factorial on the same
-49 held recording groups. We additionally quantify influence of the
-content-overlap group and use two other selectors as negative controls.
-\textbf{Results.} Liu2024 contains 50 released IDs and 2,000 processed trial
-instances, but 1,960 unique exact trial contents; IDs 4 and 5 share all
-40 epochs in the fixed pipeline. No cross-ID exact overlaps were observed
-in Weibo2014 (10 IDs; 1,580 trials) or BNCI2014\_002 (14 IDs; 2,240 trials).
-Source-macro held-record AUC changed from 0.594000 (nominal 50-ID average)
-to 0.588673 (49 identical held targets with original fits) and 0.582551
-(49-source-group full refit). Among matched 49 groups, the source-macro
-regularisation choice changed in 37, with opposing average conditional
-selector effects ($-0.001327$ versus $+0.001786$) on the two fitted models.
-The correctly predictive source-mean Gaussian policy changed its selected
-shrinkage in zero groups. The complete 49-group change was $-0.006122$ AUC,
-but the duplicate-affected content group changed by $-0.262500$;
-excluding that group from the descriptive mean left just
-$-0.000781$ AUC across the other 48 groups.
-\textbf{Conclusion.} Subject IDs alone may not ensure recording-content
-independence. In this acquisition, a large apparent aggregate
-correction was dominated by a specific digital overlap group,
-not a universal shift for unaffected participants. The original-to-corrected AUC difference mixes a reporting
-denominator shift, model changes and selection interactions; it is neither
-a patient-level causal leakage penalty nor a new transfer gain.
+\textbf{Objective.}
+We test whether distinct released participant identifiers
+in publicly available electroencephalography (EEG)
+necessarily define independent digital recording
+contents, and quantify the effect of content-disjoint
+model evaluation on cross-subject decoding.
+
+\textbf{Methods.}
+With a pinned motor-imagery preprocessing pipeline
+(MOABB 1.7.2), exact signal-and-label content
+fingerprints were audited across three public EEG
+acquisitions. In an affected acquisition, we
+compared a nominal 50-ID result with 49 distinct
+content groups and performed a matched
+$2\times2$ source-fit by regularisation-selection
+analysis. We additionally tested an alternative
+preprocessing setting and two fixed logistic/ridge
+classifier objectives on the same held contents.
+
+\textbf{Results.}
+Liu2024 contained 50 released IDs and 2,000
+processed trials but 1,960 distinct numerical
+trial contents: IDs 4 and 5 shared all 40 labelled
+epochs. Two other datasets had no exact cross-ID
+matches under their specified pipelines. The
+alias persisted after 6--35 Hz filtering and
+128 Hz resampling. Source-macro ROC-AUC
+was $0.594000$ over nominal IDs, $0.588673$
+over 49 unique contents using original fits,
+and $0.582551$ after record-purged refitting.
+The matched 49-group change of $-0.006122$
+was dominated by the alias-affected group
+($-0.262500$); the other 48 averaged
+$-0.000781$. Fixed logistic and ridge
+models respectively showed changes of
+$-0.212500$ and $-0.222500$ at the aliased
+content, versus $-0.000469$ and
+$+0.001094$ across the other 48.
+
+\textbf{Conclusion.}
+Released EEG participant IDs cannot always
+serve as independent \emph{digital-content}
+units. The validation denominator, source
+fitting and selection effects should be
+reported separately. These retrospective
+observations do not establish clinical
+patient identity, population-wide leakage
+bias or an independent new EEG cohort.
 \end{abstract}
 
 \noindent\textbf{Keywords:} EEG; motor imagery; recording identity;
