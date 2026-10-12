@@ -19,6 +19,7 @@ jobs:
         with: {python-version: '3.11'}
       - run: python -m pip install --disable-pip-version-check moabb==1.7.2 pyedflib
       - run: |
+          mkdir -p "$MNE_DATA"
           python research/defaultreg_bspc_v13/src/p2_independent_pyedflib_raw_check.py --out /tmp/p2-pyedflib-independent-raw.json
           python - <<'PY'
           import json
