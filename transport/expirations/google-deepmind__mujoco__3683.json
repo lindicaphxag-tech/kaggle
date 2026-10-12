@@ -1,0 +1,13 @@
+{
+  "case_id": "google-deepmind/mujoco#3683",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-10-12T16:03:11Z",
+  "expiry_sha256": "f7c62c63ab1122f9fcd8a2521db486054425018a9bd94e13e3d698203b753338",
+  "first_frozen_at": "2026-10-12T06:30:11Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-10-12T12:30:11Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "1ffae280f0db31331da5957f66a27a3e58c1181a38d8d5f4d1a025a6f96bab34"
+}
