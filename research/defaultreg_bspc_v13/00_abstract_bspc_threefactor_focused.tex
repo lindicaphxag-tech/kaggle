@@ -1,0 +1,50 @@
+\begin{abstract}
+\textbf{Objective:}
+Covariance fitting, Gaussian predictive likelihood, and
+unknown-person EEG discrimination are different
+regularisation objectives. We examine how a validation
+estimand mismatch affects cross-subject conclusions,
+and whether correcting or more precisely optimising
+the source criterion improves transfer.
+
+\textbf{Methods:}
+A source-fitted tangent-space LDA pipeline is evaluated
+under participant-grouped, zero-target-information
+selection. We audit a historically labelled
+covariance-NLL criterion, distinguish its
+validation-class-centred score from true
+source-mean predictive likelihood, and decompose
+their exact difference into common-location,
+score-orthogonal, and discriminant-aligned
+class-mean shifts. Frozen positive, negative and
+post-outcome source-only evidence is kept separate.
+
+\textbf{Results:}
+A prospectively frozen EEGMMIDB block (20 people)
+showed a $+0.0561$ AUC gain for source-discrimination
+selection over the historical class-centred score
+(Holm $p=0.00597$), with five materially harmed
+participants. In source-validation analyses of
+Cho2017, Dreyer2023A and native-montage
+BNCI2014\_002, respectively, 98.59\%,
+99.29\% and 99.77\% of the corrected
+predictive-score mean-shift gap was attributable
+to components invariant to the tested fixed
+classifier's within-person AUC. These
+three mechanism analyses were \emph{post-outcome}.
+A ten-person protocol-first Weibo2014 test found
+identical held-person AUC for continuous and
+27-point source selection (0.73141).
+A 40-person Cho2017 sequential follow-up
+gave an essentially zero overall source-envelope
+gain ($-0.000053$ AUC), not a superior decoder.
+
+\textbf{Conclusion:}
+A mathematically proper Gaussian likelihood
+can still primarily measure variation irrelevant
+to an EEG discriminant's within-person ranking.
+Correct estimands, source-selection information
+boundaries and individual harms are central;
+the tested more elaborate source-only selectors
+have not shown stable transfer superiority.
+\end{abstract}
