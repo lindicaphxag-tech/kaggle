@@ -1,0 +1,93 @@
+name: DefaultReg V32 immutable Dreyer 12 held target independent audit
+on:
+  push:
+    branches: [research/defaultreg-v32-noise-debiased-contrast-20261013]
+    paths: ['.github/workflows/defaultreg-v32-independent-dreyer-audit.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit-only-no-retraining:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy
+      - name: Download COMPLETED immutable real held participant results
+        uses: actions/download-artifact@v4
+        with:
+          name: defaultreg-v32-Dreyer-retry-exact-source-sha-all-held
+          run-id: 38300422475
+          github-token: ${{ github.token }}
+          path: /tmp/v32-dreyer-locked
+      - name: Recompute every method/person and all exact paired signs
+        run: |
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          import numpy as np
+          root=Path('/tmp/v32-dreyer-locked')
+          a=list(root.rglob('V32_DREYER_SOURCE_CHOICES_LOCKED_BEFORE_TARGET.json'))
+          b=list(root.rglob('V32_DREYER_NEW_ACQUISITION_ALL_HELD_RESULTS.json'))
+          assert len(a)==len(b)==1,(a,b)
+          source=json.loads(a[0].read_bytes());result=json.loads(b[0].read_bytes())
+          h=hashlib.sha256(a[0].read_bytes()).hexdigest()
+          original='9bfc60e1da10575315917aa6662532198a892dfa99f045341bb71adde58a04b9'
+          assert result["source_choices_sha256"]==h==original
+          assert source["source_ids"]==list(range(1,13))
+          assert source["target_ids_unread"]==list(range(13,25))
+          choices=source["selected_choices"]
+          assert choices["new_risk_operator"]=={"lambda":0.1,"alpha":0.0}
+          assert choices["risk_scalar_ablation"]==choices["new_risk_operator"]
+          assert choices["proper_predictive_nll"]==choices["new_risk_operator"]
+          assert choices["source_macro_original"]=={"lambda":0.3,"alpha":0.0}
+          assert choices["mean_operator_ablation"]==choices["source_macro_original"]
+          assert source["operator_source_geometry"]["selected_matrix_operator_nontrivial"] is False
+          r=sorted(result["all_held_person_outcomes"],key=lambda z:z["subject"])
+          assert [x["subject"] for x in r]==list(range(13,25))
+          methods=list(r[0]["auc"].keys())
+          assert all(set(x["auc"])==set(methods) for x in r)
+          assert all(0<=x["auc"][m]<=1 for x in r for m in methods)
+          assert all(x["trials"]>=40 for x in r)
+          means={m:float(np.mean([x["auc"][m] for x in r])) for m in methods}
+          for key in methods:
+              assert abs(means[key]-result["macro_auc_by_method"][key])<1e-12
+          for x in r:
+              assert x["auc"]["new_risk_operator"]==x["auc"]["risk_scalar_ablation"]
+              assert x["auc"]["new_risk_operator"]==x["auc"]["proper_predictive_nll"]
+              assert x["auc"]["source_macro_original"]==x["auc"]["mean_operator_ablation"]
+          d=np.array([x["auc"]["new_risk_operator"]-x["auc"]["source_macro_original"] for x in r])
+          assert np.allclose(d,[x["primary_delta"] for x in r])
+          assert abs(float(d.mean())-result["mean_primary_delta_new_matrix_risk_minus_original_scalar_macro"])<1e-12
+          sign=1-2*((np.arange(1<<12,dtype=np.uint32)[:,None]
+                  >>np.arange(12,dtype=np.uint32))&1).astype(np.int8)
+          p=float(np.mean(np.abs(sign@d)>=abs(float(d.sum()))-1e-12))
+          assert abs(p-result["exact_two_sided_group_signflip_p"])<1e-12
+          boot=d[np.random.default_rng(20261013).integers(0,12,(20000,12))].mean(axis=1)
+          ci=np.quantile(boot,[.025,.975]).tolist()
+          assert np.allclose(ci,result["descriptive_person_bootstrap95"],atol=1e-12)
+          assert int((d<-.020000000001).sum())==result["n_harmed_gt_002"]
+          assert int((d>.020000000001).sum())==result["n_benefited_gt_002"]
+          print("V32_DREYER_IMMUTABLE_INDEPENDENT_AUDIT_PASS",h)
+          print("V32_DREYER_FIXED_METHOD_MACRO_AUC",json.dumps(means,sort_keys=True))
+          print("V32_DREYER_SCIENTIFIC_HARD_GATE",json.dumps({
+            "selected_alpha":0.,
+            "novel_operator_selected":False,
+            "original_scalar_macro_auc":means["source_macro_original"],
+            "risk_scalar_auc":means["new_risk_operator"],
+            "paired_mean_delta":float(d.mean()),"bootstrap_95":ci,
+            "exact_two_sided_signflip_p":p,
+            "harm_gt_002":int((d<-.020000000001).sum()),
+            "n_pos":int((d>1e-12).sum()),
+            "n_neg":int((d< -1e-12).sum()),
+            "target_people":12,
+            "target_trials":result["n_held_trials"],
+            "promotion":"FAIL",
+          },sort_keys=True))
+          print("V32_DREYER_SIGNED_HELD12",json.dumps([
+              {"subject":x["subject"],"delta":float(z)}
+              for x,z in zip(r,d)],sort_keys=True))
+          PY
