@@ -1,0 +1,44 @@
+\subsection{Conditional continuous-search benchmark and a negative certification result}
+\label{sec:v23-source-search-pilot}
+The V23 source-only continuous-search pilot used exactly the
+first outer pool of BNCI2014\_002, retaining 13 held
+\emph{source} people, the original covariance/tangent-LDA
+models, and a fixed $[0.05,0.95]$ feasible-search range.
+After five interval splits with
+$\epsilon=0.02$ source-macro-AUC target tolerance,
+the original frozen 27-grid source-macro selector achieved
+$0.79397$ AUC. The best lambda actually evaluated by
+the continuous search achieved $0.79296$ source AUC.
+The initial interval enclosure left a global source-macro
+AUC upper bound of $0.88773$, or residual optimality
+gap $0.09477$, so \emph{no certificate was issued}.
+
+To address excessive conservatism, we subsequently
+intersected the monotone spectral bounds with an
+enclosing second-order Taylor interval; this is
+\emph{post-pilot mathematical refinement}, not an
+independent prospective validation. With the same
+five-split budget, the source-macro upper bound fell
+to $0.87939$, but the remaining optimality gap of
+$0.08643$ still exceeded the declared tolerance.
+The empirical selected-source AUC did \emph{not}
+improve, and the method honestly remained inconclusive.
+The refinement improves tightness on this example,
+not target-person generalisation.
+
+\begin{table}[tb]
+\centering\small
+\caption{Real BNCI2014\_002 held-source continuous search,
+one outer training pool, five interval splits.
+Source-validation only; not a new TARGET result.}
+\label{tab:v23-source-search}
+\begin{tabular}{lrr}
+\toprule
+Source-only operation & Empirical AUC & Upper residual gap\\
+\midrule
+Original 27-grid macro selector & 0.79397 & ---\\
+Spectral interval, five splits & 0.79296 & 0.09477\\
+Spectral $+$ Taylor, five splits & 0.79296 & 0.08643\\
+\bottomrule
+\end{tabular}
+\end{table}
