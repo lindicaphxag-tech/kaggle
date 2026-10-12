@@ -1,4 +1,4 @@
-name: DefaultReg V22 real held-source EEG rank-transition audit
+name: DefaultReg V22 all-outer source-only EEG rank-transition audit
 on:
   push:
     branches:
@@ -10,7 +10,7 @@ on:
 permissions:
   contents: read
 jobs:
-  source-only-bnci14-first-person:
+  source-only-bnci14-all-persons:
     runs-on: ubuntu-latest
     timeout-minutes: 110
     env:
@@ -29,26 +29,28 @@ jobs:
         run: |
           python -m py_compile research/defaultreg_proper_predictive/original_frozen_runner.py research/defaultreg_bspc_v13/src/run_real_source_rank_v22.py research/defaultreg_bspc_v13/src/source_rank_churn_v22.py
           python -m unittest discover -v -s research/defaultreg_bspc_v13/tests -p 'test_source_rank_churn_v22.py'
-      - name: Execute source-only BNCI2014_002 outer-person-1 diagnostic WITHOUT using held-target labels
+      - name: Execute all 14 BNCI2014_002 source-only outer pools WITHOUT held-target labels
         run: |
           mkdir -p "$MNE_DATA" /tmp/defaultreg-v22
-          python research/defaultreg_bspc_v13/src/run_real_source_rank_v22.py --dataset BNCI2014_002 --outer-person 1 --out /tmp/defaultreg-v22/BNCI2014_002_outer1_source_only.json
+          python research/defaultreg_bspc_v13/src/run_real_source_rank_v22.py --dataset BNCI2014_002 --outer-person all --out /tmp/defaultreg-v22/BNCI2014_002_all_outer_source_only.json
           python - <<'PY'
           import json
           from pathlib import Path
-          p=Path('/tmp/defaultreg-v22/BNCI2014_002_outer1_source_only.json')
+          p=Path('/tmp/defaultreg-v22/BNCI2014_002_all_outer_source_only.json')
           d=json.loads(p.read_text())
-          assert d['status']=='SOURCE_ONLY_POSTHOC_MECHANISM_NOT_PROSPECTIVE_EFFECT'
-          assert d['n_participants']==d['source_participant_count']==13
-          assert d['held_target_labels_used_in_this_diagnostic'] is False
-          assert d['analysis_scope']=='source_validation'
-          assert abs(d['macro_auc_delta_exact']-(d['macro_auc_after']-d['macro_auc_before']))<1e-12
-          print('PASS_V22_REAL_SOURCE_RANK_DIAGNOSTIC_BNCI2014_002_OUTER1')
+          assert d['status']=='SOURCE_ONLY_ALL_OUTER_MECHANISM_COMPLETE_POSTHOC'
+          assert d['n_outer_pools']==14 and len(d['source_pool_results'])==14
+          assert all(q['n_participants']==q['source_participant_count']==13 for q in d['source_pool_results'])
+          assert d['no_target_outcomes_or_target_tuning'] is True
+          assert all(q['held_target_labels_used_in_this_diagnostic'] is False for q in d['source_pool_results'])
+          assert all(q['analysis_scope']=='source_validation' for q in d['source_pool_results'])
+          assert all(abs(q['macro_auc_delta_exact']-(q['macro_auc_after']-q['macro_auc_before']))<1e-12 for q in d['source_pool_results'])
+          print('PASS_V22_REAL_SOURCE_RANK_DIAGNOSTIC_BNCI2014_002_ALL14')
           PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: defaultreg-v22-real-source-rank-bnci002-outer1-posthoc
+          name: defaultreg-v22-real-source-rank-bnci002-all14-posthoc
           path: /tmp/defaultreg-v22/**
           if-no-files-found: warn
           retention-days: 90
