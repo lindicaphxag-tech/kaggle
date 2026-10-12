@@ -92,7 +92,8 @@ def reconstruct(report):
         "n_exact_epoch_unique_contents":report["n_unique_exact_epoch_contents"],
         "n_distinct_epoch_safe_recording_groups":len(groups),
         "epoch_components":groups,
-        "shared_epoch_edges":edge_map,
+        "shared_epoch_edges":[{"subject_a":a,"subject_b":b,"shared_unique_epoch_contents":n}
+                              for (a,b),n in sorted(edge_map.items())],
         "recording_representatives":representatives,
         "all_held_group_source_splits":folds,
         "not_physically_target_isolated":True,
@@ -117,7 +118,7 @@ def verify_with_purged(v28, purged_zip):
         raise AssertionError("full-record groups miss partial exact-epoch links; must re-fit")
     by_fold={int(c["target_recording_representative"]):c for c in choices}
     outcomes_by_target={int(z["representative_recording"]):z for z in outcomes["target_outcomes"]}
-    if (len(by_fold) != len(outcomes_by_target) != len(v28["all_held_group_source_splits"])):
+    if not (len(by_fold) == len(outcomes_by_target) == len(v28["all_held_group_source_splits"])):
         raise AssertionError("inconsistent held recording denominator")
     if set(by_fold)!=set(v28["recording_representatives"]) or set(outcomes_by_target)!=set(by_fold):
         raise AssertionError("missing a held source group")
