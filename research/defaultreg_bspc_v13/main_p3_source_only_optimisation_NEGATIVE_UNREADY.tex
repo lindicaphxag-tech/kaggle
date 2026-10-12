@@ -1,0 +1,219 @@
+% PAPER 3 CONDITIONALLY PREPARED / NOT SUBMISSION READY.
+% These are different source policies in different cohorts and should NEVER
+% be pooled as a single algorithm's preregistered replication.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=0.93in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,booktabs,graphicx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{lmodern}
+\title{Source-Only Optimisation Does Not Certify Unseen-Person EEG Transfer:\\
+Four Precommitted or Sequential Falsification Studies}
+\author{AUTHORS, AFFILIATIONS, AND CONTRIBUTIONS TO BE VERIFIED}
+\date{}
+\begin{document}
+\maketitle
+\begin{abstract}
+\textbf{Objective.} Can increasingly precise or structured source-only
+regularisation optimization improve unknown-participant EEG decoding
+without access to target signals or labels?
+\textbf{Approach.} We retain a case series of separately executed
+source-locked protocols, using the original participant-grouped
+27-point shrinkage LDA as a reference, and distinguish a
+continuous source optimizer, a source-contrast envelope (SCE),
+an anisotropic covariance proposal and a classical
+group-centred discriminant operator. Individual and
+group-mean ROC-AUC changes, exact source-freezing evidence
+and mathematical degeneration are recorded without pooling
+dissimilar algorithms as if they were a single policy.
+\textbf{Results.} On Weibo2014 (10 people) the continuous
+choice was identical to the original grid (both 0.731405 macro
+ROC-AUC). Cho2017 (40 target people) gave a pooled SCE-minus-grid
+difference of $-0.00005264$, with SCE selecting the fixed-full-shrinkage
+endpoint, invalidating a nondegenerate novel-operator claim.
+The Dreyer2023A anisotropic design selected zero anisotropy
+and differed from the baseline by $-0.001088$ ROC-AUC on 12 people.
+A separate pre-target Lee2019 group-centred estimator selected
+$\lambda=0.15$ versus original $0.4$ and had source-forecast
+NEGATIVE; its first untouched 12-person block yielded
+$-0.003933$ AUC (exact two-sided paired sign-flip $p=0.1289$).
+A planned second Lee block did not produce interpretable
+outcomes, because a bitwise source-covariance SHA check rejected
+the separately run setup BEFORE accessing target data.
+\textbf{Conclusions.} Source-criterion optimization and
+invariance of a feature operator are not evidence of
+positive target-person benefit. This series motivates
+a falsifiable zero-target model-selection benchmark rather
+than a claim of a superior decoder.
+\end{abstract}
+\noindent\textbf{Keywords:} EEG; motor imagery; transfer;
+source-only model selection; negative results;
+domain-shift generalisation; reproducing frozen protocols.
+
+\section{Introduction}
+Covariance-shrinkage and Riemannian tangent decoding have
+long been established for EEG signals
+\cite{barachant2012,jayaram2018moabb}.
+Higher-precision optimisation over a source-only criterion
+is not guaranteed to deliver transfer improvements when the
+target distribution is unknown. Evidence on incorrect
+EEG evaluation units \cite{gil2026subjectvalidation} and
+multi-paradigm subject normalization
+\cite{qin2026spatialnorm} motivates explicit distinctions
+between source-policy optimization and target outcome.
+Unlike the related estimand-mismatch study (P1),
+the outcome here is the realised, pre-target-frozen
+selection/action of each concrete candidate algorithm.
+The four tested operators, however, were not
+precommitted as one hypothesis family, and their source
+cohorts and targets differ; this limits general conclusions.
+
+\section{Materials and methods}
+\subsection{Zero-target source selection and fixed score family}
+All target-agnostic models train on known source EEG.
+Original comparison for each study is the same
+27-point source-macro AUC-selected scalar pooled-LDA
+path with source-only tangent geometry.
+The original scalar shrinkage family is
+$A_{\lambda}=(1-\lambda)S+\lambda\operatorname{tr}(S)I/p$;
+candidate procedures modify the choice of $\lambda$,
+source uncertainty objective, or covariance/contrast
+definition. No target EEG feature moments or target labels
+enter the reported SOURCE selection. Nonidentical
+candidate methods are not treated as one shared
+algorithm and no formal cross-cohort combined $p$-value
+is calculated.
+
+\subsection{Precision and source-contrast families}
+The Weibo2014 acquisition tested a finite 27-point
+source-macro selector against continuous source criterion
+optimization, using the same C3/Cz/C4 EEG feature
+pipeline. Cho2017 tested a pre-data source-contrast
+envelope against the same original source-macro grid,
+followed by a reserved group without parameter updates.
+The second Cho block was protocolized AFTER seeing
+the first-block results, so its inferential status is
+sequential-exploratory. The Dreyer noise-debiased
+covariance-contrast method selected its anisotropy
+parameter on source people; $\alpha=0$ corresponds
+to the original scalar family.
+
+\subsection{Source-group nuisance invariance}
+Let $\mu_{gc}$ be each source person's class mean.
+A further classical within-group operator uses
+\[
+ W={\sum_{g,c}\sum_{i\in(g,c)}
+ (x_i-\mu_{gc})(x_i-\mu_{gc})^\top\over N-2G},
+ \quad
+ d_{\rm eq}={1\over G}\sum_g(\mu_{g1}-\mu_{g0}).
+\]
+For an arbitrary common translation applied to
+each source participant in FIXED feature coordinates,
+both $W$ and $d_{\rm eq}$ stay unchanged. This is
+standard within-group discriminant analysis,
+not a new generalization theorem, nor invariance
+to refitting a nonlinear EEG reference.
+
+On Lee2019\_MI, source IDs 1--12,
+target A=13--24, and reserved B=25--36
+were defined before data access. Using grouped
+source macro-AUC, a positive transfer forecast
+required paired GID--original source mean difference
+$\geq 0.005$ AND at least 8/12 source positives.
+A SHA-256 lock on the entire original source-only
+manifest is mandatory before reading any target,
+even in repeated workflows. No positive forecast
+was generated, and an attempted B run stopped
+after reproducing divergent byte-level source
+covariance signatures before opening B.
+
+\section{Real-data outcomes and limits}
+\begin{table}[ht]
+\centering\small
+\caption{Previously executed source-locked
+EEG experiments. Each row tests a DIFFERENT
+algorithm/acquisition. Changes are target
+macro ROC-AUC versus that row's frozen
+source-macro original grid, not accuracy
+percentage points or independent
+replications of a single method.}
+\begin{tabular}{p{.25\linewidth}rcc}
+\toprule
+Study / candidate & Held groups & $\Delta$ AUC & Status\\
+\midrule
+Weibo2014 continuous & 10 & $0.000000$ & Equal model\\
+Cho2017 SCE / grid & 40 & $-0.00005264$ & Sequential block\\
+Dreyer2023A $\alpha$ & 12 & $-0.001088$ & $\alpha=0$\\
+Lee2019 GID / original A & 12 & $-0.003933$ & $p=0.1289$\\
+Lee2019 GID / original B & 12 planned & -- & SHA halted\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The original Weibo grid and source-continuous
+choice each yielded $0.731405$ macro-AUC on
+all ten people, selecting identical shrinkage
+values for all source pools. On the first
+Cho2017 block, source-envelope minus original
+was $+0.003395$ AUC (exact paired $p=0.0931$);
+the next 20 held people showed $-0.003500$
+and all 40 combined were approximately equal,
+but not a predeclared independent 40-person test.
+The upper source-envelope choice was
+$\lambda=1$, making scores rank-equivalent
+to a trivial isotropic/full-shrinkage endpoint.
+Dreyer's new anisotropic $\alpha$ was selected
+at exactly zero and was not a nondegenerate
+transfer improvement. The 12-person
+Lee2019 held A main comparison was original
+$0.754100$, GID $0.750167$ and CSP(3)+LR
+$0.751767$; zero persons experienced a
+loss exceeding 0.02 AUC relative to original.
+The Lee B execution failed a strict source-lock
+reproducibility check prior to opening target
+EEG. No B target AUC is reported.
+
+\section{Discussion}
+This is currently an exploratory study with
+a meaningful aggregation threat: it combines
+different methods, targets and chronology.
+The result does not establish a universal
+limit on source-only domain generalization.
+A future stand-alone comparative evaluation
+requires ALL candidates selected on the
+SAME precommitted shared source/target
+cohort matrix and the same information budget,
+and an operational measurement such as
+source-to-target ranking regret or selection
+error rate. New acquisitions must be allocated
+at the study level to avoid treating previously
+exposed outcome data as confirmations.
+Stricter source artifact locking needs
+deterministic serialized feature releases
+if raw-batch covariance calculations are
+not bitwise stable between identical runs.
+
+\section{Conclusion}
+Across these distinct attempts, no
+nondegenerate new algorithm has established
+reproducible positive unseen-person benefit
+over the original source-macro scalar LDA.
+This result is an engineering
+and research agenda, NOT an independently
+registered negative-effect finding or
+a new accuracy state of the art.
+All P1 source-score geometry and P2 clinical
+record-identity findings remain
+separate scientific claims.
+
+\section*{Statements and Declarations}
+\textbf{Data/code:} Source-locked GitHub experiment receipts
+exist, but a stand-alone reproducibility release and
+new matched, independent-acquisition evaluation
+are required before a journal submission.
+\textbf{Authorship, IRB/secondary data rights,
+funding, competing interests and AI use:}
+To be checked by actual authors.
+\bibliographystyle{unsrt}
+\bibliography{references_v10}
+\end{document}
