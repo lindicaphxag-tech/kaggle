@@ -50,6 +50,26 @@ jobs:
           assert a['new_confirmatory_test_performed'] is False
           print('V18_ORIGINAL_AND_CORRECTED_PREDICTIVE_EEG_SCORES_PASS')
           PY
+      - name: Download original and real 14-person BNCI predictive comparator archives
+        run: |
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11675156650/zip > /tmp/BNCI-original.zip
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11722553787/zip > /tmp/BNCI-proper-predictive.zip
+          echo '15137db055b54983c297d28b93e714836ff3711888c35bcdd3640eba05b1a6e1  /tmp/BNCI-original.zip' | sha256sum -c
+          echo 'b4f583d63997d69d2f405c915ca9ca8eef8e623a4443e98b1634399d7d4f421b  /tmp/BNCI-proper-predictive.zip' | sha256sum -c
+      - name: Independently verify second real EEG cohort on all 14 original folds
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          python src/verify_v18_bnci_corrected_predictive.py /tmp/BNCI-original.zip /tmp/BNCI-proper-predictive.zip --out v18_bnci14_independent_proper_audit.json
+          python - <<'PY'
+          import json
+          j=json.load(open('v18_bnci14_independent_proper_audit.json'))
+          assert j['status']=='PASS_BNCI14_ORIGINAL_AND_REAL_PROPER_EEG_SOURCE_SCORE_AUDIT'
+          assert j['participants']==14 and j['positive_SOURCE_penalties']==14
+          assert abs(j['source_macro_minus_proper_auc']-0.00681919642857142)<1e-12
+          assert abs(j['proper_minus_centered_auc']-0.0107700892857143)<1e-12
+          assert j['new_confirmatory_test'] is False
+          print('V18_SECOND_EEG_COHORT_REAL_PROPER_NLL_AUDIT_PASSED')
+          PY
       - name: Verify exact between-person mean-shift decomposition on 300 SPD examples
         working-directory: research/defaultreg_bspc_v13
         run: python src/predictive_minus_centered_identity_v17.py | tee v18_exact_identity_regression.json
@@ -74,5 +94,6 @@ jobs:
             research/defaultreg_bspc_v13/main_bspc_v18_DRAFT.log
             research/defaultreg_bspc_v13/main_bspc_v18_DRAFT.bbl
             research/defaultreg_bspc_v13/v18_independent_proper_audit.json
+            research/defaultreg_bspc_v13/v18_bnci14_independent_proper_audit.json
             research/defaultreg_bspc_v13/v18_exact_identity_regression.json
           retention-days: 90
