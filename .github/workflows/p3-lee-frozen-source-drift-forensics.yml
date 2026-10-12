@@ -1,0 +1,80 @@
+name: P3 Lee2019 source fingerprint drift non-target forensic audit
+on:
+  push:
+    branches: [publication/default-eeg-p3-transfer-negative-20261013]
+    paths: ['.github/workflows/p3-lee-frozen-source-drift-forensics.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  two-immutable-source-manifests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: actions/download-artifact@v4
+        with:
+          name: defaultreg-Lee2019-first-source-only-frozen-12-SHA
+          run-id: 38305991164
+          github-token: ${{ github.token }}
+          path: /tmp/source_original
+      - uses: actions/download-artifact@v4
+        with:
+          name: defaultreg-Lee2019-first-source-sha-verified-untouched-held-B
+          run-id: 38306653777
+          github-token: ${{ github.token }}
+          path: /tmp/source_halted
+      - name: Inspect identical source-only scientific selections and all individual source covariance fingerprints
+        run: |
+          python - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          roots=['/tmp/source_original','/tmp/source_halted']
+          files=[]
+          for root in roots:
+            files0=list(Path(root).rglob('LEE2019_S1_SOURCE12_IMMUTABLE_CHOICES.json'))
+            assert len(files0)==1,(root,files0)
+            files.append(files0[0])
+          b=[f.read_bytes() for f in files]
+          x,y=[json.loads(z) for z in b]
+          dig=[hashlib.sha256(z).hexdigest() for z in b]
+          assert dig[0]=='27efc2565d5bc2bc22344b67ee994e42b985c16c34cabf6cdf55136270fa18f3'
+          assert dig[0]!=dig[1]
+          assert x['source_ids']==y['source_ids']==list(range(1,13))
+          assert x['target_A_UNREAD']==y['target_A_UNREAD']==list(range(13,25))
+          assert x['target_B_UNREAD']==y['target_B_UNREAD']==list(range(25,37))
+          orig=x['source_trial_receipts'];again=y['source_trial_receipts']
+          assert len(orig)==len(again)==12
+          changed=sum(a['covariance_sha256']!=b['covariance_sha256']
+                      for a,b in zip(orig,again))
+          assert changed==12
+          flags={}
+          for key in x:
+            if key=='source_trial_receipts':continue
+            if key=='nuisance_cov_between_fraction':
+              flags[key]={'original':x[key],'rerun':y[key],'absolute_diff':abs(x[key]-y[key])}
+            else:
+              flags[key+'_identical']=x[key]==y[key]
+          assert all(v is True for k,v in flags.items() if k.endswith('_identical'))
+          out={'status':'DIFFERENT_SOURCE_COVARIANCE_BYTES_NO_TARGET_B_ACCESSED',
+               'original_sha':dig[0],'rerun_sha':dig[1],
+               'changed_source_covariance_hash_count':changed,
+               'source_person_count':12,
+               'identical_source_policy_and_choices':True,
+               'floating_aggregate_difference':flags['nuisance_cov_between_fraction'],
+               'one_bitwise_source_lock_still_FAILED':True,
+               'target_B_not_measured':True,
+               'cannot_infer_if_drift_was_only_float_rounding_without_source_arrays':True,
+               'no_sha_relaxation_permitted':True}
+          outp=Path('/tmp/p3-source-only-lee-forensic-summary.json')
+          outp.write_text(json.dumps(out,sort_keys=True,indent=2)+'\n')
+          print('P3_FROZEN_SOURCE_SCIENTIFIC_CHOICES_PARITY_BUT_RAW_FP_SHA_DRIFT_CONFIRMED',json.dumps(out,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: defaultreg-P3-pretarget-Lee-original-vs-halted-forensic-evidence
+          path: /tmp/p3-source-only-lee-forensic-summary.json
+          retention-days: 90
