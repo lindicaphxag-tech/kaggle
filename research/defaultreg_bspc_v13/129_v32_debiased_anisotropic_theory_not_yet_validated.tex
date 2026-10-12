@@ -1,0 +1,133 @@
+% V32 standalone theoretical method note, no real target outcomes included yet.
+% Not a BSPC accepted method and not independently registered.
+\section{Finite-source contrast uncertainty as a regularisation operator}
+\label{sec:v32-theory}
+\paragraph{Hypothesis and prior art.}
+Anisotropic regularisation, discriminant analysis, random-effects
+variance components and source-domain generalisation have substantial
+prior literature. Our specific falsifiable construction combines
+source-participant contrast variance \emph{deconvolved for finite
+within-person trial noise} with the \emph{same} fixed
+EEG pooled-LDA classifier, and tests whether the resulting matrix
+operator predicts performance shifts under source-only selection.
+We do not claim this combination is independently novel until a
+thorough literature review and new EEG benefit are established.
+A complementary research question is whether the observed
+between-person dispersion represents physical discriminant-direction
+shift or is predominantly the variance of noisy estimated contrasts.
+
+\paragraph{Source-only estimation.}
+Let each independent source recording group $g=1,\dots,G$
+contain class-specific trials with means
+$\widehat\mu_{g0},\widehat\mu_{g1}$ and class covariance
+$\widehat\Sigma_{gc}$. Define the estimated class contrast
+$\widehat d_g=\widehat\mu_{g1}-\widehat\mu_{g0}$
+and sampling-noise variance estimate
+\[
+  \widehat V_g=
+  {\widehat\Sigma_{g0}\over n_{g0}}+
+  {\widehat\Sigma_{g1}\over n_{g1}},\qquad
+  \widehat B_{\rm obs}=\operatorname{Cov}_g(\widehat d_g).
+\]
+The proposed heterogeneity matrix is
+\[
+  \widehat B_{\rm debias}=
+  \Pi_{\mathbb S_+}\left(
+       \widehat B_{\rm obs}-{1\over G}\sum_g\widehat V_g
+                       \right)
+\]
+with $\Pi_{\mathbb S_+}$ denoting the standard eigenvalue-wise
+positive semidefinite projection. The source-only operator is
+\[
+ \boxed{\quad
+ w_{\lambda,\alpha}=
+  \left[(1-\lambda)\widehat S_{\rm pooled}
+        +\lambda\nu I+\alpha\widehat B_{\rm debias}
+  \right]^{-1}\widehat d_{\rm pooled},
+ \quad \nu={\operatorname{tr}(\widehat S_{\rm pooled})\over p}.
+ \quad}
+\]
+The original EEG pipeline is recovered EXACTLY when $\alpha=0$;
+with $\widehat B_{\rm debias}=0$ it is identical for all $\alpha$.
+Conversely, a non-isotropic matrix may produce an oblique
+new direction even at $\lambda=1$ when $\alpha>0$,
+avoiding the V31 fixed-$\lambda=1$ endpoint degeneracy.
+This is a testable distinction, not a promise of an improvement.
+
+\paragraph{Proposition 1: sampling-noise decomposition.}
+Assume independent source-group sampling, unbiased class-mean
+estimates, finite second moments and uncorrelated zero-mean
+within-group estimation errors
+$\widehat d_g=d_g+\varepsilon_g$ with
+$\operatorname{Cov}(\varepsilon_g)=V_g$.
+Conditionally on the fixed group contrasts $d_1,\ldots,d_G$,
+\[
+  \mathbb E[\widehat B_{\rm obs}]
+  = B_{\rm actual} + {1\over G}\sum_g V_g,
+  \qquad
+  B_{\rm actual}={1\over G-1}\sum_g(d_g-\bar d)
+                                   (d_g-\bar d)^\top .
+\]
+Thus subtracting the average \emph{unprojected} mean-noise covariance
+is unbiased for $B_{\rm actual}$, provided the sample class
+covariance estimates are unbiased. Note that the PSD projection is
+nonlinear and introduces upward bias and potential direction changes.
+No finite-source posterior or target coverage follows from this
+identity, especially when $G$ is small compared with feature rank.
+
+\paragraph{Proposition 2: motivation under a random-effect Gaussian target.}
+Under \emph{additional assumptions} that target class-conditional
+features are Gaussian with shared known covariance $\Sigma\succ0$
+and random target class contrast $d_t\sim
+\mathcal N(\bar d,B)$ independent of the test noise,
+the unconditional expected target AUC of a fixed nonzero direction $w$
+is exactly
+\[
+ \mathbb E_{d_t}\bigl[\operatorname{AUC}_t(w)\bigr]
+  =\Phi\!\left(
+     {w^\top\bar d\over\sqrt{2w^\top\Sigma w+w^\top Bw}}\right).
+\]
+To see this, the target positive-minus-negative score is normal
+with conditional mean $w^\top d_t$ and conditional variance
+$2w^\top\Sigma w$; marginalizing the Gaussian $d_t$ adds
+$w^\top Bw$ to the variance. Maximizing its normalized mean
+gives the Fisher solution
+$w_{\rm rand}\propto(2\Sigma+B)^{-1}\bar d$,
+equivalently
+$(\Sigma+\tfrac12 B)^{-1}\bar d$.
+This is a classical Gaussian random-effects calculation, NOT a
+generalization theorem for real EEG. Our $\lambda=0,\alpha=0.5$
+special case resembles this reference only if
+$\widehat S_{\rm pooled}\simeq\Sigma$,
+$\widehat d_{\rm pooled}\simeq\bar d$, and
+$\widehat B_{\rm debias}\simeq B$.
+If target directions are not drawn from this family, it can be worse
+than scalar shrinkage.
+
+\paragraph{Source-only selection and falsification.}
+The frozen code evaluates every feasible original 27-point scalar
+$\lambda$ at $\alpha\in\{0,0.5,2\}$ on original round-robin
+grouped source folds, refitting tangent reference and all
+variance components within source fold training. It selects by
+group macro-AUC minus $0.25$ times the source-group AUC standard
+deviation. The unpenalized grouped source macro-AUC at
+$\alpha=0$ is reproduced bitwise to ordinary floating tolerance.
+We additionally report the risk-only scalar ablation and
+the best source mean-AUC matrix ablation. Source group CV
+is a heuristic: its standard deviation is not an uncertainty
+interval on unseen persons.
+
+\paragraph{Novelty disqualification and first external study.}
+The method fails its \emph{structural} novelty gate if it selects
+$\alpha=0$, if $\widehat B_{\rm debias}=0$, or if the selected
+direction remains parallel to the corresponding scalar-LDA
+direction. Its \emph{empirical} method-promotion gate is
+separately frozen in the Dreyer2023A protocol and requires
+a material paired improvement, valid sign-flip result and
+no increase in adverse held subjects.
+We retain the source-only controls, Riemannian MDM and
+tangent logistic regression under the same electrodes,
+plus full source choice SHA receipts before any held
+Dreyer2023A target access. A successful test on one
+collection would require independent-acquisition replication
+and a prior-art novelty review before any L8/L9 claim.

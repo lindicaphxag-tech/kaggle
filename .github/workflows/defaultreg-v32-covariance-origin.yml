@@ -1,0 +1,21 @@
+name: DefaultReg V32 covariance origin mechanism falsification
+on:
+  push:
+    branches: [research/defaultreg-v32-noise-debiased-contrast-20261013]
+    paths:
+      - '.github/workflows/defaultreg-v32-covariance-origin.yml'
+      - 'research/defaultreg_bspc_v13/src/pooled_eeg_origin_decomposition_v32.py'
+      - 'research/defaultreg_bspc_v13/tests/test_pooled_eeg_origin_decomposition_v32.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact-decomposition:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy scikit-learn pytest
+      - run: python -m pytest -q research/defaultreg_bspc_v13/tests/test_pooled_eeg_origin_decomposition_v32.py
