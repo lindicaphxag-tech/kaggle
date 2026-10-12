@@ -2,7 +2,11 @@ name: DefaultReg V31 focused BSPC evidence-gated manuscript
 on:
   push:
     branches: [research/defaultreg-contrast-envelope-20261013]
-    paths: ['.github/workflows/defaultreg-v31-bspc-evidence-paper.yml']
+    paths:
+      - '.github/workflows/defaultreg-v31-bspc-evidence-paper.yml'
+      - 'research/defaultreg_bspc_v13/main_bspc_v31_EVIDENCE_GATED_CANDIDATE.tex'
+      - 'research/defaultreg_bspc_v13/127_v31_CHO2017_REAL_FROZEN_NON_SIGNIFICANT.tex'
+      - 'research/defaultreg_bspc_v13/128_v31b_CHO40_REVERSED_NO_RETUNE.tex'
   workflow_dispatch:
 permissions:
   contents: read
