@@ -1,0 +1,60 @@
+name: DefaultReg V24 untouched Weibo2014 source-only first run
+on:
+  push:
+    branches: [research/defaultreg-v24-honest-selection-20261013]
+    paths:
+      - '.github/workflows/defaultreg-v24-first-external-weibo.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  public-external-weibo2014:
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MNE_DATA: /tmp/defaultreg-v24-weibo2014
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Pin original MOABB analysis family
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Strict protocol-first new EEG acquisition
+        run: |
+          python -m py_compile research/defaultreg_bspc_v13/src/run_new_weibo_v24.py
+          python -m unittest discover -v -s research/defaultreg_bspc_v13/tests -p 'test_v24_anchor_integrity.py'
+          mkdir -p "$MNE_DATA" /tmp/defaultreg-v24-weibo-result
+          python research/defaultreg_bspc_v13/src/run_new_weibo_v24.py --out /tmp/defaultreg-v24-weibo-result
+          python - <<'PY'
+          import json,hashlib,pathlib
+          p=pathlib.Path('/tmp/defaultreg-v24-weibo-result')
+          names=list(p.glob('WEIBO2014*.json'))
+          assert len(names)==2,names
+          source=p/'WEIBO2014_10_PERSON_SOURCE_ONLY_CHOICES_FROZEN_BEFORE_TARGET.json'
+          results=p/'WEIBO2014_10_PERSON_FIRST_RUN_EXTERNAL_TARGET_AUC.json'
+          j=json.loads(results.read_text())
+          choices=json.loads(source.read_text())
+          assert j['n_outer_people']==len(choices)==10
+          assert j['n_channels']==3 and j['n_tangent_features']==6
+          assert j['source_lambda_decisions_sha256_before_target']==hashlib.sha256(source.read_bytes()).hexdigest()
+          assert j['source_selector_ran_before_all_target_scores']
+          assert j['no_held_target_selected_parameter'] and j['all_people_retained']
+          assert set(int(r['held_outer_person']) for r in choices)==set(range(1,11))
+          assert set(int(r['held_person']) for r in j['per_person_target_outcomes'])==set(range(1,11))
+          assert all(r['source_fit_subjects_exclude_target'] for r in choices)
+          assert all(r['no_held_target_data_in_regularisation_selection'] for r in choices)
+          assert all(r['source_continuous_evaluated_auc']>=r['source_macro_grid_auc']-1e-10 for r in choices)
+          print('PASS_V24_WEIBO_FIRST_RUN_10_PEOPLE_SHA_LOCK_NOT_PREREGISTERED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-v24-Weibo2014-first-run-source-locked
+          path: |
+            /tmp/defaultreg-v24-weibo-result/**
+            research/defaultreg_bspc_v13/V24_WEIBO2014_PRE_OUTCOME_FIRST_RUN_PROTOCOL.md
+          if-no-files-found: warn
+          retention-days: 90

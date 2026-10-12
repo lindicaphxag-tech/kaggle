@@ -1,0 +1,54 @@
+name: DefaultReg V24 evidence-locked article build
+on:
+  push:
+    branches: [research/defaultreg-v24-honest-selection-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/**'
+      - '.github/workflows/defaultreg-v24-article-build.yml'
+  pull_request:
+    paths:
+      - 'research/defaultreg_bspc_v13/**'
+      - '.github/workflows/defaultreg-v24-article-build.yml'
+permissions:
+  contents: read
+jobs:
+  v24-draft:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: install scientific typesetting
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-pictures texlive-fonts-recommended lmodern poppler-utils
+      - name: Evidence-gated V24 manuscript compile
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_bspc_v24_EVIDENCE_DRAFT.tex
+          test -s main_bspc_v24_EVIDENCE_DRAFT.pdf
+          pdftotext main_bspc_v24_EVIDENCE_DRAFT.pdf /tmp/v24.txt
+          grep -q '0.79397' /tmp/v24.txt
+          grep -q '0.01623' /tmp/v24.txt
+          grep -q '0.77714' /tmp/v24.txt
+          if grep -Eq 'Undefined control sequence|Citation.*undefined|multiply defined' main_bspc_v24_EVIDENCE_DRAFT.log; then exit 3; fi
+          pdfinfo main_bspc_v24_EVIDENCE_DRAFT.pdf | grep Pages
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_bspc_v24_CONCISE_SUBMISSION_CANDIDATE.tex
+          test -s main_bspc_v24_CONCISE_SUBMISSION_CANDIDATE.pdf
+          pdftotext main_bspc_v24_CONCISE_SUBMISSION_CANDIDATE.pdf /tmp/v24_concise.txt
+          grep -q '0.731405' /tmp/v24_concise.txt
+          grep -q '0.01623' /tmp/v24_concise.txt
+          if grep -Eq 'Reference.*undefined|Citation.*undefined|Undefined control sequence|multiply defined' main_bspc_v24_CONCISE_SUBMISSION_CANDIDATE.log; then exit 3; fi
+          pdfinfo main_bspc_v24_CONCISE_SUBMISSION_CANDIDATE.pdf | grep Pages
+      - uses: actions/upload-artifact@v4
+        with:
+          name: defaultreg-v24-source-target-gap-evidence-locked-PDF
+          path: |
+            research/defaultreg_bspc_v13/main_bspc_v24_EVIDENCE_DRAFT.pdf
+            research/defaultreg_bspc_v13/main_bspc_v24_EVIDENCE_DRAFT.log
+            research/defaultreg_bspc_v13/main_bspc_v24_EVIDENCE_DRAFT.bbl
+            research/defaultreg_bspc_v13/main_bspc_v24_CONCISE_SUBMISSION_CANDIDATE.pdf
+            research/defaultreg_bspc_v13/main_bspc_v24_CONCISE_SUBMISSION_CANDIDATE.log
+          if-no-files-found: error
+          retention-days: 90

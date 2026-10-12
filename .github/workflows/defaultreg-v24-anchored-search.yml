@@ -1,0 +1,65 @@
+name: DefaultReg V24 anchored source selection and audit
+on:
+  push:
+    branches: [research/defaultreg-v24-honest-selection-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/**'
+      - '.github/workflows/defaultreg-v24-anchored-search.yml'
+  pull_request:
+    paths:
+      - 'research/defaultreg_bspc_v13/**'
+      - '.github/workflows/defaultreg-v24-anchored-search.yml'
+permissions:
+  contents: read
+jobs:
+  scientific-unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --quiet numpy
+      - name: Run V24 baseline and continuous certificate tests
+        run: |
+          python -m unittest discover -v -s research/defaultreg_bspc_v13/tests -p 'test_v24_anchor_integrity.py'
+          python -m unittest discover -v -s research/defaultreg_bspc_v13/tests -p 'test_certified_continuous_selector_v23.py'
+          python -m unittest discover -v -s research/defaultreg_bspc_v13/tests -p 'test_spectral_path_certificate_v23.py'
+  real-source-matched:
+    runs-on: ubuntu-latest
+    timeout-minutes: 95
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MNE_DATA: /tmp/defaultreg-v24-eeg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Install exact original public EEG environment
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Compute the honest full-grid-anchored source-EEG result
+        run: |
+          mkdir -p "$MNE_DATA" /tmp/defaultreg-v24
+          python research/defaultreg_bspc_v13/src/run_real_certified_search_v23.py --outer-person 1 --low .05 --high .95 --max-splits 5 --out /tmp/defaultreg-v24/BNCI002_outer1_grid_anchored_source_search.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/defaultreg-v24/BNCI002_outer1_grid_anchored_source_search.json').read_text())
+          assert d['status']=='REAL_SOURCE_ONLY_CONTINUOUS_SEARCH_NOT_TARGET_CONFIRMATION'
+          assert d['source_participants']==13
+          assert d['anchor_grid_selected_pre_target_data']
+          assert d['original_grid_inside_search_interval']
+          assert d['source_only_improvement_over_original_grid'] >= -1e-12
+          assert d['no_outer_target_scores_or_labels_used']
+          assert d['best_evaluated_source_macro_auc']<=d['upper_bound_global_continuous_source_macro_auc']+1e-12
+          print('PASS_V24_ANCHORED_REAL_SOURCE_GRID_FAIR_COMPARATOR')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-v24-honest-grid-anchored-source-EEG
+          path: /tmp/defaultreg-v24/**
+          if-no-files-found: warn
+          retention-days: 90

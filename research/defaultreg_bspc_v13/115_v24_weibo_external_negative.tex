@@ -1,0 +1,92 @@
+\subsection{Independent-acquisition Weibo2014 source-locked test: no gain from finer optimisation}
+\label{sec:v24-weibo}
+The repository-fixed V24 first-run protocol specified Weibo2014
+\cite{yi2014simplecompound,jayaram2018moabb} before any newly acquired
+target outcomes were evaluated. It used all ten participants, the
+fixed C3/Cz/C4 three-channel sensorimotor subset, left- versus
+right-hand motor imagery, 8--30 Hz processing and a 160 Hz resample.
+All 1,580 actually loaded trials were retained. This is a
+different acquisition from the original cohorts, but deliberately
+restricted to six covariance-tangent features and one binary task.
+It is not an independent preregistered clinical trial.
+
+All ten outer-held-person source-only parameter vectors were saved
+and SHA-256 hashed before \emph{any} target scores were calculated.
+The original 27-point held-source macro-AUC shrinkage choice,
+a same-range, baseline-anchored continuous source optimiser,
+source-trained-mean predictive Gaussian NLL, the historical
+validation-class-centred covariance score, Ledoit--Wolf, OAS
+and fixed $\lambda=0.50$ were evaluated on identical held-person
+trials using the original tangent-LDA pipeline.
+
+\begin{table}[tb]
+\centering\small
+\caption{V24 new Weibo2014 acquisition: mean held-person ROC-AUC,
+$N=10$ people and 1,580 original MI trials. Models have identical
+three-channel geometry and target information access (Z0).
+These are descriptive first-run results, not independently
+preregistered confirmation.}
+\label{tab:v24-weibo}
+\begin{tabular}{lr}
+\toprule
+Source-only selection policy & Held-person macro AUC\\
+\midrule
+Original 27-point source macro-AUC & 0.731405\\
+V24 anchored continuous source AUC & 0.731405\\
+Fixed $\lambda=0.50$ & 0.730149\\
+Correct source-trained-mean Gaussian predictive NLL & 0.729358\\
+Ledoit--Wolf & 0.725509\\
+OAS & 0.725509\\
+Historical validation-class-centred covariance & 0.725489\\
+\midrule
+V24 minus original grid & $0.000000$\\
+V24 minus proper predictive NLL & $+0.002047$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The conditional source-optimisation residual was at most
+0.02 AUC on \emph{all ten} outer source pools, yet the
+continuous optimiser selected the \emph{identical}
+$\lambda$ as the 27-point source-macro baseline in
+10/10 cases. The held-person AUC advantage over that
+baseline was exactly zero in every person. Neither
+method harmed a held individual by more than 0.02 AUC
+relative to the other because their decisions were
+identical. Against the correctly predictive Gaussian
+selection, V24 had mean difference $+0.002047$; a
+descriptive participant bootstrap interval was
+$[-0.000234,0.004219]$, including zero. The corresponding
+difference versus the historical class-centred score
+was $+0.005916$; no individual difference in that
+comparison exceeded 0.02 AUC in absolute magnitude.
+The bootstrap intervals are conditional descriptive
+statistics from ten overlapping-source LOSO fits;
+they are \emph{not} a confirmatory population test.
+
+This negative optimisation result is consequential:
+more precise optimisation of a correctly defined
+\emph{source} ranking criterion cannot be assumed
+to yield a meaningfully better unknown-person
+decoder. The result is consistent with the
+distinction in Eq.~\eqref{eq:v24-transfer-gap},
+but a small difference between policies alone
+does not identify a causal mechanism of transfer.
+We do not promote continuous optimisation to a
+superior transfer algorithm.
+
+An independent verifier downloaded the original
+first-run Actions artifact, rechecked the ten
+source-person selection records, recomputed all
+held-person AUC macro means and the paired descriptive
+statistics, and verified the pre-target selection
+hash. The source-choice SHA-256 is
+\texttt{a2fb5b334218a00b\ldots} (full digest in the online evidence ledger).
+The original first-run Actions identifier is
+\texttt{38279322314}; the independent verification
+identifier is \texttt{38280133125}. The outcome
+receipt was not used to revise the precommitted
+selector or protocol. The acquisition/source
+validity of its data is constrained by the
+public dataset loader, not an independent
+recollection of EEG.

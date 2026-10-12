@@ -1,0 +1,83 @@
+\subsection{Separating source optimisation error from transfer error}
+\label{sec:v24-selection-gap}
+The V23 continuous-path enclosure constrains the maximum
+\emph{source-validation} macro-AUC; it does not constrain the
+performance of an unseen target participant. This distinction can
+be made precise using a simple deterministic inequality.
+
+Let $S(\lambda)$ be the participant-macro AUC of frozen
+held-source validation scores, and $T(\lambda)$ the AUC on
+a fixed unseen target participant, on a common feasible candidate
+set $\Lambda$. Suppose a source-only selector chooses
+$\widehat\lambda$ with
+\[
+ \max_{\lambda\in\Lambda} S(\lambda)
+   -S(\widehat\lambda)\le\varepsilon_S.
+\]
+Define the unobservable-at-selection transfer discrepancy
+\[
+ \Delta_{S,T}(\Lambda)=
+ \sup_{\lambda\in\Lambda}|S(\lambda)-T(\lambda)|.
+\]
+Then a direct add-and-subtract argument gives
+\begin{equation}
+ \underbrace{\max_{\lambda\in\Lambda}T(\lambda)
+   -T(\widehat\lambda)}_{\text{target-oracle regret}}
+ \le \underbrace{\varepsilon_S}_{\text{source selection gap}}
+ +\underbrace{2\Delta_{S,T}(\Lambda)}_{\text{source--target discrepancy}}.
+ \label{eq:v24-transfer-gap}
+\end{equation}
+This elementary inequality is not a newly discovered statistical
+generalisation theorem. Its contribution to the study is to make
+explicit \emph{why better source optimisation alone may be
+irrelevant to transfer}: closing the source optimisation gap does
+not control the second term. A source-only certificate for
+$\varepsilon_S$ therefore must not be reported as a guarantee
+on Eq.~\eqref{eq:v24-transfer-gap}; target labels would be required
+to compute $\Delta_{S,T}$ post hoc. Non-exchangeable and label-reversed
+target populations can have the same observed source data but
+conflicting best shrinkage decisions. No source-only selector can
+promise universally improved target AUC without additional
+assumptions.
+
+\paragraph{Matched source search repair.}
+The original V23 exploratory continuous optimiser started with two
+interval endpoints and five bisections and therefore sometimes
+failed to evaluate the original 27-point grid's best candidate
+within the same interval. The V24 repair first evaluates the
+\emph{predeclared source-only} feasible finite-grid candidates,
+partitions the continuous interval at them and searches
+subintervals with pair-credit upper bounds. This eliminates
+a logically avoidable finite-grid regression, at the cost of
+additional candidate evaluation; that cost is reported.
+
+In a genuine BNCI2014\_002 held-source experiment (first
+outer pool, 13 validation source people), the original grid
+and the repaired continuous search both attained source
+macro-AUC $0.79397$ with selected $\lambda=0.8$.
+The computed conditional source upper bound decreased to
+$0.81019$, so the remaining source-only optimum gap
+was at most $0.01623$ within the fixed interval
+$[0.05,0.95]$ under the numerical enclosure assumptions.
+This met the predeclared 0.02 \emph{source} AUC tolerance,
+but yielded \emph{zero observed source AUC improvement}
+relative to the already competitive grid. The earlier
+endpoints-only five-split search had source AUC $0.79296$
+and an inconclusive $0.09477$ source optimality gap.
+This is a repaired optimisation audit, not a new target
+transfer gain or clinical safety certificate.
+
+\paragraph{External decision gate.}
+A new public MI acquisition (Weibo2014, 10 participants,
+three fixed sensorimotor electrodes and binary left/right
+imagery) is reserved by a repository-committed, pre-outcome
+source-only first-run protocol. Four source-only comparators
+and a fifth fixed-grid control are chosen before target
+scores are evaluated. Successful execution and actual
+participant-level target outcomes are required before any
+algorithm-performance statement can appear in this
+manuscript; an in-repository freeze is not equivalent
+to an independent registry preregistration. If the anchored
+search matches the 27-point baseline without target benefit,
+we will retain the negative result rather than claim the
+continuous optimiser is a superior transfer algorithm.

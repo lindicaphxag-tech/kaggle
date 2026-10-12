@@ -1,0 +1,46 @@
+name: DefaultReg V24 independent ten-person external EEG audit
+on:
+  push:
+    branches: [research/defaultreg-v24-honest-selection-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/verify_v24_weibo_external_artifact.py'
+      - '.github/workflows/defaultreg-v24-independent-weibo-audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  recheck-immutable-first-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --quiet numpy
+      - name: Retrieve the genuine first-run immutable GitHub artifact
+        run: |
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11760219323/zip > /tmp/v24-Weibo-original.zip
+          test -s /tmp/v24-Weibo-original.zip
+      - name: Independent ten-person reanalysis without accessing EEG or reselection
+        run: |
+          mkdir -p /tmp/v24-weibo-audit
+          python research/defaultreg_bspc_v13/src/verify_v24_weibo_external_artifact.py /tmp/v24-Weibo-original.zip --out /tmp/v24-weibo-audit/independent_v24_weibo_audit.json
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/v24-weibo-audit/independent_v24_weibo_audit.json'))
+          assert x['status']=='PASS_INDEPENDENT_V24_WEIBO_ALL10_FROZEN_ARTIFACT_AUDIT'
+          assert x['n_people']==10 and x['trials']==1580
+          assert x['n_source_optimality_gaps_below_002']==10
+          assert abs(x['paired_v24_comparisons']['source_macro_grid']['mean_auc_difference'])<1e-12
+          print('PASS_V24_INDEPENDENT_MATCHED_GENUINE_WEIBO_FIRST_RUN')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-v24-Weibo2014-independent-all-person-recheck
+          path: /tmp/v24-weibo-audit/**
+          if-no-files-found: warn
+          retention-days: 90

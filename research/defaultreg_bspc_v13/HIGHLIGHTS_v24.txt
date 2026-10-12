@@ -1,0 +1,8 @@
+Highlights — Default EEG V24 (Biomedical Signal Processing and Control candidate)
+
+- Held-source class-centred covariance fit is not predictive Gaussian likelihood.
+- Pairwise EEG score ranks explain selection changes without transfer gains.
+- Spectral bounds quantify finite-source continuous shrinkage optimisation.
+- Ten-person external EEG replication finds no gain beyond a source AUC grid.
+
+Evidence status: 2026-10-13; not independently registered; do not claim SOTA.
