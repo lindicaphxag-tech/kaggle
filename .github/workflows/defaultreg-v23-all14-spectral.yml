@@ -1,0 +1,49 @@
+name: DefaultReg V23 full 14-source-pool continuum audit
+on:
+  push:
+    branches:
+      - research/defaultreg-v23-certified-spectral-path-20261013
+    paths:
+      - '.github/workflows/defaultreg-v23-all14-spectral.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  bnci-source-full:
+    runs-on: ubuntu-latest
+    timeout-minutes: 105
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MNE_DATA: /tmp/defaultreg-v23-full-eeg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin original EEG analysis software
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Execute continuum source rank enclosure on all 14 outer held-person source pools
+        run: |
+          mkdir -p "$MNE_DATA" /tmp/defaultreg-v23
+          python research/defaultreg_bspc_v13/src/run_real_spectral_certificate_v23.py --outer-person all --segments 8 --out /tmp/defaultreg-v23/BNCI002_all14_source_spectral_enclosure.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/defaultreg-v23/BNCI002_all14_source_spectral_enclosure.json'))
+          assert d['status']=='EXECUTED_REAL_SOURCE_SPECTRAL_PATH_NOT_TARGET_VALIDATION'
+          assert d['n_outer_folds']==14
+          assert len(d['outer_source_reports'])==14
+          assert d['no_target_label_or_target_feature_used_in_source_analysis']
+          assert all(r['held_source_people']==13 for r in d['outer_source_reports'])
+          assert abs(d['mean_source_auc_delta']-.026796875)<1e-8
+          assert all(0<=r['held_source_mean_certified_stable_fraction']<=1 for r in d['outer_source_reports'])
+          print('PASS_REAL_ALL_14_SOURCE_CONTINUUM_CROSSING_CERTIFICATES')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-v23-real-14-outer-source-spectral-continuum
+          path: /tmp/defaultreg-v23/**
+          if-no-files-found: warn
+          retention-days: 90
