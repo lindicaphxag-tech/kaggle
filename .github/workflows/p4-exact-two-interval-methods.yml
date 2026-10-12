@@ -1,0 +1,33 @@
+name: P4 exact rational interval Horner vs Bernstein comparison
+on:
+  push:
+    branches: [publication/default-eeg-p4-rank-certificates-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/p4_exact_two_certifiers_benchmark.py'
+      - '.github/workflows/p4-exact-two-interval-methods.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  certifier-microbenchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: |
+          python -m py_compile research/defaultreg_bspc_v13/src/p4_exact_two_certifiers_benchmark.py
+          python research/defaultreg_bspc_v13/src/p4_exact_two_certifiers_benchmark.py --out /tmp/p4-rational-benchmark.json
+          python - <<'PY'
+          import json
+          z=json.load(open('/tmp/p4-rational-benchmark.json'))
+          assert z['interval_count']==960
+          assert not z['real_EEG_float_input_certified']
+          assert all(x['intervals']==192 for x in z['per_dimension'])
+          print('PASS_EXACT_RATIONAL_COMPARISON_NOT_REAL_EEG_CERTIFICATION')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p4-exact-rational-bernstein-vs-horner-960-interval-benchmark
+          path: /tmp/p4-rational-benchmark.json
+          retention-days: 90
