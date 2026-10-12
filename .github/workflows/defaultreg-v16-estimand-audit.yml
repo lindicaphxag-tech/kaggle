@@ -112,6 +112,7 @@ jobs:
         run: |
           cd research/defaultreg_proper_predictive
           python -m unittest -v test_proper_predictive_source_only
+          python -m unittest -v test_receipt_29_outer_integration
       - name: Download immutable ORIGINAL frozen Shin score family
         run: |
           gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11674238395/zip > /tmp/defaultreg-Shin-original.zip
