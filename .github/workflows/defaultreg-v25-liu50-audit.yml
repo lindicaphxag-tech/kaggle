@@ -57,11 +57,11 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: '3.11'}
       - run: python -m pip install --disable-pip-version-check moabb==1.7.2
-      - name: Compare SHA256 of patient 4 versus patient 5 preprocessed trials (no EEG samples shown)
+      - name: Compare SHA256 of candidate pairs 4/5 and 47/49 from released EDF numeric signals (no EEG samples shown)
         run: |
           mkdir -p "$MNE_DATA" /tmp/defaultreg-v25-liu-audit
           python research/defaultreg_bspc_v13/src/liu2024_4_5_fingerprint_v25.py
-          test -s /tmp/defaultreg-v25-liu-audit/raw_subject4_5_fingerprint.json
+          test -s /tmp/defaultreg-v25-liu-audit/raw_collision_pairs_provenance.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
