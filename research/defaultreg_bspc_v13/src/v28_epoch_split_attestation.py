@@ -147,7 +147,7 @@ def main():
     p.add_argument("--v26-zip",type=Path)
     p.add_argument("--out",type=Path,required=True)
     args=p.parse_args()
-    r,sha=archive_member(args.v27_zip,"LIU2024_ALL2000_EPOCH_OVERLAP_REPORT.json")
+    r,sha=archive_member(args.v27_zip.read_bytes(),"LIU2024_ALL2000_EPOCH_OVERLAP_REPORT.json")
     v=reconstruct(r)
     v["v27_original_report_sha256"]=sha
     if args.v26_zip:
