@@ -1,0 +1,75 @@
+\section{Checking partial EEG epoch replay beyond complete recording identity}
+\label{sec:v27-epoch-identity}
+The V26 check identified one pair of identical full
+preprocessed EEG recording arrays under different subject identifiers.
+That check is insufficient to exclude \emph{partial} record overlap:
+two different 40-trial arrays can share a small number of identical
+epochs while having different complete-record SHA-256 digests.
+We distinguish EEG \emph{subject identifiers}, numerical
+\emph{recording content}, and human patient identity; the last
+cannot be determined from the published arrays.
+
+\paragraph{Content-based epoch-overlap graph.}
+For subject identifier $i$, let
+$E_i=\{h(x_{it}):t=1,\ldots,n_i\}$ be the set of
+cryptographic fingerprints of the complete EEG trial arrays
+after the single, frozen MOABB preprocessing pipeline. The
+fingerprint hashes both channel/time dimensions and the contiguous
+float64 signal bytes. Candidate equality is checked by exact
+numerical array comparison, with contradictory class labels
+treated as a dataset-integrity failure.
+Define the undirected graph with an edge $(i,j)$ if
+$E_i\cap E_j\ne\varnothing$ for $i\ne j$.
+The graph ignores observed classifier predictions and AUC values.
+
+For any partition that assigns each complete identifier's
+trials to one fold, \emph{zero exact trial-content overlap between
+training and test folds} is equivalent to requiring that
+every connected component of this graph is contained in
+one fold. If an edge crosses the partition, its identical
+epoch appears on both sides; conversely, if an exact epoch
+appears on both sides, that pair defines a crossing edge.
+A component can be separated only by cutting such an edge.
+This elementary graph observation is not a newly invented
+generalisation theorem. It gives an actionable grouping
+contract under exact equality, which the original
+complete-record check does not provide.
+
+\paragraph{Audit and boundary.}
+We precommitted a retrospective scan over all 50 public
+Liu2024 subject IDs and all 2,000 originally retained
+40-trial observations, before executing the new trial-level
+scan. A pinned MOABB 1.7.2 loader retains the previous
+29-channel, 8--30 Hz, 160 Hz left/right motor-imagery
+processing and 20/20 class balance. For each exact epoch
+content appearing under multiple identifiers, we count
+shared unique epoch contents, cross-identifier matching
+trial instances and any transitive groups. Internal repeats
+are reported separately. No threshold is tuned to target
+classifier performance, and no unverified near-duplicate
+criterion is introduced. Synthetic tests inject
+partial overlap, transitive reuse, whole-record copies,
+and conflicting event labels. The entire source EEG
+trial list and matching rules are fixed prior to the
+audit, with complete reproducible logs archived.
+
+All grouping necessarily inspects globally released
+EEG signal content, including held records. Consequently,
+any resulting component-aware reanalysis is an
+\emph{exposed-cohort integrity sensitivity study},
+not a physically target-isolated, independently
+prospective zero-calibration experiment.
+Exact equality says nothing about near duplicates,
+overlapping-but-nonidentical time windows, patient
+identity or source-site dependencies. Even a negative
+additional-overlap scan would only strengthen one
+specific data-integrity check and cannot be promoted
+to a new AUC gain or proof of population transfer.
+
+Published EEG validation research documents
+the importance of the subject/record split
+\cite{gil2026subjectvalidation}. Our novelty claim
+is restricted to the \emph{specific} released-record
+finding and its reproducible trial-granularity
+consequences under a frozen EEG decoding pipeline,
+not to the general concept of preventing leakage.
