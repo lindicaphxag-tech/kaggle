@@ -172,6 +172,20 @@ post-filtering model inputs. The negative-control pair IDs 47
 and 49 had coincident previously recorded target AUC vectors
 but different signal arrays; equal classifier outcomes alone
 must not be used as an identity criterion.
+The independent digital EDF payload reader confirmed
+exact byte-for-byte equality of 32 of 33 original
+channel sample streams for the released ID 4/5 pair,
+with sole difference at unnamed channel index 32.
+The negative-control released pair 47/49 shared
+only one of 33 digital channels. A strict pyEDFlib
+physical-signal reader rejected the source EDF
+header because its Physical Maximum metadata
+were noncompliant; thus our separate raw digital
+result is a statement about original integer
+sample payloads, not about independently validated
+EDF physical-amplitude calibration. The exact
+auditor and successful nonidentifying log are at
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38319951161}.
 Neither EDF channel matching nor a source file's different
 basename resolves the identity of clinical participants.
 Zero exact overlaps in the two controls cannot rule out near-duplicates
