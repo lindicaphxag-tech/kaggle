@@ -26,10 +26,12 @@ from original_frozen_runner import (  # noqa: E402
 from source_rank_churn_v22 import subject_macro_rank_audit  # noqa: E402
 
 
-def compute(dataset: str, outer_person: int) -> dict:
+def compute(dataset: str, outer_person: int, loaded=None) -> dict:
     if dataset not in ("BNCI2014_002", "Shin2017A"):
         raise ValueError("Only the ORIGINAL FROZEN runner's two cohorts are supported")
-    C, y, groups, receipt, spec, n_channels, _ = load_dataset(dataset)
+    C, y, groups, receipt, spec, n_channels, _ = (
+        loaded if loaded is not None else load_dataset(dataset)
+    )
     if outer_person not in set(map(int, groups)):
         raise ValueError("outer person not found")
     source_mask = groups != outer_person
@@ -88,19 +90,40 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", choices=["BNCI2014_002", "Shin2017A"],
                         default="BNCI2014_002")
-    parser.add_argument("--outer-person", type=int, required=True)
+    parser.add_argument("--outer-person", required=True,
+                        help="One participant ID, or all for full source-only LOSO audit")
     parser.add_argument("--out", type=pathlib.Path, required=True)
     args = parser.parse_args()
-    result = compute(args.dataset, args.outer_person)
+    if args.outer_person == "all":
+        loaded = load_dataset(args.dataset)
+        people = sorted(set(map(int, loaded[2])))
+        results = [compute(args.dataset, p, loaded) for p in people]
+        result = {
+            "status": "SOURCE_ONLY_ALL_OUTER_MECHANISM_COMPLETE_POSTHOC",
+            "dataset": args.dataset,
+            "n_outer_pools": len(results),
+            "mean_source_auc_delta_exact": float(np.mean(
+                [q["macro_auc_delta_exact"] for q in results])),
+            "mean_source_gross_pair_churn": float(np.mean(
+                [q["participant_mean_gross_pair_churn"] for q in results])),
+            "no_target_outcomes_or_target_tuning": True,
+            "source_pool_results": results,
+        }
+    else:
+        result = compute(args.dataset, int(args.outer_person))
     body = json.dumps(result, indent=2, sort_keys=True, allow_nan=False) + "\n"
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(body, encoding="utf-8")
-    print(json.dumps({
-        "status": result["status"], "outer_held_person": args.outer_person,
-        "macro_auc_delta_exact": result["macro_auc_delta_exact"],
-        "mean_gross_pair_churn": result["participant_mean_gross_pair_churn"],
+    summary = {
+        "status": result["status"],
         "report_sha256": hashlib.sha256(body.encode("utf-8")).hexdigest(),
-    }, indent=2))
+    }
+    for key in ("outer_held_person", "macro_auc_delta_exact",
+                "participant_mean_gross_pair_churn", "n_outer_pools",
+                "mean_source_auc_delta_exact", "mean_source_gross_pair_churn"):
+        if key in result:
+            summary[key] = result[key]
+    print(json.dumps(summary, indent=2))
 
 
 if __name__ == "__main__":
