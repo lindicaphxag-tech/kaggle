@@ -1,0 +1,220 @@
+name: DefaultReg V21 four EEG geometries and source-subject CVaR risk
+on:
+  push:
+    branches:
+      - submission/defaultreg-v21-lowrank-source-risk-20261012
+    paths:
+      - 'research/defaultreg_bspc_v13/**'
+      - '.github/workflows/defaultreg-v21-lowrank-source-risk.yml'
+  pull_request:
+    paths:
+      - 'research/defaultreg_bspc_v13/**'
+      - '.github/workflows/defaultreg-v21-lowrank-source-risk.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  v18-independent-fair-baseline-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      GH_TOKEN: ${{ github.token }}
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install reproducibility checks and LaTeX
+        run: |
+          python -m pip install --quiet numpy scipy
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-pictures texlive-fonts-recommended lmodern poppler-utils
+      - name: Download BOTH immutable original and successful comparator artifacts
+        run: |
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11674238395/zip > /tmp/Shin-original.zip
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11722966174/zip > /tmp/Shin-proper-predictive.zip
+          echo 'cda3210d24a8e9c7f3bf2d48490e51ad51f023beb652816a8679088cc3fb1842  /tmp/Shin-original.zip' | sha256sum -c
+          echo 'd260a402bfbd9f4b8a49f6d0a47de766f71d7b399f1011039def302043d07467  /tmp/Shin-proper-predictive.zip' | sha256sum -c
+      - name: Independently re-check all 29 held-person AUCs and source lambda lock
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          python src/verify_v18_proper_predictive_artifact.py /tmp/Shin-original.zip /tmp/Shin-proper-predictive.zip --out v18_independent_proper_audit.json
+          python - <<'PY'
+          import json
+          a=json.load(open('v18_independent_proper_audit.json'))
+          assert a['status']=='PASS_29_SUBJECT_REAL_PROPER_NLL_POSTOUTCOME_ARTIFACT_AUDIT'
+          assert a['n']==29 and a['proper_lambda_counts']=={'0.2':29}
+          assert abs(a['macro_minus_proper_mean_delta_AUC']+0.0003065134099616916)<1e-12
+          assert abs(a['class_centred_minus_proper_mean_delta_AUC']+0.022528735632183904)<1e-12
+          assert a['new_confirmatory_test_performed'] is False
+          print('V18_ORIGINAL_AND_CORRECTED_PREDICTIVE_EEG_SCORES_PASS')
+          PY
+      - name: Download original and real 14-person BNCI predictive comparator archives
+        run: |
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11675156650/zip > /tmp/BNCI-original.zip
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11722553787/zip > /tmp/BNCI-proper-predictive.zip
+          echo '15137db055b54983c297d28b93e714836ff3711888c35bcdd3640eba05b1a6e1  /tmp/BNCI-original.zip' | sha256sum -c
+          echo 'b4f583d63997d69d2f405c915ca9ca8eef8e623a4443e98b1634399d7d4f421b  /tmp/BNCI-proper-predictive.zip' | sha256sum -c
+      - name: Independently verify second real EEG cohort on all 14 original folds
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          python src/verify_v18_bnci_corrected_predictive.py /tmp/BNCI-original.zip /tmp/BNCI-proper-predictive.zip --out v18_bnci14_independent_proper_audit.json
+          python - <<'PY'
+          import json
+          j=json.load(open('v18_bnci14_independent_proper_audit.json'))
+          assert j['status']=='PASS_BNCI14_ORIGINAL_AND_REAL_PROPER_EEG_SOURCE_SCORE_AUDIT'
+          assert j['participants']==14 and j['positive_SOURCE_penalties']==14
+          assert abs(j['source_macro_minus_proper_auc']-0.00681919642857142)<1e-12
+          assert abs(j['proper_minus_centered_auc']-0.0107700892857143)<1e-12
+          assert j['new_confirmatory_test'] is False
+          print('V18_SECOND_EEG_COHORT_REAL_PROPER_NLL_AUDIT_PASSED')
+          PY
+      - name: Verify exact between-person mean-shift decomposition on 300 SPD examples
+        working-directory: research/defaultreg_bspc_v13
+        run: python src/predictive_minus_centered_identity_v17.py | tee v18_exact_identity_regression.json
+      - name: Exact source-only estimand homotopy and posterior EEG diagnostic in both cohorts
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          python src/estimand_homotopy_v19.py --shin-original /tmp/Shin-original.zip \
+            --shin-proper /tmp/Shin-proper-predictive.zip \
+            --bnci-original /tmp/BNCI-original.zip \
+            --bnci-proper /tmp/BNCI-proper-predictive.zip \
+            --out v19_estimand_continuation | tee v19_summary_stdout.json
+          python - <<'PY'
+          import json,pathlib
+          root=pathlib.Path('v19_estimand_continuation')
+          a=json.loads((root/'Shin2017A_estimand_homotopy_POSTOUTCOME_SUMMARY.json').read_text())
+          b=json.loads((root/'BNCI2014_002_estimand_homotopy_POSTOUTCOME_SUMMARY.json').read_text())
+          assert a['n']==29 and a['number_changing_lambda_from_alpha0_to_alpha1']==29
+          assert b['n']==14 and b['number_changing_lambda_from_alpha0_to_alpha1']==14
+          assert abs(a['median_exact_first_change_alpha']-0.0660314554639444)<1e-10
+          assert abs(b['median_exact_first_change_alpha']-0.19444225258616926)<1e-10
+          assert a['segment_count_distribution']=={'6':29}
+          assert b['segment_count_distribution']=={'7':1,'8':9,'9':4}
+          assert a['no_new_hypothesis_test'] and b['no_new_hypothesis_test']
+          assert a['no_target_selected_alpha_policy'] and b['no_target_selected_alpha_policy']
+          for z in [a,b]:
+            assert abs(z['postoutcome_mean_AUC_fixed_alpha']['0.0']-
+                    (0.76367816091954 if z['n']==29 else 0.7611160714285715))<1e-12
+          print('PASS_V19_43_REAL_EEG_SOURCE_ONLY_EXACT_BREAKPOINT_CERTIFICATES')
+          PY
+      - name: Download FIRST-RUN independently source-locked external BNCI2014_001 EEG archive
+        run: |
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11723613895/zip > /tmp/BNCI2014_001_first_run.zip
+          echo '36ddb760b0198a713be08b96b0586e575be5b5e6c73e3cbd87ef1b1b2e88f9fd  /tmp/BNCI2014_001_first_run.zip' | sha256sum -c
+      - name: Reaudit nine public EEG people and all pre-outcome protocol locks independently
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          python src/verify_external_bnci2014_001_v20.py /tmp/BNCI2014_001_first_run.zip --out v20_bnci2014_001_source_locked_external_audit.json
+          python - <<'PY'
+          import json
+          d=json.load(open('v20_bnci2014_001_source_locked_external_audit.json'))
+          assert d['status']=='PASS_NEW_EXTERNAL_N9_PROTOCOL_FROZEN_EEG_INDEPENDENT_ARTIFACT_AUDIT'
+          assert d['subjects']==9 and d['trials']==2592
+          assert abs(d['mean_auc_by_selector']['macro']-0.7890517832647462)<1e-12
+          assert abs(d['mean_auc_by_selector']['true_source_mean_predictive']-0.783414780521262)<1e-12
+          assert abs(d['mean_macro_minus_proper_auc']-0.0056370027434842086)<1e-12
+          assert d['no_independent_registration_claim'] and d['no_significance_claim']
+          print('PASS_V20_EXTERNAL_PUBLIC_EEG_ALL_9_PEOPLE_DOUBLE_AUDIT')
+          PY
+      - name: Download original 3-channel BNCI2014_004 source-CVaR first-run archive
+        run: |
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11724106959/zip > /tmp/BNCI2014_004_original_source_CVaR.zip
+          echo '81fc7b2d8e88a3e65b88a73be4c8237cf605f854169f7cee232f9badc824bcfb  /tmp/BNCI2014_004_original_source_CVaR.zip' | sha256sum -c
+      - name: Independently verify all nine 3-channel EEG risk-person outcomes
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          python src/verify_bnci2014_004_risk_v21.py /tmp/BNCI2014_004_original_source_CVaR.zip --out v21_bnci2014_004_cvar_audit.json
+          python - <<'PY'
+          import json
+          d=json.load(open('v21_bnci2014_004_cvar_audit.json'))
+          assert d['status']=='PASS_V21_ALL_9_LOW_DIM_EEG_SOURCE_ONLY_RISK_AUDIT'
+          assert d['n']==9 and d['trials']==6520 and d['tangent_feature_dimensions']==6
+          assert abs(d['mean_auc']['macro']-0.7780021701933706)<1e-12
+          assert abs(d['mean_auc']['source_worst_quarter_CVaR_auc']-0.7771407273253103)<1e-12
+          assert abs(d['source_CVaR_minus_macro_auc']+0.0008614428680602989)<1e-12
+          assert d['lambda_decision_diff_risk_vs_macro']==8
+          assert d['CVaR_subjects_harmed_gt002_against_macro']==0
+          print('PASS_V21_LOW_DIM_CVAR_NEGATIVE_ABLATION_NOT_HIDDEN')
+          PY
+      - name: Verify original publication family arithmetic
+        working-directory: research/defaultreg_bspc_v13
+        run: python verify_bspc_submission_claims.py --check-consistency
+      - name: Compile FULL V18 scientific manuscript with bibliography
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_bspc_v18_DRAFT.tex
+          test -s main_bspc_v18_DRAFT.pdf
+          pdftotext main_bspc_v18_DRAFT.pdf v18_manuscript.txt
+          grep -q 'Covariance Validation Is Not Predictive Likelihood' v18_manuscript.txt
+          grep -q '0.786207' v18_manuscript.txt
+          pdfinfo main_bspc_v18_DRAFT.pdf | grep Pages
+          echo 'V18_REAL_SHIN_EEG_PREDICTIVE_CONTROL_AND_PAPER_PASSED'
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_bspc_v18_CONCISE_DRAFT.tex
+          test -s main_bspc_v18_CONCISE_DRAFT.pdf
+          pdftotext main_bspc_v18_CONCISE_DRAFT.pdf v18_concise_manuscript.txt
+          grep -q '0.771886' v18_concise_manuscript.txt
+          grep -q '0.786207' v18_concise_manuscript.txt
+          if grep -Eq 'multiply defined|Undefined control sequence|Citation.*undefined' main_bspc_v18_CONCISE_DRAFT.log; then exit 3; fi
+          echo 'V18_CONCISE_ARTICLE_BUILT_WITH_CITATIONS_AND_BOTH_COHORTS'
+          pdfinfo main_bspc_v18_CONCISE_DRAFT.pdf | grep Pages
+      - name: Compile concise V19 research article with exact source regimes
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_bspc_v19_CONCISE_DRAFT.tex
+          test -s main_bspc_v19_CONCISE_DRAFT.pdf
+          pdftotext main_bspc_v19_CONCISE_DRAFT.pdf v19_concise_extract.txt
+          grep -q '0.0660' v19_concise_extract.txt
+          grep -q '0.1944' v19_concise_extract.txt
+          if grep -Eq 'multiply defined|Undefined control sequence|Citation.*undefined' main_bspc_v19_CONCISE_DRAFT.log; then exit 3; fi
+          pdfinfo main_bspc_v19_CONCISE_DRAFT.pdf | grep Pages
+          echo 'PASS_V19_EXACT_ESTIMAND_MAIN_PDF_NO_BROKEN_REFERENCES'
+      - name: Compile evidence-locked V20 external EEG research article
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_bspc_v20_CONCISE_DRAFT.tex
+          test -s main_bspc_v20_CONCISE_DRAFT.pdf
+          pdftotext main_bspc_v20_CONCISE_DRAFT.pdf v20_concise_extract.txt
+          grep -q '0.789052' v20_concise_extract.txt
+          grep -q '0.783415' v20_concise_extract.txt
+          if grep -Eq 'multiply defined|Undefined control sequence|Citation.*undefined' main_bspc_v20_CONCISE_DRAFT.log; then exit 3; fi
+          pdfinfo main_bspc_v20_CONCISE_DRAFT.pdf | grep Pages
+          echo 'PASS_V20_NEW_EEG_COHORT_AND_EXACT_ESTIMAND_PAPER'
+      - name: Compile evidence-locked V21 four-cohort negative-risk main article
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_bspc_v21_CONCISE_DRAFT.tex
+          test -s main_bspc_v21_CONCISE_DRAFT.pdf
+          pdftotext main_bspc_v21_CONCISE_DRAFT.pdf v21_concise.txt
+          grep -q '0.777141' v21_concise.txt
+          grep -q '6,520' v21_concise.txt
+          if grep -Eq 'multiply defined|Undefined control sequence|Citation.*undefined' main_bspc_v21_CONCISE_DRAFT.log; then exit 3; fi
+          pdfinfo main_bspc_v21_CONCISE_DRAFT.pdf | grep Pages
+          echo 'PASS_V21_FOUR_EEG_GEOMETRY_AND_SOURCE_RISK_MAIN_PDF'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: defaultreg-v21-four-EEG-source-risk-CVaR-verified-PDF
+          path: |
+            research/defaultreg_bspc_v13/main_bspc_v21_CONCISE_DRAFT.pdf
+            research/defaultreg_bspc_v13/main_bspc_v21_CONCISE_DRAFT.log
+            research/defaultreg_bspc_v13/main_bspc_v21_CONCISE_DRAFT.bbl
+            research/defaultreg_bspc_v13/v21_bnci2014_004_cvar_audit.json
+            research/defaultreg_bspc_v13/main_bspc_v20_CONCISE_DRAFT.pdf
+            research/defaultreg_bspc_v13/main_bspc_v20_CONCISE_DRAFT.log
+            research/defaultreg_bspc_v13/main_bspc_v20_CONCISE_DRAFT.bbl
+            research/defaultreg_bspc_v13/v20_bnci2014_001_source_locked_external_audit.json
+            research/defaultreg_bspc_v13/main_bspc_v19_CONCISE_DRAFT.pdf
+            research/defaultreg_bspc_v13/main_bspc_v19_CONCISE_DRAFT.log
+            research/defaultreg_bspc_v13/main_bspc_v19_CONCISE_DRAFT.bbl
+            research/defaultreg_bspc_v13/v19_estimand_continuation/**
+            research/defaultreg_bspc_v13/main_bspc_v18_DRAFT.pdf
+            research/defaultreg_bspc_v13/main_bspc_v18_CONCISE_DRAFT.pdf
+            research/defaultreg_bspc_v13/main_bspc_v18_CONCISE_DRAFT.log
+            research/defaultreg_bspc_v13/main_bspc_v18_CONCISE_DRAFT.bbl
+            research/defaultreg_bspc_v13/main_bspc_v18_DRAFT.log
+            research/defaultreg_bspc_v13/main_bspc_v18_DRAFT.bbl
+            research/defaultreg_bspc_v13/v18_independent_proper_audit.json
+            research/defaultreg_bspc_v13/v18_bnci14_independent_proper_audit.json
+            research/defaultreg_bspc_v13/v18_exact_identity_regression.json
+          retention-days: 90
