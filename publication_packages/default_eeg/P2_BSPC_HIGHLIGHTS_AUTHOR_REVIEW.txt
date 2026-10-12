@@ -1,0 +1,5 @@
+• Distinct released participant IDs can share identical processed EEG content.
+• A Liu2024 ID pair shares all 40 trials under a pinned preprocessing pipeline.
+• Content-group validation changes the effective reporting denominator.
+• Matched 49-group comparisons separate fitting from regularisation selection.
+• The observed matched AUC change is concentrated in the overlap group.
