@@ -66,6 +66,13 @@ def audit(original_path,proper_path):
         if any(z["no_outer_target_info_for_selection"] is not True for z in choices):
             raise AssertionError("Source-information-budget flag missing")
         ds,dp,dc=[],[],[]
+        # Independently compare the old and new *source validation* NLL
+        # paths at exactly the SAME lambda and within the SAME grouped
+        # training/validation geometry. Under the source-mean shift
+        # identity the proper log score cannot be smaller than the
+        # held validation person's class-centred covariance score.
+        source_gap_at_proper_lambda=[]
+        source_choice={int(z["subject"]):z for z in choices}
         for sid in range(1,30):
             z=by_subject[sid]
             f=fz[sid]
@@ -88,6 +95,15 @@ def audit(original_path,proper_path):
                 raise AssertionError("Paired effect arithmetic wrong")
             if abs(float(z["delta_class_centered_minus_proper"])-(cent-path_auc))>1e-12:
                 raise AssertionError("Paired class-centered effect arithmetic wrong")
+            grid_score=source_choice[sid]["source_predictive_log_score_by_lambda"]
+            key=str(float(lam))
+            assert key in grid_score and key in f["source_path"]["criteria_by_lambda"]
+            proper_source=float(grid_score[key])
+            centred_source=float(f["source_path"]["criteria_by_lambda"][key]["covariance_mean_nll"])
+            diff_source=proper_source-centred_source
+            if not np.isfinite(diff_source) or diff_source < -1e-8:
+                raise AssertionError(f"Nonnegative exact source-mean shift difference violated in {sid}: {diff_source}")
+            source_gap_at_proper_lambda.append(diff_source)
             ds.append(marco);dp.append(path_auc);dc.append(cent)
         ds,dp,dc=map(np.asarray,(ds,dp,dc))
         delta=ds-dp
@@ -111,6 +127,10 @@ def audit(original_path,proper_path):
             "original_class_centred_mean_AUC":float(dc.mean()),
             "macro_minus_proper_mean_delta_AUC":float(delta.mean()),
             "class_centred_minus_proper_mean_delta_AUC":float(cent_delta.mean()),
+            "mean_proper_minus_class_centred_SOURCE_score_at_lambda_0_2":float(np.mean(source_gap_at_proper_lambda)),
+            "min_proper_minus_class_centred_SOURCE_score":float(np.min(source_gap_at_proper_lambda)),
+            "max_proper_minus_class_centred_SOURCE_score":float(np.max(source_gap_at_proper_lambda)),
+            "source_validation_nonnegative_mean_shift_identity_29_of_29":True,
             "macro_minus_proper_subjects_positive":int(np.sum(delta>0)),
             "macro_minus_proper_subjects_negative":int(np.sum(delta<0)),
             "macro_minus_proper_subjects_tied":int(np.sum(np.abs(delta)<1e-12)),
