@@ -46,7 +46,12 @@ found coverage improvements ranging from zero
 at $p=2$ to more than 16 percentage points on
 some higher-dimensional synthetic configurations;
 it does not constitute new EEG validation.
-Neither analysis tests an external target improvement.
+An additional exact-rational microbenchmark certified
+924/960 intervals using Bernstein versus 912/960
+using interval Horner, but Bernstein's core
+sign tests took approximately $5.65$ times longer.
+These synthetic results also do not test an
+external EEG target improvement.
 \textbf{Conclusion.} Whole-numerator
 polynomial bounding gives a small,
 measurable technical improvement in
@@ -115,6 +120,7 @@ machine-verification claims.
 
 \section{Synthetic multi-dimensional numerical experiment}
 \input{P4_synthetic_multidimensional_numeric_appendix.tex}
+\input{P4_exact_rational_horner_comparison_results.tex}
 
 \input{P4_realized_interval_refinement_negative.tex}
 
@@ -136,6 +142,9 @@ than a formal outward-directed rounding
 guarantee. Earlier numerical problems,
 large tangent dimensions and finite
 root conditioning remain test cases.
+The actual interval-Horner comparison documented
+both additional certificates and a substantial
+runtime penalty, rather than algorithm dominance.
 A publishable method note would
 need a substantial independent benchmark
 on multiple spectral dimensions and
