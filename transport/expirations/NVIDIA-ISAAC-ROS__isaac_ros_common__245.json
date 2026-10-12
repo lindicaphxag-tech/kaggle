@@ -1,0 +1,13 @@
+{
+  "case_id": "NVIDIA-ISAAC-ROS/isaac_ros_common#245",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-10-12T06:28:32Z",
+  "expiry_sha256": "fd9745fd102442594e7b025320b18440a133bb4f4005a36a4abc2a1406837673",
+  "first_frozen_at": "2026-10-11T23:58:24Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-10-12T05:58:24Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "a2953b0fb2074b0ea23b3984a1c347f896b54f91176fb09ad3ad48be3a94a575"
+}

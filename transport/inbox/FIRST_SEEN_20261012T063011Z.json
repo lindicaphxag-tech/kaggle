@@ -1,0 +1,95 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 6,
+  "new_candidates": [
+    {
+      "author_login": "yavuzmurattas",
+      "body": "## Description\n\n`setup.py` lists `egl_probe>=1.0.1` in `install_requires`. egl_probe is published on PyPI as an sdist only (latest 1.0.2, from 2021), so pip has to build it from source with CMake. Its `egl_probe/CMakeLists.txt` declares `cmake_minimum_required(VERSION 2.8.12)`. CMake 4.0 removed compatibility with versions below 3.5. So whenever the `cmake` on `PATH` is 4.x (for example, the current `cmake` package on PyPI), the egl_probe build fails and so does the whole robomimic install.\n\nrobomimic needs egl_probe only to pick a GPU for offscreen EGL rendering, in `robomimic/envs/env_robosuite.py` (around line 103) and `robomimic/envs/env_ig_momart.py` (around line 117). Users who only train from datasets, or who render on a single GPU, still cannot install the package.\n\nUpstream egl_probe looks unmaintained: the last commit was in 2021. A fix for the CMake minimum version has been open since 2025 (StanfordVL/egl_probe#7), and there are related open issues (StanfordVL/egl_probe#6, StanfordVL/egl_probe#8). The closed robomimic issue #114 shows earlier egl_probe build failures that users worked around by pinning older CMake versions.\n\n## Reproduction (clean venv, Python 3.12, robomimic master d309eae)\n\n```sh\npython -m venv /tmp/venv && . /tmp/venv/bin/activate\npip install -U pip setuptools wheel\npip install \"cmake>=4\"              # 4.4.4 here; stands in for a system CMake 4\nexport PATH=\"$(python -c 'import cmake, os; print(os.path.join(os.path.dirname(cmake.__file__), \"data\", \"bin\"))'):$PATH\"\ncmake --version                     # cmake version 4.4.4\n\npip install egl_probe               # fails\ngit clone https://github.com/ARISE-Initiative/robomimic && cd robomimic\npip install -e .                    # fails the same way while building egl_probe\n```\n\n(The `PATH` line puts the real CMake 4 binary first on `PATH`, like a system install. If you call the pip `cmake` wrapper script from inside pip's isolated build environment, it fails with an unrelated `ModuleNotFoundError: No module named 'cmake'`.)\n\nRelevant output:\n\n```\n      running build_ext\n      CMake Error at CMakeLists.txt:1 (cmake_minimum_required):\n        Compatibility with CMake < 3.5 has been removed from CMake.\n\n        Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax\n        to tell CMake that the project requires at least <min> but has been updated\n        to work with policies introduced by <max> or earlier.\n\n        Or, add -DCMAKE_POLICY_VERSION_MINIMUM=3.5 to try configuring anyway.\n\n\n      -- Configuring incomplete, errors occurred!\n      make: *** No targets specified and no makefile found.  Stop.\n      [...]\n      subprocess.CalledProcessError: Command 'cmake ..; make -j' returned non-zero exit status 2.\n  ERROR: Failed building wheel for egl_probe\nFailed to build egl_probe\nerror: failed-wheel-build-for-install\n```\n\nCurrent user-side workaround: `CMAKE_POLICY_VERSION_MINIMUM=3.5 pip install egl_probe`. With that set, the build succeeds in the same environment.\n\n## Proposal\n\n1. **Make egl_probe optional (preferred, small change).** Move it to `extras_require={\"egl\": [\"egl_probe>=1.0.1\"]}` and wrap the two imports in a small helper. The helper catches `ImportError`, logs a one-time warning, and returns no devices, so the simulator uses its default rendering device. That is already what happens today when egl_probe finds no EGL device. Users who want automatic GPU selection install `robomimic[egl]`.\n2. **Alternative or addition:** point the requirement at `hf-egl-probe`, a maintained fork on PyPI (1.0.2, MIT license, sdist only). It installs the same `egl_probe` module and declares `cmake_minimum_required(VERSION 3.5)`. I checked that it builds with CMake 4.4.4. It still needs CMake and a compiler at install time, though, and it should not be installed next to `egl_probe` because both provide the same module. Making the dependency optional avoids both problems. The fork could be mentioned in the docs as an option.\n\nI have a patch for option 1 with a small test that needs neither MuJoCo nor a GPU, and I'm happy to open a PR if this direction works for you.\n\n## AI disclosure\n\nI used an AI assistant (Claude) to help investigate and draft this report. I take responsibility for this report.\n",
+      "created_at": "2026-10-12T04:11:13Z",
+      "html_url": "https://github.com/ARISE-Initiative/robomimic/issues/323",
+      "id": "ARISE-Initiative/robomimic#323",
+      "issue_number": 323,
+      "labels": [],
+      "repository": "ARISE-Initiative/robomimic",
+      "surface_sha256": "4e53f8333f42b985747f4870439794f663063bcf13aebfb095d4a74f480ddd71",
+      "title": "pip install robomimic fails with CMake >= 4 because of the required egl_probe dependency"
+    },
+    {
+      "author_login": "kir0ul",
+      "body": "### Question\n\nHi, would it make sense to switch the Gymnasium citation from the arXiv preprint to the published paper: https://proceedings.neurips.cc/paper_files/paper/2025/hash/d7ff1795e8527f6443371c3933bdb52b-Abstract-Datasets_and_Benchmarks_Track.html ?\nHappy to make the PR in case!",
+      "created_at": "2026-10-12T03:44:06Z",
+      "html_url": "https://github.com/Farama-Foundation/Gymnasium/issues/1777",
+      "id": "Farama-Foundation/Gymnasium#1777",
+      "issue_number": 1777,
+      "labels": [
+        "question"
+      ],
+      "repository": "Farama-Foundation/Gymnasium",
+      "surface_sha256": "b3b7782597299115d5af1cb275d85faeecb7f21a4128e810d8409d7a3c5fe9a6",
+      "title": "[Question] Citation"
+    },
+    {
+      "author_login": "JunSeongKW",
+      "body": "Hi AlpaSim Challenge organizers,\n\nWe are participating in the AlpaSim E2E Closed-Loop Challenge 2026 and are\nconsidering using TensorRT to accelerate model inference in our submission container.\nWe are aware of the published constraints (40 GiB image, read-only root filesystem with 2 GiB\nwritable /tmp, no network access, 16 GiB VRAM per driver replica).\n\nCould you please clarify the following?\n\n1. Is TensorRT permitted for model inference during the official evaluation?\n2. If so, may we include prebuilt TensorRT engines in the submission image? For that, could you\n   share the GPU model and the NVIDIA driver / CUDA version of the evaluation hosts, since engines\n   are specific to the GPU architecture and TensorRT version?\n3. Alternatively, is building the engines at container startup permitted? If yes, is there a\n   startup time limit, and does startup time count toward the throughput budget? (The engines would\n   be written to /tmp.)\n4. Is reduced-precision inference (FP16, or INT8 with calibration) acceptable, given that it may\n   change model outputs slightly?\n\nThank you for your guidance!\n",
+      "created_at": "2026-10-12T04:53:42Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/205",
+      "id": "NVlabs/alpasim#205",
+      "issue_number": 205,
+      "labels": [],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "d2a018a7f33b9eec79659290c2aafeb0974cad902d2f659fb60a3f24402ef1d8",
+      "title": "[AlpaSim E2E Challenge 2026] Is TensorRT allowed for model inference?"
+    },
+    {
+      "author_login": "hujunhan",
+      "body": "### The feature, motivation and pitch\n\nI'm working on a camera sensor simulator using MuJoCo. I need linear HDR color output from Filament, before tone mapping and 8-bit quantization, so I can simulate exposure, sensor noise, CFA sampling, and ADC downstream.\nFilament already supports RGBA16F render targets and half-float readback, but mjrf currently only exposes RGB8, RGBA8, and single-channel R32F.\nI'd like to add mjPIXEL_FORMAT_RGBA16F to mjrPixelFormat, with the following behavior:\n- RGBA16F render-target attachment (not texture upload, same as R32F).\n- Readback as tightly packed RGBA half-floats (8 bytes/pixel).\n- Python support for np.float16 buffers of shape (H, W, 4).\n- Expose the existing enable_post_processing flag through Renderer.view(), defaulting to True.\n\nWith post-processing disabled, this gives linear HDR output without clipping values above 1.0.\nI've implemented this locally and tested it on NVIDIA, Intel, and software rendering backends:\nhttps://github.com/hujunhan/mujoco/tree/filament-rgba16f\n\nThe results look good so far:\n- Output scales linearly with light intensity, including values above 1.0.\n- RGB8 and RGBA16F agree after 8-bit quantization for values within range.\n- Existing pixel formats produce unchanged results.\n- Synchronous readback performance is comparable to RGB8.\n\n### Alternatives\n\nI tried RGB8 with post-processing disabled, but it clips values above 1.0 and loses precision. R32F preserves HDR values but only provides the red channel.\n\n### Additional context\n\nBefore opening a PR, I'd like to check:\n1. Does mjPIXEL_FORMAT_RGBA16F fit the API design?\n2. I had to manually update render_filament_generated.cc.inc and introspect/enums.py because the generators aren't available in the open-source tree. Is that acceptable for a PR?",
+      "created_at": "2026-10-12T01:24:07Z",
+      "html_url": "https://github.com/google-deepmind/mujoco/issues/3683",
+      "id": "google-deepmind/mujoco#3683",
+      "issue_number": 3683,
+      "labels": [
+        "enhancement"
+      ],
+      "repository": "google-deepmind/mujoco",
+      "surface_sha256": "1ffae280f0db31331da5957f66a27a3e58c1181a38d8d5f4d1a025a6f96bab34",
+      "title": "Filament renderer: expose RGBA16F color render targets"
+    },
+    {
+      "author_login": "vicfei",
+      "body": "## Description\n\nCreating a dataset with features whose shape is declared as a list (which is what every hub dataset carries - JSON arrays load as Python lists) and calling add_frame() with a correctly-shaped np.ndarray raises:\n\n```\nValueError: The feature of shape (2,) does not have the expected shape [2]\n```\n\n## Root cause\n\nnp.ndarray.shape is always a tuple, while expected_shape coming from a JSON-loaded features dict is usually a list. In validate_feature_numpy_array (src/lerobot/datasets/feature_utils.py) they are compared directly:\n\n```python\nif actual_shape != expected_shape:  # tuple != list even with identical contents\n```\n\nIn Python ((2,) != [2]) is True, so correctly-shaped frames are rejected with a misleading error message. Notably tests/datasets/test_dataset_writer.py declares its own SIMPLE_FEATURES shapes as tuples (6,), which silently works around the bug.\n\nReproduced on 0.4.4 (pip) and present on current main.\n\n## Fix\n\nNormalize before comparing: if actual_shape != tuple(expected_shape):",
+      "created_at": "2026-10-12T04:11:19Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/4928",
+      "id": "huggingface/lerobot#4928",
+      "issue_number": 4928,
+      "labels": [
+        "bug",
+        "dataset",
+        "tests",
+        "dependencies"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "ea9b30a47886c27066623f714e4572a743d318a1168f7cfc8de8e1c909ae926d",
+      "title": "validate_frame rejects features whose shape is declared as a list"
+    },
+    {
+      "author_login": "github-actions[bot]",
+      "body": "An automated scheduled build failed on `master`: https://github.com/ros-controls/ros2_control/actions/runs/38200388067\n",
+      "created_at": "2026-10-12T04:51:25Z",
+      "html_url": "https://github.com/ros-controls/ros2_control/issues/3690",
+      "id": "ros-controls/ros2_control#3690",
+      "issue_number": 3690,
+      "labels": [
+        "CI"
+      ],
+      "repository": "ros-controls/ros2_control",
+      "surface_sha256": "23c4624a6aa7f780bd16376d13718083af8cab9dcc623b8929ddc06a86064b9c",
+      "title": "CI build job lyrical/source failed!"
+    }
+  ],
+  "post_activation_issue_identities_observed": 91,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-12T06:30:11Z",
+  "schema_version": 1
+}
