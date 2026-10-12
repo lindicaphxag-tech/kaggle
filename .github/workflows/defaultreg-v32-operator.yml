@@ -1,0 +1,29 @@
+name: DefaultReg V32 nonisotropic operator zero-leakage tests
+on:
+  push:
+    branches: [research/defaultreg-v32-noise-debiased-contrast-20261013]
+    paths:
+      - '.github/workflows/defaultreg-v32-operator.yml'
+      - 'research/defaultreg_bspc_v13/src/noise_debiased_subject_operator_v32.py'
+      - 'research/defaultreg_bspc_v13/tests/test_noise_debiased_subject_operator_v32.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-operator-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Install original benchmark stack pinned
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2 pytest
+      - name: Mathematical and original source CV regression
+        run: |
+          python -m py_compile research/defaultreg_bspc_v13/src/noise_debiased_subject_operator_v32.py
+          PYTHONPATH=research/defaultreg_proper_predictive python -m pytest -q research/defaultreg_bspc_v13/tests/test_noise_debiased_subject_operator_v32.py
