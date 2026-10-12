@@ -57,6 +57,21 @@ Class-centred minus proper predictive & $-0.022529$ &
 \end{tabular}
 \end{table}
 
+We also compared the two source-validation score
+paths themselves, at the \emph{same} $\lambda=0.2$,
+using the immutable original and new source-grouped
+receipts. The genuine predictive Gaussian log score
+exceeded the validation-class-centred covariance score
+in 29/29 outer training pools. The mean difference
+was $+0.86995$ per feature, ranging from $+0.83371$
+to $+0.94214$. This is the nonnegative class-mean
+shift penalty of Eq.~\eqref{eq:v17-exact-nll-shift}
+measured on \emph{real EEG source validation data}.
+These 29 source pools overlap heavily; neither their
+positive signs nor the numerical penalty imply
+a new independent dataset replication or a causal
+guarantee of higher held-person AUC.
+
 The newly implemented proper-predictive objective selected
 \(\lambda=0.2\) in \emph{all 29} outer folds. It differs from the
 original class-centred covariance choice in 29/29 folds, yet its
