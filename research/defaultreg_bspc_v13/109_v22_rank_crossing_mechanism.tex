@@ -1,0 +1,69 @@
+\subsection{AUC-active regularisation changes: an exact rank-transition audit}
+\label{sec:v22-rank-transitions}
+A difference between two selected shrinkage parameters does not itself
+measure a downstream prediction difference. Nor does rotation of the
+discriminant vector necessarily modify the ranking of positive and negative
+trials. We therefore distinguish a \emph{selection change}, a
+\emph{score-order change}, and a \emph{signed AUC change}. This section
+provides a transparent diagnostic identity and a falsifiable source-only
+analysis protocol; it does not introduce a previously validated novel
+classifier or an independently confirmed predictive certificate.
+
+For participant $g$ with positive trials $P_g$ and negative trials $N_g$,
+let $z_{pn}(\lambda)=f_\lambda(x_p)-f_\lambda(x_n)$ and
+$h(z)={\bf1}\{z>0\}+\tfrac12{\bf1}\{z=0\}$. Then
+\[
+  A_g(\lambda)=\frac{1}{|P_g||N_g|}
+     \sum_{p\in P_g,n\in N_g}h(z_{pn}(\lambda)).
+\]
+For source-only decisions $a,b$, count pair-state transitions in a
+$3\times3$ matrix $M_{ij}^{(g)}(a,b)$ where
+$i,j\in\{-,0,+\}$ describe the signs of $z_{pn}(a),z_{pn}(b)$.
+With credit vector $c=(0,\tfrac12,1)$, the following identity is exact,
+including score ties:
+\begin{equation}
+  A_g(b)-A_g(a)=
+  \frac{\sum_{i,j}M_{ij}^{(g)}(a,b)(c_j-c_i)}
+       {|P_g||N_g|}.
+  \label{eq:v22-exact-pair-transition}
+\end{equation}
+Gross pair-state churn
+$G_g(a,b)=\sum_{i\ne j}M_{ij}^{(g)}(a,b)/(|P_g||N_g|)$
+always gives the within-participant deterministic bound
+\[
+ \left|A_g(b)-A_g(a)\right|\le G_g(a,b),
+\]
+because the difference between two pair credits is at most one and
+vanishes if the pair's sign class does not change.
+The churn may nevertheless be large although the \emph{signed}
+difference in Eq.~\eqref{eq:v22-exact-pair-transition} is zero. Thus parameter
+disagreement and even extensive pairwise reordering are insufficient to
+claim improved discrimination. This basic rank identity is not claimed
+as a new mathematical theorem. Its value here is an exact, inspectable
+link between the original covariance--discrimination mismatch and the
+observed possibility of near-invariant ROC-AUC.
+
+For source validation, matrices and AUCs are computed for each
+held-\emph{source} participant using only an inner model trained on
+different source participants. We report participant-macro averages of
+$G_g$ and the signed differences, rather than pooling pairs across
+participants of unequal trial counts. The original source-only choices
+are computed first, and no outer target record enters the source
+diagnostic. Any application of Eq.~\eqref{eq:v22-exact-pair-transition}
+to frozen outer target scores is a \emph{post-outcome explanation}, not
+an admissible selection or early-warning rule. In particular, exactness
+of the decomposition does not give a finite-sample confidence bound for
+future participants or justify treating overlapping source folds as
+independent.
+
+\paragraph{Mechanistic promotion test.}
+The frozen V21 BNCI2014\_004 observation---eight of nine CVaR selections
+different from source macro selection without a mean AUC or
+material-harm improvement---motivates the diagnostic, but does not
+validate it. Source pair-churn, cancellation, and subject dispersion
+must be compared against scalar $\lambda$ distance, source AUC regret,
+covariance regret, and source discriminant rotation on a separately
+untouched external acquisition before making a predictive or improved
+target-AUC claim. We retain all false alarms, missed harms, and negative
+results. An executable implementation, leakage-contract tests, and the
+pre-outcome falsification protocol accompany the research draft.

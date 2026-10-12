@@ -1,0 +1,49 @@
+name: DefaultReg V22 exact source rank-change mechanism and article
+on:
+  push:
+    branches:
+      - research/defaultreg-v22-pairwise-rank-mechanism-20261012
+    paths:
+      - 'research/defaultreg_bspc_v13/**'
+      - '.github/workflows/defaultreg-v22-rank-churn.yml'
+  pull_request:
+    paths:
+      - 'research/defaultreg_bspc_v13/**'
+      - '.github/workflows/defaultreg-v22-rank-churn.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact-rank-mechanism:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install numerical and scientific typesetting requirements
+        run: |
+          python -m pip install --quiet numpy
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-pictures texlive-fonts-recommended lmodern poppler-utils
+      - name: Run rank-churn mathematical and source-only regression tests
+        run: |
+          python -m unittest discover -v -s research/defaultreg_bspc_v13/tests -p 'test_source_rank_churn_v22.py'
+      - name: Compile independent V22 research article, no fabricated new EEG results
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_bspc_v22_MECHANISM_DRAFT.tex
+          test -s main_bspc_v22_MECHANISM_DRAFT.pdf
+          pdftotext main_bspc_v22_MECHANISM_DRAFT.pdf main_bspc_v22_extract.txt
+          grep -q 'Gross pair-state churn' main_bspc_v22_extract.txt
+          grep -q '0.77714' main_bspc_v22_extract.txt
+          if grep -Eq 'Undefined control sequence|Citation.*undefined|multiply defined' main_bspc_v22_MECHANISM_DRAFT.log; then exit 3; fi
+          pdfinfo main_bspc_v22_MECHANISM_DRAFT.pdf | grep Pages
+      - uses: actions/upload-artifact@v4
+        with:
+          name: defaultreg-v22-exact-rank-mechanism-research-draft
+          path: |
+            research/defaultreg_bspc_v13/main_bspc_v22_MECHANISM_DRAFT.pdf
+            research/defaultreg_bspc_v13/main_bspc_v22_MECHANISM_DRAFT.log
+            research/defaultreg_bspc_v13/V22_PREOUTCOME_FALSIFICATION_PROTOCOL.md
