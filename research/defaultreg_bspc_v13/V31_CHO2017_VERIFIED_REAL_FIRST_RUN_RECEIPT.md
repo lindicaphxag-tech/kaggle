@@ -48,7 +48,10 @@ This conditional theorem is not a real-target EEG coverage guarantee.
 
 The single predeclared primary comparison, SCE-rho1 minus source macro,
 has a participant-macro paired mean +0.003395 AUC, exact sign-flip
-enumeration reference p=0.09308433532714844 (two-sided). It FAILS
+enumeration reference p=0.09308433532714844 (two-sided); the
+20,000-draw seeded subject bootstrap descriptive 95% interval of paired
+mean AUC difference is approximately [-0.000295, +0.006975] and
+crosses zero. It FAILS
 the predeclared p<.05 positive promotion threshold. Counts: 14/20 improved,
 6/20 harmed, with 0 above +.02 benefit and 0 below -.02 harm;
 max participant effect +.0155, min -.0109. All 20 are retained.
