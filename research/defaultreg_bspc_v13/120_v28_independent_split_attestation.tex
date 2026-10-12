@@ -1,0 +1,46 @@
+\subsection{Independent source-group attestation from exact EEG epoch identity}
+\label{sec:v28-independent-graph}
+We reconstructed the eligible held-record source splits from the
+original V27 exact-epoch overlap ledger, without loading EEG waveforms,
+using class labels for fitting, or consulting classifier AUCs.
+The independent graph implementation creates an edge whenever two
+identifiers have at least one exactly equal full processed EEG epoch.
+Every connected component must remain within one validation fold
+to prevent exact cross-boundary trial-content leakage.
+
+The immutable public Liu2024 scan contains 50 nominal identifiers,
+2,000 original trials and 1,960 distinct trial arrays. It reports
+a single cross-identifier component $\{4,5\}$ sharing all 40 trials.
+No other exactly equal partial trial-content reuse was detected.
+Reconstruction therefore yields 49 held-record groups with 48
+distinct source representatives per fold. All 49 split contracts
+were checked successfully against the original V27 artifact in
+GitHub Actions run \texttt{38288719062}. The independent
+report SHA-256 begins with \texttt{5b50866f464a4d8f};
+the complete digest and JSON reside in the public run artifact.
+
+Synthetic tests deliberately insert partial and transitive
+cross-record replay, duplicate graph edges and inconsistent
+label counts. When two different complete records share just
+one original epoch, the algorithm combines their components
+instead of retaining an invalid subject-ID split.
+
+This independent audit establishes a necessary split condition,
+not the numerical performance of a refitted EEG decoder.
+The separately committed V26 runner discarded all
+copied records from source fitting and target reporting,
+re-fitted the geometry and selection rules and SHA-locked
+every source choice before joining target AUCs. The
+additional V28 independent artifact cross-check
+confirmed that all 49 actual source-training sets
+match the graph-derived legal folds; see
+Section~\ref{sec:v28-three-estimands}. These
+checks remain retrospective and do not establish
+any causal inflation estimate or new blinded test.
+
+Global inspection of held EEG signal content was used in
+this integrity analysis. It is retrospective and cannot
+be represented as strict target-signal-isolated Z0.
+Exact equality also does not identify human patients
+or rule out approximate duplicates and overlapping
+non-identical time windows.

@@ -1,0 +1,52 @@
+name: DefaultReg V28 independently attested exact-epoch-safe splits
+on:
+  push:
+    branches: [research/defaultreg-v28-epoch-group-certificate-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/v28_epoch_split_attestation.py'
+      - 'research/defaultreg_bspc_v13/tests/test_v28_epoch_split_attestation.py'
+      - '.github/workflows/defaultreg-v28-epoch-split-attestation.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independently-reconstruct-held-groups:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Synthetic invariant, transitivity and negative cases
+        run: |
+          python -m unittest discover -s research/defaultreg_bspc_v13/tests -p 'test_v28_epoch_split_attestation.py' -v
+      - name: Download original 2000-trial already executed V27 receipt (no raw EEG repeat)
+        run: |
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11763598792/zip > /tmp/v27-exact-epochs-original.zip
+          test -s /tmp/v27-exact-epochs-original.zip
+      - name: Rebuild 49 folds independently from trial-level graph
+        run: |
+          python research/defaultreg_bspc_v13/src/v28_epoch_split_attestation.py --v27-zip /tmp/v27-exact-epochs-original.zip --out /tmp/v28/INDEPENDENT_EPOCH_SAFE_49_SPLIT_ATTESTATION.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          v=json.loads(Path('/tmp/v28/INDEPENDENT_EPOCH_SAFE_49_SPLIT_ATTESTATION.json').read_text())
+          assert v['status']=='PASS_V28_GRAPH_DERIVED_EPOCH_DISJOINT_GROUPS'
+          assert v['n_distinct_epoch_safe_recording_groups']==49
+          assert v['n_exact_epoch_unique_contents']==1960
+          assert v['shared_epoch_edges']==[{'subject_a':4,'subject_b':5,'shared_unique_epoch_contents':40}]
+          assert [x for x in v['epoch_components'] if len(x)>1]==[[4,5]]
+          assert len(v['all_held_group_source_splits'])==49
+          assert all(x['n_source_unique_groups']==48 for x in v['all_held_group_source_splits'])
+          assert v['not_physically_target_isolated']
+          print('PASS_V28_REAL_LIU2024_EPOCH_SAFE_SOURCE_SPLIT_ATTESTATION')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: defaultreg-v28-independent-epoch-safe-fold-attestation
+          path: /tmp/v28/**
+          retention-days: 90
