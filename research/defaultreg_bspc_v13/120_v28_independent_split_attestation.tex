@@ -27,15 +27,16 @@ instead of retaining an invalid subject-ID split.
 
 This independent audit establishes a necessary split condition,
 not the numerical performance of a refitted EEG decoder.
-The separately committed V26 runner must discard all copied
-records from both source fitting and target reporting, refit
-the Riemannian geometry and every shrinkage selection criterion,
-and freeze source choices before joining target labels. An
-optional V28 artifact cross-check is designed to compare
-the actual fitted source ID sets to the independently
-reconstructed epoch-safe split list; until that run and
-cross-check both succeed we do not report a repaired
-target-AUC gain or loss.
+The separately committed V26 runner discarded all
+copied records from source fitting and target reporting,
+re-fitted the geometry and selection rules and SHA-locked
+every source choice before joining target AUCs. The
+additional V28 independent artifact cross-check
+confirmed that all 49 actual source-training sets
+match the graph-derived legal folds; see
+Section~\ref{sec:v28-three-estimands}. These
+checks remain retrospective and do not establish
+any causal inflation estimate or new blinded test.
 
 Global inspection of held EEG signal content was used in
 this integrity analysis. It is retrospective and cannot
