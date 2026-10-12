@@ -57,6 +57,8 @@ def run(archive,out):
     assert receipt["target_information_track"]=="Z0"
     source_candidates={int(f["target_subject"]):tuple(
         f["source_path"]["feasible_full_lambdas"]) for f in receipt["folds"]}
+    original_centered_lambdas={int(f["target_subject"]):float(
+        f["source_path"]["lambda_covariance_full"]) for f in receipt["folds"]}
     frozen_counts={int(f["participant"]):int(f["trials"])
                    for f in receipt["participant_receipt"]}
     del receipt
@@ -71,7 +73,7 @@ def run(archive,out):
         print("SOURCE_ONLY_SUBJECT_SELECTION",sid,"lambda",lam,flush=True)
         rows.append({"subject":sid,"new_source_proper_predictive_lambda":lam,
                      "source_predictive_log_score_by_lambda":path,
-                     "original_class_centered_lambda":f["source_path"]["lambda_covariance_full"],
+                     "original_class_centered_lambda":original_centered_lambdas[sid],
                      "no_outer_target_info_for_selection":True})
     out=Path(out);out.mkdir(parents=True,exist_ok=True)
     sel_bytes=json.dumps(rows,sort_keys=True,indent=2).encode()
