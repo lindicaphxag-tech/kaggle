@@ -74,7 +74,7 @@ def run():
         src47=(g!=target)&np.isin(g,list(groups_near))
         if int(held.sum())!=40 or int(src49.sum())!=48*40 or int(src47.sum())!=46*40:
             raise RuntimeError("representative source group leak")
-        row={"held_record_id":target,"near_alias_group_target":target in (4,11,47),
+        row={"held_record_id":target,"near_alias_group_target":target in (11,47),
              "outcomes":{}}
         for name in METHODS:
             a=fit_scores(C,y,src49,held,name)
@@ -95,8 +95,8 @@ def run():
           "exact49_fit_auc_over_same47_held":float(np.mean(exact)),
           "conservative_near47_fit_auc_over_same47_held":float(np.mean(near)),
           "mean_delta_all47":float(np.mean(d)),
-          "mean_delta_3_candidate_group_representatives":float(np.mean(d[touched])),
-          "mean_delta_44_others":float(np.mean(d[~touched])),
+          "mean_delta_2_new_near_group_representatives":float(np.mean(d[touched])),
+          "mean_delta_45_other_held_groups":float(np.mean(d[~touched])),
           "candidate_id11_delta":float(d[list(HELD_IDS).index(11)]),
           "candidate_id47_delta":float(d[list(HELD_IDS).index(47)]),
           "n_harmed_gt002":int(np.sum(d<-.020000001)),
