@@ -4,6 +4,8 @@ on:
     branches: [publication/default-eeg-p4-rank-certificates-20261013]
     paths:
       - '.github/workflows/defaultreg-paper-4-proof.yml'
+      - 'research/defaultreg_bspc_v13/main_p4_rank_cell_certificates_NOT_READY.tex'
+      - 'research/defaultreg_bspc_v13/P4_synthetic_multidimensional_numeric_appendix.tex'
   workflow_dispatch:
 permissions:
   contents: read
@@ -24,6 +26,8 @@ jobs:
           pdftotext -layout main_p4_rank_cell_certificates_NOT_READY.pdf /tmp/p4text.txt
           grep -q '94.267' /tmp/p4text.txt
           grep -q '96.338' /tmp/p4text.txt
+          grep -q '16.667' /tmp/p4text.txt
+          grep -q 'Synthetic' /tmp/p4text.txt
           ! grep -Eq 'Citation.*undefined|Reference.*undefined|Undefined control sequence' main_p4_rank_cell_certificates_NOT_READY.log
           pdfinfo main_p4_rank_cell_certificates_NOT_READY.pdf | grep Pages
       - uses: actions/upload-artifact@v4
