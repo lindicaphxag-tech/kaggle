@@ -29,6 +29,7 @@ def channel_equality(subject_a, subject_b):
     eq = [bool(np.array_equal(a[k], b[k])) for k in range(a.shape[0])]
     maxdiff = [float(np.max(np.abs(a[k]-b[k]))) for k in range(a.shape[0])]
     original = [(p.name, int(p.stat().st_size)) for p in paths]
+    channel_names = list(eegs[0].ch_names)
     del a,b,eegs
     return {
         "original_subject_ids":[subject_a,subject_b],
@@ -38,6 +39,7 @@ def channel_equality(subject_a, subject_b):
         "different_numeric_channels":int(len(eq)-sum(eq)),
         "channelwise_numeric_equal":eq,
         "different_channel_indices":[i for i,v in enumerate(eq) if not v],
+        "different_channel_names":[channel_names[i] for i,v in enumerate(eq) if not v],
         "per_different_channel_max_abs":[maxdiff[i] for i,v in enumerate(eq) if not v],
         "different_EDF_binary_sources":paths[0].name!=paths[1].name,
         "does_not_identify_duplicate_human_participants":True,
@@ -62,6 +64,7 @@ def main():
             "n_exact_equal":r["equal_numeric_channels"],
             "n_distinct":r["different_numeric_channels"],
             "different_channel_indices":r["different_channel_indices"],
+            "different_channel_names":r["different_channel_names"],
         } for r in result["pairs"]],
         "receipt_sha256":hashlib.sha256(body.encode()).hexdigest(),
     },indent=2))
