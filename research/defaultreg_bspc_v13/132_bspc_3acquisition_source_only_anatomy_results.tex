@@ -1,0 +1,95 @@
+% Three PUBLIC EEG source-group result rows from source-only GitHub CI.
+% Target results of these acquisitions were exposed in earlier studies:
+% this is post-outcome mechanism diagnosis, NOT independent confirmation.
+\subsection{Source-group EEG evidence for the three-factor mismatch}
+\label{sec:bspc-source-three-acq}
+We quantified the exact likelihood-score decomposition
+using three previously analysed public MI-EEG acquisitions,
+without reopening any unrelated target persons.
+The fixed group-fold source CV uses original source-trained
+tangent geometry, covariance shrinkage and class labels
+from the \emph{source-validation} subjects only.
+The Cho2017 and Dreyer2023A source pools each contained
+12 distinct released IDs and a fixed three-channel
+montage. BNCI2014\_002 used 14 already studied
+participants and its original \emph{native 15-channel,
+120-coordinate} tangent representation.
+All lambdas were chosen on the original source
+27-point grid, not by looking at held-target AUC.
+
+\begin{table}[ht]
+\centering
+\scriptsize
+\caption{Exact three-factor decomposition of the
+source-trained-mean Gaussian predictive-score penalty
+relative to the historical class-centred score,
+evaluated at the \emph{source-only proper Gaussian-NLL
+choice} for each acquisition. Percentages are fractions
+of the full nonnegative held-source mean-shift penalty,
+\emph{not} fractions of EEG information, target
+variance explained, or expected AUC improvement.
+Loc. is the AUC-invariant common-location shift;
+Orth. is class-contrast drift orthogonal to the
+trained LDA score; Score is the discriminant-projected
+class-contrast drift. These are post-outcome
+descriptive mechanism analyses.}
+\label{tab:bspc-source-threefactor}
+\setlength{\tabcolsep}{3.1pt}
+\begin{tabular}{lrrrrrr}
+\toprule
+Acquisition & $G$ & $p$ & $\lambda_{\rm pred}$
+            & Loc. (\%) & Orth. (\%) & Score (\%)\\
+\midrule
+Cho2017 & 12 & 6 & 0.10 & 97.31 & 1.28 & 1.41\\
+Dreyer2023A & 12 & 6 & 0.10 & 98.92 & 0.37 & 0.71\\
+BNCI2014\_002 & 14 & 120 & 0.30 & 98.18 & 1.58 & 0.23\\
+\bottomrule
+\end{tabular}
+\end{table}
+In all three source-validation collections,
+the largest component was the location shift,
+which leaves a fixed linear classifier's
+\emph{within-person} ROC-AUC invariant.
+Adding the score-orthogonal contrast term,
+the AUC-invariant share was 98.59\%,
+99.29\% and 99.77\%, respectively.
+These identities were validated for every
+feasible lambda and individual source group
+against the original historical score and source
+macro-AUC selection code. An independent
+artifact-only audit (no EEG retraining) recomputed
+every one of the 27-point candidate scores and
+38 source-group records. At the source-predictive
+selected lambda, the common-location contribution
+exceeded the discriminant-aligned contribution
+in \emph{all} 12/12 Cho, 12/12 Dreyer and 14/14
+BNCI source-validation groups. Descriptive
+leave-one-record-group-out \emph{reaggregation}
+of the unchanged fitted scores gave an
+AUC-invariant share range of
+98.38--99.35\% for Cho,
+99.15--99.60\% for Dreyer, and
+99.74--99.86\% for BNCI.
+These ranges are influence diagnostics, not
+refitted-model inference or population confidence
+intervals. The source-macro
+choices were respectively $\lambda=0.5$,
+0.3 and 0.9, whereas the correct predictive
+NLL choices were 0.1, 0.1 and 0.3.
+
+This shows that in these fixed held-source
+validation pipelines the \emph{numerical magnitude}
+of the corrected density-score penalty was
+dominated by changes not visible to the
+tested fixed discriminant's score ordering.
+It does \emph{not} show that a selector
+discarding the location or orthogonal terms
+improves new-person EEG decoding.
+The EEG validation cohorts have already
+been used in previous experimental work;
+the source anatomy was analysed post outcome,
+and no new independent held-person significance
+test is claimed. The two 3-channel collections
+share the same task and feature dimensionality,
+while BNCI2014\_002 has a different task,
+native montage and feature dimension.

@@ -1,0 +1,68 @@
+name: DefaultReg BSPC SOURCE-only two acquisition factor anatomy
+on:
+  push:
+    branches: [research/defaultreg-bspc-shift-factorization-20261013]
+    paths:
+      - '.github/workflows/defaultreg-bspc-real-source-shift-factors.yml'
+      - 'research/defaultreg_bspc_v13/tests/test_exact_prediction_shift_partition.py'
+      - 'research/defaultreg_bspc_v13/src/exact_prediction_shift_partition.py'
+      - 'research/defaultreg_bspc_v13/src/run_bspc_source_only_twofactor_datasets.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-structure:
+    name: Source only twofactor ${{ matrix.dataset }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    strategy:
+      fail-fast: false
+      matrix:
+        dataset: [Dreyer2023A, Cho2017]
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MNE_DATA: /tmp/bspc-source-twofactor-${{ matrix.dataset }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Fixed existing EEG analysis dependency
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2 pytest
+      - name: Establish exact mathematical and source path parity
+        run: |
+          PYTHONPATH=research/defaultreg_proper_predictive python -m pytest -q research/defaultreg_bspc_v13/tests/test_exact_prediction_shift_partition.py
+      - name: Two-factor source only real EEG with original CV folds
+        run: |
+          mkdir -p "$MNE_DATA" /tmp/bspc-source-twofactor-results
+          python research/defaultreg_bspc_v13/src/run_bspc_source_only_twofactor_datasets.py --dataset "${{ matrix.dataset }}" --out /tmp/bspc-source-twofactor-results
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          paths=list(Path('/tmp/bspc-source-twofactor-results').glob('*_SOURCE_ONLY_SHIFT_TWOFACTOR_POSTOUTCOME.json'))
+          assert len(paths)==1,paths
+          x=json.loads(paths[0].read_text())
+          assert x['n_source_people']==12
+          assert x['source_only_ids']==list(range(1,13))
+          assert x['no_target_subjects_opened']
+          assert x['has_prior_exposed_target_results_elsewhere']
+          assert x['source_macro_agrees_with_original']
+          assert x['source_covscore_agrees_with_original']
+          assert len(x['all_full_grid_rows'])>=20
+          for row in x['all_full_grid_rows']:
+              assert row['source_mean_shift_gap']>=-1e-9
+              assert abs(row['source_mean_shift_gap']-
+                       row['auc_invariant_translation_contribution']-
+                       row['contrast_shift_contribution'])<1e-8
+          print('SOURCE_ONLY_TWOFACTOR_REAL_EEG_ALL_ORIGINAL_MODEL_CONTRACTS_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-bspc-source-12-${{ matrix.dataset }}-twofactor-exploratory
+          path: |
+            /tmp/bspc-source-twofactor-results/**
+            research/defaultreg_bspc_v13/BSPC_TWOFACTOR_SOURCE_ONLY_POSTOUTCOME_SCOPE.md
+          if-no-files-found: warn
+          retention-days: 90

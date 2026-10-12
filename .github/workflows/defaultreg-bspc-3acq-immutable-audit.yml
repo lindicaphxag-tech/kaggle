@@ -1,0 +1,135 @@
+name: DefaultReg BSPC immutable 3 acquisition score-gap independent audit
+on:
+  push:
+    branches: [research/defaultreg-bspc-shift-factorization-20261013]
+    paths: ['.github/workflows/defaultreg-bspc-3acq-immutable-audit.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independent-not-refit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy
+      - name: Retrieve exact frozen Cho2017 original SOURCE run
+        uses: actions/download-artifact@v4
+        with:
+          name: defaultreg-bspc-source-12-Cho2017-twofactor-exploratory
+          run-id: 38303616022
+          github-token: ${{ github.token }}
+          path: /tmp/defaultreg-audit-cho
+      - name: Retrieve exact frozen Dreyer2023A original SOURCE run
+        uses: actions/download-artifact@v4
+        with:
+          name: defaultreg-bspc-source-12-Dreyer2023A-twofactor-exploratory
+          run-id: 38303616022
+          github-token: ${{ github.token }}
+          path: /tmp/defaultreg-audit-dreyer
+      - name: Retrieve separate native-montage BNCI original SOURCE run
+        uses: actions/download-artifact@v4
+        with:
+          name: defaultreg-BSPC-BNCI-native15-source-threefactor-postoutcome
+          run-id: 38303571392
+          github-token: ${{ github.token }}
+          path: /tmp/defaultreg-audit-bnci
+      - name: Recalculate every individual, every lambda, and source group influence
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib
+          import numpy as np
+          expected={
+            "Cho2017":("/tmp/defaultreg-audit-cho",
+              "db059d83cf23e43ea916bb1194f578ce825157d07ca38eec430aeb1d45f53cbc",
+              12,2480,6,.1,.5),
+            "Dreyer2023A":("/tmp/defaultreg-audit-dreyer",
+              "4fb322119ec62040a7cf0cf8bd404c475a395b6cfd1c9dc9aa05f97fe3aee932",
+              12,2880,6,.1,.3),
+            "BNCI2014_002":("/tmp/defaultreg-audit-bnci",
+              "7a9140ea497a047c7068981aa60ea9781663945cd049d81fb7dadc3957db89af",
+              14,2240,120,.3,.9),
+          }
+          for name,(folder,hash_expected,n,trials,p,proper_lam,macro_lam) in expected.items():
+              paths=list(Path(folder).rglob("*.json"))
+              assert len(paths)==1,(name,paths)
+              src=paths[0].read_bytes()
+              actual=hashlib.sha256(src).hexdigest()
+              assert actual==hash_expected,(name,actual)
+              report=json.loads(src)
+              is_bnci=name=="BNCI2014_002"
+              if is_bnci:
+                  assert report["source_ids"]==list(range(1,15))
+                  assert report["not_independent_target_validation"]
+                  assert report["n_eeg_channels"]==15
+                  assert report["tangent_feature_dimension"]==120
+                  rows=report["all_grid_rows"]
+                  sel=report["selected_rows"]
+                  selected=sel["proper_predictive"]
+                  assert selected["lambda"]==proper_lam
+                  assert sel["source_macro_auc"]["lambda"]==macro_lam if "source_macro_auc" in sel else True
+              else:
+                  assert report["source_only_ids"]==list(range(1,13))
+                  assert report["no_target_subjects_opened"]
+                  assert report["has_prior_exposed_target_results_elsewhere"]
+                  assert report["source_macro_agrees_with_original"]
+                  assert report["source_covscore_agrees_with_original"]
+                  rows=report["all_full_grid_rows"]
+                  sel=report["selected_points"]
+                  selected=sel["proper_predictive"]
+                  assert selected["lambda"]==proper_lam
+                  assert sel["source_macro_auc"]["lambda"]==macro_lam
+              assert report["n_source_people"]==n and report["n_source_trials"]==trials
+              assert len(rows)>=20
+              for row in rows:
+                  grouped=row["per_source_group"]
+                  assert len(grouped)==n
+                  ids=[q["group_id"] for q in grouped]
+                  assert len(set(ids))==n
+                  for q in grouped:
+                      A=q["location_shift_auc_invariant"]
+                      B=q["class_contrast_shift_score_aligned"]
+                      C=q["class_contrast_shift_score_orthogonal"]
+                      T=q["mean_shift_total"]
+                      assert all(z>=-1e-8 for z in [A,B,C,T])
+                      assert abs(A+B+C-T)<1e-8
+                      assert abs(q["proper_predictive_score"]-
+                                 q["validation_class_centred_score"]-T)<1e-8
+                  for field,col in [
+                      ("auc_invariant_translation_contribution","location_shift_auc_invariant"),
+                      ("contrast_shift_score_aligned_contribution","class_contrast_shift_score_aligned"),
+                      ("contrast_shift_score_orthogonal_contribution","class_contrast_shift_score_orthogonal"),
+                      ("source_macro_auc","held_source_auc"),
+                  ]:
+                      assert abs(row[field]-np.mean([q[col] for q in grouped]))<1e-10
+              rr=next(v for v in rows if abs(v["lambda"]-proper_lam)<1e-12)
+              x=np.array([q["location_shift_auc_invariant"] for q in rr["per_source_group"]])
+              a=np.array([q["class_contrast_shift_score_aligned"] for q in rr["per_source_group"]])
+              o=np.array([q["class_contrast_shift_score_orthogonal"] for q in rr["per_source_group"]])
+              t=x+a+o
+              fraction=float((x.sum()+o.sum())/t.sum())
+              location=float(x.sum()/t.sum())
+              aligned=float(a.sum()/t.sum())
+              loo=[float(((x.sum()-x[i])+(o.sum()-o[i]))/(t.sum()-t[i]))
+                   for i in range(n)]
+              fraction_key="auc_invariant_location_plus_orthogonal_fraction" if is_bnci else "total_auc_invariant_location_plus_orthogonal_fraction"
+              assert abs(fraction-selected[fraction_key])<1e-10
+              assert abs(location-selected["location_fraction"] if is_bnci else
+                         location-selected["translation_fraction"])<1e-10
+              print("BSPC_3ACQ_IMMUTABLE_INDEPENDENT_AUDIT_PASS",json.dumps({
+                  "dataset":name,"sha256":actual,"groups":n,"trials":trials,
+                  "feature_dim":p,"frozen_proper_lambda":proper_lam,
+                  "original_source_macro_lambda":macro_lam,
+                  "location_fraction":location,"score_aligned_fraction":aligned,
+                  "auc_invariant_fraction":fraction,
+                  "leave_one_group_out_invariant_fraction_min":min(loo),
+                  "leave_one_group_out_invariant_fraction_max":max(loo),
+                  "groups_where_location_exceeds_score_aligned":int((x>a).sum()),
+                  "previously_exposed_target_not_confirmatory":True
+              },sort_keys=True))
+          print("BSPC_3ACQ_ALL_SOURCE_GROUP_ROWS_RECOMPUTED_WITHOUT_EEG_REFIT")
+          PY
