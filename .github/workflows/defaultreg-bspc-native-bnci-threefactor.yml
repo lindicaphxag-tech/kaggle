@@ -1,0 +1,62 @@
+name: DefaultReg BSPC native BNCI 15-channel exposed source anatomy
+on:
+  push:
+    branches: [research/defaultreg-bspc-shift-factorization-20261013]
+    paths:
+      - '.github/workflows/defaultreg-bspc-native-bnci-threefactor.yml'
+      - 'research/defaultreg_bspc_v13/src/run_bspc_bnci_native_source_threefactor.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-montage-source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MNE_DATA: /tmp/defaultreg-bnci-source-native15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check moabb==1.7.2 pytest
+      - name: Verify exact shift source path contracts
+        run: |
+          PYTHONPATH=research/defaultreg_proper_predictive python -m pytest -q research/defaultreg_bspc_v13/tests/test_exact_prediction_shift_partition.py
+      - name: Read only native BNCI source folds; no unseen-target claim
+        run: |
+          mkdir -p "$MNE_DATA" /tmp/defaultreg-bspc-bnci-native
+          python research/defaultreg_bspc_v13/src/run_bspc_bnci_native_source_threefactor.py --out /tmp/defaultreg-bspc-bnci-native
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          fs=list(Path("/tmp/defaultreg-bspc-bnci-native").glob("*.json"))
+          assert len(fs)==1,fs
+          x=json.loads(fs[0].read_text())
+          assert x["dataset"]=="BNCI2014_002"
+          assert x["n_source_people"]==14
+          assert x["n_eeg_channels"]==15
+          assert x["tangent_feature_dimension"]==120
+          assert x["source_ids"]==list(range(1,15))
+          assert x["outer_target_results_previously_exposed"]
+          assert x["original_source_27_grid_parity"]
+          assert len(x["all_grid_rows"])>=20
+          for row in x["all_grid_rows"]:
+              z=row["source_mean_shift_gap"]
+              u=row["auc_invariant_translation_contribution"]
+              v=row["contrast_shift_score_aligned_contribution"]
+              w=row["contrast_shift_score_orthogonal_contribution"]
+              assert abs(z-u-v-w)<1e-8
+          print("BNCI_SOURCE14_NATIVE15_ORIGINAL_GRID_AND_3FACTOR_PARITY_PASS")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-BSPC-BNCI-native15-source-threefactor-postoutcome
+          path: |
+            /tmp/defaultreg-bspc-bnci-native/**
+            research/defaultreg_bspc_v13/BSPC_BNCI2014_002_EXPOSED_SOURCE_ANATOMY_PROTOCOL.md
+          if-no-files-found: warn
+          retention-days: 90
