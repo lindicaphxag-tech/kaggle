@@ -1,0 +1,29 @@
+name: DefaultReg BSPC two-factor shift theorem and original source path
+on:
+  push:
+    branches: [research/defaultreg-bspc-shift-factorization-20261013]
+    paths:
+      - '.github/workflows/defaultreg-bspc-twofactor-contracts.yml'
+      - 'research/defaultreg_bspc_v13/src/exact_prediction_shift_partition.py'
+      - 'research/defaultreg_bspc_v13/tests/test_exact_prediction_shift_partition.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  two-factor-identity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Original pinned EEG dependency family
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2 pytest
+      - name: Exact analytic counterexamples and source grouped CV parity
+        run: |
+          python -m py_compile research/defaultreg_bspc_v13/src/exact_prediction_shift_partition.py
+          PYTHONPATH=research/defaultreg_proper_predictive python -m pytest -q research/defaultreg_bspc_v13/tests/test_exact_prediction_shift_partition.py
