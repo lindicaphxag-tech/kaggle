@@ -3,7 +3,7 @@ on:
   push:
     branches: [research/defaultreg-bspc-accepted-topline-benchmark-20261013]
     paths:
-      - '.github/workflows/defaultreg-bspc-twofactor-paper.yml'
+      - '.github/workflows/defaultreg-bspc-accepted-headtohead-paper.yml'
       - 'research/defaultreg_bspc_v13/main_bspc_v31_EVIDENCE_GATED_CANDIDATE.tex'
       - 'research/defaultreg_bspc_v13/00_abstract_v31_CHO40_negative.tex'
       - 'research/defaultreg_bspc_v13/131_bspc_twofactor_auc_invariant_transfer_mechanism.tex'
