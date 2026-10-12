@@ -15,6 +15,15 @@ evaluate the consequences with fixed 49-content-group held
 targets and an explicit 2-by-2 analysis separating reporting
 denominator, model refitting and frozen shrinkage choice.
 
+Additional real public-data checks have now reproduced the exact
+40-trial content alias under a second preprocessing configuration
+(6--35 Hz, 128 Hz). Two fixed classifier objectives, tangent logistic
+and ridge classification, each retained a pronounced refit-related AUC
+change for the aliased recording group while showing near-zero mean
+change over the other 48. These are retrospective analyses on the
+same acquisition, not new patients, independent cohorts or a causal
+population leakage estimate.
+
 We report the full numerical observations without equating
 recording-content identity to clinical patient identity, nor
 claiming that arithmetic decomposition identifies a causal
@@ -29,8 +38,8 @@ the primary measurements, scientific question and
 conclusions of this submission are recording provenance
 and the validation unit rather than classifier improvements.
 Overlapping datasets and related manuscripts will be
-fully disclosed to the journal. We will seek any
-necessary data-custodian comment before finalizing
+fully disclosed to the journal. A data-custodian clarification and author-approved
+independent raw-record verification are prerequisites to finalizing
 the description of the public clinical dataset.
 
 [Authors, affiliations, rights, originality, exclusive-submission
