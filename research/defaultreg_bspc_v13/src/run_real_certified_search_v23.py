@@ -46,10 +46,23 @@ def compute(outer, low, high, splits):
     ]))
     if abs(original_auc-calculated)>1e-10:
         raise AssertionError("frozen source macro AUC regression failed")
+    prespecified_grid = [
+        float(lam) for lam in oldpath["feasible_full_lambdas"]
+        if low <= float(lam) <= high
+    ]
+    if original_lambda not in prespecified_grid:
+        raise AssertionError("original source-grid winner outside interval: invalid fair comparator")
     result = certified_source_auc_search(
         models, low=low, high=high, tolerance=.02,
-        max_splits=splits, segments=1,
+        max_splits=splits, segments=1, initial_lambdas=prespecified_grid,
     )
+    if result["best_evaluated_source_macro_auc"] + 1e-10 < original_auc:
+        raise AssertionError("anchored optimizer regressed below original source 27-grid")
+    result["source_only_improvement_over_original_grid"] = (
+        result["best_evaluated_source_macro_auc"] - original_auc
+    )
+    result["original_grid_inside_search_interval"] = True
+    result["anchor_grid_selected_pre_target_data"] = True
     result.update({
         "status": "REAL_SOURCE_ONLY_CONTINUOUS_SEARCH_NOT_TARGET_CONFIRMATION",
         "outer_held_person": outer,
@@ -82,6 +95,9 @@ def main():
         "continuous_upper_source_AUC": d["upper_bound_global_continuous_source_macro_auc"],
         "source_optimality_gap_upper_bound": d["residual_source_optimality_gap_upper_bound"],
         "certificate_met": d["source_optimality_certificate_met"],
+        "source_improvement_over_grid": d["source_only_improvement_over_original_grid"],
+        "selected_lambda": d["selected_lambda_source_macro"],
+        "evaluations": d["lambda_evaluations"],
         "splits": d["interval_splits"],
         "receipt_sha256": hashlib.sha256(s.encode()).hexdigest(),
     }, indent=2))
