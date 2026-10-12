@@ -1,0 +1,20 @@
+# Independent external EEG source-only criterion study — frozen before first BNCI2014_001 execution
+Protocol date: **2026-10-12**. Scope: public MOABB `BNCI2014_001` (BCI Competition IV 2a), **nine participants**, 22 EEG electrodes, left-hand vs right-hand motor imagery only; all available subject sessions. Only source participants are used to select any parameter. 
+
+## Question, design and endpoints
+Does the V18 estimand correction reproduce outside the two previously exposed Shin2017A/BNCI2014_002 score archives? **Primary descriptive paired quantity**: outer-subject person-macro AUC for source-discrimination-selected minus properly predictive Gaussian NLL-selected shrinkage. **Secondary**: properly predictive Gaussian minus historical held-validation-participant class-centred covariance-score-selected AUC; source-mean-shift penalty positivity; per-person damage >0.02 AUC; alpha=0 versus alpha=1 lambda mismatch and source-only exact crossover threshold.
+
+### Fixed method
+Use **MOABB 1.7.2**, `MotorImagery(n_classes=2, events=['left_hand','right_hand'], fmin=8, fmax=30, resample=160, baseline=None, reject_by_annotation=False)`, original `research/defaultreg_proper_predictive/original_frozen_runner.py` geometric tools (covariance, train-only tangent reference, tangent features, spectral_state, scalar_scores, original FULL_GRID of scalar shrinkages). All 9 source-transfer outer folds = hold exactly one subject for target evaluation, train on other 8; 5-fold grouped SOURCE validation for each outer fold using only labelled SOURCE participants. For `C_cent` use validation class means (historical comparator); for `C_pred` use **inner SOURCE TRAIN** class means without reference to held-source validation class means, and per-source-person equal weighting; for discriminability use source-held-person ROC-AUC. All three criteria use the **same original source-only FULL_GRID intersection and exactly the same inner tangent geometry**. No target labels, target means/covariances, test trial normalization, target-fitted reference, or target-selected lambda.
+
+### Information firewall and chronological receipt
+The file `SOURCE_ONLY_LAMBDA_CHOICES_SHA_LOCK_BEFORE_TARGET_EVALUATION.json` must be serialized and SHA256 printed BEFORE computing any outer target AUC. The source-only selection functions must accept source features, source labels/groups and feasible shrinkage grid ONLY; no target array arguments. After the manifest has been written, fit the outer model on source data; compute scores from *source-train* tangent geometry; then read outer target labels for AUC in a separate joined-results phase. Write each outer subject's score/AUC receipts and calibration-lambda IDs. Source-only decisions must never be retrospectively altered based on target results.
+
+### Inferential limits
+The public dataset is independent of the two original immutable score archives. This GitHub protocol is fixed before the first execution of this NEW run, but **we have not established globally that nobody inspected these EEG results in earlier work**. Therefore do not call it preregistered, prospectively registered, a novel clinical validation, or automatically significant. Nine individuals from one acquisition dataset are not nine independent sites. The source groups overlap across outer folds; report paired mean/median, number harmed and *conditional descriptive bootstrap interval* with no new formal significance/accepted hypothesis test. Preserve negative results and any omitted subjects due data-access or contract failures (do not silently change denominator).
+
+## Decision and stop gates
+1. Stop/fail if dataset access, trial counts, two-class balance, source fold geometry or SPD covariance constraints fail, rather than substituting a different dataset or dropping people.
+2. Stop/fail if a candidate's original source feasibility is violated or target information enters selection.
+3. One report for all 9 (or explicit entire-run failure); no after-outcome changes to event/task/band/channel filters, candidate grid, threshold or baselines.
+4. New dataset AUC gains are unknown. No expected improvement is asserted.
