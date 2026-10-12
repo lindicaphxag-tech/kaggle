@@ -36,7 +36,11 @@ reported target AUCs, their EEG signals differed
 and they must remain distinct.
 An independent released-EDF inspection found that
 IDs 4 and 5 were in different binary EDF files but
-32 of their 33 raw numerical channels were identical.
+32 of their 33 raw numerical channels were identical;
+the sole differing channel was index 32 (zero-based),
+with an empty name in the MNE EDF reader.
+The comparison was performed on numerical signals,
+not merely identical file names or matched classifier scores.
 These tests do not identify human patients and do
 not establish why the release contains identical
 EEG waveforms under two subject IDs.
