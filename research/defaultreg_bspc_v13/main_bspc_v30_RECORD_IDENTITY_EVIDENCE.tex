@@ -132,6 +132,18 @@ BNCI2014\_002 &14&2,240&2,240&0\\
 In the processed Liu2024 signals, IDs 4 and 5 have the same complete
 40-trial EEG and label contents. No further partial cross-ID exact
 trial repetitions were found among the 2,000 trial instances.
+A separate check of the originally released EDF recordings found
+that ID 4 and ID 5 are stored in different EDF binary files yet
+32 of 33 numerical channels are equal over the full corresponding
+EDF data. The sole differing channel was index 32 (zero-based),
+reported with an empty name by the pinned MNE EDF reader.
+Thus the identity evidence extends beyond the resampled,
+post-filtering model inputs. The negative-control pair IDs 47
+and 49 had coincident previously recorded target AUC vectors
+but different signal arrays; equal classifier outcomes alone
+must not be used as an identity criterion.
+Neither EDF channel matching nor a source file's different
+basename resolves the identity of clinical participants.
 Zero exact overlaps in the two controls cannot rule out near-duplicates
 or overlapping source windows with different sampled arrays.
 
