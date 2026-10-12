@@ -1,0 +1,44 @@
+name: DefaultReg V28 record plus epoch integrity manuscript
+on:
+  push:
+    branches: [research/defaultreg-v28-epoch-overlap-integrity-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/120_v28_independent_split_attestation.tex'
+      - 'research/defaultreg_bspc_v13/main_bspc_v28_INDEPENDENT_EPOCH_PROVENANCE.tex'
+      - '.github/workflows/defaultreg-v28-paper.yml'
+  pull_request:
+    paths:
+      - 'research/defaultreg_bspc_v13/120_v28_independent_split_attestation.tex'
+      - 'research/defaultreg_bspc_v13/main_bspc_v28_INDEPENDENT_EPOCH_PROVENANCE.tex'
+      - '.github/workflows/defaultreg-v28-paper.yml'
+permissions:
+  contents: read
+jobs:
+  publication-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install scientific typesetting and PDF preflight
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-pictures texlive-fonts-recommended lmodern poppler-utils
+      - name: Compile V28 technical manuscript with all prior negative controls
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_bspc_v28_INDEPENDENT_EPOCH_PROVENANCE.tex
+          test -s main_bspc_v28_INDEPENDENT_EPOCH_PROVENANCE.pdf
+          pdftotext main_bspc_v28_INDEPENDENT_EPOCH_PROVENANCE.pdf /tmp/v28_text.txt
+          grep -q 'independent' /tmp/v28_text.txt
+          grep -q 'Weibo2014' /tmp/v28_text.txt
+          grep -q '49' /tmp/v28_text.txt
+          if grep -Eq 'Reference.*undefined|Citation.*undefined|Undefined control sequence|multiply defined' main_bspc_v28_INDEPENDENT_EPOCH_PROVENANCE.log; then exit 3; fi
+          pdfinfo main_bspc_v28_INDEPENDENT_EPOCH_PROVENANCE.pdf | grep Pages
+      - uses: actions/upload-artifact@v4
+        with:
+          name: defaultreg-v28-epoch-overlap-evidence-scoped-companion
+          path: |
+            research/defaultreg_bspc_v13/main_bspc_v28_INDEPENDENT_EPOCH_PROVENANCE.pdf
+            research/defaultreg_bspc_v13/main_bspc_v28_INDEPENDENT_EPOCH_PROVENANCE.log
+          if-no-files-found: error
+          retention-days: 90
