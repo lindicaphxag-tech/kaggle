@@ -15,7 +15,7 @@ Estimand Sensitivity in Cross-Subject EEG Decoding}
 \date{}
 \begin{document}
 \maketitle
-\input{00_abstract_v18_fair_predictive.tex}
+\input{00_abstract_v19_exact_estimand.tex}
 \noindent\textbf{Keywords:} EEG; covariance shrinkage; cross-subject decoding;
 motor imagery; model-selection validity; representation sensitivity.
 
@@ -46,6 +46,15 @@ new regularisation mechanisms and multi-paradigm transfer methods
 \cite{miao2025freezing,morvay2026wbt,he2026cyclic}, while recent research highlights
 how participant-level rather than trial-level evaluation can change the
 interpretation of EEG model performance \cite{gil2026subjectvalidation}.
+Qin and colleagues, in a recent study published in this journal,
+evaluated spatial normalization with SVM decoding across nine
+distinct EEG paradigms under within- and between-subject validation
+\cite{qin2026spatialnorm}. That study provides stronger
+cross-paradigm breadth than the fixed tangent-LDA family examined here.
+Our narrower, complementary question is how the \emph{source
+validation likelihood itself} changes the selected
+regularisation regime; this is a measurement problem rather
+than evidence of a superior novel classifier.
 These contributions motivate our strict comparison but do not substitute
 for an objective-controlled study.
 
