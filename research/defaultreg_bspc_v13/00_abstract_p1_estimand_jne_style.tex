@@ -1,44 +1,48 @@
 \begin{abstract}
 \textbf{Objective.}
-Covariance fit and discrimination on previously unseen EEG participants
-need not favour the same regularisation strength.
-We ask which quantity a historically labelled
-covariance negative-log-likelihood selector actually estimates and
-which parts of the corrected predictive score can be relevant
-to a fixed linear classifier's per-person ROC-AUC.
+In cross-person electroencephalography (EEG) decoding,
+a validation-class-centred covariance score can be
+mistaken for source-trained Gaussian predictive
+likelihood. We distinguish these estimands and test
+whether apparent superiority in source-only shrinkage
+selection survives correction of this comparator.
 
 \textbf{Approach.}
-We retain participant-grouped source-only, zero-target-information
-selection and the original frozen EEG transfer evidence.
-A class-centred held-source covariance score (CovScore) is
-distinguished from proper source-trained-class-mean Gaussian
-predictive likelihood. Their exact difference is partitioned
-into common-location, score-orthogonal contrast and score-aligned
-contrast shifts, with the classifier and feature reference fixed.
-Previously exposed Cho2017, Dreyer2023A and BNCI2014\_002 acquisitions
-are analysed as source-only explanatory cohorts, not new target
-confirmations.
+We audit participant-grouped source-only tangent-space
+linear discriminant analysis using originally frozen
+EEG transfer comparisons, a fixed 27-point
+regularisation grid and explicit zero-target-information
+budgets. An exact finite-sample identity decomposes
+the difference between validation-class-centred and
+proper predictive Gaussian quadratic scores. New
+proper-predictive comparisons are designated
+\emph{retrospective}, not incorporated into earlier
+prospective inference families.
 
 \textbf{Main results.}
-In an originally prospectively frozen EEGMMIDB block of 20 participants,
-the source-discrimination choice exceeded the historical
-class-centred CovScore choice by $0.0561$ participant-macro
-ROC-AUC (within-family Holm $p=0.00597$), but five participants
-were materially harmed. In three separate \emph{retrospective}
-source-validation acquisitions, $98.59\%$, $99.29\%$ and
-$99.77\%$ of the \emph{additional mean-shift penalty}
-measured by proper versus class-centred Gaussian scoring
-was allocated to components invariant to the fixed
-linear classifier's within-participant AUC.
-Prospective- or protocol-first continuous/source-envelope
-extensions did not establish repeatable improvements.
+In the prospectively frozen EEGMMIDB 20-person block,
+source-macro-AUC selection exceeded the historical
+class-centred CovScore selector by $0.0561$ AUC
+(Holm $p=0.00597$), but harmed five participants by
+more than $0.02$ AUC. Against the corrected
+source-trained predictive criterion, the
+\emph{post-outcome} paired AUC differences were
+$-0.000307$ (Shin2017A, $n=29$) and
+$+0.006819$ (BNCI2014\_002, $n=14$;
+exploratory interval includes zero). On three
+previously exposed source-validation acquisitions,
+$98.59\%$, $99.29\%$ and $99.77\%$ of the
+\emph{additional Gaussian mean-shift penalty} lay
+in components invariant to the fixed classifier's
+within-person AUC. The prespecified filter-bank
+interaction contradicted the original direction
+hypothesis ($-0.07781$ AUC).
 
 \textbf{Significance.}
-EEG regularisation studies should distinguish validation
-estimands and pre-target information budgets before claiming
-a transferable decision improvement.
-The decomposed score penalty is \emph{not} a percentage of
-useful EEG information or classification gain.
-The contribution is an independently auditable
-EEG measurement finding, not a new SOTA decoder.
+Covariance-fit, predictive-density and subject-level
+discrimination claims cannot be interchanged.
+Our findings yield a reproducible score-auditing
+protocol; they do not establish a consistently
+superior transfer decoder or an independently
+validated policy for unknown EEG participants.
 \end{abstract}
