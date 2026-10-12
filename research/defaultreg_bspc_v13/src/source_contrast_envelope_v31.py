@@ -67,11 +67,20 @@ def source_envelope(X: np.ndarray, y: np.ndarray, groups: Sequence,
     level = max(float(np.trace(covariance)/p),np.finfo(float).tiny)
     covariance += np.eye(p)*(level*1e-8)
     shape += np.eye(p)*(shape_ridge*level)
-    eig,basis = np.linalg.eigh(covariance)
-    if eig[0] <= 0:
-        raise ValueError("invalid source within-class geometry")
-    return SourceEnvelope(center,shape,covariance,eig,basis,center.copy(),
-                          float(eig.mean()),len(ids))
+    # IMPORTANT: the chosen lambda must index the SAME classifier path as
+    # the original source-macro/NLL/LW comparisons. LDA fits globally
+    # class-centred pooled covariance, while the robustness envelope uses
+    # within-record variance and between-record contrast dispersion.
+    mean0=x[yy==0].mean(axis=0)
+    mean1=x[yy==1].mean(axis=0)
+    pooled=np.concatenate([x[yy==0]-mean0,x[yy==1]-mean1],axis=0)
+    fitting_covariance=(pooled.T@pooled)/(len(x)-2)
+    fitting_covariance=(fitting_covariance+fitting_covariance.T)/2
+    eig,basis=np.linalg.eigh(fitting_covariance)
+    if eig[0] < -1e-9*max(eig[-1],1.):
+        raise ValueError("invalid source LDA covariance")
+    return SourceEnvelope(center,shape,covariance,eig,basis,mean1-mean0,
+                          max(float(eig.mean()),np.finfo(float).eps),len(ids))
 
 def direction(model: SourceEnvelope, lam: float) -> np.ndarray:
     if not np.isfinite(lam) or not 0 <= lam <= 1:
