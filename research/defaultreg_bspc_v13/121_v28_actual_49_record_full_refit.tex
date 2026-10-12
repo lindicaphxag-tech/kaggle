@@ -1,0 +1,60 @@
+\subsection{Complete real EEG re-fitting after exact-record deduplication}
+\label{sec:v28-purged-actual}
+The originally exposed Liu2024 50-identifier zero-target-label
+comparison was subsequently found to contain identical complete
+processed source/target recordings under IDs 4 and 5.
+We have now completed an independent-run, retrospective
+49-representative \emph{full model refit} under fixed
+MOABB 1.7.2 preprocessing. For each held recording group,
+48 other distinct representatives (1,920 source trials)
+are used to re-fit the tangent reference, covariance
+estimator, discriminant, predictive-source Gaussian score
+and source-macro selection objective. The 49 selected source
+policies were SHA-locked before 49 target AUC evaluations
+were joined. No newly selected threshold or new test
+cohort is introduced by this reanalysis.
+
+\begin{table}[tb]
+\centering\small
+\caption{Original exposed 50-identifier average AUC and fully
+retrained 49 unique-\emph{content} group retrospective average
+AUC. The difference is a \emph{joint dataset-repair change},
+not a causal estimate of leakage inflation; both original
+target exposures and global record inspection were known.}
+\label{tab:v28-fullrefit}
+\begin{tabular}{lrr}
+\toprule
+Source-only criterion & Old 50 ID & Full 49-group refit\\
+\midrule
+Source-macro discrimination & 0.59400 & 0.58255\\
+Proper source-mean predictive likelihood & 0.58985 & 0.58133\\
+Historical class-centred covariance & 0.59305 & 0.58117\\
+Ledoit--Wolf & 0.59085 & 0.57852\\
+OAS & 0.58985 & 0.57827\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The original raw-source-fold study is GitHub Actions
+\texttt{38285928569}, which completed successfully
+and produced a frozen full-refit outcome manifest,
+SHA-256 prefix \texttt{5cfdc41ca056fa39}
+(full hash in the online evidence receipt).
+The correct predictive comparator remains close to
+source-macro selection; their 49-record descriptive
+difference is $+0.00122449$ AUC.
+This gives no evidence of a material, uniformly
+beneficial new regularisation rule.
+
+The original 50-ID outcome mean and new 49-group
+mean change through two logically distinct operations:
+(i) reweighting the reporting denominator by deleting
+the copied target identifier while retaining the old
+fitted models, and (ii) rebuilding the 49 training
+source pools and refitting their geometry and policies.
+The first is \emph{not} a leakage repair and the
+second changes multiple aspects of the learned estimator.
+A separate, fully hash-verified three-estimand comparison
+will report each arithmetic contrast; until its
+independent execution passes, this table must not
+be interpreted as a decomposition or causal effect.
