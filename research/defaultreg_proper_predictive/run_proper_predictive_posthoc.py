@@ -49,17 +49,26 @@ def select_proper_source_nll(C,y,g,original_feasible):
 def run(archive,out):
     blob=Path(archive).read_bytes()
     if hashlib.sha256(blob).hexdigest()!=ART_SHA:raise AssertionError("Original score ZIP SHA failed")
+    # Extract only SOURCE-generated feasible grids. Target AUC fields remain
+    # inaccessible until *after* all 29 lambda choices have been locked.
     with zipfile.ZipFile(io.BytesIO(blob)) as z:
-        frozen=json.loads(z.read(RESULT))
-    assert frozen["dataset"]=="Shin2017A" and frozen["n_subjects"]==29
-    original={int(f["target_subject"]):f for f in frozen["folds"]}
+        receipt=json.loads(z.read(RESULT))
+    assert receipt["dataset"]=="Shin2017A" and receipt["n_subjects"]==29
+    assert receipt["target_information_track"]=="Z0"
+    source_candidates={int(f["target_subject"]):tuple(
+        f["source_path"]["feasible_full_lambdas"]) for f in receipt["folds"]}
+    frozen_counts={int(f["participant"]):int(f["trials"])
+                   for f in receipt["participant_receipt"]}
+    del receipt
     C,y,g,*_=old.load_dataset("Shin2017A")
+    assert set(np.unique(g))==set(range(1,30)) and len(y)==1740
+    assert all(int(np.sum(g==sid))==frozen_counts[sid] for sid in range(1,30))
     rows=[]
     for sid in range(1,30):
         source=g!=sid
-        f=original[sid]
         lam,path=select_proper_source_nll(C[source],y[source],g[source],
-                                         f["source_path"]["feasible_full_lambdas"])
+                                         source_candidates[sid])
+        print("SOURCE_ONLY_SUBJECT_SELECTION",sid,"lambda",lam,flush=True)
         rows.append({"subject":sid,"new_source_proper_predictive_lambda":lam,
                      "source_predictive_log_score_by_lambda":path,
                      "original_class_centered_lambda":f["source_path"]["lambda_covariance_full"],
@@ -69,7 +78,11 @@ def run(archive,out):
     (out/"SOURCE_CHOICES_FROZEN_BEFORE_TARGET_OUTCOME_JOIN.json").write_bytes(sel_bytes)
     locked_sha=hashlib.sha256(sel_bytes).hexdigest()
     print("SOURCE_ONLY_PREDICTIVE_LAMBDA_VECTOR_LOCK",locked_sha,flush=True)
-    # The original target path is read ONLY here, never during source selection.
+    # Re-open the ORIGINAL ZIP only after all source lambdas have been locked.
+    # The archived per-person target AUC paths were unavailable to selection.
+    with zipfile.ZipFile(io.BytesIO(blob)) as z:
+        frozen=json.loads(z.read(RESULT))
+    original={int(f["target_subject"]):f for f in frozen["folds"]}
     paired=[]
     for rec in rows:
         sid=rec["subject"]

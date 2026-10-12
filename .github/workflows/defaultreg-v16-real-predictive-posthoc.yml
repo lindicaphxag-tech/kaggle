@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - submission/defaultreg-v16-estimand-audit-20261011
+      - experiment/defaultreg-v16-cpred-posthoc-20261011
     paths:
       - 'research/defaultreg_proper_predictive/**'
       - '.github/workflows/defaultreg-v16-real-predictive-posthoc.yml'
@@ -23,7 +24,7 @@ jobs:
       OMP_NUM_THREADS: '1'
       MKL_NUM_THREADS: '1'
       GH_TOKEN: ${{ github.token }}
-      MNE_DATA: ${{ runner.temp }}/mne_data
+      MNE_DATA: /tmp/defaultreg_mne_data
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
