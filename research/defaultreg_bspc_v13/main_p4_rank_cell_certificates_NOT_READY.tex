@@ -40,8 +40,13 @@ from $94.121\%$ to $94.267\%$
 ($+0.146$ percentage points). On intervals
 between source choices, coverage rose
 from $96.274\%$ to $96.338\%$
-($+0.064$ percentage points). Neither
-analysis tests an external target improvement.
+($+0.064$ percentage points). A separate synthetic sensitivity check across 15 SPD
+spectral states in dimensions $p=2$ to $12$
+found coverage improvements ranging from zero
+at $p=2$ to more than 16 percentage points on
+some higher-dimensional synthetic configurations;
+it does not constitute new EEG validation.
+Neither analysis tests an external target improvement.
 \textbf{Conclusion.} Whole-numerator
 polynomial bounding gives a small,
 measurable technical improvement in
@@ -105,6 +110,9 @@ machine-verification claims.
 
 \section{Retrospective source-only study}
 \input{P4_rank_cells_real_source_result.tex}
+
+\section{Synthetic multi-dimensional numerical experiment}
+\input{P4_synthetic_multidimensional_numeric_appendix.tex}
 
 \section{Limitations and independent-study requirement}
 These percentages measure \emph{certified
