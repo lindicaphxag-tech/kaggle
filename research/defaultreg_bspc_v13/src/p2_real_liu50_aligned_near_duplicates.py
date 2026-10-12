@@ -18,7 +18,7 @@ def main():
     pm=MotorImagery(n_classes=2,events=["left_hand","right_hand"],
                     fmin=8,fmax=30,resample=160,baseline=None,
                     reject_by_annotation=False)
-    vec=[];ns=[];receipts=[];ref_shape=None;label_pattern=None
+    vec=[];ns=[];receipts=[];label_vectors=[];ref_shape=None;label_pattern=None
     for sid in range(1,51):
         X,lab,_=pm.get_data(dataset=ds,subjects=[sid])
         X=np.asarray(X,dtype=np.float64);lab=np.asarray(lab)
@@ -36,6 +36,7 @@ def main():
         norm=float(np.linalg.norm(V))
         if not np.isfinite(norm) or norm==0:raise ValueError("empty digital EEG signal")
         vec.append(V/norm);ns.append(norm)
+        label_vectors.append(this.copy())
         receipts.append({"id":sid,"label_vector_equals_id1":bool(np.array_equal(this,label_pattern)),
                          "n_trials":int(len(this))})
         print("P2_NEAR_DUPLICATE_PUBLIC_SIGNAL_LOADED",sid,flush=True)
@@ -52,7 +53,7 @@ def main():
             if c>=0.95:
                 pairs.append({"ids":[i+1,j+1],"whole_record_centered_cosine":sim,
                    "matches_nominal_trial_label_sequence":
-                       receipts[i]["label_vector_equals_id1"]==receipts[j]["label_vector_equals_id1"]})
+                       bool(np.array_equal(label_vectors[i],label_vectors[j]))})
     pairs.sort(key=lambda z:(-z["whole_record_centered_cosine"],z["ids"]))
     high=[x for x in pairs if x["whole_record_centered_cosine"]>=0.9999]
     # Exact released ID4/5 is already established with strict array equality
