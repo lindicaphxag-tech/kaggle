@@ -1,0 +1,218 @@
+% PAPER 2 INDEPENDENT research manuscript: recording-content identity and selection fit/denominator factorial. NOT SUBMITTED.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=0.92in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,booktabs,graphicx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{lmodern}
+\usepackage[protrusion=true,expansion=false]{microtype}
+\title{When EEG Participant IDs Share Recording Contents:\\
+A Matched Audit of Validation Denominators, Model Refitting and Regularisation}
+\author{AUTHOR IDENTITIES AND AFFILIATIONS TO BE VERIFIED}
+\date{}
+\begin{document}\maketitle
+\begin{abstract}
+\textbf{Objective.} Subject-disjoint EEG validation assumes that released subject
+identifiers correspond to independent recordings. We test this assumption in
+a public acute-stroke motor-imagery acquisition and quantify how record-content
+purging interacts with source-model fitting and regularisation choice.
+\textbf{Methods.} Under pinned MOABB 1.7.2 processing, exact cross-ID EEG
+epoch/label fingerprints define record-content groups. All recording groups
+are checked in three public acquisitions. In the affected cohort, we
+reproduce original and fully purged held-record AUC values, then evaluate
+a frozen $2\times2$ model-fit by shrinkage-selection factorial on the same
+49 held recording groups.
+\textbf{Results.} Liu2024 contains 50 released IDs and 2,000 processed trial
+instances, but 1,960 unique exact trial contents; IDs 4 and 5 share all
+40 epochs in the fixed pipeline. No cross-ID exact overlaps were observed
+in Weibo2014 (10 IDs; 1,580 trials) or BNCI2014\_002 (14 IDs; 2,240 trials).
+Source-macro held-record AUC changed from 0.594000 (nominal 50-ID average)
+to 0.588673 (49 identical held targets with original fits) and 0.582551
+(49-source-group full refit). Among matched 49 groups, the source-macro
+regularisation choice changed in 37, with opposing average conditional
+selector effects ($-0.001327$ versus $+0.001786$) on the two fitted models.
+The correctly predictive source-mean Gaussian policy changed its selected
+shrinkage in zero groups.
+\textbf{Conclusion.} Subject IDs alone may not ensure recording-content
+independence. The original-to-corrected AUC difference mixes a reporting
+denominator shift, model changes and selection interactions; it is neither
+a patient-level causal leakage penalty nor a new transfer gain.
+\end{abstract}
+
+\noindent\textbf{Keywords:} EEG; motor imagery; recording identity;
+cross-subject validation; exact epoch overlap; regularisation.
+
+\section{Introduction}
+Cross-subject EEG generalisation requires a defensible definition of
+independent samples. Recent accepted work demonstrates large optimism
+under window-level rather than subject-level validation and proposes
+hierarchical statistical evaluation \cite{gil2026subjectvalidation}.
+Even when a dataset provides subject IDs, the stronger claim that
+different IDs never reference overlapping recording contents should be
+verified when the scientific estimand is an unseen-recording result.
+
+The public Liu2024 motor-imagery acquisition is described as comprising
+50 acute-stroke patients \cite{liu2024stroke}. This study audits numerical
+EEG trial contents available through a reproducible public software
+pipeline; it neither identifies clinical participants nor disputes the
+underlying recruitment metadata. The research questions are whether
+exact epoch contents recur under different released IDs and whether
+their removal affects decoding through altered evaluation weights,
+source fitting, source regularisation choice, or interactions.
+
+\section{Methods}
+\subsection{Preprocessing, exact identity and content-safe splits}
+We freeze MOABB 1.7.2, binary left/right imagery, original 29 EEG
+channels, 8--30 Hz filtering and 160 Hz resampling for Liu2024.
+Each of the 50 IDs contributes 40 processed trials. Exact numeric
+trial content and event label are compared across the whole
+public processed cohort; an edge joins IDs with matching epochs.
+Connected components are treated as recording-content groups. If two
+released IDs contain all 40 matching trials, those ID groups cannot
+appear on opposite sides of any claimed recording-disjoint split.
+
+This is an audit of processed arrays, not evidence of identity
+of actual patients or raw EDF/MAT data. Global feature/epoch
+inspection to discover the groups means these retrospective
+experiments are not strict physical target-isolated Z0 studies.
+
+Two already-exposed cohorts were fixed before running identical
+cross-ID fingerprint controls: Weibo2014 (C3,Cz,C4, left/right hand)
+and BNCI2014\_002 (15 EEG channels, right hand/feet). Their inclusion
+tests whether the finding appears uniformly across different acquisitions.
+It does not supply new decoder-generalisation confirmation.
+
+\subsection{Matched full-refit and source-selector cross}
+The original nominal-50-ID source model excludes one target ID, while
+possibly retaining a same-content counterpart. The purged
+49-recording-group model excludes the entire held content group and
+refits its source covariance tangent reference, spectral LDA and source
+selection on the remaining 48 representative recordings.
+All fitted-model comparisons evaluate the SAME 49 held-recording
+targets. Both parameter choices are copied from separately frozen
+source-only artifacts, not optimised with held target AUC.
+
+For an original fit $F_A$, purged fit $F_B$, old source
+choice $\lambda_A$ and purged choice $\lambda_B$, define
+\[
+\begin{array}{c|cc}
+ & \lambda_A & \lambda_B\\\hline
+ F_A&Y_{AA}&Y_{AB}\\
+ F_B&Y_{BA}&Y_{BB}
+\end{array}.
+\]
+The software-factorial identities are
+\[
+Y_{BB}-Y_{AA}=(Y_{AB}-Y_{AA})+(Y_{BB}-Y_{AB})
+=(Y_{BA}-Y_{AA})+(Y_{BB}-Y_{BA}),
+\]
+and the model--selector interaction is
+$I=Y_{BB}-Y_{BA}-Y_{AB}+Y_{AA}$.
+These are arithmetic decompositions, not causal identification.
+Every one of the $49\times3$ held-group AUC comparisons at
+$Y_{AA}$ and $Y_{BB}$ is independently checked against
+two earlier immutable outcome artifacts to $10^{-10}$.
+The inferential unit for descriptive reports is one processed
+recording group, not a trial or confirmed independent patient;
+LOPO source training pools overlap heavily.
+
+\section{Results}
+\subsection{Identity across three EEG acquisitions}
+\begin{table}[ht]\centering\small
+\caption{Exact processed trial-content audit under preselected
+pipelines. Unique contents do not imply uniquely identified patients.}
+\begin{tabular}{lrrrr}
+\toprule
+Acquisition & Released IDs & Trial instances & Unique & Cross-ID edges\\\midrule
+Liu2024 &50&2,000&1,960&1\\
+Weibo2014 &10&1,580&1,580&0\\
+BNCI2014\_002 &14&2,240&2,240&0\\
+\bottomrule
+\end{tabular}\end{table}
+In the processed Liu2024 signals, IDs 4 and 5 have the same complete
+40-trial EEG and label contents. No further partial cross-ID exact
+trial repetitions were found among the 2,000 trial instances.
+A separate check of the originally released EDF recordings found
+that ID 4 and ID 5 are stored in different EDF binary files yet
+32 of 33 numerical channels are equal over the full corresponding
+EDF data. The sole differing channel was index 32 (zero-based),
+reported with an empty name by the pinned MNE EDF reader.
+Thus the identity evidence extends beyond the resampled,
+post-filtering model inputs. The negative-control pair IDs 47
+and 49 had coincident previously recorded target AUC vectors
+but different signal arrays; equal classifier outcomes alone
+must not be used as an identity criterion.
+Neither EDF channel matching nor a source file's different
+basename resolves the identity of clinical participants.
+Zero exact overlaps in the two controls cannot rule out near-duplicates
+or overlapping source windows with different sampled arrays.
+
+\subsection{Matched fit--parameter factorial and reporting denominator}
+The original source-macro average of 0.594000 over 50 nominal IDs
+declined to 0.588673 after retaining only 49 recording representatives
+with ORIGINAL fits and lambdas, a denominator-only contrast of
+$-0.005327$. Under a fully purged, newly fitted source model,
+the matched 49-record mean was 0.582551, an additional
+$-0.006122$. The aggregate $-0.011449$ difference is
+not by itself a causal EEG leakage-effect estimate.
+
+\input{125_v30_actual_crossed_49_result.tex}
+
+\section{Discussion}
+Our observation is more specific than generic random-window leakage:
+the public released label unit was not enough to ensure disjoint
+processed signal contents. The full data-integrity audit and two
+independent-acquisition controls make the particular duplicate
+verifiable and falsifiable, while the same-held-target factorial
+prevents silently attributing the whole correction to a changing
+regularisation parameter.
+
+The source-macro policy changed $\lambda$ in 37/49 groups,
+yet its two conditional source-model selector effects had
+opposite signs. In contrast, neither the source-trained-mean
+predictive Gaussian nor historical class-centred covariance
+choice changed its $\lambda$ under this comparison. A changed
+target mean could thus arise even with \emph{no}
+regularisation-selection changes. These results separate
+source-model dependence from parameter substitution, but do
+not uniquely isolate causes of training contamination.
+
+The overlap finding pertains to a fixed processed software
+representation. Authoritative resolution of whether patient
+records themselves were duplicated requires the original
+data custodians and cannot be inferred from processed EEG.
+All performance outcomes had been exposed before the V29
+factorial and all apparent group-bootstrap intervals are
+descriptive, not new confirmatory tests. This analysis does
+not demonstrate a SOTA EEG decoder, a clinical outcome, or
+a safety guarantee for unseen stroke patients. The
+original Default Regularisation EEG estimand analysis
+remains a separate primary paper and should not combine
+these findings into its earlier frozen Holm families.
+
+\section{Conclusion}
+An EEG subject label is not automatically an independent
+signal identity. Full processed epoch-content checks found
+one complete cross-ID duplicate in a 50-ID acute-stroke
+motor-imagery acquisition, and no exact cross-ID matches
+in two preselected other acquisitions. A 49-recording-group
+full refit and $2\times2$ frozen fit--selector contrast
+showed that reporting weights, model fitting and source
+selection must not be collapsed into a single asserted
+leakage penalty. The practical implication is to audit
+recording provenance before interpreting cross-subject
+regularisation comparisons.
+
+\section*{Statements and Declarations}
+\textbf{Data:} Liu2024, Weibo2014 and BNCI2014\_002
+are publicly distributed; code and immutable numerical
+experiment receipts are provided in the public GitHub
+repository. No EEG signals are included in this manuscript.\\
+\textbf{Author, ethics, competing interests,
+funding and AI-use statements:} to be verified by
+the actual authors before submission; no claim is made
+on anyone's behalf.
+
+\bibliographystyle{unsrt}
+\bibliography{references_v10}
+\end{document}
