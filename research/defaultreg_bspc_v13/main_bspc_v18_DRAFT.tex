@@ -251,6 +251,8 @@ an artifact-level reproduction audit, not a fresh raw-EEG rerun.
 
 \input{104_v18_proper_predictive_real_eeg.tex}
 
+\input{105_v18_second_cohort_proper_predictive.tex}
+
 \subsection{The key prospective spectral-representation prediction fails}
 On the separate untouched S041--S060 block, four prespecified
 configurations compared WIDE231, FB8-1848, source-PCA-matched
@@ -286,8 +288,13 @@ outperformed the historically named Cov-NLL selector in the frozen
 EEGMMIDB and Shin2017A studies. But that historical criterion removes
 validation participants' class-mean shifts before assessing covariance
 fit; it was not a proper source-mean predictive density score.
-The new, genuinely predictive Gaussian baseline nearly ties the
-discrimination policy on Shin2017A. The paper therefore does
+The new, genuinely predictive Gaussian baseline nearly ties
+the discrimination policy on Shin2017A, whereas source-macro
+selection remains modestly higher on a second, retrospective
+BNCI2014\_002 evaluation. Both newly corrected comparisons
+were performed after the corresponding target outcomes
+were known, so neither can be treated as a new pre-data
+confirmation. The paper therefore does
 \emph{not} establish that optimizing discriminability dominates
 predictive covariance fitting. Its more specific contribution is
 identifying the exact difference between two validation estimands,
@@ -330,8 +337,10 @@ regularisation settings in source-only cross-subject EEG. An originally observed
 discrimination-selector advantage against a validation-class-centred
 covariance score is not evidence of advantage over predictive
 likelihood: the corrected Gaussian predictive source selector
-nearly tied discriminability selection in retrospective Shin2017A
-analysis. The exact missing class-mean-shift term, adverse
+nearly tied discrimination-based selection in retrospective
+Shin2017A analysis and trailed by 0.00682 AUC on
+retrospective BNCI2014\_002. These observations are
+not independent prospective superiority tests. The exact missing class-mean-shift term, adverse
 participant results, individually inconclusive external BNCI
 tests and prospective spectral falsification constrain the
 scientific conclusion. No universal shrinkage rule, patient-safe
