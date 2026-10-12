@@ -1,0 +1,57 @@
+name: DefaultReg V24 full 50 acute-stroke external source-lock then target
+on:
+  push:
+    branches:
+      - experiment/defaultreg-v24-liu2024-stroke-eeg-20261013
+    paths:
+      - '.github/workflows/defaultreg-v24-50patient-full-freeze.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  all-50-source-then-target:
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MNE_DATA: /tmp/defaultreg-v24-external-eeg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin original EEG analysis software and preflight
+        run: |
+          python -m pip install --disable-pip-version-check moabb==1.7.2
+          python -m py_compile research/defaultreg_proper_predictive/run_liu2024_50patients_frozen_v24.py
+          python -m unittest discover -v -s research/defaultreg_bspc_v13/tests -p 'test_certified_continuous_selector_v23.py'
+      - name: Execute all 50 leave-one-person-out source choice freezes BEFORE target scores
+        run: |
+          mkdir -p "$MNE_DATA" /tmp/defaultreg-v24-all50
+          python research/defaultreg_proper_predictive/run_liu2024_50patients_frozen_v24.py --out /tmp/defaultreg-v24-all50
+          python - <<'PY'
+          import json,hashlib,pathlib
+          p=pathlib.Path('/tmp/defaultreg-v24-all50')
+          lock=p/'FIFTY_SOURCE_ONLY_CHOICES_LOCKED_BEFORE_ANY_TARGET_AUC.json'
+          rec=json.loads(lock.read_text())
+          result=json.loads((p/'FROZEN_AFTER_SOURCE_LOCK_50PATIENT_LOPO_RESULTS.json').read_text())
+          sha=hashlib.sha256(lock.read_bytes()).hexdigest()
+          assert sha==result['source_choices_SHA256_pre_target_evaluation']
+          assert len(rec)==result['n_patients']==50 and result['trials']==2000
+          assert set(x['outer_subject'] for x in rec)==set(range(1,51))
+          assert all(x['n_source_people']==49 for x in rec)
+          assert all(x['no_outer_target_information_passed_to_selection'] for x in rec)
+          assert result['target_information_budget']=='Z0 strict source-only'
+          assert all(0<=z<=1 for z in result['mean_target_AUC_by_policy'].values())
+          assert result['v23_source_only_certificate_success_folds']+result['v23_fallback_to_macro_folds']==50
+          print('PASS_V24_REAL_50_ACUTE_STROKE_ALL_SOURCE_LAMBDA_LOCK_BEFORE_TARGET_AUC')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-v24-50-acute-stroke-full-Z0-protocol-locked-external-EEG
+          path: /tmp/defaultreg-v24-all50/**
+          if-no-files-found: warn
+          retention-days: 90
