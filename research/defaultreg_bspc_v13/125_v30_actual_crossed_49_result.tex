@@ -1,0 +1,77 @@
+\subsection{Real 49-record factorial diagnosis: denominator versus refitting versus selection}
+\label{sec:v30-actual-crossed}
+The previously locked V29 experiment completed all 49 unique
+recording-group held-target evaluations with the originally
+frozen model and parameter choices, and independently
+refitted all 49 content-disjoint models.
+For each group, both frozen sets of selected shrinkage
+values were evaluated under both fitted source models.
+The original per-record target AUC values and the purged
+per-record target AUC values were checked to numerical
+tolerance $10^{-10}$ against their independent immutable
+archives; all $49\times3$ method comparisons passed.
+This is retrospective, previously exposed EEG, not a
+new unseen-target performance experiment.
+
+\begin{table}[tb]
+\centering
+\small
+\caption{Liu2024 source macro-AUC shrinkage policy: genuine
+paired $2\times2$ model fit $\times$ frozen parameter analysis
+on the same 49 held recording groups. $A$ is the original
+nominal-50-ID source fit, $B$ the fully record-disjoint 49-group
+refit. The reported values are held-record macro-AUC,
+not independent trials or new patients.}
+\label{tab:v30-crossed}
+\begin{tabular}{lcc}
+\toprule
+Model fit & Original choice $\lambda_A$ & Purged choice $\lambda_B$\\
+\midrule
+Original $F_A$ & 0.588673 & 0.587347\\
+Purged $F_B$ & 0.580765 & 0.582551\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The source-macro selector changed its frozen $\lambda$
+in 37/49 groups. Its mean \emph{conditional parameter
+substitution} was $-0.001327$ AUC on the original
+fit but $+0.001786$ on the purged fit, producing
+an interaction $+0.003112$. The \emph{total matched}
+change from old fit/old choice to purged fit/purged
+choice was $-0.006122$. In contrast, the correct
+source-trained-mean predictive Gaussian and historical
+validation-class-centred covariance policies selected
+the same shrinkage under both group specifications
+in all 49 cases. Their corresponding model-refit-only
+matched differences were $-0.003724$ and $-0.006071$.
+Thus the observed change should not be labeled a
+universal selector instability: the source-macro
+choice reacts to record composition, but the
+predictive choice did not react in this test.
+
+\paragraph{Do not confuse denominators with a paired treatment effect.}
+The original, contaminated \emph{50-ID} mean
+source-macro AUC was 0.594000, whereas the subset of
+49 recording representatives under the unchanged
+original fit and unchanged parameter choices
+averaged 0.588673. The $0.005327$ difference is
+a \emph{reporting-denominator contrast} caused by
+removing one duplicated held-test identifier.
+The additional matched $0.006122$ difference to
+the properly purged and refitted result yields
+the descriptive full $0.011449$ difference,
+but each term is contingent on the original
+dataset and model. It is incorrect to report
+$0.011449$ as a causal leakage bias, a
+cross-subject generalization gain, or a
+statistically independent 50-versus-49 test.
+
+All 49 held-record $Y_{AA}$ and $Y_{BB}$ values
+were independently reproduced, not just their
+means. The completed workflow is GitHub Actions
+\texttt{38290349868}, receipt SHA-256 prefix
+\texttt{0e7bfdb73970fcff}. This is an
+observable software-factorial decomposition,
+not an intervention identifying the direct
+causal contribution of duplicated EEG signals.
