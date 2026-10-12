@@ -45,3 +45,18 @@ A niche short methods note may eventually fit a computational
 signal-processing or numerical methods outlet, but a source
 certificate increase of 0.146 pp is too small to assume
 journal-level superiority or rapid acceptance.
+
+
+## PROVISIONAL OUTLET ONLY: Digital Signal Processing
+Elsevier; 2025 legacy CAS large category Engineering & Technology 3;
+hybrid subscription mode can avoid open access APC (verify final
+author-guide for ancillary fees). Publisher scope explicitly covers
+statistical signal processing and mathematical tools with
+signal-processing application:
+https://shop.elsevier.com/journals/digital-signal-processing/1051-2004
+However the current P4 is only ONE SOURCE EEG collection, a small
++0.146 percentage-point interval-certificate coverage improvement
+and unverified rounding. It is **NOT a submission-ready DSP method
+paper**. Substantive numerical method novelty, runtime savings,
+multiple signal families and reproducible independent comparisons
+are required. Outlet not locked until promotion gates pass.
