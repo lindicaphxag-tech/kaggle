@@ -1,0 +1,45 @@
+name: DefaultReg V25 all50 acute-stroke EEG duplicate-record audit
+on:
+  push:
+    branches: [research/defaultreg-v25-bernstein-rank-cells-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/liu2024_all50_record_fingerprints_v25.py'
+      - '.github/workflows/defaultreg-v25-all50-record-identity.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit-all-original-recordings:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    env:
+      MNE_DATA: /tmp/defaultreg-v25-liu-all50-mne
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Scan all 50 ORIGINAL released EDF files and MOABB processed 40-trial EEG matrices
+        run: |
+          mkdir -p "$MNE_DATA" /tmp/defaultreg-v25-liu-all50
+          python research/defaultreg_bspc_v13/src/liu2024_all50_record_fingerprints_v25.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/defaultreg-v25-liu-all50/LIU2024_ALL50_PUBLIC_DATA_FINGERPRINTS.json')
+          d=json.loads(p.read_text())
+          assert d['status']=='COMPLETE_50_PUBLIC_LIU2024_PREPROCESSED_RECORD_IDENTITY_AUDIT'
+          assert d['subjects_checked']==50 and d['original_trial_count']==2000
+          assert d['all_exact_signal_duplicates_also_same_event_labels']
+          assert 1<=d['unique_EEG_records_count']<=50
+          assert len(d['identity_based_representative_subject_ids'])==d['unique_EEG_records_count']
+          print('PASS_ALL50_EEG_SIGNAL_FINGERPRINTS_COMPLETE')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: defaultreg-v25-all50-original-Liu2024-EEG-record-identity
+          path: /tmp/defaultreg-v25-liu-all50/**
+          if-no-files-found: error
