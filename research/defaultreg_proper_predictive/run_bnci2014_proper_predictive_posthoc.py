@@ -107,7 +107,7 @@ def run(archive,out):
     result={"status":"POST_OUTCOME_REAL_EEG_SENSITIVITY_NOT_CONFIRMATORY",
             "source_only_lambda_lock_sha256":locked_sha,
             "original_archive_sha256":ART_SHA,
-            "n":29,"mean_source_macro_minus_proper_AUC":float(gains.mean()),
+            "n":len(rows),"mean_source_macro_minus_proper_AUC":float(gains.mean()),
             "mean_class_centered_minus_proper_AUC":float(cent.mean()),
             "harm_gt_0_02_vs_proper":int(np.sum(gains<-.020000000001)),
             "proper_lambda_differs_from_original_class_centered_n":sum(
