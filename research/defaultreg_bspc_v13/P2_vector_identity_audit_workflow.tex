@@ -1,0 +1,34 @@
+% Vector workflow, identity unit and inferential-boundary diagram.
+\begin{figure}[tb]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+  >=latex,
+  node distance=0.45cm,
+  every node/.style={font=\footnotesize},
+  step/.style={draw=black!70,rounded corners=1.5pt,fill=black!3,
+      inner sep=5pt,minimum height=1.50cm,text width=2.70cm,align=center},
+  link/.style={->,line width=.55pt,draw=black!75}
+]
+\node[step] (release) {Public release\\50 distinct IDs\\2,000 processed trials};
+\node[step,right=of release] (hash) {Frozen EEG pipeline\\exact array + label\\candidate fingerprint};
+\node[step,right=of hash] (group) {Byte-confirmed overlap\\ID 4 / ID 5 full alias\\49 content groups};
+\node[step,right=of group] (cross) {Same 49 held groups\\old / purged source fit\\old / purged selection};
+\node[step,right=of cross] (effect) {Outcome audit\\reporting weight vs\\paired fit / selector};
+\draw[link] (release) -- (hash);
+\draw[link] (hash) -- (group);
+\draw[link] (group) -- (cross);
+\draw[link] (cross) -- (effect);
+\end{tikzpicture}%
+}
+\caption{Unit-of-analysis and outcome-attribution workflow.
+A candidate hash match is confirmed using numerical content and event
+labels; its connected component defines a conservative split unit.
+The group map uses already accessible public EEG signals and therefore
+does not constitute a blind, zero-target-information discovery.
+The matched four-cell comparison changes \emph{source fitting}
+and \emph{source-selected regularisation} while retaining
+the same 49 target contents; only the last stage accesses held
+target outcomes. No stage resolves clinical participant identity.}
+\label{fig:p2-identity-workflow}
+\end{figure}
