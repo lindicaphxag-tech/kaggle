@@ -1,0 +1,54 @@
+name: DefaultReg Lee2019 GID unseen new-acquisition original SOURCE12 SHA freeze
+on:
+  push:
+    branches: [research/defaultreg-gid-unseen-lee2019-20261013]
+    paths:
+      - '.github/workflows/defaultreg-lee2019-gid-original-source.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-lock-only-never-held:
+    runs-on: ubuntu-latest
+    timeout-minutes: 155
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MNE_DATA: /tmp/defaultreg-lee2019-gid-source
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Existing fixed EEG software stack
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2 pytest
+      - name: Original source LDA and group-centred invariant unit tests
+        run: |
+          PYTHONPATH=research/defaultreg_proper_predictive python -m pytest -q research/defaultreg_bspc_v13/tests/test_source_group_invariant_lda.py
+          python -m py_compile research/defaultreg_bspc_v13/src/run_lee2019_gid_source_lock.py
+      - name: Load ONLY fixed 12 Lee2019 source participants and freeze selections
+        run: |
+          mkdir -p "$MNE_DATA" /tmp/lee2019-GID-frozen-source
+          python research/defaultreg_bspc_v13/src/run_lee2019_gid_source_lock.py --out /tmp/lee2019-GID-frozen-source
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          a=Path('/tmp/lee2019-GID-frozen-source/LEE2019_S1_SOURCE12_IMMUTABLE_CHOICES.json')
+          z=json.loads(a.read_bytes())
+          assert z['source_ids']==list(range(1,13))
+          assert z['target_A_UNREAD']==list(range(13,25))
+          assert z['target_B_UNREAD']==list(range(25,37))
+          assert z['source_choices_created_before_any_held_target_IO']
+          assert z['original_lambdas_exactly_reproduced']
+          assert len(z['source_trial_receipts'])==12
+          print('LEE2019_SOURCE_ONLY_INDEPENDENT_SHA_CHECK',hashlib.sha256(a.read_bytes()).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-Lee2019-first-source-only-frozen-12-SHA
+          path: |
+            /tmp/lee2019-GID-frozen-source/**
+            research/defaultreg_bspc_v13/LEE2019_GID_FROZEN_FIRST_EXPERIMENT_PROTOCOL.md
+          if-no-files-found: warn
+          retention-days: 90

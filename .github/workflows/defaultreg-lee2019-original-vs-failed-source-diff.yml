@@ -1,0 +1,77 @@
+name: DefaultReg Lee2019 original-versus-failed-B source manifest forensic diff
+on:
+  push:
+    branches: [research/defaultreg-gid-unseen-lee2019-20261013]
+    paths: ['.github/workflows/defaultreg-lee2019-original-vs-failed-source-diff.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  source-manifest-diff-no-target:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: actions/download-artifact@v4
+        with:
+          name: defaultreg-Lee2019-first-source-only-frozen-12-SHA
+          run-id: 38305991164
+          github-token: ${{ github.token }}
+          path: /tmp/lee-original
+      - uses: actions/download-artifact@v4
+        with:
+          name: defaultreg-Lee2019-first-source-sha-verified-untouched-held-B
+          run-id: 38306653777
+          github-token: ${{ github.token }}
+          path: /tmp/lee-failed-b
+      - name: Compare source manifests from independently sealed original and pre-target B abort
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,math
+          folders=['/tmp/lee-original','/tmp/lee-failed-b']
+          paths=[]
+          for root in folders:
+              files=list(Path(root).rglob('LEE2019_S1_SOURCE12_IMMUTABLE_CHOICES.json'))
+              assert len(files)==1,(root,files)
+              paths.append(files[0])
+          originals=[p.read_bytes() for p in paths]
+          o,b=map(json.loads,originals)
+          def hash(x):return hashlib.sha256(x).hexdigest()
+          expected='27efc2565d5bc2bc22344b67ee994e42b985c16c34cabf6cdf55136270fa18f3'
+          assert hash(originals[0])==expected
+          print('LEE_SOURCE_ORIGINAL_SHA',hash(originals[0]))
+          print('LEE_SOURCE_FAILED_B_SHA',hash(originals[1]))
+          count=0;maxnumeric=0.
+          def check(a,z,loc='root'):
+              global count,maxnumeric
+              if isinstance(a,dict) and isinstance(z,dict):
+                  for k in sorted(set(a)|set(z)):
+                      if k not in a or k not in z:
+                          print('KEY_DIFFERENCE',loc+'.'+str(k))
+                      else:check(a[k],z[k],loc+'.'+str(k))
+              elif isinstance(a,list) and isinstance(z,list):
+                  if len(a)!=len(z):print('LIST_LENGTH',loc,len(a),len(z))
+                  for i,(x,y) in enumerate(zip(a,z)):check(x,y,loc+'['+str(i)+']')
+              elif a!=z:
+                  count+=1
+                  if isinstance(a,(int,float)) and isinstance(z,(int,float)):
+                      delta=abs(float(a)-float(z))
+                      maxnumeric=max(maxnumeric,delta)
+                      if count<=22: print('NUMERIC_DIFFERENCE',loc,repr(a),repr(z),'delta',delta)
+                  elif count<=22:
+                      print('OTHER_DIFFERENCE',loc,repr(a)[:180],repr(z)[:180])
+          check(o,b)
+          print('LEE_SOURCE_TOTAL_DIFFERENCE_FIELD_COUNT',count)
+          print('LEE_SOURCE_MAX_FLOAT_DELTA',maxnumeric)
+          print('LEE_SOURCE_DIFF_TARGET_IO_OCCURRED',False)
+          assert o['source_ids']==b['source_ids']==list(range(1,13))
+          assert o['target_A_UNREAD']==b['target_A_UNREAD']==list(range(13,25))
+          assert o['target_B_UNREAD']==b['target_B_UNREAD']==list(range(25,37))
+          assert o['source_trial_receipts']==b['source_trial_receipts'], 'SOURCE COV DATA CHANGED; DO NOT RETRY TARGET'
+          assert o['source_protocol_sha256']==b['source_protocol_sha256']
+          print('LEE_IDENTICAL_SOURCE_BYTES_PER_PERSON_AND_PROTOCOL',True)
+          PY
