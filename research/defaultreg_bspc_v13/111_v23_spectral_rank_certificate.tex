@@ -1,0 +1,75 @@
+\subsection{A conditional spectral enclosure of AUC change over a continuous shrinkage path}
+\label{sec:v23-spectral-continuum}
+The finite endpoint transition decomposition in
+Section~\ref{sec:v22-rank-transitions} can identify rank changes
+\emph{after} two scalar-shrinkage choices have been evaluated.
+A more demanding question is whether a ranking remains unchanged for
+\emph{every} regularisation value on the interval between them.
+We exploit the existing source-trained LDA eigensystem, not a
+new classifier. For fixed source-trained class contrast $d_s$,
+$S=U\operatorname{diag}(s_i)U^\top$ and
+$A_\lambda=(1-\lambda)S+\lambda\nu I$,
+the score difference on a positive--negative pair of held
+\emph{source-validation} trials with vector difference $v_{pn}$ is
+\begin{equation}
+ z_{pn}(\lambda)=v_{pn}^\top A_\lambda^{-1}d_s
+ =\sum_{i=1}^p\frac{(u_i^\top v_{pn})(u_i^\top d_s)}
+ {(1-\lambda)s_i+\lambda\nu}.
+ \label{eq:v23-spectral-path}
+\end{equation}
+Every candidate is required to have a positive denominator over the
+entire interval. For any subinterval $[l,r]$ and coefficient
+$a_{i,pn}=(u_i^\top v_{pn})(u_i^\top d_s)$, each individual rational
+summand is monotone because its denominator is affine and strictly
+positive. Hence for all $\lambda\in[l,r]$,
+\begin{align}
+ L_{pn}[l,r]&=\sum_i\min\left\{
+ \frac{a_{i,pn}}{(1-l)s_i+l\nu},
+ \frac{a_{i,pn}}{(1-r)s_i+r\nu}\right\},\nonumber\\
+ U_{pn}[l,r]&=\sum_i\max\left\{
+ \frac{a_{i,pn}}{(1-l)s_i+l\nu},
+ \frac{a_{i,pn}}{(1-r)s_i+r\nu}\right\},
+ \label{eq:v23-interval}
+\end{align}
+enclose $z_{pn}(\lambda)$ as
+$L_{pn}[l,r]\le z_{pn}(\lambda)\le U_{pn}[l,r]$.
+Consequently, if every subinterval has $L_{pn}>0$, that pair
+remains positive throughout the complete path; similarly if
+every subinterval has $U_{pn}<0$, its sign remains negative.
+Pairs that fail the test are \emph{uncertain}, not observed
+reversals.
+
+\paragraph{Finite-trial AUC sensitivity bound.}
+For a fixed validation person $g$, denote by $\eta_g$
+the fraction of positive--negative trial pairs not certified
+strictly sign-stable over the whole interval. Since every
+certified pair contributes unchanged AUC credit $0$ or $1$
+throughout, while each uncertified pair may vary by no more
+than one unit of credit, for all $\lambda\in[l,r]$,
+\begin{equation}
+ \left|A_g(\lambda)-A_g(l)\right|\le\eta_g.
+ \label{eq:v23-continuum-bound}
+\end{equation}
+This is a deterministic bound on a fixed participant's fixed
+sample scores, conditional on the computed source eigensystem;
+it is \textbf{not} an unseen-person generalisation guarantee
+or a statistical confidence interval. The mathematical
+ingredients---spectral shrinkage and scalar interval arithmetic---
+are standard. We do not claim novelty for either ingredient.
+In implementation, a conservative floating-point
+slack prevents a near-zero pair from receiving a fragile
+rank-stability certificate; without machine-verified directed
+rounding we do not claim formal verified-numerics correctness
+for the original real-valued dataset.
+
+The procedure is evaluated on source-validation subjects
+under the same original fixed EEG covariance and
+tangent-space folds as V21--V22. The candidate $\lambda$
+endpoints are computed from SOURCE people only; no outer
+target data enter this analysis. Crucially, decreasing
+the bound in Eq.~\eqref{eq:v23-continuum-bound}
+is a property of the source trial-score path, not evidence
+that a future target subject will be protected. To promote
+this analysis to a novel useful model-selection policy
+requires a frozen source-statistic-to-selection map and an
+unexposed external acquisition that tests actual target harm.
