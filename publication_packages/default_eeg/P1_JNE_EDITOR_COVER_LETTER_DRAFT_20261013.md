@@ -20,6 +20,17 @@ score-aligned class differences, reporting the exact assumptions
 under which parts of that penalty are irrelevant to the ROC-AUC
 ordering of a FIXED linear decoder.
 
+
+An additional retrospective 12-person BNCI2015_001 experiment now
+compares the corrected source-trained predictive Gaussian NLL selector
+with the historical validation-class-centred score, source-macro AUC,
+Ledoit–Wolf and OAS under identical participant-grouped source folds.
+Source-macro outperformed the correct NLL selector by +0.035989 AUC
+on average, but three participants lost >0.02 AUC and a two-sided
+exploratory exact paired sign-flip check gave p=0.1572. This study
+reuses an earlier exposed cohort; it is not new prospective confirmation.
+Run: https://github.com/lindicaphxag-tech/kaggle/actions/runs/38321486917
+
 Our evidence includes prospectively frozen individual-participant
 EEG outcomes, a comparison of source-selection criteria with
 both positive and harmful participant-level outcomes, and an
