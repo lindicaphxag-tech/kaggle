@@ -1,5 +1,5 @@
-• Distinct released participant IDs can share identical processed EEG content.
-• One Liu2024 ID pair remains duplicated under two processing configurations.
-• Content-group splitting changes the effective validation denominator.
-• Two fixed classifiers reproduce a large change at the aliased content group.
-• Mean changes among the other 48 content groups remain close to zero.
+• Released EEG participant IDs can share identical processed digital recordings.
+• Two more cross-ID pairs have near-perfect aligned waveform similarity.
+• An independent raw EDF digital reader confirms 32/33 equal ID4/5 channels.
+• Exact-content and high-similarity grouping are not equivalent.
+• Matched classifier refits localise most AUC changes to the aliased group.
