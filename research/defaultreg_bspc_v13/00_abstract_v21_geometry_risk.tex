@@ -1,0 +1,63 @@
+\begin{abstract}
+\textbf{Objective:} We investigate how a
+mischaracterized covariance validation
+objective changes the regularisation
+selected for cross-subject EEG decoding,
+and whether alternative source-only
+selection criteria improve held-person
+discrimination or downside risk.
+\textbf{Methods:} In the original
+source-grouped covariance/tangent-LDA
+pipeline, we distinguish validation
+class-centred Gaussian covariance
+scores, source-trained-mean predictive
+Gaussian scores and source-person
+AUC. We derive an exact class-mean-shift
+penalty and source-only regularisation
+selection breakpoints. We preserve
+original prospective EEG results,
+evaluate corrected estimands in two
+previously exposed public cohorts,
+and conduct repository-protocol-locked
+new runs on independent 22-channel and
+3-channel EEG datasets. The latter
+additionally tests a fixed worst-quarter
+source-person AUC objective (CVaR).
+\textbf{Results:} The original EEGMMIDB
+block ($N=20$) gave $+0.0561$ mean AUC
+for discrimination over the historical
+class-centred criterion
+(Holm $p=0.00597$), with five harmed
+individuals; two originally frozen
+BNCI tests were not individually
+significant and a prospective
+filter-bank hypothesis failed.
+Retrospective proper Gaussian
+comparators nearly tied source
+discrimination on Shin2017A and
+trailed by 0.00682 AUC on
+BNCI2014\_002. A newly protocol-locked
+22-channel BNCI2014\_001 cohort
+($N=9$) yielded 0.78905 and 0.78341
+AUC for source discrimination and
+correct Gaussian prediction.
+A separate low-rank BNCI2014\_004
+cohort ($N=9$, 6,520 trials,
+3 channels) yielded AUCs of
+0.77800, 0.77658 and 0.77714
+for discrimination, proper predictive
+selection and source-CVaR, respectively.
+The risk-oriented comparator changed
+shrinkage decisions but did not improve
+mean AUC or the adverse-subject count.
+\textbf{Conclusion:} The source
+validation estimand changes EEG
+regularisation decisions across
+acquisition geometries, but there
+is no confirmed universally superior
+selector. Reporting the actual
+objective, adverse transfer and
+source-target information boundary
+is essential before generalized
+EEG decoding claims.
+\end{abstract}
