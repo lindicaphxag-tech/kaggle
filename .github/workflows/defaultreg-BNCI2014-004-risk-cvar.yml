@@ -1,0 +1,70 @@
+name: DefaultReg new 3-channel BNCI2014_004 source-CVaR vs proper predictive EEG
+on:
+  push:
+    branches:
+      - experiment/defaultreg-BNCI2014-004-risk-robust-20261012
+    paths:
+      - 'research/defaultreg_proper_predictive/**'
+      - '.github/workflows/defaultreg-BNCI2014-004-risk-cvar.yml'
+  pull_request:
+    paths:
+      - 'research/defaultreg_proper_predictive/**'
+      - '.github/workflows/defaultreg-BNCI2014-004-risk-cvar.yml'
+permissions:
+  contents: read
+jobs:
+  low-dimensional-risk-EEG:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MNE_DATA: /tmp/defaultreg_mne_data
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install original MOABB stack
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Verify original source-only and locked new protocol
+        run: |
+          test -s research/defaultreg_proper_predictive/BNCI2014_004_RISK_LOW_DIM_FIRST_RUN_PROTOCOL_20261012.md
+          python -m py_compile research/defaultreg_proper_predictive/run_new_bnci2014_004_risk_robust.py
+          cd research/defaultreg_proper_predictive
+          python -m unittest -v test_proper_predictive_source_only
+      - name: Execute new low-rank EEG risk-vs-estimand experiment
+        run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_proper_predictive/run_new_bnci2014_004_risk_robust.py --out /tmp/bnci2014_004_risk
+      - name: Audit complete denominators, CVaR integrity and source-target firewall
+        run: |
+          python - <<'PY'
+          import json,hashlib,pathlib,numpy as np
+          root=pathlib.Path('/tmp/bnci2014_004_risk')
+          a=root/'SOURCE_ONLY_LAMBDA_CHOICES_SHA_LOCK_BEFORE_TARGET_EVALUATION.json'
+          b=root/'BNCI2014_004_RISK_SOURCE_ONLY_EXTERNAL_RESULTS.json'
+          s=json.loads(a.read_text())
+          r=json.loads(b.read_text())
+          assert len(s)==r['n_outer_people']==9 and r['all_participants_retained']
+          assert r['source_lambda_choices_sha256_before_target_outcomes']==hashlib.sha256(a.read_bytes()).hexdigest()
+          assert r['n_channels']==3 and r['target_information_track']=='Z0'
+          assert r['source_CVaR_quarter_selector_primary_risk_comparator'] is True
+          assert all(len(row['source_people'])==8 and row['no_outer_target_data_in_source_selector'] for row in s)
+          assert all(row['selected_lambda']['source_worst_quarter_CVaR_auc'] in row['source_feasible_lambda_grid'] for row in s)
+          assert all(set(x['auc'])=={'macro','historical_class_centred','true_source_mean_predictive','source_worst_quarter_CVaR_auc','LW','OAS'} for x in r['per_subject_AUC'])
+          assert np.isfinite(list(r['mean_AUC'].values())).all()
+          assert r['new_confirmatory_p_values'] is None and r['no_global_preregistration_claim'] is True
+          print('PASS_NEW_BNCI004_3_CHANNEL_SOURCE_CVAR_ZERO_TARGET_EEG',r['mean_AUC'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-new-BNCI2014-004-low-dim-risk-CVaR-EEG-results
+          path: |
+            /tmp/bnci2014_004_risk/**
+            research/defaultreg_proper_predictive/BNCI2014_004_RISK_LOW_DIM_FIRST_RUN_PROTOCOL_20261012.md
+            research/defaultreg_proper_predictive/run_new_bnci2014_004_risk_robust.py
+          if-no-files-found: warn
+          retention-days: 90
