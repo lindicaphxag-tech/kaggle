@@ -1,0 +1,53 @@
+% Additional independent, fully synthetic stress profile; NOT a new EEG dataset.
+\subsection{Cross-dimension numerical stress test, not neural-transfer evidence}
+\label{sec:p4-synthetic-multidimensional}
+A second, separately executed code path tested the two
+source-domain bounding implementations on constructed
+symmetric-positive-definite eigensystems of dimensions
+$p\in\{2,3,6,9,12\}$. Each setting used three fixed
+random seeds, 18 synthetic positive and 18 synthetic
+negative feature rows (324 score-pairs per setting),
+12 shrinkage subintervals in $[0.02,0.98]$ and 201
+directly recomputed $\lambda$ values. In all fifteen
+cases, both calculated source AUC envelopes contained
+all dense-grid AUC values. This is a sampled numerical
+consistency check, \emph{not} a mathematical proof of
+floating-point enclosure between sampled grid values.
+
+\begin{table}[tb]
+\centering\small
+\caption{Synthetic SPD spectral certificate sensitivity
+across feature dimension. Mean percentage-point
+difference in SOURCE pair ranking stability coverage,
+Bernstein minus existing termwise/Taylor, over three
+fixed seeds (not independent EEG participants).}
+\label{tab:p4-synthetic-spd}
+\begin{tabular}{rrrl}
+\toprule
+Feature $p$ & Trials & Mean coverage gain (pp) &
+Bernstein versus old\\
+\midrule
+2 & 3 & $+0.000$ & 3 ties\\
+3 & 3 & $+4.321$ & 3 better\\
+6 & 3 & $+13.169$ & 3 better\\
+9 & 3 & $+16.667$ & 3 better\\
+12 & 3 & $+16.152$ & 3 better\\
+\bottomrule
+\end{tabular}
+\end{table}
+These are deliberately generated synthetic spectra,
+not additional EEG acquisitions; their coverage
+percentages cannot be pooled with or substituted for
+the observed Weibo2014 $+0.146$-pp real SOURCE improvement.
+The synthetic experiment neither demonstrates a
+computational speedup nor identifies how often
+uncertain source pairs actually reverse rank. Although
+the higher-dimensional means suggest whole-numerator
+cancellation may be increasingly useful for these
+particular constructed states, synthetic generator
+choice and floating-point instability can change
+the result. Validation on multiple NEW native
+EEG feature geometries remains necessary.
+The source code, raw per-case results and all
+fifteen dense-grid checks are linked in the
+supplementary execution receipt (run 38312807723).
