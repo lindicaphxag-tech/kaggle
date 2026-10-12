@@ -1,0 +1,57 @@
+\begin{abstract}
+\textbf{Objective:} We investigate whether
+source-domain regularisation selection in
+cross-subject EEG changes when an
+often-used class-centred covariance
+validation score is replaced by a
+source-trained Gaussian predictive score.
+\textbf{Methods:} We distinguish held-source
+person class-recentred covariance scoring,
+proper plug-in class-conditional Gaussian
+predictive scoring, and held-source
+discrimination. We derive the exact
+nonnegative class-mean-shift penalty
+separating the first two objectives,
+and a finite-grid source-only certificate
+for when their selected shrinkage
+strength changes. Original pre-data
+EEG tests are preserved; corrected
+controls on Shin2017A and
+BNCI2014\_002 are explicitly
+retrospective. A separate public
+BNCI2014\_001 protocol was
+committed before its first run
+with a source-only selection lock.
+\textbf{Results:} Original EEGMMIDB
+(\(N=20\)) showed +0.0561 mean
+AUC for discrimination over the
+historical class-centred criterion
+(Holm \(p=0.00597\)), but five
+individuals were harmed. Two
+original BNCI tests were
+non-significant and a prospective
+filter-bank prediction failed.
+The corrected predictive comparator
+nearly tied discrimination on
+Shin2017A (\(0.786207\) versus
+\(0.785900\)) and was 0.00682 AUC
+below it on BNCI2014\_002.
+In the separately protocol-locked
+BNCI2014\_001 experiment
+(\(N=9\), 2,592 trials), discrimination,
+correct predictive likelihood and
+historical class-centred selection
+obtained 0.789052, 0.783415
+and 0.772387 AUC, respectively.
+The exact source-estimand decision
+breakpoint was dataset-dependent.
+\textbf{Conclusion:} The class-centred
+covariance score does not measure
+source-mean predictive likelihood,
+and can change the apparent method
+ranking. Results favour clear
+estimand specifications and
+source-only sensitivity reporting,
+not a universal optimal shrinkage
+rule or deployment-level safety claim.
+\end{abstract}
