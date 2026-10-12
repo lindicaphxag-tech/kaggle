@@ -64,6 +64,28 @@ its duplicate IDs. Correcting only the denominator
 of a reported mean AUC does not repair the fitted
 source models.
 
+This contamination can be illustrated without assuming
+any particular classifier. Let $\widehat\mu_c$ be a
+training-class mean from $N_c$ EEG observations
+and let the inadvertently duplicated recording
+contribute $n_{k,c}$ observations with mean
+$\widehat\mu_{k,c}$. Then its extra inclusion changes
+the fitted training-class mean to
+\[
+ \widehat\mu'_c
+ =\widehat\mu_c+
+ \frac{n_{k,c}}{N_c+n_{k,c}}
+ \bigl(\widehat\mu_{k,c}-\widehat\mu_c\bigr).
+\]
+For a duplicate of a nominally held target,
+$\widehat\mu_{k,c}$ contains the nominal target's
+\emph{labelled} feature observations. In the
+source-fitted tangent-LDA pipeline, this can also
+change regularised covariance spectra and the
+source-validation paths. The elementary weighted-mean
+identity is not a new statistical theorem and gives
+no quantitative estimate of performance inflation.
+
 \paragraph{Purged re-fitting.}
 The precommitted retrospective V26 protocol groups
 only exact signal- and label-identical records;
