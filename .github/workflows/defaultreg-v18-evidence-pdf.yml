@@ -86,11 +86,22 @@ jobs:
           grep -q '0.786207' v18_manuscript.txt
           pdfinfo main_bspc_v18_DRAFT.pdf | grep Pages
           echo 'V18_REAL_SHIN_EEG_PREDICTIVE_CONTROL_AND_PAPER_PASSED'
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_bspc_v18_CONCISE_DRAFT.tex
+          test -s main_bspc_v18_CONCISE_DRAFT.pdf
+          pdftotext main_bspc_v18_CONCISE_DRAFT.pdf v18_concise_manuscript.txt
+          grep -q '0.771886' v18_concise_manuscript.txt
+          grep -q '0.786207' v18_concise_manuscript.txt
+          if grep -Eq 'multiply defined|Undefined control sequence|Citation.*undefined' main_bspc_v18_CONCISE_DRAFT.log; then exit 3; fi
+          echo 'V18_CONCISE_ARTICLE_BUILT_WITH_CITATIONS_AND_BOTH_COHORTS'
+          pdfinfo main_bspc_v18_CONCISE_DRAFT.pdf | grep Pages
       - uses: actions/upload-artifact@v4
         with:
           name: defaultreg-v18-fair-predictive-EEG-reviewed-PDF-and-evidence
           path: |
             research/defaultreg_bspc_v13/main_bspc_v18_DRAFT.pdf
+            research/defaultreg_bspc_v13/main_bspc_v18_CONCISE_DRAFT.pdf
+            research/defaultreg_bspc_v13/main_bspc_v18_CONCISE_DRAFT.log
+            research/defaultreg_bspc_v13/main_bspc_v18_CONCISE_DRAFT.bbl
             research/defaultreg_bspc_v13/main_bspc_v18_DRAFT.log
             research/defaultreg_bspc_v13/main_bspc_v18_DRAFT.bbl
             research/defaultreg_bspc_v13/v18_independent_proper_audit.json
