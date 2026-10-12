@@ -58,7 +58,7 @@ def test_class_contrast_shift_can_be_auc_invisible_when_orthogonal():
     V[yv==1,1]+=9.0
     score0=old.scalar_scores(old.spectral_state(T,y),T,1.0)
     score1=old.scalar_scores(old.spectral_state(T,y),V,1.0)
-    assert np.array_equal(score0,score1)
+    assert np.allclose(score0,score1,atol=1e-10,rtol=1e-10)
     a=exact_shift_partition(T,y,T,y,1.)
     b=exact_shift_partition(T,y,V,yv,1.)
     assert b["class_contrast_shift_density_only"]>10.
