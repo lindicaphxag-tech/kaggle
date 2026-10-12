@@ -61,7 +61,7 @@ def eval_poly(coeffs,x):
 def check():
     # Root at t=1/2: positive and negative halves cannot each
     # receive an inclusive strict sign certificate.
-    n=numerator(["1","3"],["1","-2"],"2")
+    n=numerator(["1","3"],["3/4","-5/4"],"2")
     assert n==[Q(1),Q(-2)]
     assert certify(n)=="unresolved"
     assert eval_poly(n,Q(1,2))==0
@@ -73,7 +73,7 @@ def check():
     # Identically zero must retain half-credit for ties, never + or -.
     assert certify(numerator(["1","3"],["0","0"],"2"))=="identically_tied"
     # Stress very-near-zero rational intercept: no arbitrary eps.
-    tiny=numerator(["1","3"],["1","-1/3"+"0"*0],"2")
+    tiny=numerator(["1","3"],["1","-1/3"],"2")
     assert all(isinstance(v,Q) for v in tiny)
     examined=0
     for p in [2,3,6,9,12]:
