@@ -1,0 +1,39 @@
+name: P2 real matched-pair affine residual and raw EDF forensic audit
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths: ['research/defaultreg_bspc_v13/src/p2_near_match_affine_forensic.py','.github/workflows/p2-near-match-affine-forensics.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  record-content-forensics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 85
+    env:
+      MNE_DATA: /tmp/p2-nearmatch-source-release
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Inspect discovered near-match IDs and explicit negative controls in processed and raw EDF digital inputs
+        run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_bspc_v13/src/p2_near_match_affine_forensic.py --out /tmp/p2-nearmatch-audit.json
+          python - <<'PY'
+          import json
+          z=json.load(open('/tmp/p2-nearmatch-audit.json'))
+          assert len(z['pairs'])==5
+          assert z['not_a_causal_or_patient_identity_claim']
+          assert z['near_pairs_previously_selected_from_1225_pairs']==[[4,5],[47,49],[11,15]]
+          print('P2_TRUE_NEAR_MATCH_DIAGNOSTIC_RESULTS_REPORTED_WITHOUT_IMPUTED_IDENTITY')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p2-real-exposed-3-near-and-2-control-processed-affine-edf-raw-audit
+          path: /tmp/p2-nearmatch-audit.json
+          if-no-files-found: warn
+          retention-days: 90
