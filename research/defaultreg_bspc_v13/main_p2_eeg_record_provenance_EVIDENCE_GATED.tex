@@ -172,6 +172,7 @@ not by itself a causal EEG leakage-effect estimate.
 \input{125_v30_actual_crossed_49_result.tex}
 
 \input{P2_49_record_localisation_real_results.tex}
+\input{P2_additional_real_multimodel_and_preprocess_results.tex}
 \input{P2_figure_frozen49_group_paired_auc.tex}
 
 \section{Discussion}
@@ -192,6 +193,12 @@ target mean could thus arise even with \emph{no}
 regularisation-selection changes. These results separate
 source-model dependence from parameter substitution, but do
 not uniquely isolate causes of training contamination.
+
+The complete cross-ID overlap also persisted under a separately fixed
+6--35 Hz/128 Hz preprocessing configuration, and two additional fixed
+classifier loss functions retained the localized large change in the
+aliased content group. This does not provide an independent cohort or
+establish prevalence across public EEG datasets.
 
 The overlap finding pertains to a fixed processed software
 representation. Authoritative resolution of whether patient
