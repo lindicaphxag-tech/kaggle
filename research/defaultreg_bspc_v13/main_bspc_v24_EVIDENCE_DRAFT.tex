@@ -68,10 +68,10 @@ the frozen confirmatory family. All target labels, target feature
 moments and target-fitted geometry are excluded from primary source-only
 (Z0) selection. We preserve the original predeclared finite shrinkage grid,
 frozen prospective test cohorts, the representation falsification,
-individual harms, and the newly verified posterior comparator. An additional acquisition dataset, BNCI2014\_001, was evaluated
-under a repository-frozen first-run protocol only after the V19
-analyses had been specified. This new cohort is not treated as
-an independently preregistered trial.
+individual harms, and the newly verified posterior comparator. An additional BNCI2014\_001 acquisition and a new Weibo2014
+ten-person, three-channel dataset were evaluated under
+repository-committed protocol-first procedures. Neither experiment
+constitutes independent external preregistration.
 
 The objective is not to show
 that one numerical shrinkage value is universally optimal; it is to measure
@@ -311,81 +311,83 @@ cannot be claimed from these data.
 
 
 \section{Discussion}
-The corrected experiment changes the causal interpretation of the
-original ranking of regularisation selectors. Source discrimination
-outperformed the historically named Cov-NLL selector in the frozen
-EEGMMIDB and Shin2017A studies. But that historical criterion removes
-validation participants' class-mean shifts before assessing covariance
-fit; it was not a proper source-mean predictive density score.
-The new, genuinely predictive Gaussian baseline nearly ties
-the discrimination policy on Shin2017A, whereas source-macro
-selection remains modestly higher on a second, retrospective
-BNCI2014\_002 evaluation. Both newly corrected comparisons
-were performed after the corresponding target outcomes
-were known, so neither can be treated as a new pre-data
-confirmation. The paper therefore does
-\emph{not} establish that optimizing discriminability dominates
-predictive covariance fitting. Its more specific contribution is
-identifying the exact difference between two validation estimands,
-deriving the omitted nonnegative mean-shift term, and documenting
-the resulting reversal of an earlier experimental interpretation.
-The classical principle that discriminative risk and covariance
-estimation differ is prior art \cite{friedman1989,tomioka2010regularized}.
+The central finding is not that discrimination-optimised covariance
+shrinkage is universally preferable, but that \emph{an apparently
+reasonable validation criterion can silently change the scientific
+estimand}. The previously called Cov-NLL scored each held-source
+participant after subtracting that participant's own validation-class
+means. It therefore omitted an exact, nonnegative source-trained-mean
+shift penalty and must not be compared to discriminative selection
+as if it were proper predictive likelihood. The corrected source-trained
+Gaussian score changes the magnitude and interpretation of the earlier
+advantage. Selecting shrinkage using held-source discrimination is
+classical; our contribution concerns the reproducibility and
+interpretation of that objective comparison, not priority for
+discriminative tuning \cite{friedman1989,tomioka2010regularized}.
 
-The evidence is heterogeneous rather than universal. Two independently
-pre-data-frozen BNCI cohorts have positive mean directions but individually
-non-significant adjusted tests. Shin2017A's old comparisons were frozen
-separately; the new proper-predictive criterion was specified and executed
-only after that dataset's results were exposed.
-The cross-representation intervention directly falsifies the originally
-expected filter-bank improvement, and none of the proposed follow-up
-source-only tail/fidelity heuristics has passed a promotion rule.
-The post-outcome frontier correction removes the earlier population
-span interpretation. These adverse findings constrain the contribution
-and should remain visible rather than be suppressed.
+The prospectively fixed EEGMMIDB comparison is real, but it also
+contains harmed participants; the two original independently frozen
+BNCI families do not individually establish adjusted superiority.
+Shin2017A's proper predictive comparison is retrospective.
+The subsequent three-channel CVaR experiment demonstrated
+that changing the source-selected regularisation does not
+necessarily change target discrimination, and the prospective
+spectral-representation intervention refuted the initially
+expected universal filter-bank advantage. These negative
+results are central to the paper, not unsuccessful parameter
+searches to be discarded.
 
-The new source-only regret/rotation diagnostic is a measurement instrument,
-not a validated alarm threshold or a new covariance estimator. Its
-prospective predictive value and decision safety remain untested. Nor do
-these offline AUC results establish clinically relevant operating thresholds,
-reduced labelled calibration burden or superior modern deep EEG decoding.
-The data contain few independent acquisition laboratories, while
-test-participant bootstrap inference does not capture overlapping
-source-fit variation or future domain shifts. Broad clinical claims
-would require a separate pre-registered device/session/threshold utility study.
+The V22 and V23 mechanisms distinguish source parameter changes,
+score-pair order changes and source-validation AUC effects.
+The V24 continuous branch-and-bound repair provides a useful
+conditional finite-\emph{source} optimisation gap. Yet the new
+Weibo2014 experiment is more informative for its \emph{failure
+to improve transfer}: the same shrinkage was selected
+in every outer source pool by the new continuous method
+and the original 27-point grid, producing identical
+held-person predictions by that pipeline. The average
+$+0.00205$ AUC contrast to proper predictive likelihood
+has a descriptive participant interval containing zero.
+Under the deterministic decomposition of
+Eq.~\eqref{eq:v24-transfer-gap}, closing the source
+optimisation term cannot bound the unobserved
+source--target discrepancy; no source-only rank
+certificate is an unseen-person safety guarantee.
 
-
-
-
-
-
-
-\paragraph{Extended technical analyses.}
-The accompanying full manuscript preserves post-outcome source--target
-rank diagnostics, formal identifiability examples, original CSP reference
-comparisons and the historical finite-grid hindsight envelope. None
-of these supplementary results creates a new confirmatory family.
+The independent Weibo acquisition extends the practical
+stress test to another recording site, but the fixed
+three-channel, single binary MI task is deliberately
+limited. Its ten overlapping-source leave-one-person-out
+models do not provide ten independent study replications,
+and repository protocol-first chronology is weaker than
+independent preregistration. The work does not establish
+SOTA deep EEG performance, calibration time saved,
+clinical safety, or deployment-ready trigger policies.
+The most robust methodological recommendation is to
+specify validation estimands, target-information budgets,
+pre-outcome selection boundaries, negative controls,
+and participant-level adverse effects before making
+claims about EEG regularisation.
 
 \section{Conclusion}
-Different covariance-validation targets can yield different
-regularisation settings in source-only cross-subject EEG. An originally observed
-discrimination-selector advantage against a validation-class-centred
-covariance score is not evidence of advantage over predictive
-likelihood: the corrected Gaussian predictive source selector
-nearly tied discrimination-based selection in retrospective
-Shin2017A analysis and trailed by 0.00682 AUC on
-retrospective BNCI2014\_002. These observations are
-not independent prospective superiority tests. The exact missing class-mean-shift term, adverse
-participant results, individually inconclusive external BNCI
-tests and prospective spectral falsification constrain the
-scientific conclusion. An additional protocol-locked BNCI2014\_001 dataset gives a
-small mean discrimination-over-predictive difference whose
-participant-level uncertainty spans zero; this is a new
-dataset-specific check, not a globally pre-registered validation.
-No universal shrinkage rule, patient-safe
-switch, or population-wide superiority is demonstrated.
-Transparent source-estimand definitions and genuinely untouched
-external replication are necessary before recommending a selector.
+An historical validation-class-centred EEG covariance score
+was not a proper predictive Gaussian likelihood, and
+the distinction changes how earlier discrimination-based
+regularisation gains should be interpreted. Exact
+pairwise ranking and spectral path analyses clarify why
+source selection decisions can differ without producing
+important target AUC improvements. The independently
+audited ten-person Weibo2014 protocol-first test
+found that source-optimality gaps were numerically
+small but continuous selection and the original
+27-point source grid chose identical parameters and
+achieved the same held-person macro AUC.
+This supports \emph{measurement correctness and
+selection validity} as the manuscript's contribution,
+not superiority of a new EEG decoder. Broader
+multi-acquisition, fully independent pre-data
+replication is required before claiming a universally
+safe or better shrinkage rule.
 
 \section*{Statements and Declarations}
 \textbf{Data availability:} The EEG cohorts are publicly distributed.
