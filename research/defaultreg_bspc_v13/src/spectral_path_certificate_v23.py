@@ -92,6 +92,26 @@ def certified_path_rank_stability(
             right_terms = coeff / denom[s + 1]
             lower = np.minimum(left_terms, right_terms).sum(-1)
             upper = np.maximum(left_terms, right_terms).sum(-1)
+            # Intersect monotone-term bounds with a centered Taylor
+            # interval using source covariance's fixed spectral drift.
+            # Cancellation in the FIRST derivative is preserved exactly,
+            # while second-order remainder is bounded absolutely.
+            halfwidth = (grid[s + 1] - grid[s]) / 2.
+            middle = (grid[s + 1] + grid[s]) / 2.
+            rm = (1. - middle) * e + middle * nu
+            drift = nu - e
+            fm = np.sum(coeff / rm, axis=-1)
+            d1 = -np.sum(coeff * drift / (rm * rm), axis=-1)
+            curvature = np.sum(
+                2 * np.abs(coeff) * drift**2 /
+                (np.minimum(denom[s], denom[s + 1])**3),
+                axis=-1,
+            )
+            taylor_radius = np.abs(d1) * halfwidth + (
+                0.5 * curvature * halfwidth**2
+            )
+            lower = np.maximum(lower, fm - taylor_radius)
+            upper = np.minimum(upper, fm + taylor_radius)
             magnitude = np.maximum(
                 np.abs(left_terms), np.abs(right_terms)
             ).sum(-1)
