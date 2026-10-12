@@ -1,0 +1,158 @@
+% PAPER 4 — exploratory exact-source rank-cell certificate note.
+% NOT a prospective transfer improvement. NOT JOURNAL READY.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=0.95in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,booktabs,graphicx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{lmodern}
+\title{Polynomial Rank Cells for Continuous EEG Shrinkage Paths:\\
+A Retrospective Source-Domain Certificate Study}
+\author{AUTHORS TO BE VERIFIED}
+\date{}
+\begin{document}\maketitle
+\begin{abstract}
+\textbf{Objective.} For a source-trained
+regularised EEG linear discriminant, determine
+which continuous shrinkage intervals can
+be certified not to change any held-source
+positive--negative score ordering.
+\textbf{Methods.} We express each positive--negative
+source score difference as a rational function
+of the scalar shrinkage parameter. Its numerator
+is a polynomial of degree at most the
+feature dimension minus one, giving a finite
+rank-cell decomposition on feasible intervals.
+A Bernstein-basis enclosure uses whole-numerator
+cancellation rather than only separate
+termwise spectral enclosures. We test the
+two source-only certificate procedures
+on the same previously exposed
+three-channel Weibo2014 motor-imagery
+feature folds without changing any
+held-target prediction or source selector.
+\textbf{Results.} In nine held-source
+validation groups under the original
+six-dimensional tangent feature geometry,
+the proportion of pair orderings certified
+unchanged on the full $[0,1]$ path rose
+from $94.121\%$ to $94.267\%$
+($+0.146$ percentage points). On intervals
+between source choices, coverage rose
+from $96.274\%$ to $96.338\%$
+($+0.064$ percentage points). Neither
+analysis tests an external target improvement.
+\textbf{Conclusion.} Whole-numerator
+polynomial bounding gives a small,
+measurable technical improvement in
+source rank stability coverage. Classical
+polynomial algebra is not newly invented
+here; no formally rounded numerical
+proof or prospective EEG transfer gain
+has been established.
+\end{abstract}
+\noindent\textbf{Keywords:} EEG;
+regularised discriminant analysis;
+spectral perturbations; polynomial
+certification; rank stability;
+Bernstein basis.
+
+\section{Introduction}
+Regularisation is often selected by
+cross-validation on source participants.
+A linear classifier's held-source
+ROC-AUC depends only on positive--negative
+pair orderings, so a continuous scalar
+shrinkage path need not produce a
+continuous performance objective.
+The source score is a rational function
+of shrinkage under the classical
+covariance eigendecomposition. Instead of
+optimising its held-target outcomes,
+we quantify how much of the
+SOURCE AUC path can be certified
+stable by algebraic sign enclosures.
+Riemannian EEG decoding and source
+evaluation follow established methods
+\cite{barachant2012,jayaram2018moabb}.
+This is distinct from Paper 1's
+Gaussian-vs-discriminative measurement
+question, Paper 2's recording-content
+identity audit, and Paper 3's
+held-target policy efficacy question.
+
+\section{Methods}
+For fitted source covariance
+$S=U\operatorname{diag}(s_i)U^\top$
+and source class contrast $d$,
+the score direction satisfies
+$w_\lambda=[(1-\lambda)S+
+\lambda\nu I]^{-1}d$ with
+$\nu=\operatorname{tr}(S)/p$.
+For any fixed held-source
+positive--negative feature difference $v$,
+the sign of $v^\top w_\lambda$
+changes only where its
+rational numerator vanishes or
+where the denominator leaves the
+strictly positive feasible region.
+The following technical formulation
+retains this sign convention, treats ties
+separately and avoids false formal
+machine-verification claims.
+
+\input{P4_rank_cells_method.tex}
+
+\section{Retrospective source-only study}
+\input{P4_rank_cells_real_source_result.tex}
+
+\section{Limitations and independent-study requirement}
+These percentages measure \emph{certified
+SOURCE pair stability}, NOT new EEG
+classification accuracy, AUC improvement
+or the fraction of clinically
+beneficial decisions. The experiment
+uses a single previously explored
+three-channel acquisition with nine
+source validation groups. Two
+different source certificate implementations
+on the same fitted model are not
+independent held-target experiments.
+The Bernstein bounding method has
+a floating-point safety margin rather
+than a formal outward-directed rounding
+guarantee. Earlier numerical problems,
+large tangent dimensions and finite
+root conditioning remain test cases.
+A publishable method note would
+need a substantial independent benchmark
+on multiple spectral dimensions and
+an explicit complexity/precision tradeoff.
+The resulting certificate could be useful
+without a new classifier, but its
+downstream value must be shown rather
+than assumed.
+
+\section{Conclusion}
+The six-feature source score path admits
+a finite polynomial rank-cell analysis.
+Whole-numerator Bernstein bounds
+raised the certified source pair coverage
+only slightly on the actual Weibo2014
+retrospective experiment. The finding
+is technical and bounded, and should
+not be published as a surrogate
+for transfer-performance gains.
+
+\section*{Statements and Declarations}
+\textbf{Data/code:} Real source-only
+workflow and SHA-256 artifact are
+available in the research repository;
+independent release and source code
+stabilization are not yet complete.
+\textbf{Authorship, conflicts,
+funding, ethics, AI use:} must be
+approved by actual authors.
+\bibliographystyle{unsrt}
+\bibliography{references_v10}
+\end{document}
