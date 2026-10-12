@@ -1,0 +1,69 @@
+\subsection{Disentangling source shrinkage choices from refitted EEG geometry}
+\label{sec:v29-crossed-software-interventions}
+The independently verified V28 analysis established that
+removing an exact duplicated recording changes both
+the source-fitted model and its source-selected shrinkage
+decisions. The matched 49-record AUC change cannot by
+itself reveal whether a changed shrinkage value is
+responsible. We therefore implement a retrospective
+$2\times2$ \emph{software counterfactual}, holding
+the 49 evaluated target recording groups fixed.
+
+Let $F_A$ be the original nominal-50-ID fitted
+tangent-LDA model on each source group, and let
+$F_B$ be the independently re-fitted 49-unique-group
+model. Let $\lambda_A$ and $\lambda_B$ be the respective
+\emph{source-only}, already frozen selected shrinkage
+values. Write $Y_{uv}$ for the held-record ROC-AUC
+of fitted model $F_u$ with scalar $\lambda_v$
+($u,v\in\{A,B\}$). For each policy separately,
+the four recorded values are
+\[
+\begin{array}{c|cc}
+ & \lambda_A & \lambda_B\\
+\hline
+F_A & Y_{AA} & Y_{AB}\\
+F_B & Y_{BA} & Y_{BB}
+\end{array}
+\]
+where $Y_{AA}$ must exactly reproduce the
+original immutable 50-ID held-person AUC and
+$Y_{BB}$ the true full-refit 49-record AUC.
+A failure of either full per-record identity
+check invalidates the mechanism experiment.
+
+The following algebraic identities are exact
+for each held representative and its participant-macro
+aggregation:
+\begin{align}
+Y_{BB}-Y_{AA}
+&=(Y_{AB}-Y_{AA})+(Y_{BB}-Y_{AB}),\\
+&=(Y_{BA}-Y_{AA})+(Y_{BB}-Y_{BA}).
+\end{align}
+The difference of two conditional selector effects
+\[
+ I=(Y_{BB}-Y_{BA})-(Y_{AB}-Y_{AA})
+\]
+is an observable fitted-model-by-parameter
+interaction. If $\lambda_A=\lambda_B$ in a fold,
+both within-model selector contrasts must be
+exactly zero (up to floating-point consistency);
+the remaining AUC contrast is exclusively
+associated with changing the fitted model,
+\emph{not} a new shrinkage decision. Conversely,
+a changed $\lambda$ does not guarantee a changed
+AUC because it may leave positive-negative trial
+pair rankings invariant.
+
+No theorem of causal leakage attribution follows:
+the old source model may contain a held duplicated
+record, and model refitting changes covariance
+geometry, training weights and the discriminant
+simultaneously. All source lambdas, both original
+held AUC vectors, and the full content grouping
+were already exposed before this study.
+The four-way decomposition is a falsifiable
+computational explanation, not a fresh
+unseen-person test, and all participant-level
+outcomes must be preserved if a result does
+not support the source-decision mechanism.

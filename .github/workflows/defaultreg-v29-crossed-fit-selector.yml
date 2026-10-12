@@ -1,0 +1,65 @@
+name: DefaultReg V29 49-EEG-group crossed fit-selection experiment
+on:
+  push:
+    branches: [research/defaultreg-v29-crossed-model-selector-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/run_v29_crossed_fit_selector.py'
+      - '.github/workflows/defaultreg-v29-crossed-fit-selector.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  genuine-frozen-2x2-crossed-eeg:
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    env:
+      GH_TOKEN: ${{ github.token }}
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MNE_DATA: /tmp/defaultreg-v29-real-eeg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin original public real EEG environment
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Fetch independent pre-outcome source-choice locks and frozen first-run EEG outcomes
+        run: |
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11760774972/zip > /tmp/original-50-nominal-subjects.zip
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11765005135/zip > /tmp/purged-49-unique-recordings.zip
+          test -s /tmp/original-50-nominal-subjects.zip
+          test -s /tmp/purged-49-unique-recordings.zip
+      - name: Execute 2x2 original/refitted models x frozen original/purged lambdas for all 49 identical held targets
+        run: |
+          mkdir -p "$MNE_DATA" /tmp/defaultreg-v29
+          python -m py_compile research/defaultreg_bspc_v13/src/run_v29_crossed_fit_selector.py
+          python research/defaultreg_bspc_v13/src/run_v29_crossed_fit_selector.py --original-zip /tmp/original-50-nominal-subjects.zip --purged-zip /tmp/purged-49-unique-recordings.zip --out /tmp/defaultreg-v29/CROSSED_MODEL_SELECTION_49_GROUPS.json
+          python - <<'PY'
+          import json
+          p='/tmp/defaultreg-v29/CROSSED_MODEL_SELECTION_49_GROUPS.json'
+          r=json.load(open(p))
+          assert r['status']=='V29_RETROSPECTIVE_FROZEN_FOUR_CELL_REFIT_SELECTION_COMPLETE'
+          assert r['n_content_disjoint_held_groups']==49
+          assert len(r['held_record_crossed_responses'])==49
+          assert r['all_49_original_and_purged_outcomes_reproduced']
+          assert r['not_causal_or_strict_physically_target_isolated_Z0']
+          assert set(r['method_summary'])=={'source_macro','proper_source_mean_gaussian','historical_class_centred'}
+          for k,method in r['method_summary'].items():
+              vals=method['participant_macro_mean']
+              assert abs(vals['BB_purged_fit_purged_lambda']-
+                         vals['AA_old_fit_old_lambda']-
+                         vals['total_purged_BB_minus_original_AA'])<1e-12
+          assert r['method_summary']['source_macro']['n_changed_frozen_source_lambda']==37
+          assert r['method_summary']['proper_source_mean_gaussian']['n_changed_frozen_source_lambda']==0
+          print('PASS_V29_ALL49_FROZEN_AUC_REPRODUCTIONS_AND_2X2_DECOMPOSITIONS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-v29-real-49-record-crossed-model-regularisation-four-cells
+          path: /tmp/defaultreg-v29/**
+          if-no-files-found: warn
+          retention-days: 90
