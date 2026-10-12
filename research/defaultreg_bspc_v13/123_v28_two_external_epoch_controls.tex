@@ -1,0 +1,48 @@
+\subsection{Two public EEG acquisitions as negative exact-epoch integrity controls}
+\label{sec:v28-negative-acquisition-controls}
+The exact-epoch cross-identifier finding is not presented
+as a universal property of public EEG repositories.
+We preselected two previously exposed independent
+recording acquisitions (not new performance-validation
+cohorts) before conducting the content identity scan.
+Weibo2014 was processed with its original fixed
+C3/Cz/C4 three-channel, left/right motor imagery
+pipeline. BNCI2014\_002 retained the original native
+EEG channels and fixed right-hand/feet task. Both
+used the original MOABB 1.7.2, 8--30 Hz,
+160 Hz, source-compatible preprocessing.
+
+\begin{table}[tb]
+\centering\small
+\caption{Exact processed full EEG trial-content identity across
+all preselected subject identifiers in three public acquisitions.
+Only exact repeats under these fixed pipelines are audited;
+no new AUC is evaluated in this table.}
+\label{tab:v28-integrity-controls}
+\begin{tabular}{lrrrr}
+\toprule
+Acquisition & IDs & Trials & Unique trials & Cross-ID edges\\
+\midrule
+Liu2024 & 50 & 2,000 & 1,960 & 1\\
+Weibo2014 & 10 & 1,580 & 1,580 & 0\\
+BNCI2014\_002 & 14 & 2,240 & 2,240 & 0\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The two negative-control audits completed successfully in
+GitHub Actions run \texttt{38289332514},
+receipt SHA-256 prefix \texttt{eb870591f13e7593}
+(full result and digest in its immutable artifact).
+For both controls all trial arrays were unique under
+the exact numeric and event-label equality criterion.
+This constrains the observed duplicated released
+record to the specific Liu2024 acquisition and
+preprocessing representation. It does not establish
+that other releases are free of exact duplicates,
+nor do negative exact-equality tests exclude near-duplicates
+or nonidentical overlapping signal windows.
+The two control cohorts had already been used
+in earlier DefaultReg method development,
+so they do not add fresh independent algorithm
+generalisation evidence.
