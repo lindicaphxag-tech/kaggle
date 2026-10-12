@@ -25,6 +25,11 @@ def test_exact_two_factor_identity_and_valid_source_classes(lam):
        atol=1e-10,rtol=1e-10)
     assert r["location_shift_auc_invariant"]>=0
     assert r["class_contrast_shift_density_only"]>=0
+    assert r["class_contrast_shift_score_aligned"]>=0
+    assert r["class_contrast_shift_score_orthogonal"]>=-1e-10
+    assert np.isclose(r["class_contrast_shift_density_only"],
+                      r["class_contrast_shift_score_aligned"]+
+                      r["class_contrast_shift_score_orthogonal"],atol=1e-10)
     assert np.isclose(r["class0_fraction"],37/120)
     assert np.isclose(r["class1_fraction"],83/120)
 
@@ -62,6 +67,8 @@ def test_class_contrast_shift_can_be_auc_invisible_when_orthogonal():
     a=exact_shift_partition(T,y,T,y,1.)
     b=exact_shift_partition(T,y,V,yv,1.)
     assert b["class_contrast_shift_density_only"]>10.
+    assert b["class_contrast_shift_score_aligned"]<1e-12
+    assert b["class_contrast_shift_score_orthogonal"]>10.
     assert np.isclose(a["validation_class_centred_score"],
                       b["validation_class_centred_score"])
     assert roc_auc_score(y,score0)==roc_auc_score(y,score1)==1.
