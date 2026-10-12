@@ -20,7 +20,7 @@ from moabb.paradigms import MotorImagery
 
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
-sys.path.insert(0,str(HERE.parents[2]/"defaultreg_proper_predictive"))
+sys.path.insert(0,str(HERE.parents[1]/"defaultreg_proper_predictive"))
 from record_identity_groups_v26 import assign_recording_groups,check_disjoint_training
 import original_frozen_runner as old
 
