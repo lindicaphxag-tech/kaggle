@@ -1,0 +1,70 @@
+name: DefaultReg V18 BNCI2014_002 proper predictive likelihood post-outcome
+on:
+  push:
+    branches:
+      - research/defaultreg-v18-BNCI2014-proper-predictive-20261012
+    paths:
+      - 'research/defaultreg_proper_predictive/**'
+      - '.github/workflows/defaultreg-v18-BNCI2014-proper.yml'
+  pull_request:
+    paths:
+      - 'research/defaultreg_proper_predictive/**'
+      - '.github/workflows/defaultreg-v18-BNCI2014-proper.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  bnci-proper-source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    env:
+      GH_TOKEN: ${{ github.token }}
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MNE_DATA: /tmp/defaultreg_mne_data
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install frozen EEG stack
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Verify corrected source-only operator and real runner source
+        run: |
+          cd research/defaultreg_proper_predictive
+          python -m py_compile run_bnci2014_proper_predictive_posthoc.py
+          python -m unittest -v test_proper_predictive_source_only
+      - name: Fetch original BNCI2014_002 frozen score family with exact checksum
+        run: |
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11675156650/zip > /tmp/bnci_original.zip
+          echo '15137db055b54983c297d28b93e714836ff3711888c35bcdd3640eba05b1a6e1  /tmp/bnci_original.zip' | sha256sum -c
+      - name: Real EEG source-only Gaussian conditional prediction comparator
+        run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_proper_predictive/run_bnci2014_proper_predictive_posthoc.py \
+            --original-zip /tmp/bnci_original.zip --out /tmp/bnci_proper_v18
+      - name: Check honest post-outcome 14-person provenance
+        run: |
+          python - <<'PY'
+          import json, pathlib, hashlib
+          p=pathlib.Path('/tmp/bnci_proper_v18')
+          b=(p/'SOURCE_CHOICES_FROZEN_BEFORE_TARGET_OUTCOME_JOIN.json').read_bytes()
+          s=json.loads(b)
+          x=json.loads((p/'POSTHOC_PROPER_PREDICTIVE_VS_FROZEN_RESULTS.json').read_text())
+          assert len(s)==x["n"]==14
+          assert x["status"]=="POST_OUTCOME_REAL_EEG_SENSITIVITY_NOT_CONFIRMATORY"
+          assert x["no_new_confirmatory_p_value"] is True
+          assert x["source_only_lambda_lock_sha256"]==hashlib.sha256(b).hexdigest()
+          assert all(z["no_outer_target_info_for_selection"] for z in s)
+          print("PASS_BNCI14_REAL_PROPER_GAUSSIAN_NLL_POSTOUTCOME",x["mean_source_macro_minus_proper_AUC"],x["mean_class_centered_minus_proper_AUC"])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-v18-BNCI14-proper-predictive-postoutcome-ONLY
+          path: |
+            /tmp/bnci_proper_v18/**
+            research/defaultreg_proper_predictive/run_bnci2014_proper_predictive_posthoc.py
+          if-no-files-found: warn
+          retention-days: 90
