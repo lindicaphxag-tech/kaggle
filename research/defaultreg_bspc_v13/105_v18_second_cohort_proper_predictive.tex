@@ -1,0 +1,82 @@
+\subsection{Second real EEG source-mean predictive comparison}
+\label{sec:v18-bnci-proper}
+We repeated the corrected source-mean Gaussian predictive
+criterion on the \emph{original, separately frozen}
+BNCI2014\_002 frontier experiment. Its public EEG pipeline
+contained 14 held persons, 2240 trials and the original
+source-only tangent-LDA scoring family. The new analysis
+was specified \emph{after} this dataset's outcomes were
+available; thus the original experiment's true-pre-data
+status does not carry over to the new comparator.
+The corresponding original artifact and new source-choice
+files were independently read, with 14 paired AUC values
+verified against the original immutable target AUC paths.
+
+\begin{table}[tb]
+\centering
+\small
+\caption{Matched real EEG descriptive comparisons after
+correcting the covariance validation estimand. Entries
+for the properly predictive criterion are \emph{post-outcome}
+secondary analyses. The two rows correspond to different
+public datasets, not two independent pre-data confirmations
+of the new criterion. Mean source log-score penalty is
+\(C_{\rm pred}-C_{\rm cent}\) at the newly chosen shrinkage
+value, normalised per feature; positive values are an
+exact class-mean-shift consequence.}
+\label{tab:v18-two-real-cohorts}
+\begin{tabular}{lcc}
+\toprule
+Metric & Shin2017A & BNCI2014\_002\\
+\midrule
+Held persons & 29 & 14\\
+Source-macro selected AUC & 0.785900 & 0.778705\\
+Proper predictive selected AUC & 0.786207 & 0.771886\\
+Historical class-centred AUC & 0.763678 & 0.761116\\
+Macro minus proper AUC & $-0.000307$ & $+0.006819$\\
+Proper minus historical AUC & $+0.022529$ & $+0.010770$\\
+Mean source class-mean-shift penalty & $+0.86995$ & $+0.91218$\\
+Positive source penalties / folds & 29/29 & 14/14\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+On BNCI2014\_002, the corrected proper-predictive
+criterion selected \(\lambda=0.3\) in five folds,
+\(0.4\) in eight, and \(0.5\) in one, contrasting
+with the uniform \(0.2\) on Shin2017A.
+Its person-macro AUC was \(0.771886\), compared
+with \(0.778705\) under source-macro selection.
+The difference of \(+0.006819\) AUC in favour
+of source-macro selection is \emph{descriptive}.
+An exploratory bootstrap over the 14 held persons,
+conditional on their overlapping source fits,
+gave the interval \([-0.00595,0.02027]\) AUC,
+which includes zero. It cannot be interpreted
+as a predeclared test, an equivalence result or
+a population-level confidence interval.
+
+At the same chosen \(\lambda\) within each
+outer fold, the proper source log score
+was higher than the class-centred score in
+14/14 folds. The mean nonnegative difference
+was \(+0.91218\) per feature, with foldwise
+range \(+0.86056\) to \(+1.00008\).
+This observation supports the algebraic
+source-mean-shift decomposition in a second
+public EEG dataset; it does \emph{not}
+establish that the penalty predicts the
+direction of target AUC gains.
+
+The original BNCI2014\_002 frontier archive
+used in this secondary comparison has its
+own stored source-selection settings and
+reported AUCs. It must not be silently
+substituted for the separate originally frozen
+two-BNCI testing-family statistics reported
+above (for example, their originally
+adjusted nonsignificant tests). Both
+pre-existing score families are preserved
+under their exact artifact identities,
+and the corrected baseline is not added
+retroactively to either family.
