@@ -116,7 +116,8 @@ jobs:
               aligned=float(a.sum()/t.sum())
               loo=[float(((x.sum()-x[i])+(o.sum()-o[i]))/(t.sum()-t[i]))
                    for i in range(n)]
-              assert abs(fraction-selected["auc_invariant_location_plus_orthogonal_fraction"])<1e-10
+              fraction_key="auc_invariant_location_plus_orthogonal_fraction" if is_bnci else "total_auc_invariant_location_plus_orthogonal_fraction"
+          assert abs(fraction-selected[fraction_key])<1e-10
               assert abs(location-selected["location_fraction"] if is_bnci else
                          location-selected["translation_fraction"])<1e-10
               print("BSPC_3ACQ_IMMUTABLE_INDEPENDENT_AUDIT_PASS",json.dumps({
