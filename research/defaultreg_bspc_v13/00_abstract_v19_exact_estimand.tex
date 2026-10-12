@@ -1,0 +1,41 @@
+\begin{abstract}
+\textbf{Objective:} The apparent advantage of one EEG covariance
+regularisation selector can depend on what is actually measured
+in held-source validation. We distinguish covariance fitting
+after validation-person class re-centring from proper
+source-mean plug-in Gaussian predictive log scoring.
+\textbf{Methods:} We audit previously frozen zero-target
+cross-subject EEG decoding studies, derive the exact
+nonnegative class-mean-shift term omitted by the historical
+covariance score, and calculate exact source-only selection
+breakpoints along a parametric continuation between
+the two objectives. Corrected predictive controls
+were run retrospectively on two independently archived
+public EEG cohorts and checked against their immutable
+target AUC paths.
+\textbf{Results:} The original prospective EEGMMIDB
+participant block ($N=20$) gave a $+0.0561$ mean
+AUC contrast between source discrimination and
+historical class-centred covariance scoring
+(Holm $p=0.00597$), with five materially harmed
+individuals. Two originally frozen BNCI tests were
+individually non-significant and a prospective
+filter-bank gain hypothesis was contradicted.
+In retrospective Shin2017A ($N=29$), discrimination,
+corrected predictive and historical covariance
+selectors achieved mean AUCs of 0.785900,
+0.786207 and 0.763678; in retrospective
+BNCI2014\_002 ($N=14$), the respective
+values were 0.778705, 0.771886 and 0.761116.
+The median exact source-only weight at which
+the historical selection first changes was
+0.0660 and 0.1944 in the two cohorts.
+\textbf{Conclusion:} Held-source participant class
+re-centring suppresses a mathematically
+necessary between-person mean-shift term and
+can change the estimated best regularisation.
+The two retrospective corrected controls do not
+demonstrate universal superiority or equivalence.
+Estimand-specific reporting and independent
+pre-data transfer evaluation remain necessary.
+\end{abstract}
