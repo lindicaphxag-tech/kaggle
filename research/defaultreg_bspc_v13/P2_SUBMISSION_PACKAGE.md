@@ -1,0 +1,79 @@
+# PAPER 2 — Exact EEG recording-content identity and matched fitting-selection impacts
+Status: INDEPENDENT full LaTeX manuscript, NOT submitted.
+Original matched 49-record experimental workflow: https://github.com/lindicaphxag-tech/kaggle/actions/runs/38290349868
+Verified title manuscript: `research/defaultreg_bspc_v13/main_p2_eeg_record_provenance_EVIDENCE_GATED.tex`
+Table: `research/defaultreg_bspc_v13/125_v30_actual_crossed_49_result.tex`
+Literature source: `research/defaultreg_bspc_v13/references_v10.bib`
+
+## Primary question and independent knowledge
+Can distinct published EEG participant IDs carry exact numerical
+EEG TRIAL CONTENTS in the same fixed processing pipeline, and how
+does removing content-overlap affect held-record performance via
+reporting denominator, SOURCE MODEL REFITTING and already
+SOURCE SELECTED shrinkage?
+This paper is about the unit of signal-data independence. NOT the
+Gaussian scoring estimand or 3-factor AUC-invariance from P1.
+
+## Quantified material (already generated; do not embellish)
+- Liu2024: 50 released IDs, 2000 processed trials, but 1960 unique
+  exact EEG trial/label contents. IDs 4/5 share complete same 40
+  processed trials, creating 49 recording-content groups.
+- EEG controls: Weibo2014 10 IDs/1580 trial instances and
+  BNCI2014_002 14 IDs/2240 trial instances have zero exact
+  cross-ID overlaps in the specified processing pipeline.
+  Zero exact matches does NOT rule out similar or window-overlap.
+- Corresponding raw EDF channel evidence: 32 of 33 numerical
+  channels match between IDs 4 and 5 across the corresponding
+  signal, channel 32 unnamed and different. This is signal
+  evidence, NOT an assertion that two clinical patients
+  share identity. A data-custodian confirmation is outstanding.
+- Original 50-ID reported macro AUC = 0.594000. Keeping
+  49 record representatives under ORIGINAL fit/choice =
+  0.588673. Matched fully purged 49 content-disjoint refits =
+  0.582551.
+- 2x2 matched held-record AUC matrix:
+  original fit lambdaA .588673, lambdaB .587347;
+  purged fit lambdaA .580765, lambdaB .582551.
+  Source-macro lambda changed for 37/49 groups.
+  Conditional selection effects -.001327 and +.001786;
+  interaction +.003112; total matched -.006122.
+- These contrasts are RETROSPECTIVE; they neither identify
+  individual patient IDs nor causal 'leakage penalty'.
+- Original/purged 49-identity outcome vectors were independently
+  compared to immutable archives with ~1e-10 numerical parity.
+
+## Non-overlap publication firewall
+This is the ONLY paper allowed to headline the ID4/5 content
+overlap and 49-group 2x2 fitted-model-by-selector interaction.
+P1 may mention datasets are provenance-checked but must
+not introduce these quantitative results as a P1 discovery.
+P3 must not reuse Liu2024 data overlap as an independent
+statistical replicate, nor turn paper2's 49 groups into
+49 independent patients.
+
+## Publication positioning
+Candidate BSPC: EEG signal quality/reliability, benchmark data
+audit, and actionable split hygiene within journal scope:
+https://shop.elsevier.com/journals/biomedical-signal-processing-and-control/1746-8094
+Candidate Brain Topography if supported by broader EEG
+measurement/reliability and physiologic validation. Do not
+claim acceptance odds or 2026 non-CAS sector ranking.
+Check official journal scope, subscriptions, publishing fees
+and institution's official 2025 CAS partition at submission.
+
+## Required gates
+[ ] Contact/notify appropriate EEG dataset custodians before
+    a public claim about a clinical dataset's record duplication,
+    offer a response, and use privacy-preserving numerical
+    characterization instead of speculation about patients.
+[ ] Validate duplicate evidence under raw EDF and independent
+    preprocessing / second software path; report negative controls.
+[ ] Full pipeline release with original and purged source
+    train/reference fits and all 49 per-record receipts.
+[ ] Explain why the two sources' target performance differ
+    without causal language.
+[ ] Verify intended journal welcomes a dataset/data-integrity
+    note supported by ONE affected acquisition plus 2 controls.
+[ ] Final official publisher format, figures, author declarations,
+    funding/ethics/rights/AI use approved by humans.
+NO simultaneous submission as P1 text or rebranded duplicate.
