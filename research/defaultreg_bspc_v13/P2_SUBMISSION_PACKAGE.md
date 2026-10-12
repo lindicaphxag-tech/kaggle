@@ -77,3 +77,20 @@ and institution's official 2025 CAS partition at submission.
 [ ] Final official publisher format, figures, author declarations,
     funding/ethics/rights/AI use approved by humans.
 NO simultaneous submission as P1 text or rebranded duplicate.
+
+
+## CURRENT PRIMARY TARGET (2026-10-13): Biomedical Signal Processing and Control — BSPC
+Publisher Elsevier; 2025 legacy CAS large category Medicine 2.
+Official aims explicitly accept signal quality, artifact/robustness
+and benchmark or dataset papers:
+https://shop.elsevier.com/journals/biomedical-signal-processing-and-control/1746-8094
+This is a hybrid subscription journal. Subscription publishing
+usually permits **no APC**; only OA choice incurs APC. Verify
+the live author-guide for any unexpected charge at submission:
+https://www.elsevier.com/about/policies-and-standards/pricing
+Novelty must remain EEG recording CONTENT identity
+and a paired 49-group fitting-vs-parameter mechanism—not a generic
+textbook warning about data leakage.
+Non-negotiable: notify data custodians on clinical release ID4/ID5;
+verify raw/independent processing and avoid patient-identity claims.
+**BSPC is the one selected PREPARATION target, NOT a submission.**
