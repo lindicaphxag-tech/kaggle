@@ -1,0 +1,80 @@
+name: DefaultReg V31 independent immutable Cho2017 target audit
+on:
+  push:
+    branches: [research/defaultreg-contrast-envelope-20261013]
+    paths: ['.github/workflows/defaultreg-v31-independent-frozen-audit.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit-v31-immutable-first-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Install independent numerical audit
+        run: python -m pip install --disable-pip-version-check numpy
+      - name: Fetch PREEXISTING immutable first-run artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: defaultreg-v31-cho-source-locked-first-run
+          run-id: 38295151137
+          github-token: ${{ github.token }}
+          path: /tmp/frozen-v31
+      - name: Independently verify source SHA, all 20 held AUCs and exact p
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,numpy as np
+          files=list(Path("/tmp/frozen-v31").rglob("CHO2017_V31_*.json"))
+          print("ORIGINAL_ARTIFACT_PATHS",[str(p) for p in files])
+          src=next(p for p in files if p.name=="CHO2017_V31_SOURCE_CHOICES_BEFORE_ANY_TARGET_READ.json")
+          out=next(p for p in files if p.name=="CHO2017_V31_REAL_FIRST_RUN_TARGET_AUC.json")
+          s=json.loads(src.read_bytes());t=json.loads(out.read_bytes())
+          sha=hashlib.sha256(src.read_bytes()).hexdigest()
+          assert sha=="677f848de0e3bc3122892e5bec55b20dc7808ab04093bdaeb33f1bd0a923f796"
+          assert t["source_choice_sha256"]==sha
+          assert s["source_subjects"]==list(range(1,13))
+          assert s["held_subjects_unread"]==list(range(13,33))
+          assert set(s["selected_lambdas"].values()).issubset(set(s["feasible_lambdas"]))
+          r=sorted(t["participant_rows"],key=lambda q:q["subject"])
+          assert len(r)==20 and [q["subject"] for q in r]==list(range(13,33))
+          keys=set(r[0]["auc"])
+          assert keys=={"envelope_r1","envelope_r0","source_macro_grid",
+                        "proper_source_mean_gaussian","historical_class_centred","LW","OAS"}
+          assert all(0<=v["auc"][k]<=1 for v in r for k in keys)
+          methods={k:float(np.mean([v["auc"][k] for v in r])) for k in keys}
+          assert all(abs(v-t["macro_auc_by_method"][k])<1e-12 for k,v in methods.items())
+          d=np.array([v["auc"]["envelope_r1"]-v["auc"]["source_macro_grid"] for v in r])
+          assert np.allclose(d,[v["primary_delta"] for v in r])
+          assert abs(float(d.mean())-t["primary_mean_delta_envelope_minus_source_macro"])<1e-12
+          assert int((d<-.020000000001).sum())==t["harmed_gt_002"]
+          assert int((d>.020000000001).sum())==t["improved_gt_002"]
+          count=0
+          for lo in range(0,1<<20,8192):
+              masks=np.arange(lo,min(lo+8192,1<<20),dtype=np.uint32)
+              signs=2*((masks[:,None]>>np.arange(20,dtype=np.uint32))&1).astype(float)-1
+              count+=int((np.abs(signs@d)>=abs(float(d.sum()))-1e-12).sum())
+          p=count/(1<<20)
+          assert abs(p-t["exact_two_sided_sign_flip_pvalue"])<1e-12
+          print("V31_IMMUTABLE_AUDIT_PASS")
+          print("SOURCE_LAMBDA_CHOICES",json.dumps(s["selected_lambdas"],sort_keys=True))
+          print("CONDITIONAL_SOURCE_DOMINANCE",json.dumps(s["conditional_margin_prediction_vs_macro"],sort_keys=True))
+          print("CHO20_METHOD_MACRO_AUC",json.dumps(methods,sort_keys=True))
+          print("CHO20_PRIMARY",json.dumps({
+              "mean_auc_delta":float(d.mean()),"two_sided_exact_signflip_p":p,
+              "n_pos":int((d>1e-12).sum()),
+              "n_zero":int((abs(d)<=1e-12).sum()),
+              "n_neg":int((d< -1e-12).sum()),
+              "harmed_gt_002":int((d<-.020000000001).sum()),
+              "benefited_gt_002":int((d>.020000000001).sum()),
+              "min_delta":float(d.min()),"max_delta":float(d.max()),
+              "n_trials":t["n_target_trials"],
+          },sort_keys=True))
+          print("CHO20_SIGNED_TARGET_DELTAS",json.dumps([
+             {"subject":v["subject"],"n_trials":v["n_trials"],
+              "primary_delta":float(delta)} for v,delta in zip(r,d)],sort_keys=True))
+          PY
