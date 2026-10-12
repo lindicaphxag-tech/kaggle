@@ -42,6 +42,7 @@ def certified_source_auc_search(
     max_splits: int = 12,
     segments: int = 1,
     block_size: int = 32,
+    initial_lambdas: Sequence[float] = (),
 ):
     """Branch-and-bound max of fixed source-fold macro AUC over [low,high].
 
@@ -55,8 +56,11 @@ def certified_source_auc_search(
         raise ValueError("tolerance must be nonnegative finite")
     if not isinstance(max_splits, int) or max_splits < 0:
         raise ValueError("max_splits must be nonnegative integer")
-    if not (0 <= low < high <= 1):
+    if not (np.isfinite(low) and np.isfinite(high) and 0 <= low < high <= 1):
         raise ValueError("invalid interval")
+    anchors = np.asarray(list(initial_lambdas), dtype=float)
+    if anchors.ndim != 1 or np.any(~np.isfinite(anchors)) or np.any(anchors < low) or np.any(anchors > high):
+        raise ValueError("anchors must be finite and inside the search interval")
     cache = {}
 
     def macro(lam):
@@ -82,11 +86,17 @@ def certified_source_auc_search(
         ub = macro(b)
         return min(1., max(ua, ub, upper) + 1e-12)
 
-    scores = {float(low): macro(float(low)), float(high): macro(float(high))}
+    scores = {float(lam): macro(float(lam))
+              for lam in sorted(set([float(low), float(high)] + anchors.tolist()))}
     best_lam = max(scores, key=lambda la: (scores[la], -la))
     best_auc = scores[best_lam]
-    initial = bound(float(low), float(high))
-    heap = [(-initial, float(low), float(high))]
+    # Anchors are evaluated and *partition* the original interval, so no
+    # neglected gap can invalidate the global source-only bound.
+    ordered = sorted(scores)
+    heap = [(-bound(a, b), a, b)
+            for a, b in zip(ordered[:-1], ordered[1:])]
+    heapq.heapify(heap)
+    initial = max((-x[0] for x in heap), default=best_auc)
     split_count = 0
     while heap and split_count < max_splits:
         top = -heap[0][0]
@@ -120,6 +130,8 @@ def certified_source_auc_search(
         "source_people": len(source_fold_models),
         "interval_splits": split_count,
         "lambda_evaluations": len(cache),
+        "initial_anchor_count": len(ordered),
+        "max_splits": max_splits,
         "failed_closed_when_budget_exhausted": bool(
             upper - best_auc > tolerance + 1e-12
         ),
