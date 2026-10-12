@@ -1,0 +1,58 @@
+name: DefaultReg V30 focused recording-identity paper
+on:
+  push:
+    branches: [research/defaultreg-v30-evidence-synthesis-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/main_bspc_v30_RECORD_IDENTITY_EVIDENCE.tex'
+      - 'research/defaultreg_bspc_v13/125_v30_actual_crossed_49_result.tex'
+      - 'research/defaultreg_bspc_v13/123_v28_two_external_epoch_controls.tex'
+      - 'research/defaultreg_bspc_v13/references_v10.bib'
+      - '.github/workflows/defaultreg-v30-focused-paper.yml'
+  pull_request:
+    paths:
+      - 'research/defaultreg_bspc_v13/main_bspc_v30_RECORD_IDENTITY_EVIDENCE.tex'
+      - 'research/defaultreg_bspc_v13/125_v30_actual_crossed_49_result.tex'
+      - '.github/workflows/defaultreg-v30-focused-paper.yml'
+permissions:
+  contents: read
+jobs:
+  paper-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PDF typography, LaTex and verification tools
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended lmodern poppler-utils
+      - name: Compile and independently inspect the focused V30 manuscript
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_bspc_v30_RECORD_IDENTITY_EVIDENCE.tex
+          test -s main_bspc_v30_RECORD_IDENTITY_EVIDENCE.pdf
+          pdftotext -layout main_bspc_v30_RECORD_IDENTITY_EVIDENCE.pdf /tmp/defaultreg-v30-paper.txt
+          grep -q '0.582551' /tmp/defaultreg-v30-paper.txt
+          grep -q '0.588673' /tmp/defaultreg-v30-paper.txt
+          grep -q '0.001327' /tmp/defaultreg-v30-paper.txt
+          grep -q '2,240' /tmp/defaultreg-v30-paper.txt
+          if grep -Eq 'Reference.*undefined|Citation.*undefined|Undefined control sequence|multiply defined' main_bspc_v30_RECORD_IDENTITY_EVIDENCE.log; then exit 3; fi
+          python - <<'PY'
+          import re,subprocess
+          info=subprocess.check_output(['pdfinfo','main_bspc_v30_RECORD_IDENTITY_EVIDENCE.pdf'],text=True)
+          pages=int(re.search(r'Pages:\s+(\d+)',info).group(1))
+          assert 4<=pages<=15,pages
+          print('V30_FOCUSED_JOURNAL_PAGES',pages)
+          PY
+          mkdir -p /tmp/defaultreg-v30-preview
+          pdftoppm -f 1 -l 1 -png -r 110 main_bspc_v30_RECORD_IDENTITY_EVIDENCE.pdf /tmp/defaultreg-v30-preview/cover
+          test -s /tmp/defaultreg-v30-preview/cover-1.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: defaultreg-v30-focused-record-identity-manuscript
+          path: |
+            research/defaultreg_bspc_v13/main_bspc_v30_RECORD_IDENTITY_EVIDENCE.pdf
+            research/defaultreg_bspc_v13/main_bspc_v30_RECORD_IDENTITY_EVIDENCE.log
+            research/defaultreg_bspc_v13/main_bspc_v30_RECORD_IDENTITY_EVIDENCE.bbl
+            research/defaultreg_bspc_v13/main_bspc_v30_RECORD_IDENTITY_EVIDENCE.tex
+          if-no-files-found: error
+          retention-days: 90
