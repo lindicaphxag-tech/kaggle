@@ -1,0 +1,77 @@
+\subsection{Additional corrected predictive likelihood comparator on BNCI2015\_001}
+\label{sec:p1-proper-bnci2015-new}
+To determine whether the corrected comparator eliminates
+the historic covariance-score contrast in a second
+previously exposed dataset, we separately recomputed
+leave-one-participant-out source-only shrinkage choices
+on the public 12-person BNCI2015\_001 motor-imagery
+acquisition (right hand versus feet; 13 channels).
+The 27-point scalar shrinkage grid, 8--30~Hz processing
+and 160~Hz resampling were pinned for every held person.
+Each outer training pool contained the remaining 11
+participants. Five participant-grouped \emph{inner
+source} folds each refitted the tangent reference,
+class means and pooled within-class covariance.
+The corrected Gaussian predictive-NLL criterion
+scored source-validation EEG using \emph{source-training}
+class means, whereas the historical comparator used
+each held-source-validation participant's own
+class means. The source-macro criterion selected
+on inner grouped ROC-AUC; Ledoit--Wolf and OAS
+were computed as separate analytic controls.
+All 12 source parameter choices were serialized and
+SHA-256 locked before computing the \emph{new}
+per-participant summary, but the target dataset had
+already been evaluated by earlier related studies:
+this is an explicitly \emph{retrospective}, not an
+independent prospective, comparison.
+
+\begin{table}[tb]
+\centering\small
+\caption{BNCI2015\_001, $n=12$ previously exposed
+participants: retrospective mean held-person AUC
+under the same 27-point, source-grouped pipeline.
+No confirmatory adjusted significance test
+is claimed for this new analysis.}
+\label{tab:p1-correct-predictive-bnci2015}
+\begin{tabular}{lr}
+\toprule
+Source-only policy / analytic comparator & Macro ROC-AUC\\
+\midrule
+Source-macro-AUC selection & 0.767813\\
+Proper source-trained-mean predictive NLL & 0.731824\\
+Validation-class-centred covariance score & 0.723582\\
+Ledoit--Wolf & 0.721656\\
+OAS & 0.721571\\
+\bottomrule
+\end{tabular}
+\end{table}
+Source-macro exceeded proper predictive NLL
+on average by $0.035989$ AUC, but three of
+the 12 participants were materially harmed
+($\Delta<-0.02$ AUC) and five improved by
+more than $0.02$ AUC. The exploratory
+two-sided exact paired sign-flip analysis,
+enumerating $2^{12}=4096$ sign assignments
+on the participant-level paired differences,
+yielded $p=0.157227$.
+This \emph{does not} reject equality
+at the conventional 0.05 level and is
+not added retrospectively to the original
+Holm-adjusted confirmatory comparison family.
+The direction does not contradict earlier
+proper-NLL contrasts: Shin2017A was
+$-0.000307$ and a separate BNCI2014\_002
+comparison $+0.006819$; taken together
+the previously exposed acquisitions show
+effect heterogeneity, not an empirically
+validated universal transfer rule.
+
+The public-data, pinned-code and per-person
+numerical receipt are available in the
+successful real EEG workflow
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38321486917}.
+No target labels or target-specific covariance
+are involved in choosing a participant's
+source training policy, but all these
+observations are retrospectively inspected.
