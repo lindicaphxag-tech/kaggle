@@ -1,0 +1,38 @@
+name: Default EEG Paper 4 independent rank-certificate note PDF proof
+on:
+  push:
+    branches: [publication/default-eeg-p4-rank-certificates-20261013]
+    paths:
+      - '.github/workflows/defaultreg-paper-4-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  technical-note-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended lmodern poppler-utils
+      - name: Compile isolated P4 mathematical method note
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_p4_rank_cell_certificates_NOT_READY.tex
+          test -s main_p4_rank_cell_certificates_NOT_READY.pdf
+          pdftotext -layout main_p4_rank_cell_certificates_NOT_READY.pdf /tmp/p4text.txt
+          grep -q '94.267' /tmp/p4text.txt
+          grep -q '96.338' /tmp/p4text.txt
+          ! grep -Eq 'Citation.*undefined|Reference.*undefined|Undefined control sequence' main_p4_rank_cell_certificates_NOT_READY.log
+          pdfinfo main_p4_rank_cell_certificates_NOT_READY.pdf | grep Pages
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-P4-rank-certificates-NOT-SUBMISSION-APPROVED
+          path: |
+            research/defaultreg_bspc_v13/main_p4_rank_cell_certificates_NOT_READY.*
+            research/defaultreg_bspc_v13/P4_RESEARCH_GATE.md
+            research/defaultreg_bspc_v13/P4_rank_cells_*.tex
+          if-no-files-found: warn
+          retention-days: 90
