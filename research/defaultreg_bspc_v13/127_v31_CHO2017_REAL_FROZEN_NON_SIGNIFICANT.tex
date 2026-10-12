@@ -1,0 +1,63 @@
+% Frozen V31 first-run Cho2017 after independent immutable artifact audit.
+% An observed SMALL, NONSIGNIFICANT positive contrast; no SOTA claim.
+\subsection{Independent-acquisition stress test of a source-contrast envelope}
+\label{sec:v31-cho}
+The source-contrast envelope (Section~\ref{sec:v31-brief-method})
+was precommitted before reading 20 target-person recordings from
+the public Cho2017 acquisition. Exactly 12 other source persons
+were used for every source-only choice; the outer targets
+13--32 contributed 4,000 motor-imagery trials and were accessed
+only after SHA-256 locking of the source manifest.
+All methods used the fixed C3/Cz/C4 montage, 8--30 Hz band
+and identical pooled-LDA spectral score family.
+The old source macro-AUC 27-point grid selected $\lambda=0.5$,
+the new $\rho=1$ source-envelope method selected $\lambda=1$,
+the radius-zero geometric ablation selected $\lambda=0.3$,
+and the properly predictive Gaussian source NLL selected $\lambda=0.1$.
+The source-only pairwise dominance test did not certify
+the new choice against the original macro-grid one.
+
+\begin{table}[ht]
+\centering
+\small
+\caption{Cho2017 externally held-person macro ROC-AUC.
+The original source-macro criterion is the sole predefined
+reference for the new SCE method. Other rows are descriptive controls;
+all decisions were fixed before opening target outcomes.}
+\label{tab:v31-cho}
+\begin{tabular}{lr}
+\toprule
+Source-only regularisation choice & Macro AUC\\
+\midrule
+Source contrast envelope (SCE, $\rho=1$) & 0.618230\\
+Original source-macro full grid & 0.614835\\
+SCE radius-zero ablation ($\rho=0$) & 0.610300\\
+Proper source-mean Gaussian NLL & 0.601830\\
+OAS & 0.593580\\
+Ledoit--Wolf & 0.593535\\
+Historical validation-class-centred likelihood & 0.593355\\
+\bottomrule
+\end{tabular}
+\end{table}
+The paired difference, SCE minus the original source-macro
+selector, was $+0.003395$ AUC. Fourteen persons improved and
+six declined; none improved or declined by more than 0.02 AUC.
+The descriptive 20,000-draw participant bootstrap 95\% interval
+was approximately $[-0.000295,0.006975]$, containing zero.
+The two-sided all-$2^{20}$-sign enumeration gave
+$p=0.0930843$ under the usual sign-flip reference assumptions;
+thus this predeclared positive-method promotion gate FAILED.
+The subject-level inference depends on the paired-sign symmetry
+assumption, not trial pseudo-replication, and no external
+preregistration or clinical utility is claimed.
+
+This result is especially important because the new method
+chose the upper shrinkage endpoint $\lambda=1$.
+Its slight mean advantage in one acquisition does not establish
+that the across-source contrast ellipsoid is a calibrated
+future-person uncertainty set, that the source-only certificate
+correctly predicts individual benefit, or that the new
+selection policy is robust across recording conditions.
+Both the all-person first-run result and the non-positive
+inferential conclusion are kept; the V31 method is not promoted
+to the primary manuscript contribution.
