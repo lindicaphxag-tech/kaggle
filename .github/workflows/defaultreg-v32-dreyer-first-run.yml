@@ -1,0 +1,60 @@
+name: DefaultReg V32 untouched Dreyer source-lock EEG first-run
+on:
+  push:
+    branches: [research/defaultreg-v32-noise-debiased-contrast-20261013]
+    paths:
+      - '.github/workflows/defaultreg-v32-dreyer-first-run.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-new-dreyer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 175
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MNE_DATA: /tmp/defaultreg-v32-dreyer-public
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Install original pinned MOABB and contract test dependencies
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2 pytest
+      - name: Validate noise-debiased structure against scalar-LDA exactly
+        run: |
+          PYTHONPATH=research/defaultreg_proper_predictive python -m pytest -q research/defaultreg_bspc_v13/tests/test_noise_debiased_subject_operator_v32.py
+          python -m py_compile research/defaultreg_bspc_v13/src/run_v32_dreyer_strict_source_only.py
+      - name: Frozen strict Dreyer source-only first run (fail closed)
+        run: |
+          mkdir -p "$MNE_DATA" /tmp/defaultreg-v32-dreyer-result
+          python research/defaultreg_bspc_v13/src/run_v32_dreyer_strict_source_only.py --out /tmp/defaultreg-v32-dreyer-result
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib
+          root=Path('/tmp/defaultreg-v32-dreyer-result')
+          a=root/'V32_DREYER_SOURCE_CHOICES_LOCKED_BEFORE_TARGET.json'
+          b=root/'V32_DREYER_NEW_ACQUISITION_ALL_HELD_RESULTS.json'
+          s=json.loads(a.read_text());t=json.loads(b.read_text())
+          assert t['source_choices_sha256']==hashlib.sha256(a.read_bytes()).hexdigest()
+          assert s['source_ids']==list(range(1,13))
+          assert s['target_ids_unread']==list(range(13,25))
+          assert [r['subject'] for r in t['all_held_person_outcomes']]==list(range(13,25))
+          assert t['n_source_participants']==t['n_held_participants']==12
+          assert t['all_helt_target_data_read_after_source_sha']
+          assert 'riemannian_MDM' in t['macro_auc_by_method']
+          assert 'tangent_LogReg' in t['macro_auc_by_method']
+          assert 'new_risk_operator' in t['macro_auc_by_method']
+          assert 'source_macro_original' in t['macro_auc_by_method']
+          print('V32_DREYER_12_HELD_SOURCE_SHA_FROZEN_ALL_RESULTS_CHECKED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-v32-Dreyer-new-acquisition-12-subject-first-run
+          path: |
+            /tmp/defaultreg-v32-dreyer-result/**
+            research/defaultreg_bspc_v13/V32_DREYER_STRICT_SOURCE_ONLY_FIRST_RUN_PROTOCOL.md
+          if-no-files-found: warn
+          retention-days: 90
