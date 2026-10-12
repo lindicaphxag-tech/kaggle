@@ -106,7 +106,25 @@ def audit_archive(file: Path):
         row_contrasts = np.asarray([list(v.values()) for v in c])
         boot = row_contrasts[indices].mean(axis=1)
         boot_q = np.quantile(boot, [0.025,0.975], axis=0)
+        # A zero count of changed choices can arise from identical boundary
+        # saturation, not from a proven robust prediction policy.
+        old_lambdas = np.asarray([
+            r["method_crossed_AUC"][policy]["lambda_A"] for r in rows
+        ],dtype=float)
+        purged_lambdas = np.asarray([
+            r["method_crossed_AUC"][policy]["lambda_B"] for r in rows
+        ],dtype=float)
+        def histogram(v):
+            unique, counts = np.unique(v,return_counts=True)
+            return {format(float(key),".10g"):int(count)
+                    for key,count in zip(unique,counts)}
         results[policy] = {
+            "source_lambda_original_histogram":histogram(old_lambdas),
+            "source_lambda_purged_histogram":histogram(purged_lambdas),
+            "original_lambda_zero_count":int(np.sum(old_lambdas==0)),
+            "original_lambda_one_count":int(np.sum(old_lambdas==1)),
+            "purged_lambda_zero_count":int(np.sum(purged_lambdas==0)),
+            "purged_lambda_one_count":int(np.sum(purged_lambdas==1)),
             "n_unique_processed_recording_groups": 49,
             "matched_mean_auc": {k:float(matrix[:,i].mean()) for i,k in enumerate(CELLS)},
             "mean_contrast": {key:float(np.mean([v[key] for v in c])) for key in c[0]},
