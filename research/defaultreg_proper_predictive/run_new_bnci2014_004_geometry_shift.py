@@ -86,6 +86,8 @@ def exact_first_change(grid,centred,proper,baseline):
 def run(outdir):
     if not PROTOCOL.exists():
         raise RuntimeError("Precommitted protocol not available")
+    amendment=PROTOCOL.with_name("BNCI2014_004_PRE_OUTCOME_FIXED_CONTROLS_AMENDMENT.md")
+    if not amendment.exists():raise RuntimeError("Pre-outcome fixed controls amendment missing")
     C,y,g,session_ids,participants=load_public()
     if set(np.unique(g))!=set(SUBJECTS):
         raise RuntimeError("Missing independent outer subject")
@@ -103,9 +105,13 @@ def run(outdir):
         c0=[float(oldpath["criteria_by_lambda"][str(x)]["covariance_mean_nll"]) for x in grid]
         c1=[float(proper_path[str(x)]) for x in grid]
         threshold=exact_first_change(grid,c0,c1,oldpath["lambda_covariance_full"])
+        # Strong no-selection controls were protocol-amended BEFORE any BCI2b
+        # target outcomes were computed; fixed 0.95 derives from earlier
+        # exposed BNCI2014_001 and is explicitly disclosed.
         chosen={"macro":float(oldpath["lambda_source_macro"]),
                 "historical_class_centred":float(oldpath["lambda_covariance_full"]),
-                "true_source_mean_predictive":float(lam_proper)}
+                "true_source_mean_predictive":float(lam_proper),
+                "fixed_lambda_0_50":0.50,"fixed_lambda_0_95":0.95}
         if not all(v in grid for v in chosen.values()):
             raise AssertionError("Source-only feasible grid selection mismatch")
         i=grid.index(float(lam_proper))
