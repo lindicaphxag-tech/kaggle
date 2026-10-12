@@ -7,6 +7,9 @@ on:
       - 'research/defaultreg_bspc_v13/main_bspc_v31_EVIDENCE_GATED_CANDIDATE.tex'
       - 'research/defaultreg_bspc_v13/00_abstract_v31_CHO40_negative.tex'
       - 'research/defaultreg_bspc_v13/131_bspc_twofactor_auc_invariant_transfer_mechanism.tex'
+      - 'research/defaultreg_bspc_v13/132_bspc_3acquisition_source_only_anatomy_results.tex'
+      - 'research/defaultreg_bspc_v13/00_abstract_bspc_threefactor_focused.tex'
+      - 'research/defaultreg_bspc_v13/91_table_main_prospective_results.tex'
   workflow_dispatch:
 permissions:
   contents: read
@@ -30,6 +33,9 @@ jobs:
           grep -q '0.616996' /tmp/defaultreg-bspc-twofactor-text.txt
           grep -q '0.619261' /tmp/defaultreg-bspc-twofactor-text.txt
           grep -q '0.0561' /tmp/defaultreg-bspc-twofactor-text.txt
+          grep -q '98.59' /tmp/defaultreg-bspc-twofactor-text.txt
+          grep -q '99.29' /tmp/defaultreg-bspc-twofactor-text.txt
+          grep -q '99.77' /tmp/defaultreg-bspc-twofactor-text.txt
           grep -q 'AUC-invariant' /tmp/defaultreg-bspc-twofactor-text.txt
           grep -q 'contrast' /tmp/defaultreg-bspc-twofactor-text.txt
           if grep -Eq 'Reference.*undefined|Citation.*undefined|Undefined control sequence|multiply defined' main_bspc_v31_EVIDENCE_GATED_CANDIDATE.log; then exit 3; fi
