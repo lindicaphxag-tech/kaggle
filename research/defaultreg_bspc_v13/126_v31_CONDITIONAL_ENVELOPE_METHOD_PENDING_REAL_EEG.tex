@@ -83,9 +83,11 @@ The additional source-contrast scatter is
 $O(Np+Gp^2)$ for $N$ source feature rows and $G$ source
 record groups; the original path eigendecomposition is $O(p^3)$,
 and each candidate costs $O(p^2)$ with dense matrix evaluation.
-The implementation rejects missing group classes, duplicate
-source-group pseudoreplication at the interface level, non-finite
-features and infeasible shrinkage; its tests verify alignment with
+The implementation rejects missing group classes, missing
+source-group class information, non-finite
+features and infeasible shrinkage; duplicate physical recording
+content is NOT detected by this operator and must be audited separately.
+Its tests verify alignment with
 the original LDA path, the closed-form worst-case witness,
 positive-scale invariance, and an unconditional-transfer
 counterexample. True recording identity must be checked separately.
