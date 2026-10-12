@@ -1,0 +1,100 @@
+name: DefaultReg Lee2019 GID original SHA locked untouched held A+B
+on:
+  push:
+    branches: [research/defaultreg-gid-unseen-lee2019-20261013]
+    paths:
+      - '.github/workflows/defaultreg-lee2019-gid-held-originalsha.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  held-block:
+    name: LEE2019 untuned HELD ${{ matrix.block }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 170
+    strategy:
+      fail-fast: false
+      matrix:
+        block: [A, B]
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MNE_DATA: /tmp/defaultreg-Lee2019-held-${{ matrix.block }}
+      ORIGINAL_SOURCE_SHA: 27efc2565d5bc2bc22344b67ee994e42b985c16c34cabf6cdf55136270fa18f3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Use identical original MOABB data and algorithm package
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2 pytest
+      - name: Test exact mathematical path and target-source SHA denial
+        run: |
+          PYTHONPATH=research/defaultreg_proper_predictive python -m pytest -q research/defaultreg_bspc_v13/tests/test_source_group_invariant_lda.py research/defaultreg_bspc_v13/tests/test_lee2019_gid_held_runner_gate.py
+          python -m py_compile research/defaultreg_bspc_v13/src/run_lee2019_gid_held_sha_locked.py
+      - name: Download immutable FIRST source-only original choices
+        uses: actions/download-artifact@v4
+        with:
+          name: defaultreg-Lee2019-first-source-only-frozen-12-SHA
+          run-id: 38305991164
+          github-token: ${{ github.token }}
+          path: /tmp/lee2019-original-source-only
+      - name: Verify FIRST source artifact SHA before source model computation
+        run: |
+          find /tmp/lee2019-original-source-only -type f -maxdepth 5 -print
+          SOURCE_FILE="$(find /tmp/lee2019-original-source-only -name 'LEE2019_S1_SOURCE12_IMMUTABLE_CHOICES.json' -type f -print -quit)"
+          test -n "$SOURCE_FILE"
+          python - "$SOURCE_FILE" "$ORIGINAL_SOURCE_SHA" <<'PY'
+          import hashlib,sys,json
+          p=sys.argv[1];expected=sys.argv[2]
+          raw=open(p,'rb').read()
+          got=hashlib.sha256(raw).hexdigest()
+          assert got==expected,(got,expected)
+          d=json.loads(raw)
+          assert d['source_ids']==list(range(1,13))
+          assert d['target_A_UNREAD']==list(range(13,25))
+          assert d['target_B_UNREAD']==list(range(25,37))
+          assert d['original_lambdas_exactly_reproduced']
+          assert d['source_choices_created_before_any_held_target_IO']
+          assert d['positive_transfer_pre_prediction'] is False
+          assert d['chosen_source_only']['decisions']['gid']['lambda']==0.15
+          print("LEE2019_FIRST_S12_SHA_FROZEN_FILE_CHECKED_BEFORE_ANY_HELD",got)
+          PY
+      - name: Restore exact original source SHA, evaluate ONLY precommitted block
+        run: |
+          mkdir -p "$MNE_DATA" /tmp/lee2019-held-${{ matrix.block }}
+          SOURCE_FILE="$(find /tmp/lee2019-original-source-only -name 'LEE2019_S1_SOURCE12_IMMUTABLE_CHOICES.json' -type f -print -quit)"
+          python research/defaultreg_bspc_v13/src/run_lee2019_gid_held_sha_locked.py \
+            --original-manifest "$SOURCE_FILE" \
+            --original-sha "$ORIGINAL_SOURCE_SHA" \
+            --block "${{ matrix.block }}" \
+            --out /tmp/lee2019-held-${{ matrix.block }}
+          python - <<'PY'
+          import os,json,hashlib
+          from pathlib import Path
+          block='${{ matrix.block }}'
+          root=Path('/tmp/lee2019-held-'+block)
+          lockf=root/'LEE2019_S1_SOURCE12_IMMUTABLE_CHOICES.json'
+          p=root/('LEE2019_BLOCK_'+block+'_HELD_RESULTS.json')
+          expect=os.environ['ORIGINAL_SOURCE_SHA']
+          assert hashlib.sha256(lockf.read_bytes()).hexdigest()==expect
+          z=json.loads(p.read_bytes())
+          assert z['original_source_sha256']==expect
+          assert z['status']=='ONE_HELD_BLOCK_COMPLETED_WITHOUT_RETUNE'
+          assert z['block']==block and z['n_held_people']==12
+          ids=[q['person_id'] for q in z['block_result']['all_person_results']]
+          assert ids==list(range(13,25) if block=='A' else range(25,37))
+          assert all(len(q['auc'])>=10 for q in z['block_result']['all_person_results'])
+          assert z['fixed_source_model_no_target_retrain']
+          print('LEE2019_FROZEN_HELD_PERSON_COMPLETE_SHA_AND_METHOD_COUNT_AUDIT_PASS',block)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-Lee2019-first-source-sha-verified-untouched-held-${{ matrix.block }}
+          path: |
+            /tmp/lee2019-held-${{ matrix.block }}/**
+            research/defaultreg_bspc_v13/LEE2019_GID_FROZEN_FIRST_EXPERIMENT_PROTOCOL.md
+          if-no-files-found: warn
+          retention-days: 90
