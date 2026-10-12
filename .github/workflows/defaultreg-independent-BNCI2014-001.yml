@@ -1,0 +1,72 @@
+name: DefaultReg independent BNCI2014_001 source-only three-estimand EEG
+on:
+  push:
+    branches:
+      - experiment/defaultreg-BNCI2014-001-external-source-only-20261012
+    paths:
+      - 'research/defaultreg_proper_predictive/**'
+      - '.github/workflows/defaultreg-independent-BNCI2014-001.yml'
+  pull_request:
+    paths:
+      - 'research/defaultreg_proper_predictive/**'
+      - '.github/workflows/defaultreg-independent-BNCI2014-001.yml'
+permissions:
+  contents: read
+jobs:
+  source-only-external-EEG:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MNE_DATA: /tmp/defaultreg_mne_data
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Exact frozen source-EEG dependencies
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Fail closed if the first-run pre-data protocol or executable is missing
+        run: |
+          test -s research/defaultreg_proper_predictive/BNCI2014_001_EXTERNAL_FIRST_RUN_PROTOCOL_20261012.md
+          python -m py_compile research/defaultreg_proper_predictive/run_new_bnci2014_001_source_only.py
+          cd research/defaultreg_proper_predictive
+          python -m unittest -v test_proper_predictive_source_only
+      - name: Execute new BNCI2014_001 held-person source-only EEG experiment
+        run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_proper_predictive/run_new_bnci2014_001_source_only.py \
+            --out /tmp/defaultreg-external-bnci2014-001
+      - name: Independently reject target information or subject denominator inconsistencies
+        run: |
+          python - <<'PY'
+          import json,pathlib,hashlib,numpy as np
+          p=pathlib.Path('/tmp/defaultreg-external-bnci2014-001')
+          f=p/'SOURCE_ONLY_LAMBDA_CHOICES_SHA_LOCK_BEFORE_TARGET_EVALUATION.json'
+          r=p/'BNCI2014_001_SOURCE_ONLY_EXTERNAL_RESULTS.json'
+          src=json.loads(f.read_text())
+          out=json.loads(r.read_text())
+          assert len(src)==out['n_outer_people']==9
+          assert out['all_participants_retained'] is True
+          assert out['source_lambda_choices_sha256_before_target_outcomes']==hashlib.sha256(f.read_bytes()).hexdigest()
+          assert out['target_information_track']=='Z0'
+          assert out['n_channels']==22
+          assert len(out['per_subject_AUC'])==9
+          assert out['new_confirmatory_p_values'] is None and out['no_global_preregistration_claim']
+          assert all(len(q['source_people'])==8 and q['no_outer_target_data_in_source_selector'] for q in src)
+          assert all(0<=score<=1 for record in out['per_subject_AUC'] for score in record['auc'].values())
+          assert np.isfinite(list(out['mean_AUC'].values())).all()
+          print('PASS_EXTERNAL_FIRST_RUN_BNCI2014_001_N9_SOURCE_ONLY_FULL_GRID_WITH_SHA_FIREWALL')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-new-BNCI2014-001-source-only-external-all-outcomes
+          path: |
+            /tmp/defaultreg-external-bnci2014-001/**
+            research/defaultreg_proper_predictive/BNCI2014_001_EXTERNAL_FIRST_RUN_PROTOCOL_20261012.md
+            research/defaultreg_proper_predictive/run_new_bnci2014_001_source_only.py
+          if-no-files-found: warn
+          retention-days: 90
