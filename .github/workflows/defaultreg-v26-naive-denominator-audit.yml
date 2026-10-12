@@ -1,0 +1,45 @@
+name: DefaultReg V26 naive deletion is not a leakage repair
+on:
+  push:
+    branches: [research/defaultreg-v26-record-identity-purged-lopo-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/naive_record_reweight_only_v26.py'
+      - '.github/workflows/defaultreg-v26-naive-denominator-audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original-frozen-50-vs-49:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --quiet numpy
+      - name: Get immutable original 50-ID source-lock experiment
+        run: |
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11760774972/zip > /tmp/v26-original50.zip
+          test -s /tmp/v26-original50.zip
+      - name: Report target reweighting effect WITHOUT changing contaminated source models
+        run: |
+          mkdir -p /tmp/defaultreg-v26-denominator
+          python research/defaultreg_bspc_v13/src/naive_record_reweight_only_v26.py /tmp/v26-original50.zip --out /tmp/defaultreg-v26-denominator/NAIVE_EXPOSED_50_TO_49_TARGET_ROW_REWEIGHT.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/defaultreg-v26-denominator/NAIVE_EXPOSED_50_TO_49_TARGET_ROW_REWEIGHT.json'))
+          assert d['status']=='PASS_RETROSPECTIVE_TARGET_REWEIGHTING_ONLY_NOT_GROUP_PURGE'
+          assert d['original_identifier_count']==50
+          assert d['n_unique_processed_records_from_separate_all50_audit']==49
+          assert d['original_source_models_contain_record_duplication']
+          assert d['this_is_not_contamination_removal']
+          print('PASS_49_ID_TARGET_DENOMINATOR_ONLY_NOT_PURGED_TRAINING')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: defaultreg-v26-original50-naive49-target-weight-control
+          path: /tmp/defaultreg-v26-denominator/**
+          if-no-files-found: error
