@@ -68,3 +68,19 @@ Fitted analysis components are shared within this project:
 [ ] All authors verify title, authorship, disclosures, licenses,
     funding, ethics, data availability, and AI-use declaration.
 **DO NOT upload without author approval.**
+
+
+## CURRENT PRIMARY TARGET (2026-10-13): Journal of Neural Engineering — JNE
+Publisher IOP; 2025 legacy CAS large category Medicine 3; neither JCR
+nor unofficial 2026 New Journal Partition is substituted for 2025 CAS.
+Subscription-access publication **no publication charge** per IOP.
+Official journal statement:
+https://publishingsupport.iopscience.iop.org/journals/journal-of-neural-engineering/about-journal-neural-engineering/
+Manuscript content must stay estimand/EEG decoding focused, present
+traceable full source+target effects and the source-only negative
+controls. JNE structured Objective / Approach / Main results /
+Significance abstract is already drafted in this P1 branch.
+Alternative only after editor/author reassessment: Brain Topography
+(Springer, legacy CAS 3, subscription route normally no APC), but it
+needs deeper sensorimotor physiological interpretations.
+**JNE is the one selected PREPARATION target, NOT a submission.**
