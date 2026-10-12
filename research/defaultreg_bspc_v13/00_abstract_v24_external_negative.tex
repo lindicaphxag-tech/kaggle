@@ -1,0 +1,47 @@
+\begin{abstract}
+\textbf{Objective:} Covariance-fitting fidelity,
+predictive likelihood and source-participant
+discrimination are distinct objectives for
+EEG regularisation. We test when their
+selection disagreement changes unknown-person
+decoding, and whether a more exact source
+search resolves the discrepancy.
+\textbf{Methods:} We retain a source-fitted
+covariance/tangent-LDA pipeline, participant-grouped
+selection and source-only target information
+boundaries. We correct a validation class-centred
+covariance score to genuine source-trained-mean
+Gaussian predictive likelihood, and decompose
+AUC changes into positive--negative pair transitions.
+Spectral interval bounds are used to search
+continuous shrinkage ranges while reporting
+conditional source-only optimality gaps.
+\textbf{Results:} In a frozen EEGMMIDB
+20-person block, source-discrimination selection
+exceeded the historical class-centred score
+by $0.0561$ AUC (Holm $p=0.00597$), although
+five participants were harmed by more than
+0.02 AUC. A three-channel BNCI2014\_004
+worst-quarter source-risk criterion changed
+eight of nine selections without a mean
+AUC improvement. An anchored BNCI2014\_002
+source search reduced an inconclusive
+continuous-source optimality gap from
+0.09477 to 0.01623 without improving
+the original grid AUC. In a separate
+protocol-first, unregistered Weibo2014
+test (ten participants, 1,580 trials),
+the continuous selector met its source
+tolerance in all ten pools yet selected
+the same shrinkage as the 27-point grid
+in every pool; both obtained
+0.73141 held-person macro AUC.
+The gain relative to proper Gaussian
+selection was only $0.00205$ AUC.
+\textbf{Conclusion:} Closing a source
+optimisation gap need not reduce transfer
+risk. Correct validation estimands,
+selection chronology and participant-level
+negative results matter more than
+shrinkage-grid precision alone.
+\end{abstract}
