@@ -24,6 +24,8 @@ change over the other 48. These are retrospective analyses on the
 same acquisition, not new patients, independent cohorts or a causal
 population leakage estimate.
 
+An exploratory screening of all 1,225 trial-aligned released-ID recording pairs also detected two further, previously unrecognized, very high full-record similarities: 47/49 (0.99999999166) and 11/15 (0.99999998340). The latter two are candidate near-overlaps, NOT exact byte-matches or independently confirmed duplicate physical acquisitions. We do not extend the primary 49 exact-content-group AUC estimand to an asserted count of independent patients.
+
 We report the full numerical observations without equating
 recording-content identity to clinical patient identity, nor
 claiming that arithmetic decomposition identifies a causal
