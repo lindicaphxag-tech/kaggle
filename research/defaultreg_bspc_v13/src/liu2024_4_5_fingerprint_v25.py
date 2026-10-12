@@ -13,6 +13,7 @@ from pathlib import Path
 import numpy as np
 from moabb.datasets import Liu2024
 from moabb.paradigms import MotorImagery
+import mne
 
 
 def read_one(subject):
@@ -32,7 +33,9 @@ def read_one(subject):
     with edf.open("rb") as file:
         for chunk in iter(lambda:file.read(1<<20),b""):
             h.update(chunk)
-    return np.asarray(X,dtype=np.float64),np.asarray(lab),h.hexdigest()
+    raw=mne.io.read_raw_edf(str(edf),preload=True,verbose=False,stim_channel='')
+    numeric=np.ascontiguousarray(raw.get_data(),dtype=np.float64)
+    return np.asarray(X,dtype=np.float64),np.asarray(lab),h.hexdigest(),numeric,tuple(raw.ch_names)
 
 
 def fingerprint(x):
@@ -40,8 +43,8 @@ def fingerprint(x):
 
 
 def check_pair(a,b):
-    X,y,raw_sha=read_one(a)
-    Z,labels,other_sha=read_one(b)
+    X,y,raw_sha,raw_x,raw_channels=read_one(a)
+    Z,labels,other_sha,raw_other,other_channels=read_one(b)
     if X.shape!=Z.shape or y.shape!=labels.shape:
         raise AssertionError("paired EEG feature dimension mismatch")
     return {
@@ -55,6 +58,15 @@ def check_pair(a,b):
         "released_edf_file_sha_first":raw_sha,
         "released_edf_file_sha_second":other_sha,
         "released_edf_binary_files_identical":raw_sha==other_sha,
+        "released_edf_numeric_channel_order_identical":raw_channels==other_channels,
+        "released_edf_numeric_arrays_identical":bool(np.array_equal(raw_x,raw_other)),
+        "released_edf_numeric_sha_first":fingerprint(raw_x),
+        "released_edf_numeric_sha_second":fingerprint(raw_other),
+        "raw_numeric_array_shape":list(raw_x.shape),
+        "raw_numeric_diff_max_abs":(
+            float(np.max(np.abs(raw_x-raw_other)))
+            if raw_x.shape==raw_other.shape else None),
+
     }
 
 
