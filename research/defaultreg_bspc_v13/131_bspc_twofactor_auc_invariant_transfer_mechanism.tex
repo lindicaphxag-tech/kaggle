@@ -1,0 +1,112 @@
+% New exact two-component decomposition of the ALREADY-AUDITED
+% historical class-centred vs proper predictive source validation NLL.
+% The identity is a classical weighted variance decomposition.
+% No new target AUC gain or original-theorem priority is claimed.
+\subsection{Disentangling transfer-relevant contrast from AUC-invariant location}
+\label{sec:bspc-twofactor}
+The exact predictive-minus-class-centred score term in
+Eq.~\eqref{eq:v17-exact-nll-shift} still mixes two statistically
+distinct source-person shifts. This matters because a
+Gaussian predictive density, even when correctly evaluated,
+is \emph{not} a proper score for within-person ROC-AUC:
+a common source-to-validation-person location shift may
+lower predictive likelihood without changing any within-person
+classification ranking.
+
+Let $\pi_{g,c}=n_{g,c}/n_g$,
+$\delta_{g,c}=\widehat\mu_{g,c}-
+\widehat\mu_{\mathrm{train},c}$,
+$\bar\delta_g=\pi_{g,0}\delta_{g,0}+
+               \pi_{g,1}\delta_{g,1}$,
+and $\Gamma_g=\delta_{g,1}-\delta_{g,0}$.
+For the \emph{same} source-fitted positive definite
+$A_\lambda$, the weighted parallel-axis identity gives
+\begin{align}
+C_{\mathrm{pred},g}(\lambda)
+-C_{\mathrm{cent},g}(\lambda)
+&=P_{\mathrm{loc},g}(\lambda)
+  +P_{\mathrm{contrast},g}(\lambda),\label{eq:twofactor}\\
+P_{\mathrm{loc},g}(\lambda)
+&={\bar\delta_g^\top A_\lambda^{-1}\bar\delta_g\over p},\\
+P_{\mathrm{contrast},g}(\lambda)
+&={\pi_{g,0}\pi_{g,1}\over p}
+  \Gamma_g^\top A_\lambda^{-1}\Gamma_g.
+\end{align}
+Both terms are nonnegative. The identity is exact for
+\emph{finite} class-imbalanced samples and every
+feasible $\lambda$; it requires no Gaussian data
+assumption to hold as a squared-residual statement.
+
+\paragraph{Proof and the AUC-invariant counterfactual.}
+Substitute
+$\delta_{g,0}=\bar\delta_g-\pi_{g,1}\Gamma_g$ and
+$\delta_{g,1}=\bar\delta_g+\pi_{g,0}\Gamma_g$ into
+Eq.~\eqref{eq:v17-exact-nll-shift}. The weighted cross
+terms cancel exactly. If the held person's feature
+vectors are all shifted by the same $b\in\mathbb R^p$,
+then $\bar\delta_g$ becomes $\bar\delta_g+b$ but
+$\Gamma_g$ is unchanged. For any fixed linear
+score $f_w(x)=w^\top x+c$,
+\[
+ f_w(x^+ +b)-f_w(x^- +b)
+ = f_w(x^+)-f_w(x^-),
+\]
+so the held-person ROC-AUC and all paired ranking
+decisions remain identical \emph{regardless} of the
+change in $P_{\mathrm{loc},g}$. The historical
+held-class-centred score is invariant as well.
+Thus $P_{\mathrm{loc},g}$ can grow without bound
+under source-group location shifts that have no
+effect on within-person AUC. A proper predictive
+Gaussian NLL, though correct as a density score,
+can therefore be a poor surrogate for
+discriminative transfer under zero-target
+information conditions.\hfill$\square$
+
+\paragraph{Why retaining only the contrast term is insufficient.}
+Even $P_{\mathrm{contrast},g}$ is only a class-mean
+density discrepancy, not a guaranteed change in ROC-AUC.
+For a fixed classifier $w$, an arbitrary class-contrast
+displacement orthogonal to $w$ can increase
+$P_{\mathrm{contrast},g}$ while keeping all
+held-person scores and ranks identical.
+For example, at $\lambda=1$, let the trained
+mean contrast be $(2,0)$ in two-dimensional
+feature space. The classifier is parallel to
+the first coordinate. Moving the validation
+positive-class mean by $(0,h)$ for any $h$ leaves
+all classifier scores unchanged but increases
+$P_{\mathrm{contrast}}$ quadratically in $h$.
+An executable numerical counterexample checks
+this construction alongside the original
+pooled-LDA implementation. Consequently, the
+\emph{contrast-only} criterion
+$C_{\mathrm{cent}}+P_{\mathrm{contrast}}$
+is an informative diagnostic, \emph{not} an
+established proper predictive likelihood or a
+proven new method for EEG regularisation selection.
+
+\paragraph{EEG application, allowed evidence and prior art.}
+Our source-only instrument computes each term on the
+original predeclared participant-grouped folds,
+re-estimating the tangent reference, training class
+means and regularised covariance within the available
+source groups. It reproduces both the historical
+class-centred score and the original source-macro AUC
+on their exact 27-point grid.
+The translation fraction
+$\bar P_{\mathrm{loc}}/
+(\bar P_{\mathrm{loc}}+\bar P_{\mathrm{contrast}})$
+quantifies an \emph{AUC-invariant component} of the
+held-source predictive-score gap, but it does
+not predict held-target benefit.
+A post-outcome source-only diagnostic is reported on
+Dreyer2023A and Cho2017 source groups separately;
+these acquisitions have previously exposed target
+results, so this is \emph{not} a new preregistered
+independent EEG transfer experiment.
+The decomposition is a standard weighted
+quadratic-variance identity used as an
+EEG validation-estimand interpretation,
+not a claim that we invented ANOVA or Gaussian
+predictive scoring.
