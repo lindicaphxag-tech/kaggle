@@ -1,0 +1,31 @@
+name: P2 content-group split hygiene regression
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/p2_record_unit_identity_regression.py'
+      - '.github/workflows/p2-signal-content-split-audit.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  identity-math:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python research/defaultreg_bspc_v13/src/p2_record_unit_identity_regression.py > p2_split_test.json
+      - run: |
+          python - <<'PY'
+          import json
+          a=json.load(open("p2_split_test.json"))
+          assert a["group_components"]==[[4,5],[47],[49]]
+          assert not a["EEG_raw_data_reloaded"]
+          print(a)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p2-synthetic-content-identity-arithmetic-only
+          path: p2_split_test.json
+          retention-days: 90
