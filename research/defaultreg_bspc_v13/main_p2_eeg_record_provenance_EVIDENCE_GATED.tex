@@ -15,54 +15,33 @@ A Matched Audit of Validation Denominators, Model Refitting and Regularisation}
 \date{}
 \begin{document}\maketitle
 \begin{abstract}
-\textbf{Objective.}
-We test whether distinct released participant identifiers
-in publicly available electroencephalography (EEG)
-necessarily define independent digital recording
-contents, and quantify the effect of content-disjoint
-model evaluation on cross-subject decoding.
-
-\textbf{Methods.}
-With a pinned motor-imagery preprocessing pipeline
-(MOABB 1.7.2), exact signal-and-label content
-fingerprints were audited across three public EEG
-acquisitions. In an affected acquisition, we
-compared a nominal 50-ID result with 49 distinct
-content groups and performed a matched
-$2\times2$ source-fit by regularisation-selection
-analysis. We additionally tested an alternative
-preprocessing setting and two fixed logistic/ridge
-classifier objectives on the same held contents.
-
-\textbf{Results.}
-Liu2024 contained 50 released IDs and 2,000
-processed trials but 1,960 distinct numerical
-trial contents: IDs 4 and 5 shared all 40 labelled
-epochs. Two other datasets had no exact cross-ID
-matches under their specified pipelines. The
-alias persisted after 6--35 Hz filtering and
-128 Hz resampling. Source-macro ROC-AUC
-was $0.594000$ over nominal IDs, $0.588673$
-over 49 unique contents using original fits,
-and $0.582551$ after record-purged refitting.
-The matched 49-group change of $-0.006122$
-was dominated by the alias-affected group
-($-0.262500$); the other 48 averaged
-$-0.000781$. Fixed logistic and ridge
-models respectively showed changes of
-$-0.212500$ and $-0.222500$ at the aliased
-content, versus $-0.000469$ and
-$+0.001094$ across the other 48.
-
-\textbf{Conclusion.}
-Released EEG participant IDs cannot always
-serve as independent \emph{digital-content}
-units. The validation denominator, source
-fitting and selection effects should be
-reported separately. These retrospective
-observations do not establish clinical
-patient identity, population-wide leakage
-bias or an independent new EEG cohort.
+Distinct participant identifiers in released electroencephalography
+(EEG) datasets do not necessarily denote independent digital
+recording contents. We audited exact EEG trial and label identity
+under pinned motor-imagery pipelines and investigated the effect
+of using recording-content groups instead of released identifiers
+in subject-held classification. Of 50 released identifiers and
+2,000 processed trials in Liu2024, two identifiers (4 and 5)
+shared all 40 labelled epochs, leaving 1,960 distinct processed
+trial contents and 49 recording-content groups. Under a second
+6--35 Hz/128 Hz processing configuration, the same complete
+cross-identifier alias persisted. An independent EDF raw
+digital-sample comparison found 32 of 33 original channel
+streams equal byte-for-byte for identifiers 4 and 5,
+versus one of 33 for a negative-control pair. The nominal
+50-ID source-macro ROC-AUC was 0.594000, falling to 0.588673
+after evaluating 49 unique held contents with original
+training and source choices, and to 0.582551 under
+content-disjoint refitting. The matched 49-group difference
+($-0.006122$) was dominated by the aliased group
+($-0.262500$); the other 48 groups averaged $-0.000781$.
+Two further frozen-classifier analyses produced aliased-group
+changes of $-0.212500$ (logistic) and $-0.222500$ (ridge),
+but near-zero mean changes elsewhere. These retrospective
+results identify a concrete validation-unit failure and motivate
+content-aware splitting; they do not establish duplicated
+clinical participant identities, a universal bias correction
+or independence from previously inspected public data.
 \end{abstract}
 
 \noindent\textbf{Keywords:} EEG; motor imagery; recording identity;
