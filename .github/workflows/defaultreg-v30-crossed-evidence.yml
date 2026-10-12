@@ -1,0 +1,58 @@
+name: DefaultReg V30 immutable 49-record factorial independent audit
+on:
+  push:
+    branches: [research/defaultreg-v30-evidence-synthesis-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/verify_v30_crossed_immutable_artifact.py'
+      - 'research/defaultreg_bspc_v13/tests/test_v30_crossed_immutable_audit.py'
+      - '.github/workflows/defaultreg-v30-crossed-evidence.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independent-v29-original-reanalysis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install lightweight analysis environment
+        run: python -m pip install --disable-pip-version-check numpy
+      - name: Test exact source-independent factorial algebra
+        run: |
+          python -m unittest discover -v -s research/defaultreg_bspc_v13/tests -p 'test_v30_crossed_immutable_audit.py'
+      - name: Retrieve V29 genuine frozen independent EEG execution artifact
+        run: |
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11765232221/zip > /tmp/v29-original-genuine.zip
+          test -s /tmp/v29-original-genuine.zip
+      - name: Independently check all 49x3 four-cell source group values
+        run: |
+          mkdir -p /tmp/defaultreg-v30
+          python research/defaultreg_bspc_v13/src/verify_v30_crossed_immutable_artifact.py /tmp/v29-original-genuine.zip --out /tmp/defaultreg-v30/independent_crossed_all49.json
+          python - <<'PY'
+          import json
+          f='/tmp/defaultreg-v30/independent_crossed_all49.json'
+          d=json.load(open(f))
+          assert d['status']=='V30_PASS_IMMUTABLE_49_RECORD_CROSSED_REANALYSIS'
+          assert d['n_groups']==49
+          assert d['no_causal_leakage_or_independent_patients_claim']
+          q=d['results']
+          assert q['source_macro']['n_lambda_changed']==37
+          assert q['proper_source_mean_gaussian']['n_lambda_changed']==0
+          assert q['historical_class_centred']['n_lambda_changed']==0
+          p=q['source_macro']['mean_contrast']
+          assert abs(p['paired_full_change'] - (-.006122448979591841))<1e-11
+          assert abs(p['model_by_lambda_interaction']-.0031122448979591763)<1e-11
+          print('PASS_V30_ORIGINAL_REAL_49_RECORD_MODEL_SELECTOR_FACTORIAL_AUDIT')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: defaultreg-v30-original49-independent-crossed-EEG-audit
+          path: /tmp/defaultreg-v30/**
+          if-no-files-found: error
+          retention-days: 90
