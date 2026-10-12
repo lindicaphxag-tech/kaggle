@@ -1,0 +1,50 @@
+name: DefaultReg V32 immutable source-choice structural novelty audit
+on:
+  push:
+    branches: [research/defaultreg-v32-noise-debiased-contrast-20261013]
+    paths: ['.github/workflows/defaultreg-v32-first-source-choices-audit.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  source-only-frozen-diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Retrieve original first-run frozen source decisions (NOT retry)
+        uses: actions/download-artifact@v4
+        with:
+          name: defaultreg-v32-Dreyer-new-acquisition-12-subject-first-run
+          run-id: 38299747910
+          github-token: ${{ github.token }}
+          path: /tmp/v32-source-original
+      - name: Verify immutable SHA, baseline path, alpha and oblique direction
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib
+          a=list(Path('/tmp/v32-source-original').rglob('V32_DREYER_SOURCE_CHOICES_LOCKED_BEFORE_TARGET.json'))
+          assert len(a)==1,a
+          b=a[0].read_bytes()
+          h=hashlib.sha256(b).hexdigest()
+          expected='9bfc60e1da10575315917aa6662532198a892dfa99f045341bb71adde58a04b9'
+          assert h==expected
+          x=json.loads(b)
+          assert x['source_ids']==list(range(1,13))
+          assert x['target_ids_unread']==list(range(13,25))
+          assert x['no_held_target_info_for_policy_selection']
+          assert x['all_models_fit_before_held_target_io']
+          src=x['selected_choices'];geo=x['operator_source_geometry']
+          structural=bool(geo['selected_matrix_operator_nontrivial'])
+          print('V32_FIRST_SOURCE_LOCK_IMMUTABLE_PASS',h)
+          print('V32_SOURCE_ONLY_SELECTED_PARAMETERS',json.dumps(src,sort_keys=True))
+          print('V32_UNTOUCHED_SOURCE_RISK_SCORE',json.dumps(x['source_cv_summary'],sort_keys=True))
+          print('V32_FIRST_SOURCE_GEOMETRY',json.dumps(geo,sort_keys=True))
+          print('V32_STRUCTURAL_NOVELTY_GATE', 'PASS' if structural else 'FAIL')
+          print('V32_SOURCE_ONLY_INTERPRETATION',
+                'structural novelty is NOT a future target AUC gain')
+          PY
