@@ -1,0 +1,43 @@
+name: P2 real 49 exact groups vs 47 assumed near groups refit sensitivity
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/p2_real_exact49_vs_near47_sensitivity.py'
+      - '.github/workflows/p2-real-exact49-near47-sensitivity.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  matched-retrospective-refits:
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    env:
+      MNE_DATA: /tmp/p2-real-47-versus-49-eeg
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_bspc_v13/src/p2_real_exact49_vs_near47_sensitivity.py --out /tmp/p2-real-47-vs-49-matched.json
+          python - <<'PY'
+          import json
+          z=json.load(open("/tmp/p2-real-47-vs-49-matched.json"))
+          assert z["n_exact_unique_records"]==49
+          assert z["n_conservative_similarity_groups"]==47
+          assert len(z["rows"])==47
+          assert z["near_group_membership_assumed_for_sensitivity_only"]
+          assert z["not_new_prospective_Z0_or_causal_bias_estimate"]
+          print("P2_REAL_47_VS_49_GROUP_SCENARIO_FINISHED_NOT_CLINICAL_IDENTITY")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p2-real-retro-47-high-cosine-vs-49-exact-group-source-refits
+          path: /tmp/p2-real-47-vs-49-matched.json
+          if-no-files-found: warn
+          retention-days: 90
