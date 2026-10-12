@@ -96,7 +96,7 @@ jobs:
       OMP_NUM_THREADS: '1'
       MKL_NUM_THREADS: '1'
       GH_TOKEN: ${{ github.token }}
-      MNE_DATA: ${{ runner.temp }}/mne_data
+      MNE_DATA: /tmp/defaultreg_mne_data
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
