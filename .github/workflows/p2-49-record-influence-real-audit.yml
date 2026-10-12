@@ -1,0 +1,49 @@
+name: P2 BSPC original 49-record exact overlap group influence and robust three-policy decomposition
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths:
+      - '.github/workflows/p2-49-record-influence-real-audit.yml'
+      - 'research/defaultreg_bspc_v13/src/p2_exact_duplicate_influence_audit.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_immutable_49_record_influence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy
+      - uses: actions/download-artifact@v4
+        with:
+          name: defaultreg-v29-real-49-record-crossed-model-regularisation-four-cells
+          run-id: 38290349868
+          github-token: ${{ github.token }}
+          path: /tmp/immutable-v29-49
+      - name: No EEG target reads; independent original output reanalysis
+        run: |
+          cd /tmp/immutable-v29-49
+          test "$(find . -name 'CROSSED_MODEL_SELECTION_49_GROUPS.json' | wc -l)" -eq 1
+          zip -qr /tmp/immutable-v29-original.zip .
+          cd "$GITHUB_WORKSPACE"
+          python research/defaultreg_bspc_v13/src/p2_exact_duplicate_influence_audit.py              /tmp/immutable-v29-original.zip --out /tmp/p2-49-influence-audit.json
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/p2-49-influence-audit.json'))
+          assert x['n_unique_processed_recording_content_groups']==49
+          a=x['policies']['source_macro']
+          assert abs(a['remaining48_delta_BB_minus_AA']+.00078125)<1e-10
+          assert abs(a['ID4_delta_BB_minus_AA']+.2625)<1e-10
+          assert abs(x['policies']['proper_source_mean_gaussian']['remaining48_delta_BB_minus_AA']-.00130208333333333)<1e-10
+          assert x['not_patient_identity_or_causal_effect']
+          print('P2_EXACT_ORIGINAL_AFFECTED_GROUP_AND_48_UNAFFECTED_RECHECK_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: P2-BSPC-REAL-49-source-content-group-localized-influence-three-models
+          path: /tmp/p2-49-influence-audit.json
+          retention-days: 90
