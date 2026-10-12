@@ -21,7 +21,8 @@ epoch/label fingerprints define record-content groups. All recording groups
 are checked in three public acquisitions. In the affected cohort, we
 reproduce original and fully purged held-record AUC values, then evaluate
 a frozen $2\times2$ model-fit by shrinkage-selection factorial on the same
-49 held recording groups.
+49 held recording groups. We additionally quantify influence of the
+content-overlap group and use two other selectors as negative controls.
 \textbf{Results.} Liu2024 contains 50 released IDs and 2,000 processed trial
 instances, but 1,960 unique exact trial contents; IDs 4 and 5 share all
 40 epochs in the fixed pipeline. No cross-ID exact overlaps were observed
@@ -32,9 +33,14 @@ to 0.588673 (49 identical held targets with original fits) and 0.582551
 regularisation choice changed in 37, with opposing average conditional
 selector effects ($-0.001327$ versus $+0.001786$) on the two fitted models.
 The correctly predictive source-mean Gaussian policy changed its selected
-shrinkage in zero groups.
+shrinkage in zero groups. The complete 49-group change was $-0.006122$ AUC,
+but the duplicate-affected content group changed by $-0.262500$;
+excluding that group from the descriptive mean left just
+$-0.000781$ AUC across the other 48 groups.
 \textbf{Conclusion.} Subject IDs alone may not ensure recording-content
-independence. The original-to-corrected AUC difference mixes a reporting
+independence. In this acquisition, a large apparent aggregate
+correction was dominated by a specific digital overlap group,
+not a universal shift for unaffected participants. The original-to-corrected AUC difference mixes a reporting
 denominator shift, model changes and selection interactions; it is neither
 a patient-level causal leakage penalty nor a new transfer gain.
 \end{abstract}
@@ -116,6 +122,8 @@ The inferential unit for descriptive reports is one processed
 recording group, not a trial or confirmed independent patient;
 LOPO source training pools overlap heavily.
 
+\input{P2_methods_signal_identity_benchmark_upgrade.tex}
+
 \section{Results}
 \subsection{Identity across three EEG acquisitions}
 \begin{table}[ht]\centering\small
@@ -157,6 +165,8 @@ $-0.006122$. The aggregate $-0.011449$ difference is
 not by itself a causal EEG leakage-effect estimate.
 
 \input{125_v30_actual_crossed_49_result.tex}
+
+\input{P2_49_record_localisation_real_results.tex}
 
 \section{Discussion}
 Our observation is more specific than generic random-window leakage:
