@@ -1,0 +1,81 @@
+\subsection{Three-way decomposition of nominal and record-purged EEG outcomes}
+\label{sec:v28-three-estimands}
+After successful completion of the 49-record full refit, an
+independent job downloaded \emph{three immutable experiment
+artifacts}: the original 50-ID source-locked result, the
+all-2,000-epoch identity ledger, and the 49-representative
+fully refitted result. It reconstructed all 49 legitimate
+train/held source partitions from exact EEG trial identity
+and checked their equality to the actual source sets used
+for the real-data re-fitting. All 49 passed, with source
+policies SHA-locked before the recorded target AUCs.
+
+For each frozen method, define three descriptive means.
+$A$ is the original 50-identifier LOPO mean. $B$ drops
+the copied target ID 5 from the old outcome table while
+keeping all \emph{old fitted models} unchanged. $C$
+recomputes tangent-space references, class-contrast
+models and the source-only parameter choices from the
+48 distinct source representatives for each of the 49
+held recording groups. The arithmetic identity
+\[
+ C-A=(B-A)+(C-B)
+\]
+separates the reporting-denominator change from
+the aggregate fully-refitted-model change on a
+fixed set of 49 target IDs. It is \emph{not} a
+causal decomposition of leakage inflation, since
+the fit and source-selection changes themselves
+combine several factors.
+
+\begin{table}[tb]
+\centering\small
+\caption{Liu2024 exact-record identity sensitivity:
+participant/record-content-macro AUC under original nominal
+50-ID evaluation ($A$), old fitted models restricted
+to 49 unique target rows ($B$), and complete 49-group
+source refitting ($C$). All differences are retrospective
+descriptive observations, not preregistered treatment effects.}
+\label{tab:v28-three-estimands}
+\begin{tabular}{lrrr}
+\toprule
+Criterion & A: 50 IDs & B: 49 target rows & C: 49 refit\\
+\midrule
+Source macro-AUC & 0.59400 & 0.58867 & 0.58255\\
+True predictive Gaussian & 0.58985 & 0.58505 & 0.58133\\
+Historical class-centred & 0.59305 & 0.58724 & 0.58117\\
+Ledoit--Wolf & 0.59085 & 0.58495 & 0.57852\\
+OAS & 0.58985 & 0.58378 & 0.57827\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For source-macro shrinkage, $B-A=-0.00532653$
+and $C-B=-0.00612245$, summing to
+$C-A=-0.01144898$ AUC. Crucially, re-fitting
+altered the source-macro-selected shrinkage
+in \emph{37 of 49} matched held recording groups.
+The source-mean predictive Gaussian criterion's
+selected shrinkage stayed identical in all
+49 comparisons, although its mean AUC still
+changed from $0.58985$ to $0.58133$.
+Thus changes in selected $\lambda$ and
+changes in fitted model geometry or target
+performance are distinct events, in line
+with the original objective-mismatch hypothesis.
+
+An independent job \texttt{38289471605}
+validated the old, held-content and refitted
+source SHA manifests and the identity graph;
+its frozen joint-audit report SHA-256 begins
+\texttt{c9b49cf112e1e7d4} (full digest
+in the online Actions artifact).
+Neither these paired observations nor the
+arithmetic identity can attribute performance
+loss causally to a specific duplicated observation,
+prove distinct patient identity, or guarantee
+record-independent generalisation at another site.
+This experiment was performed after the
+target outcomes had been exposed and global
+target signal identities inspected, not as
+a new strict Z0 confirmatory trial.
