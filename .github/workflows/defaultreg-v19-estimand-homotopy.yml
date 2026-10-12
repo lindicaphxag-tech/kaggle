@@ -1,0 +1,151 @@
+name: DefaultReg V19 exact estimand homotopy and two-cohort EEG paper
+on:
+  push:
+    branches:
+      - submission/defaultreg-v19-exact-estimand-homotopy-20261012
+    paths:
+      - 'research/defaultreg_bspc_v13/**'
+      - '.github/workflows/defaultreg-v19-estimand-homotopy.yml'
+  pull_request:
+    paths:
+      - 'research/defaultreg_bspc_v13/**'
+      - '.github/workflows/defaultreg-v19-estimand-homotopy.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  v18-independent-fair-baseline-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      GH_TOKEN: ${{ github.token }}
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install reproducibility checks and LaTeX
+        run: |
+          python -m pip install --quiet numpy scipy
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-pictures texlive-fonts-recommended lmodern poppler-utils
+      - name: Download BOTH immutable original and successful comparator artifacts
+        run: |
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11674238395/zip > /tmp/Shin-original.zip
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11722966174/zip > /tmp/Shin-proper-predictive.zip
+          echo 'cda3210d24a8e9c7f3bf2d48490e51ad51f023beb652816a8679088cc3fb1842  /tmp/Shin-original.zip' | sha256sum -c
+          echo 'd260a402bfbd9f4b8a49f6d0a47de766f71d7b399f1011039def302043d07467  /tmp/Shin-proper-predictive.zip' | sha256sum -c
+      - name: Independently re-check all 29 held-person AUCs and source lambda lock
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          python src/verify_v18_proper_predictive_artifact.py /tmp/Shin-original.zip /tmp/Shin-proper-predictive.zip --out v18_independent_proper_audit.json
+          python - <<'PY'
+          import json
+          a=json.load(open('v18_independent_proper_audit.json'))
+          assert a['status']=='PASS_29_SUBJECT_REAL_PROPER_NLL_POSTOUTCOME_ARTIFACT_AUDIT'
+          assert a['n']==29 and a['proper_lambda_counts']=={'0.2':29}
+          assert abs(a['macro_minus_proper_mean_delta_AUC']+0.0003065134099616916)<1e-12
+          assert abs(a['class_centred_minus_proper_mean_delta_AUC']+0.022528735632183904)<1e-12
+          assert a['new_confirmatory_test_performed'] is False
+          print('V18_ORIGINAL_AND_CORRECTED_PREDICTIVE_EEG_SCORES_PASS')
+          PY
+      - name: Download original and real 14-person BNCI predictive comparator archives
+        run: |
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11675156650/zip > /tmp/BNCI-original.zip
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11722553787/zip > /tmp/BNCI-proper-predictive.zip
+          echo '15137db055b54983c297d28b93e714836ff3711888c35bcdd3640eba05b1a6e1  /tmp/BNCI-original.zip' | sha256sum -c
+          echo 'b4f583d63997d69d2f405c915ca9ca8eef8e623a4443e98b1634399d7d4f421b  /tmp/BNCI-proper-predictive.zip' | sha256sum -c
+      - name: Independently verify second real EEG cohort on all 14 original folds
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          python src/verify_v18_bnci_corrected_predictive.py /tmp/BNCI-original.zip /tmp/BNCI-proper-predictive.zip --out v18_bnci14_independent_proper_audit.json
+          python - <<'PY'
+          import json
+          j=json.load(open('v18_bnci14_independent_proper_audit.json'))
+          assert j['status']=='PASS_BNCI14_ORIGINAL_AND_REAL_PROPER_EEG_SOURCE_SCORE_AUDIT'
+          assert j['participants']==14 and j['positive_SOURCE_penalties']==14
+          assert abs(j['source_macro_minus_proper_auc']-0.00681919642857142)<1e-12
+          assert abs(j['proper_minus_centered_auc']-0.0107700892857143)<1e-12
+          assert j['new_confirmatory_test'] is False
+          print('V18_SECOND_EEG_COHORT_REAL_PROPER_NLL_AUDIT_PASSED')
+          PY
+      - name: Verify exact between-person mean-shift decomposition on 300 SPD examples
+        working-directory: research/defaultreg_bspc_v13
+        run: python src/predictive_minus_centered_identity_v17.py | tee v18_exact_identity_regression.json
+      - name: Exact source-only estimand homotopy and posterior EEG diagnostic in both cohorts
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          python src/estimand_homotopy_v19.py --shin-original /tmp/Shin-original.zip \
+            --shin-proper /tmp/Shin-proper-predictive.zip \
+            --bnci-original /tmp/BNCI-original.zip \
+            --bnci-proper /tmp/BNCI-proper-predictive.zip \
+            --out v19_estimand_continuation | tee v19_summary_stdout.json
+          python - <<'PY'
+          import json,pathlib
+          root=pathlib.Path('v19_estimand_continuation')
+          a=json.loads((root/'Shin2017A_estimand_homotopy_POSTOUTCOME_SUMMARY.json').read_text())
+          b=json.loads((root/'BNCI2014_002_estimand_homotopy_POSTOUTCOME_SUMMARY.json').read_text())
+          assert a['n']==29 and a['number_changing_lambda_from_alpha0_to_alpha1']==29
+          assert b['n']==14 and b['number_changing_lambda_from_alpha0_to_alpha1']==14
+          assert abs(a['median_exact_first_change_alpha']-0.0660314554639444)<1e-10
+          assert abs(b['median_exact_first_change_alpha']-0.19444225258616926)<1e-10
+          assert a['segment_count_distribution']=={'6':29}
+          assert b['segment_count_distribution']=={'7':1,'8':9,'9':4}
+          assert a['no_new_hypothesis_test'] and b['no_new_hypothesis_test']
+          assert a['no_target_selected_alpha_policy'] and b['no_target_selected_alpha_policy']
+          for z in [a,b]:
+            assert abs(z['postoutcome_mean_AUC_fixed_alpha']['0.0']-
+                    (0.76367816091954 if z['n']==29 else 0.7611160714285715))<1e-12
+          print('PASS_V19_43_REAL_EEG_SOURCE_ONLY_EXACT_BREAKPOINT_CERTIFICATES')
+          PY
+      - name: Verify original publication family arithmetic
+        working-directory: research/defaultreg_bspc_v13
+        run: python verify_bspc_submission_claims.py --check-consistency
+      - name: Compile FULL V18 scientific manuscript with bibliography
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_bspc_v18_DRAFT.tex
+          test -s main_bspc_v18_DRAFT.pdf
+          pdftotext main_bspc_v18_DRAFT.pdf v18_manuscript.txt
+          grep -q 'Covariance Validation Is Not Predictive Likelihood' v18_manuscript.txt
+          grep -q '0.786207' v18_manuscript.txt
+          pdfinfo main_bspc_v18_DRAFT.pdf | grep Pages
+          echo 'V18_REAL_SHIN_EEG_PREDICTIVE_CONTROL_AND_PAPER_PASSED'
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_bspc_v18_CONCISE_DRAFT.tex
+          test -s main_bspc_v18_CONCISE_DRAFT.pdf
+          pdftotext main_bspc_v18_CONCISE_DRAFT.pdf v18_concise_manuscript.txt
+          grep -q '0.771886' v18_concise_manuscript.txt
+          grep -q '0.786207' v18_concise_manuscript.txt
+          if grep -Eq 'multiply defined|Undefined control sequence|Citation.*undefined' main_bspc_v18_CONCISE_DRAFT.log; then exit 3; fi
+          echo 'V18_CONCISE_ARTICLE_BUILT_WITH_CITATIONS_AND_BOTH_COHORTS'
+          pdfinfo main_bspc_v18_CONCISE_DRAFT.pdf | grep Pages
+      - name: Compile concise V19 research article with exact source regimes
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_bspc_v19_CONCISE_DRAFT.tex
+          test -s main_bspc_v19_CONCISE_DRAFT.pdf
+          pdftotext main_bspc_v19_CONCISE_DRAFT.pdf v19_concise_extract.txt
+          grep -q '0.0660' v19_concise_extract.txt
+          grep -q '0.1944' v19_concise_extract.txt
+          if grep -Eq 'multiply defined|Undefined control sequence|Citation.*undefined' main_bspc_v19_CONCISE_DRAFT.log; then exit 3; fi
+          pdfinfo main_bspc_v19_CONCISE_DRAFT.pdf | grep Pages
+          echo 'PASS_V19_EXACT_ESTIMAND_MAIN_PDF_NO_BROKEN_REFERENCES'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: defaultreg-v19-source-estimand-breakpoints-two-real-EEG-PDF-and-audits
+          path: |
+            research/defaultreg_bspc_v13/main_bspc_v19_CONCISE_DRAFT.pdf
+            research/defaultreg_bspc_v13/main_bspc_v19_CONCISE_DRAFT.log
+            research/defaultreg_bspc_v13/main_bspc_v19_CONCISE_DRAFT.bbl
+            research/defaultreg_bspc_v13/v19_estimand_continuation/**
+            research/defaultreg_bspc_v13/main_bspc_v18_DRAFT.pdf
+            research/defaultreg_bspc_v13/main_bspc_v18_CONCISE_DRAFT.pdf
+            research/defaultreg_bspc_v13/main_bspc_v18_CONCISE_DRAFT.log
+            research/defaultreg_bspc_v13/main_bspc_v18_CONCISE_DRAFT.bbl
+            research/defaultreg_bspc_v13/main_bspc_v18_DRAFT.log
+            research/defaultreg_bspc_v13/main_bspc_v18_DRAFT.bbl
+            research/defaultreg_bspc_v13/v18_independent_proper_audit.json
+            research/defaultreg_bspc_v13/v18_bnci14_independent_proper_audit.json
+            research/defaultreg_bspc_v13/v18_exact_identity_regression.json
+          retention-days: 90
