@@ -5,6 +5,36 @@ Two realistically standalone completed research stories (P1/P2);
 two conditional research/technical notes (P3/P4).**
 Each is on an independent branch and a separate draft pull request.
 
+
+## Selected journal assignment (2026-10-13; 2025 ORIGINAL CAS ranking)
+| Track | Primary target | 2025 CAS major area | Fee route | Status |
+|---|---|---|---|---|
+| P1 [#143](https://github.com/lindicaphxag-tech/kaggle/pull/143) | **Journal of Neural Engineering (IOP)** | Medicine 3 | Explicitly free for subscription-access | Selected for manuscript preparation; NOT submitted |
+| P2 [#144](https://github.com/lindicaphxag-tech/kaggle/pull/144) | **Biomedical Signal Processing and Control (Elsevier)** | Medicine 2 | Subscription route ordinarily avoids OA APC | Selected for manuscript preparation; NOT submitted |
+| P3 [#145](https://github.com/lindicaphxag-tech/kaggle/pull/145) | Brain Topography (Springer) | Medicine 3 | Subscription generally no OA APC, possible extras | PROVISIONAL ONLY; major new independent physiology/evidence needed |
+| P4 [#146](https://github.com/lindicaphxag-tech/kaggle/pull/146) | Digital Signal Processing (Elsevier) | Engineering & Technology 3 | Subscription route ordinarily avoids OA APC | PROVISIONAL ONLY; independent numerical/algorithmic gains needed |
+
+*2026 'new journal partition' is NOT treated as the last CAS journal
+partition. The university's current promotion regulations govern any
+official classification. Fee statements mean OA APC only, not a promise
+that no submission, page, or colour charge applies in all cases.*
+
+Publisher references:
+- JNE scope and FREE subscription publishing:
+  https://publishingsupport.iopscience.iop.org/journals/journal-of-neural-engineering/about-journal-neural-engineering/
+- BSPC scope benchmark and data/signal reliability:
+  https://shop.elsevier.com/journals/biomedical-signal-processing-and-control/1746-8094
+- Brain Topography:
+  https://link.springer.com/journal/10548
+- Digital Signal Processing:
+  https://shop.elsevier.com/journals/digital-signal-processing/1051-2004
+
+**A chosen journal is not a scientific pass.** P1 still needs
+result-to-artifact full checks and author-approved data/declarations;
+P2 additionally needs clinical data-custodian outreach and a
+raw-data identity reliability review. P3 and P4 remain HOLD;
+never submit redundant P1 negative case-control results as P3.
+
 ## Direct reader and corresponding-author navigation
 
 | Paper | Main scientific object | Independent research branch / Draft PR | PDF Actions evidence | Stage |
