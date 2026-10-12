@@ -1,0 +1,116 @@
+\section{Recording identity, not person ID alone, is a prerequisite for EEG transfer validation}
+\label{sec:v26-identity}
+Contemporary EEG reproducibility work already documents that
+trial-level validation can greatly overestimate subject-independent
+performance \cite{gil2026subjectvalidation}; neither the
+principle of leakage-safe splitting nor signal hashing is
+presented here as novel. The previously unverified
+\emph{record identity across different IDs} and its
+consequences for this frozen regularisation comparison
+are the dataset-specific methodological findings.
+
+\paragraph{An independent raw-data integrity check.}
+A separate source-locked Liu2024 acute-stroke experiment
+originally included 50 public subject identifiers and
+2,000 nominal trials (40 per identifier), with
+29 EEG channels and no target-statistic fitting for
+its \emph{predeclared} source regularisation rule.
+The frozen 50-identifier outcome means were 0.59400
+AUC for source-macro selection and 0.58985 for
+genuine source-trained-mean Gaussian selection.
+These are not yet estimates of transfer to 50
+independent processed recordings.
+
+We subsequently inspected each public MOABB 1.7.2
+processed EEG trial array and the associated binary
+left/right event labels \emph{without examining classifier
+scores as a criterion for record grouping}. Exact
+float64 array hashes, verified over all 50 identifiers,
+found that IDs 4 and 5 have identical entire processed
+EEG trial arrays and identical class labels.
+No other full processed EEG array was repeated,
+so the fixed release provides 49 unique preprocessed
+recording groups under this exact identity criterion.
+Although IDs 47 and 49 had coincident vectors of
+reported target AUCs, their EEG signals differed
+and they must remain distinct.
+An independent released-EDF inspection found that
+IDs 4 and 5 were in different binary EDF files but
+32 of their 33 raw numerical channels were identical;
+the sole differing channel was index 32 (zero-based),
+with an empty name in the MNE EDF reader.
+The comparison was performed on numerical signals,
+not merely identical file names or matched classifier scores.
+These tests do not identify human patients and do
+not establish why the release contains identical
+EEG waveforms under two subject IDs.
+
+\paragraph{Why this can invalidate apparent held-person isolation.}
+Let $D_i$ denote the preprocessed trial-signal and
+label array associated with nominal subject ID $i$.
+In the original leave-one-ID-out training protocol,
+$\mathcal S_i=\{D_k:k\ne i\}$. For $D_i=D_j$ with
+$i\ne j$, $D_j\in\mathcal S_i$ is a copy of the
+nominal held-out record, including its labels.
+The source-fitted tangent reference, spectral covariance,
+class contrast, Gaussian predictive source criterion and
+discriminative source validation can therefore all
+depend on the held record through its duplicate.
+The assumption of independent source/target
+\emph{recordings} is violated even though the numerical
+subject identifiers differ. For all other outer folds,
+the same recording receives additional weight through
+its duplicate IDs. Correcting only the denominator
+of a reported mean AUC does not repair the fitted
+source models.
+
+This contamination can be illustrated without assuming
+any particular classifier. Let $\widehat\mu_c$ be a
+training-class mean from $N_c$ EEG observations
+and let the inadvertently duplicated recording
+contribute $n_{k,c}$ observations with mean
+$\widehat\mu_{k,c}$. Then its extra inclusion changes
+the fitted training-class mean to
+\[
+ \widehat\mu'_c
+ =\widehat\mu_c+
+ \frac{n_{k,c}}{N_c+n_{k,c}}
+ \bigl(\widehat\mu_{k,c}-\widehat\mu_c\bigr).
+\]
+For a duplicate of a nominally held target,
+$\widehat\mu_{k,c}$ contains the nominal target's
+\emph{labelled} feature observations. In the
+source-fitted tangent-LDA pipeline, this can also
+change regularised covariance spectra and the
+source-validation paths. The elementary weighted-mean
+identity is not a new statistical theorem and gives
+no quantitative estimate of performance inflation.
+
+\paragraph{Purged re-fitting.}
+The precommitted retrospective V26 protocol groups
+only exact signal- and label-identical records;
+it retains the smallest ID per group, excludes
+other identical copies \emph{from every source pool
+and every target denominator}, and re-fits all
+source references and source-only selection rules.
+Every model uses one of the other 48 unique
+processed recording groups as its held target
+and is trained on the remaining 48.
+All grouped source decisions are locked before
+their corresponding target AUCs are joined.
+Numerical results are not reported until the
+real-data run and identity receipts have passed.
+
+\paragraph{Information-budget limitation.}
+Identifying duplicates required a global inspection
+of the publicly released held-target EEG arrays;
+therefore the new reanalysis is \emph{not} a strict
+no-target-feature-access Z0 or an independent
+prospective test. This retrospective integrity check
+cannot prove causal performance inflation solely
+from the duplicate: purging also changes source
+sample weights and fitted covariance/geometry.
+The previously exposed 50-identifier result
+must be treated as \emph{unqualified} with respect
+to recording-independent transfer until a
+record-level separation analysis is complete.
