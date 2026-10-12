@@ -1,0 +1,39 @@
+name: P2 independent malformed-EDF raw digital payload check
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/p2_edf_digital_payload_audit.py'
+      - '.github/workflows/p2-independent-edf-digital-raw.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  digital-payload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    env:
+      MNE_DATA: /tmp/p2-public-edf-digital-second-reader
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - run: |
+          mkdir -p "$MNE_DATA"
+          python -m py_compile research/defaultreg_bspc_v13/src/p2_edf_digital_payload_audit.py
+          python research/defaultreg_bspc_v13/src/p2_edf_digital_payload_audit.py --out /tmp/p2-raw-edf-digital-content.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/p2-raw-edf-digital-content.json'))
+          assert len(r['pairs'])==2
+          assert all(q['reader_independent_of_mne_and_pyedflib'] for q in r['pairs'])
+          assert all(q['n_identical_digital_channels']<=q['n_raw_channels'] for q in r['pairs'])
+          print('P2_SECOND_EDF_DIGITAL_READER_COMPARISON_COMPLETE_NOT_PHYSICAL_IDENTITY')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p2-independent-raw-edf-digital-sample-identity-no-patient-data
+          path: /tmp/p2-raw-edf-digital-content.json
+          if-no-files-found: warn
+          retention-days: 90
