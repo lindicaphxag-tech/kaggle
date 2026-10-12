@@ -1,0 +1,377 @@
+% BSPC V31 evidence-gated editorial candidate: keeps V24 verified history and adds the V31 NONSIGNIFICANT true acquisition result. NOT SUBMITTED.
+% Original frozen cohorts and one newly executed but post-outcome Shin2017A comparator; see evidence hierarchy.
+% Compile in paper_vnext, source files remain original and editable.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=0.92in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,booktabs,graphicx}
+\usepackage{tikz}
+\usepackage[hidelinks]{hyperref}
+\usepackage{lmodern}
+\usepackage[protrusion=true,expansion=false]{microtype}
+\title{When Regularisation Selection Matters:\\
+Source Optimisation, Predictive Validation, and Transfer Discrepancy in EEG}
+\author{AUTHOR IDENTITIES AND AFFILIATIONS TO BE APPROVED}
+\date{}
+\begin{document}
+\maketitle
+\input{00_abstract_v24_external_negative.tex}
+\noindent\textbf{Keywords:} EEG; covariance shrinkage; cross-subject decoding;
+motor imagery; model-selection validity; representation sensitivity.
+
+\section{Introduction}
+Cross-subject EEG decoding asks a model fitted on source participants to
+generalise to a different individual, often without labelled calibration.
+Tangent-space covariance features are established in EEG decoding
+\cite{barachant2012riemannian}, and can be high dimensional even
+when each participant contributes few examples. A stable covariance estimator is therefore
+attractive, but the statistical criterion used to estimate a covariance
+matrix is not the criterion used to judge held-person classification.
+Ledoit--Wolf shrinkage is an established covariance estimator
+\cite{ledoit2004}; regularised discriminant analysis selected against
+predictive discrimination is also classical \cite{friedman1989}.
+Consequently, selecting a shrinkage parameter by source discrimination
+is not, in itself, our claimed methodological invention.
+
+A more basic measurement question is what is actually being scored:
+centring held source participants with their own class means produces a
+covariance log score that does not equal the predictive Gaussian log score
+under source-trained means. Confusing these objectives can create an
+apparent advantage for discrimination-based selection. A corrected
+comparator must be run on real EEG to determine whether the original
+objective comparison survives. A separate prospective intervention asks
+whether the selection criterion can alter a spectral representation
+conclusion under the same target-information budget. Contemporary work proposes
+new regularisation mechanisms and multi-paradigm transfer methods
+\cite{miao2025freezing,morvay2026wbt,he2026cyclic}, while recent research highlights
+how participant-level rather than trial-level evaluation can change the
+interpretation of EEG model performance \cite{gil2026subjectvalidation}.
+Qin and colleagues, in a recent study published in this journal,
+evaluated spatial normalization with SVM decoding across nine
+distinct EEG paradigms under within- and between-subject validation
+\cite{qin2026spatialnorm}. That study provides stronger
+cross-paradigm breadth than the fixed tangent-LDA family examined here.
+Our narrower, complementary question is how the \emph{source
+validation likelihood itself} changes the selected
+regularisation regime; this is a measurement problem rather
+than evidence of a superior novel classifier.
+These contributions motivate our strict comparison but do not substitute
+for an objective-controlled study.
+
+We study a fixed tangent-space linear discriminant family, separating
+three source-only selection targets: held-source-participant
+macro-AUC, a validation-class-centred covariance score, and a true
+Gaussian predictive score using only source-training class means.
+The third comparator was executed on Shin2017A only after its original
+target results had been seen; this is retrospective and is not part of
+the frozen confirmatory family. All target labels, target feature
+moments and target-fitted geometry are excluded from primary source-only
+(Z0) selection. We preserve the original predeclared finite shrinkage grid,
+frozen prospective test cohorts, the representation falsification,
+individual harms, and the newly verified posterior comparator. An additional BNCI2014\_001 acquisition and a new Weibo2014
+ten-person, three-channel dataset were evaluated under
+repository-committed protocol-first procedures. Neither experiment
+constitutes independent external preregistration.
+
+The objective is not to show
+that one numerical shrinkage value is universally optimal; it is to measure
+how an incorrectly described covariance-validation estimand can change
+the interpretation of a transfer comparison.
+
+
+\section{Methods}
+\subsection{Datasets and target-information budgets}
+PhysioNet EEGMMIDB S001--S008 is the method-development source pool
+\cite{schalk2009eegmmidb,schalk2004bci2000}.
+Its S021--S040 participants form a prospectively untouched target block
+of 20 people. The primary fixed 21-channel sensorimotor montage, 8--30 Hz
+filtering and source-fitted Riemannian tangent reference generate 231
+wide-band coordinates. The independently frozen BNCI2014\_002
+(\(N=14\), 15 channels, 120 features) and BNCI2015\_001
+(\(N=12\), 13 channels, 91 features) protocols use native montage,
+8--30 Hz processing and leave-one-person-out evaluation. Shin2017A
+(\(N=29\), 30 channels, 465 features) was frozen under a \emph{separate}
+prospective protocol before that cohort's target outcomes and is not a
+retrospective addition to the original BNCI inference family.
+
+All main effects use Z0: no target labels, target feature means, target
+covariance, target normalisation statistics or target-selected feature
+configuration. Within each source-validation fold, tangent references and
+other representation-dependent operations are refitted using available
+source participants only. Repeated trials and sessions do not become
+independent inferential units.
+
+\subsection{Paired objectives on one scalar shrinkage path}
+For source within-class covariance \(S\), let
+\[
+ A_\lambda=(1-\lambda)S+\lambda\nu I,\qquad
+ \nu=\mathrm{tr}(S)/p,\quad \lambda\in[0,1].
+\]
+Two source objectives are evaluated on the same participant-grouped folds:
+macro-AUC \(A_s(\lambda)\), maximised for discrimination, and held-source validation-class-centred covariance log score
+\(C_s(\lambda)\), minimised for within-class covariance fit.
+This frozen estimator historically appears in logs and tables as
+Cov-NLL, but it uses each held-source validation participant's own
+class-centred residuals; it is not a source-mean predictive likelihood
+(Section~\ref{sec:v16-estimand-audit}). Analytic Ledoit--Wolf and OAS shrinkage use the same
+source feature pool; tangent-space logistic regression and Riemannian
+MDM serve as additional non-identical algorithm controls. Full-domain
+selection refers to the \emph{finite} 27-point candidate grid
+\[
+\begin{aligned}
+\Lambda=\{&0,.0005,.001,.002,.003,.005,.0075,.01,.015,\\
+&.02,.03,.05,.075,.10,.15,.20,.30,.40,.50,\\
+&.60,.70,.80,.90,.95,.98,.99,1\}.
+\end{aligned}
+\]
+Singular candidates are declared infeasible, not silently replaced by
+a target-informed rule. Target scores are frozen before their
+label-based performance is calculated.
+
+\input{101_v16_covscore_estimand_audit.tex}
+\input{103_v17_exact_class_mean_shift_decomposition.tex}
+
+
+\subsection{Source decision stability and finite-grid validity}
+For source-fitted shrinkage $A_\lambda=(1-\lambda)S+\lambda\nu I$,
+the LDA discriminant $w_\lambda=A_\lambda^{-1}d_s$
+changes continuously with $\lambda$ when the covariance
+is nonsingular. An exact decomposition of within-participant
+ROC-AUC into positive--negative pair ranks separates
+parameter changes from discrimination changes. A spectral
+interval enclosure bounds the fixed held-source-trial
+macro-AUC over a continuous $\lambda$ interval.
+A branch-and-bound selector evaluated the predeclared
+finite grid before optional interval subdivision,
+reporting a conditional source-optimisation gap rather
+than claiming target-generalisation guarantees.
+All numerical proof details, synthetic counterexamples
+and the full source rank audit appear in the
+accompanying technical manuscript.
+
+\input{113_v24_source_target_selection_gap.tex}
+\subsection{Pre-outcome source-contrast envelope falsification}
+\label{sec:v31-brief-method}
+As a separate, fixed-source stress test, we also constructed the
+source-contrast envelope (SCE) without any target participant EEG.
+For each source recording group we computed a class-mean contrast
+$d_g$, its source-group mean $\bar d$, and between-group
+contrast scatter $B$. With within-source-group class noise
+covariance $\Sigma_{\rm within}$, SCE chooses among the
+\emph{same feasible} original pooled-LDA directions
+$w_\lambda$ by maximizing
+\[
+ {w_\lambda^\top\bar d-\rho\sqrt{w_\lambda^\top B w_\lambda}
+ \over\sqrt{2w_\lambda^\top\Sigma_{\rm within}w_\lambda}},
+ \qquad \rho=1.
+\]
+An isotropic $0.01$ source-noise-relative ridge fixes the
+contrast ellipsoid before evaluation. This criterion is the
+exact conditional minimum Gaussian margin if the target
+class contrast belongs to the specified ellipsoid and target
+class noise matches $\Sigma_{\rm within}$; these assumptions
+are not empirically certified, and the underlying robust
+optimization inequality is not claimed as a new theorem.
+The zero-radius ablation and comparison to the unchanged
+27-point grouped source-macro selector were frozen
+before Cho2017 target data access. The additional
+public Cho2017 first-run used source IDs 1--12 and held
+IDs 13--32, exactly C3/Cz/C4, left/right motor imagery,
+8--30 Hz and 160 Hz resampling. A SHA-256 source-choice
+receipt preceded opening the held EEG.
+It is a new-acquisition repository-protocol-first test,
+not an independent externally registered study.
+The extended proof, sharp witness and unreliability
+counterexample remain in the technical companion.
+
+\subsection{Prospective hierarchy and statistics}
+The frozen EEGMMIDB block tests two primary comparisons: source macro-AUC
+selection versus the originally executed validation-class-centred
+covariance-score criterion and versus Ledoit--Wolf. The corrected
+proper-predictive criterion is a new, retrospective Shin2017A-only
+comparison, and does not enter any original Holm family.
+The two original BNCI datasets form an independent TRUE PRE-DATA family;
+Shin2017A is separately frozen and its Holm family remains independent.
+The participant is the unit for paired sign-flip inference, paired bootstrap
+confidence intervals and within-family Holm adjustment. An AUC loss
+greater than 0.02 relative to the comparator defines a materially harmed
+participant. Neither sessions nor trial counts are treated as independent
+replications. Post-primary source-pool sensitivity and post-outcome frontier
+sensitivity are not relabelled as new confirmatory tests.
+
+
+\section{Results}
+\subsection{Objective conflict remains after restoring the near-zero region}
+In EEGMMIDB S001--S008, held-source macro AUC selected
+\(\lambda_D=0.8\) while covariance-NLL selected \(\lambda_C=0.075\).
+Analytic Ledoit--Wolf selected about 0.01567. Source macro AUC reached
+0.67833 at 0.8; moving from 0.075 to 0.8 improved this source macro
+score by 0.05801 and increased held-source class-centred covariance score by 0.92233.
+This is source evidence of disagreement, not evidence that 0.8 is a
+universally correct EEG parameter.
+
+\subsection{Held-out discrimination gains coexist with individual harm}
+On the prospective EEGMMIDB S021--S040 target block (\(N=20\)),
+source-macro selection obtained 0.72116 macro AUC, source
+covariance-NLL 0.66509, and Ledoit--Wolf 0.62919.
+The paired mean gains were +0.05607 (95\% participant-bootstrap
+[0.02185,0.09049], Holm \(p=0.00597\)) against covariance-NLL and
++0.09197 ([0.04108,0.14310], Holm \(p=0.00510\)) against
+Ledoit--Wolf. Five and four participants, respectively, lost more
+than 0.02 AUC. After completely reselecting the method and refitting
+source geometry under eight separate source-participant omissions,
+the mean contrast direction stayed positive in 8/8 omissions.
+Selected discriminative strengths varied between 0.4 and 0.95,
+supporting objective-order stability under these perturbations,
+not a single stable regularisation constant.
+
+\subsection{External evidence distinguishes direction from adjusted significance}
+BNCI2014\_002 (\(N=14\)) showed +0.01763 macro AUC over
+covariance-NLL, with adjusted \(p=0.13965\).
+BNCI2015\_001 (\(N=12\)) showed +0.04329, \(p=0.18555\).
+Both effect directions were positive and the source optima differed in
+26/26 outer folds; these folds are not 26 independent study replications.
+Neither BNCI cohort passed its own frozen family-wise superiority test.
+Separately frozen Shin2017A (\(N=29\)) reported +0.02222 over
+covariance-NLL (Holm \(p=0.02232\)) and +0.04866 over Ledoit--Wolf
+(Holm \(p=0.00051\)), with five and three materially harmed
+participants. The original Kaggle PR97 execution and 29 frozen per-person
+score files have now been independently checksum-checked, with
+the stored per-person AUC arithmetic reconciled. This is
+an artifact-level reproduction audit, not a fresh raw-EEG rerun.
+
+\input{91_table_main_prospective_results.tex}
+\input{93_figure_participant_effects.tex}
+
+\input{104_v18_shin_concise.tex}
+
+\input{105_v18_second_cohort_proper_predictive.tex}
+
+
+
+\input{108_v21_low_rank_cvar_negative.tex}
+\input{115_v24_weibo_external_negative.tex}
+\input{127_v31_CHO2017_REAL_FROZEN_NON_SIGNIFICANT.tex}
+
+\subsection{The key prospective spectral-representation prediction fails}
+On the separate untouched S041--S060 block, four prespecified
+configurations compared WIDE231, FB8-1848, source-PCA-matched
+FB8-231 and nuisance-augmented WIDE-1848. The primary
+difference-in-differences for FB8-vs-WIDE under discrimination versus
+Ledoit--Wolf regularisation was \(-0.07781\) AUC
+(95\% [-0.12415,-0.03451], Holm \(p=0.01328\)).
+The selection objective materially affected the representation
+conclusion, but in the \emph{opposite} direction to the historical
+claim that discrimination-oriented regularisation would reveal a
+universal filter-bank advantage. Dimensionality-matched and nuisance
+controls also contradicted a monotonic feature-dimension explanation.
+
+\section{Discussion}
+The central finding is not that discrimination-optimised covariance
+shrinkage is universally preferable, but that \emph{an apparently
+reasonable validation criterion can silently change the scientific
+estimand}. The previously called Cov-NLL scored each held-source
+participant after subtracting that participant's own validation-class
+means. It therefore omitted an exact, nonnegative source-trained-mean
+shift penalty and must not be compared to discriminative selection
+as if it were proper predictive likelihood. The corrected source-trained
+Gaussian score changes the magnitude and interpretation of the earlier
+advantage. Selecting shrinkage using held-source discrimination is
+classical; our contribution concerns the reproducibility and
+interpretation of that objective comparison, not priority for
+discriminative tuning \cite{friedman1989,tomioka2010regularized}.
+
+The prospectively fixed EEGMMIDB comparison is real, but it also
+contains harmed participants; the two original independently frozen
+BNCI families do not individually establish adjusted superiority.
+Shin2017A's proper predictive comparison is retrospective.
+The subsequent three-channel CVaR experiment demonstrated
+that changing the source-selected regularisation does not
+necessarily change target discrimination, and the prospective
+spectral-representation intervention refuted the initially
+expected universal filter-bank advantage. These negative
+results are central to the paper, not unsuccessful parameter
+searches to be discarded.
+
+The V22 and V23 mechanisms distinguish source parameter changes,
+score-pair order changes and source-validation AUC effects.
+The V24 continuous branch-and-bound repair provides a useful
+conditional finite-\emph{source} optimisation gap. Yet the new
+Weibo2014 experiment is more informative for its \emph{failure
+to improve transfer}: the same shrinkage was selected
+in every outer source pool by the new continuous method
+and the original 27-point grid, producing identical
+held-person predictions by that pipeline. The average
+$+0.00205$ AUC contrast to proper predictive likelihood
+has a descriptive participant interval containing zero.
+Under the deterministic decomposition of
+Eq.~\eqref{eq:v24-transfer-gap}, closing the source
+optimisation term cannot bound the unobserved
+source--target discrepancy; no source-only rank
+certificate is an unseen-person safety guarantee.
+
+A second newly evaluated acquisition, Cho2017, adds a
+source-locked robustness challenge beyond merely searching
+the finite shrinkage grid more exactly
+(Section~\ref{sec:v31-cho}). Although the predeclared SCE
+source-contrast operator obtained a $+0.003395$ AUC
+difference versus the original source-macro choice,
+its sign-flip reference result ($p=0.0931$) and
+participant-bootstrap interval crossing zero do not
+establish a genuine positive transfer benefit.
+The source-only dominance check was negative, and the
+chosen $\lambda=1$ indicates potential boundary saturation.
+We therefore use SCE as a falsification probe rather than
+an advertised superior EEG decoder.
+
+The independent Weibo acquisition extends the practical
+stress test to another recording site, but the fixed
+three-channel, single binary MI task is deliberately
+limited. Its ten overlapping-source leave-one-person-out
+models do not provide ten independent study replications,
+and repository protocol-first chronology is weaker than
+independent preregistration. The work does not establish
+SOTA deep EEG performance, calibration time saved,
+clinical safety, or deployment-ready trigger policies.
+The most robust methodological recommendation is to
+specify validation estimands, target-information budgets,
+pre-outcome selection boundaries, negative controls,
+and participant-level adverse effects before making
+claims about EEG regularisation.
+
+\section{Conclusion}
+An historical validation-class-centred EEG covariance score
+was not a proper predictive Gaussian likelihood, and
+the distinction changes how earlier discrimination-based
+regularisation gains should be interpreted. Exact
+pairwise ranking and spectral path analyses clarify why
+source selection decisions can differ without producing
+important target AUC improvements. The independently
+audited ten-person Weibo2014 protocol-first test
+found that source-optimality gaps were numerically
+small but continuous selection and the original
+27-point source grid chose identical parameters and
+achieved the same held-person macro AUC.
+A further source-locked 20-person Cho2017 test gave only a
+small, nonsignificant exploratory geometric-envelope
+contrast; it did not rescue the claim that more elaborate
+source-only regularisation reliably improves transfer.
+This supports \emph{measurement correctness and
+selection validity} as the manuscript's contribution,
+not superiority of a new EEG decoder. Broader
+multi-acquisition, fully independent pre-data
+replication is required before claiming a universally
+safe or better shrinkage rule.
+
+\section*{Statements and Declarations}
+\textbf{Data availability:} The EEG cohorts are publicly distributed.
+Original participant score receipts, repository commit hashes and code
+availability must be confirmed in the final submission package.
+
+\textbf{Author contribution, funding, competing interests, ethics and
+AI-assisted writing:} To be completed and confirmed by all authors before
+publisher upload. No declaration is made on an author's behalf.
+
+\bibliographystyle{unsrt}
+\bibliography{references_v10}
+\end{document}
