@@ -1,0 +1,155 @@
+\subsection{Exact source-only estimand continuation and decision thresholds}
+\label{sec:v19-estimand-homotopy}
+The real-source identity in Eq.~\eqref{eq:v17-exact-nll-shift}
+gives more than a post hoc contrast between two discrete
+regularisation criteria. For each inner held-source participant
+group $g$, let the historical covariance score be
+$C_{0,g}(\lambda)$ and its nonnegative mean-shift penalty
+be $P_g(\lambda)=C_{1,g}(\lambda)-C_{0,g}(\lambda)$.
+On the original fixed source-feasible regularisation grid
+$\Lambda_g$, define an \emph{estimand continuation}:
+\begin{equation}
+\label{eq:v19-estimand-continuation}
+  J_{\alpha,g}(\lambda)=C_{0,g}(\lambda)
+                +\alpha P_g(\lambda),\qquad
+  \widehat\lambda_g(\alpha)
+     \in\arg\min_{\lambda\in\Lambda_g}J_{\alpha,g}(\lambda),
+  \quad \alpha\in[0,1].
+\end{equation}
+This is a \emph{diagnostic path of source-validation
+measurements}, not a new participant-specific target
+adaptation algorithm. At $\alpha=0$ it exactly recovers the
+executed class-centred covariance selector; at $\alpha=1$
+it exactly recovers source-trained-mean Gaussian predictive
+selection. Neither choice requires an outer target example.
+
+\paragraph{Finite-grid breakpoint theorem.}
+Let $c_i=C_{0,g}(\lambda_i)$ and
+$p_i=P_g(\lambda_i)$, both fixed by source data.
+The optimized source score
+$h_g(\alpha)=\min_i(c_i+\alpha p_i)$
+is continuous, concave and piecewise affine.
+Except at ties, the selected regularisation
+$\widehat\lambda_g(\alpha)$ is piecewise constant.
+All changes can occur only at candidate crossings
+\[
+\alpha_{ij}=\frac{c_j-c_i}{p_i-p_j}
+\quad\text{where }p_i\ne p_j,\quad 0<\alpha_{ij}<1.
+\]
+Moreover the \emph{selected mean-shift penalty}
+$p_{\widehat\lambda_g(\alpha)}$ cannot increase
+as $\alpha$ grows. This defines a source-only,
+exactly computable \emph{decision-stability
+certificate}: $\alpha_g^*$ is the smallest
+$\alpha$ at which the minimizer differs from
+the original class-centred minimizer.
+
+\emph{Proof.}
+The pointwise minimum of finitely many affine
+functions is a continuous concave piecewise-affine
+function. Within each open interval between
+pairwise crossings, candidate order is fixed.
+For $a<b$, optimality at each endpoint gives
+$c_i+a p_i\le c_j+a p_j$ and
+$c_j+b p_j\le c_i+b p_i$, for minimizers
+$i$ at $a$ and $j$ at $b$.
+Adding both inequalities yields
+$(b-a)(p_j-p_i)\le0$, so $p_j\le p_i$.
+The other claims follow by enumerating the
+finite pairwise line intersections.
+\hfill$\square$
+
+We computed the \emph{exact} lower envelope rather
+than approximating its change points with an
+arbitrary coarse $\alpha$ step. The original frozen
+covariance score path and the separately executed
+proper-predictive source-score path were paired at
+the \emph{same} feasible scalar $\lambda$ in each
+outer fold. An independent source-only program
+enumerated all feasible affine crossings, merged
+contiguous equal-minimizer intervals, and checked
+the monotone-penalty theorem numerically on every
+record. Each source-only trajectory was serialized
+with a SHA-256 digest \emph{before} retrospective
+joining of the already archived outer target AUC
+paths. This chronology prevents within-execution
+target-informed $\alpha$ decisions but does not
+make the analysis prospectively pre-data.
+
+\begin{table}[tb]
+\centering
+\small
+\caption{Source-only exact estimand sensitivity in two
+original EEG source pools. Thresholds $\alpha_g^*$ and
+number of distinct minimizer intervals use only source
+validation losses. The $\alpha$ grid is a diagnostic
+continuation, not a calibrated target-optimal selector.
+Outer folds overlap substantially and are not independent
+laboratory replications.}
+\label{tab:v19-homotopy-thresholds}
+\begin{tabular}{lcc}
+\toprule
+Measure & Shin2017A & BNCI2014\_002\\
+\midrule
+Source-only outer folds & 29 & 14\\
+Changes from $\alpha=0$ to 1 & 29/29 & 14/14\\
+Median first-change $\alpha_g^*$ & 0.0660 & 0.1944\\
+Minimum $\alpha_g^*$ & 0.0519 & 0.0406\\
+Maximum $\alpha_g^*$ & 0.0930 & 0.2470\\
+Source-regime intervals per fold & 6 & 7--9\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The real source-path measurements show a
+strong dataset-dependent difference in the
+sensitivity of the original covariance choice.
+All 29 Shin2017A folds first changed their
+selected $\lambda$ after an added penalty weight
+between 0.0519 and 0.0930; the corresponding
+range on BNCI2014\_002 was 0.0406--0.2470.
+This does not mean the second dataset is
+necessarily safer or more stable: the two
+source populations and feature geometries
+differ, and the threshold is a descriptive
+decision property rather than a calibrated
+measure of future-person predictive reliability.
+
+For completeness, retrospective outcomes along
+\emph{fixed, externally specified} diagnostic
+weights $\alpha$ are shown in
+Table~\ref{tab:v19-homotopy-outcomes}. These are
+observations on already exposed held-subject
+outcomes; no $\alpha$ was selected using target
+AUC, no new adjusted $p$-value is calculated, and
+no improvement relative to the executed proper
+predictive comparator is claimed.
+\begin{table}[tb]
+\centering
+\small
+\caption{Person-macro target AUC along the source-only
+estimand diagnostic path: retrospective outcomes,
+\emph{not} a new trainable adaptive method result.
+Endpoints reproduce the original class-centred
+and the corrected proper-predictive comparators.}
+\label{tab:v19-homotopy-outcomes}
+\begin{tabular}{lcc}
+\toprule
+Fixed $\alpha$ & Shin2017A AUC & BNCI2014\_002 AUC\\
+\midrule
+0 (class-centred) & 0.763678 & 0.761116\\
+0.1 & 0.772529 & 0.761518\\
+0.4 & 0.777969 & 0.767333\\
+0.8 & 0.784751 & 0.769933\\
+1 (proper predictive) & 0.786207 & 0.771886\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The source path therefore yields an interpretable
+\emph{measurement-stability diagnostic}: one can
+report how small an explicit class-mean-shift
+weight would change a published choice of
+regularisation strength. It is not yet a
+clinically deployable algorithm and adds no
+prospectively validated EEG accuracy gain.
