@@ -1,0 +1,42 @@
+name: DefaultReg V26 raw EDF channel-origin forensic check
+on:
+  push:
+    branches: [research/defaultreg-v26-record-identity-purged-lopo-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/liu2024_edf_channel_identity_v26.py'
+      - '.github/workflows/defaultreg-v26-channel-forensics.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  raw-EDF-channel-numeric-origin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      MNE_DATA: /tmp/defaultreg-v26-edf-mne
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Compare original EDF channel amplitudes, not patient names
+        run: |
+          mkdir -p "$MNE_DATA" /tmp/defaultreg-v26-channel-forensics
+          python research/defaultreg_bspc_v13/src/liu2024_edf_channel_identity_v26.py
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/defaultreg-v26-channel-forensics/LIU2024_EDF_ORIGIN_CHANNEL_IDENTITY.json'))
+          assert d['status']=='PUBLIC_LIU2024_EDF_NUMERIC_SOURCE_CHANNEL_IDENTITY'
+          assert [p['original_subject_ids'] for p in d['pairs']]==[[4,5],[47,49]]
+          assert all(p['n_raw_channels']==33 for p in d['pairs'])
+          assert all(p['does_not_identify_duplicate_human_participants'] for p in d['pairs'])
+          print('PASS_RAW_PUBLIC_EDF_NUMERIC_CHANNEL_DUPLICATION_AUDIT')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: defaultreg-v26-Liu2024-released-EDF-channel-identity
+          path: /tmp/defaultreg-v26-channel-forensics/**
+          if-no-files-found: error
