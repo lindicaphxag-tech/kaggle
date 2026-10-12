@@ -1,0 +1,43 @@
+\begin{abstract}
+\textbf{Objective:}
+Source-participant discrimination and covariance-estimation
+criteria can favour different regularisation strengths in
+zero-target EEG decoding. We examine whether an apparent
+transfer advantage reflects a genuine predictive-covariance
+comparison or the precise validation estimand being scored.
+\textbf{Methods:}
+Using prospectively frozen participant-held EEG decoding
+experiments, we audit the executed source-only covariance
+scoring algorithm and compare its validation-class-centred
+Gaussian log score with a proper class-conditional predictive
+log score fitted using source-training class means.
+We derive an exact nonnegative class-mean-shift penalty
+that separates their objectives. A new Shin2017A source-only
+predictive comparator was executed \emph{retrospectively}
+against an immutable original 29-participant score grid.
+\textbf{Results:}
+The original EEGMMIDB prospective block ($N=20$)
+showed a $+0.0561$ macro-AUC contrast between
+source-discrimination and validation-class-centred
+covariance selection (Holm $p=0.00597$), alongside
+five participants harmed by more than 0.02 AUC.
+Two frozen external BNCI comparisons were each
+non-significant after their declared adjustments,
+and a separate prospective spectral comparison
+refuted a general filter-bank improvement.
+For Shin2017A ($N=29$), the new proper-predictive
+selection obtained 0.786207 mean AUC compared with
+0.785900 for source-discrimination selection and
+0.763678 for the original class-centred selector.
+The new criterion selected $\lambda=0.2$ in
+all 29 overlapping outer folds.
+\textbf{Conclusion:}
+The original covariance baseline was class-centred
+and must not be called a proper held-source predictive
+likelihood. Correcting its measurement target
+removes the observed source-discrimination advantage
+in one retrospective external analysis. The results
+support transparent objective specification and
+prospective replication, not a universal shrinkage
+choice or participant-safe adaptation.
+\end{abstract}
