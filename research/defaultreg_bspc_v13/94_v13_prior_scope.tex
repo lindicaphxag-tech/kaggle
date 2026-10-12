@@ -17,6 +17,20 @@ of whether selecting \emph{the same} scalar regulariser by
 validation-class-centred source covariance log score or by
 source-participant discrimination changes which EEG representation appears better.
 
+A 2026 EEG study by Zhang and colleagues systematically compared
+support-vector machine regularisation, cross-validation fold counts
+and trial averaging across seven event-related potential paradigms,
+as well as additional multiclass tasks
+\cite{zhang2026svmeeg}. This demonstrates that the effects of
+regularisation and validation design on EEG decoding have already
+been studied empirically. Its regulariser (SVM penalty) and
+typical evaluation question differ from the
+\emph{class-centred-versus-source-mean covariance estimand}
+and zero-target held-person tangent-LDA comparison analysed
+here. We therefore claim neither the discovery of EEG
+regularisation sensitivity nor a universally optimal
+cross-validation setting.
+
 The distinction from earlier signal-processing work deserves particular
 care. Tomioka and M{\"u}ller's regularised discriminative EEG framework
 already treated regularised empirical risk as an explicit learning
