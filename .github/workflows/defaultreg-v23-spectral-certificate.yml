@@ -26,6 +26,7 @@ jobs:
         run: |
           python -m unittest discover -v -s research/defaultreg_bspc_v13/tests -p 'test_spectral_path_certificate_v23.py'
           python -m unittest discover -v -s research/defaultreg_bspc_v13/tests -p 'test_source_rank_churn_v22.py'
+          python -m unittest discover -v -s research/defaultreg_bspc_v13/tests -p 'test_certified_continuous_selector_v23.py'
   authentic-bnci-source:
     runs-on: ubuntu-latest
     timeout-minutes: 105
