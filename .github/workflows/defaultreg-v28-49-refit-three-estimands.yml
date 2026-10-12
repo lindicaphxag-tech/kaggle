@@ -1,0 +1,66 @@
+name: DefaultReg V28 independently reconciled 50 vs 49 true refit
+on:
+  push:
+    branches: [research/defaultreg-v28-epoch-group-certificate-20261013]
+    paths:
+      - '.github/workflows/defaultreg-v28-49-refit-three-estimands.yml'
+      - 'research/defaultreg_bspc_v13/src/v28_epoch_split_attestation.py'
+      - 'research/defaultreg_bspc_v13/src/compare_v26_purged_vs_reweight.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  immutable-archive-cross-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install --quiet numpy
+      - name: Download the three independently frozen original experiment archives
+        run: |
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11760774972/zip > /tmp/liu50-original-before-record-inspection.zip
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11765005135/zip > /tmp/liu49-fully-purged-refitted.zip
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11763598792/zip > /tmp/liu2000-epochs-global-exact-identity.zip
+          test -s /tmp/liu50-original-before-record-inspection.zip
+          test -s /tmp/liu49-fully-purged-refitted.zip
+          test -s /tmp/liu2000-epochs-global-exact-identity.zip
+      - name: Independent all-49 actual trained source group reconciliation
+        run: |
+          mkdir -p /tmp/defaultreg-v28-reconcile
+          python research/defaultreg_bspc_v13/src/v28_epoch_split_attestation.py --v27-zip /tmp/liu2000-epochs-global-exact-identity.zip --v26-zip /tmp/liu49-fully-purged-refitted.zip --out /tmp/defaultreg-v28-reconcile/49_GROUP_FULL_FIT_EPOCH_CONTENT_ATTESTED.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/defaultreg-v28-reconcile/49_GROUP_FULL_FIT_EPOCH_CONTENT_ATTESTED.json'))
+          assert d['n_distinct_epoch_safe_recording_groups']==49
+          assert d['v26_purged_alignment']['all_source_held_epoch_groups_covered']
+          assert d['v26_purged_alignment']['all_held_source_splits_exact_epoch_disjoint']
+          print('PASS_V28_IMMUTABLE_ALL49_FULL_REFIT_MATCHES_INDEPENDENT_EXACT_EPOCH_CONTENT_GRAPH')
+          PY
+      - name: Independently decompose old apparent performance into denominator and full refit changes
+        run: |
+          python research/defaultreg_bspc_v13/src/compare_v26_purged_vs_reweight.py --original-zip /tmp/liu50-original-before-record-inspection.zip --purged-zip /tmp/liu49-fully-purged-refitted.zip --out /tmp/defaultreg-v28-reconcile/THREE_ESTIMANDS_ORIGINAL_REWEIGHT_REFIT.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/defaultreg-v28-reconcile/THREE_ESTIMANDS_ORIGINAL_REWEIGHT_REFIT.json'))
+          assert d['status']=='PASS_V26_THREE_ESTIMANDS_ID_REWEIGHT_VERSUS_RECORD_PURGED_REFIT'
+          assert d['n_original_IDs']==50 and d['n_unique_processed_EEG_records']==49
+          assert d['record_identity_preinspection_not_strict_Z0']
+          assert d['retraining_delta_is_not_a_causal_effect_of_duplicates']
+          for row in d['comparisons'].values():
+              a,b,c=row['original_50_ID_macro_AUC'],row['same_models_delete_duplicate_target_only_49_macro_AUC'],row['fully_record_purged_retrained_49_macro_AUC']
+              assert abs((b-a)+(c-b)-(c-a))<1e-12
+          assert abs(d['comparisons']['source_macro']['fully_record_purged_retrained_49_macro_AUC']-0.5825510204081633)<1e-12
+          print('PASS_V28_VALIDITY_WEIGHTING_VERSUS_COMPLETE_MODEL_REFIT_DECOMPOSITION')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: defaultreg-v28-independent-record-purged-49-vs-50-three-estimands
+          path: /tmp/defaultreg-v28-reconcile/**
+          if-no-files-found: error
+          retention-days: 90
