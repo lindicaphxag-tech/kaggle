@@ -1,0 +1,50 @@
+\begin{abstract}
+\textbf{Objective:} Covariance estimation, predictive
+Gaussian likelihood, and held-source-participant
+discrimination may select different EEG
+regularisation regimes. We examine whether
+these differences affect zero-calibration
+cross-participant decoding, and when a
+parameter change becomes an actual
+classification-ranking change.
+\textbf{Methods:} We retain the original
+source-fitted covariance/tangent-LDA pathway,
+subject-grouped validation, and frozen
+historical tests. We distinguish validation
+class-centred covariance scoring from genuine
+source-mean predictive likelihood, then
+decompose AUC changes exactly into
+positive--negative pair transitions. A spectral
+interval enclosure and second-order Taylor
+refinement bound rank stability for every
+shrinkage value within a continuous interval.
+A source-only branch-and-bound search returns
+an explicit finite-validation optimisation
+gap or reports failure.
+\textbf{Results:} In the prospective EEGMMIDB
+20-person test block, source-discriminative
+selection exceeded the historical class-centred
+selector by $0.0561$ AUC (Holm $p=0.00597$),
+but harmed five participants by $>0.02$ AUC.
+Corrected predictive-likelihood comparisons
+narrowed the apparent advantage in other
+cohorts. The new 3-channel BNCI2014\_004
+CVaR control altered 8/9 shrinkage decisions
+without improving mean held-person AUC.
+On BNCI2014\_002, a retrospective 14-pool
+\emph{source-validation} audit showed
+mean AUC difference $+0.02680$ and
+spectrally certified continuous-path
+pair-rank stability of $32.48\%$ after
+Taylor refinement. A five-split continuous
+source search failed its declared $0.02$
+optimality tolerance (residual gap $0.08643$).
+\textbf{Conclusion:} Regularisation-objective
+disagreement need not imply transfer gain.
+Continuous spectral analysis makes the
+source-domain ranking consequences auditable,
+but neither its bound nor the new search
+establishes improved unknown-participant
+performance. Clinical generalisation
+requires a genuinely external frozen test.
+\end{abstract}

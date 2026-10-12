@@ -1,0 +1,68 @@
+name: DefaultReg V23 source-only spectral path proof and real EEG
+on:
+  push:
+    branches:
+      - research/defaultreg-v23-certified-spectral-path-20261013
+    paths:
+      - 'research/defaultreg_bspc_v13/**'
+      - '.github/workflows/defaultreg-v23-spectral-certificate.yml'
+  pull_request:
+    paths:
+      - 'research/defaultreg_bspc_v13/**'
+      - '.github/workflows/defaultreg-v23-spectral-certificate.yml'
+permissions:
+  contents: read
+jobs:
+  certificate-unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install --quiet numpy
+      - name: Prove continuous-path enclosure by roots random SPD spectra and adversarial tests
+        run: |
+          python -m unittest discover -v -s research/defaultreg_bspc_v13/tests -p 'test_spectral_path_certificate_v23.py'
+          python -m unittest discover -v -s research/defaultreg_bspc_v13/tests -p 'test_source_rank_churn_v22.py'
+          python -m unittest discover -v -s research/defaultreg_bspc_v13/tests -p 'test_certified_continuous_selector_v23.py'
+  authentic-bnci-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 105
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MNE_DATA: /tmp/defaultreg-v23-eeg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Original pinned public EEG software
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Execute source-only continuum enclosure on genuine BNCI2014_002
+        run: |
+          python -m unittest discover -v -s research/defaultreg_bspc_v13/tests -p 'test_spectral_path_certificate_v23.py'
+          mkdir -p "$MNE_DATA" /tmp/defaultreg-v23
+          python research/defaultreg_bspc_v13/src/run_real_spectral_certificate_v23.py --outer-person 1 --segments 8 --out /tmp/defaultreg-v23/BNCI002_outer1_source_spectral_enclosure.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/defaultreg-v23/BNCI002_outer1_source_spectral_enclosure.json'))
+          assert d['status']=='EXECUTED_REAL_SOURCE_SPECTRAL_PATH_NOT_TARGET_VALIDATION'
+          assert d['n_outer_folds']==1 and d['segments']==8
+          assert d['no_target_label_or_target_feature_used_in_source_analysis']
+          r=d['outer_source_reports'][0]
+          assert r['held_source_people']==13
+          assert abs(r['source_auc_delta']-.04625)<1e-8
+          assert 0<=r['held_source_mean_certified_stable_fraction']<=1
+          print('PASS_V23_ONE_REAL_SOURCE_FOLD_SPECTRAL_CROSSING_CERTIFICATE')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-v23-real-BNCI-source-spectral-continuum-certificate
+          path: /tmp/defaultreg-v23/**
+          if-no-files-found: warn
+          retention-days: 90

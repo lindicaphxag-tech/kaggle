@@ -1,0 +1,48 @@
+name: DefaultReg V23 Taylor-tightened continuous source selector benchmark
+on:
+  push:
+    branches:
+      - research/defaultreg-v23-certified-spectral-path-20261013
+    paths:
+      - '.github/workflows/defaultreg-v23-real-continuous-search.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-only-continuous-benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 105
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MNE_DATA: /tmp/defaultreg-v23-cont-eeg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Check exact mathematically bounded source-domain search
+        run: |
+          python -m unittest discover -v -s research/defaultreg_bspc_v13/tests -p 'test_certified_continuous_selector_v23.py'
+          mkdir -p "$MNE_DATA" /tmp/defaultreg-v23
+          python research/defaultreg_bspc_v13/src/run_real_certified_search_v23.py --outer-person 1 --low 0.05 --high 0.95 --max-splits 5 --out /tmp/defaultreg-v23/BNCI002_outer1_source_only_continuous_search.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/defaultreg-v23/BNCI002_outer1_source_only_continuous_search.json').read_text())
+          assert d['source_participants']==13
+          assert d['no_outer_target_scores_or_labels_used']
+          assert d['status']=='REAL_SOURCE_ONLY_CONTINUOUS_SEARCH_NOT_TARGET_CONFIRMATION'
+          assert d['residual_source_optimality_gap_upper_bound']>=0
+          assert d['upper_bound_global_continuous_source_macro_auc']>=d['best_evaluated_source_macro_auc']-1e-12
+          print('PASS_REAL_BNCI_SOURCE_ONLY_CONTINUOUS_SEARCH_RESULT_RECORDED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-v23-source-EEG-conditional-continuous-search
+          path: /tmp/defaultreg-v23/**
+          if-no-files-found: warn
+          retention-days: 90
