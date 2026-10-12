@@ -65,8 +65,25 @@ def exact_shift_partition(Xtrain,ytrain,Xval,yval,lambda_:float):
     v=delta[1]-delta[0]
     translation=quad(u)/p
     contrast=float(pi[0]*pi[1])*quad(v)/p
+    # The contrast penalty itself splits exactly into the component
+    # along the ACTUAL source-trained LDA score and a Q-orthogonal
+    # component that cannot shift fixed-score class-mean separation.
+    # Q=A_lambda^-1 and w=Q*d_train.
+    d=mt[1]-mt[0]
+    w=U@((U.T@d)/spec)
+    discriminator_norm=float(d@w)
+    decision_aligned=(
+        float(pi[0]*pi[1])*(float(v@w)**2)/discriminator_norm/p
+        if discriminator_norm>1e-12 else 0.0
+    )
+    orthogonal=contrast-decision_aligned
+    if orthogonal < -1e-8*max(1.,contrast):
+        raise AssertionError("decision projection Cauchy-Schwarz violated")
+    orthogonal=max(0.,orthogonal)
     unaggregated=(pi[0]*quad(delta[0])+pi[1]*quad(delta[1]))/p
     residual=predictive-centered
+    if abs(contrast-decision_aligned-orthogonal)>1e-8*(1+abs(contrast)):
+        raise AssertionError('contrast-alignment partition failed')
     if (abs(residual-unaggregated)>1e-8*(1+abs(predictive))
         or abs(residual-translation-contrast)>1e-8*(1+abs(predictive))):
         raise AssertionError("weighted Gaussian shift factorisation failed")
@@ -78,6 +95,8 @@ def exact_shift_partition(Xtrain,ytrain,Xval,yval,lambda_:float):
         "mean_shift_total":float(residual),
         "location_shift_auc_invariant":float(translation),
         "class_contrast_shift_density_only":float(contrast),
+        "class_contrast_shift_score_aligned":float(decision_aligned),
+        "class_contrast_shift_score_orthogonal":float(orthogonal),
         "contrast_fraction_of_mean_shift":(
             float(contrast/residual) if residual>1e-12 else None),
         "not_held_target_validation":True,
@@ -148,6 +167,8 @@ def source_group_partition(C,y,groups,lambdas):
             "source_mean_shift_gap":mean("mean_shift_total"),
             "auc_invariant_translation_contribution":mean("location_shift_auc_invariant"),
             "contrast_shift_contribution":mean("class_contrast_shift_density_only"),
+            "contrast_shift_score_aligned_contribution":mean("class_contrast_shift_score_aligned"),
+            "contrast_shift_score_orthogonal_contribution":mean("class_contrast_shift_score_orthogonal"),
             "per_source_group":rows,
         })
     if not out:
