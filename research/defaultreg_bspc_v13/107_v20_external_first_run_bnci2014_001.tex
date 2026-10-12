@@ -1,0 +1,130 @@
+\subsection{A newly protocol-locked external acquisition cohort}
+\label{sec:v20-new-external}
+After establishing the exact source-estimand continuation
+from the two previously exposed score archives, we locked
+a new, independent public EEG experiment protocol in
+GitHub \emph{before initiating the evaluation run} on
+BNCI2014\_001 (BCI Competition IV Dataset 2a)
+\cite{tangermann2012bciiv,jayaram2018moabb}.
+This is a different acquisition dataset rather than a
+resplit of Shin2017A or BNCI2014\_002. We restricted
+the original four-class motor imagery paradigm to
+left- versus right-hand imagery \emph{in the protocol},
+before this run's results were computed, and used all
+nine participants, 2,592 trials (288/person),
+22 EEG channels and 8--30 Hz preprocessing.
+The 22-channel covariance tangent vector contained
+253 coordinates. The study used MOABB 1.7.2 and the
+same original source-only covariance/tangent-space
+LDA implementation, without target-fitted geometry.
+
+For each held outer participant, the eight
+remaining participants were divided into
+five source-participant-grouped validation folds.
+The source-only selected shrinkage values were:
+(i) macro-AUC of the held \emph{source} people,
+(ii) validation-class-centred Gaussian covariance
+log score, and (iii) properly source-training-mean
+Gaussian plug-in predictive log score.
+All used the identical originally fixed finite
+feasible shrinkage grid. In this run
+we included analytic Ledoit--Wolf and OAS LDA
+comparators, without additional optimization.
+The nine source-only decisions were saved,
+and the manifest was SHA-256 locked
+(\texttt{d782c2e00c0cbdd7c3a7dc641e3ffc4e902ca8d075f61f65f78d8bb7d36216c0})
+\emph{before the first outer target AUC was computed}.
+The GitHub pre-run protocol SHA-256 was independently
+reconciled with the release artifact.
+No target label, target normalization, target
+class mean or covariance informed model selection.
+
+\begin{table}[tb]
+\centering
+\small
+\caption{Newly run BNCI2014\_001 source-only
+external EEG experiment (9 persons, 2,592 trials).
+The experiment's protocol was committed before this
+run's target evaluation; it was \emph{not}
+independently preregistered or established
+globally unexposed. Differences and harms are
+descriptive: the same source people overlap
+across outer folds.}
+\label{tab:v20-new-cohort}
+\begin{tabular}{lr}
+\toprule
+Selection or diagnostic & Result\\
+\midrule
+Source participant macro-AUC selector & 0.789052 AUC\\
+Correct source-mean predictive score selector & 0.783415 AUC\\
+Historical class-centred covariance selector & 0.772387 AUC\\
+Analytic Ledoit--Wolf LDA & 0.752722 AUC\\
+Analytic OAS LDA & 0.752829 AUC\\
+Macro minus proper predictive (mean) & $+0.005637$ AUC\\
+Conditional descriptive bootstrap interval & $[-0.00619,0.01793]$\\
+Macro harmed more than 0.02 AUC vs proper & 1/9\\
+Proper harmed more than 0.02 AUC vs macro & 2/9\\
+Mean source log-score shift penalty & $+0.46946$\\
+Median source first-change $\alpha_g^*$ & 0.14841\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Source discrimination selected
+$\lambda=0.90$ for 3/9 folds,
+0.95 for 5/9 and 0.98 for 1/9;
+the correctly predictive source criterion
+selected $\lambda=0.20$ for 3/9 folds
+and 0.30 for 6/9, while the historical
+class-centred criterion selected 0.10
+for 7/9 folds and 0.15 for 2/9.
+Thus the change in the \emph{measurement
+estimand} again corresponded to a
+different regularisation region.
+The source mean-shift penalty was
+positive in all nine groups as
+\emph{required algebraically}; its
+\emph{observed magnitude} was
+0.46946 (per-feature log-score units)
+when evaluated at the properly
+predictive selected shrinkage.
+
+The paired difference of
+$+0.005637$ AUC between the
+source-discrimination and correctly
+predictive selectors had a post-run,
+participant-conditional descriptive
+bootstrap interval crossing zero.
+We do \emph{not} report a newly
+confirmatory superiority $p$-value or
+claim equivalent predictive
+performance. This first run
+prespecified the preprocessing,
+participants, target-information firewall,
+method comparison and reporting
+procedure, but it was not publicly
+preregistered by an independent body;
+we cannot certify that its outcomes
+were never inspected elsewhere.
+Its nine persons arise from one dataset
+rather than independently sampled
+clinical sites. The source-train-group
+cross-validation fits overlap.
+
+Together, the two retrospective
+source-estimand correction studies
+and this additional protocol-locked
+new dataset support a narrower
+conclusion than a new superior
+EEG decoding method: the
+historical class-centred criterion
+systematically omits a mean-shift
+component and can induce
+different lambda choices in diverse
+source populations. They do
+not prove that any one of the
+three selection objectives
+always optimises future-person
+discrimination or that its
+empirical gain generalizes
+to clinical deployment.
