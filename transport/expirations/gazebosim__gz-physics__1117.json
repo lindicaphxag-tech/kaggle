@@ -1,0 +1,13 @@
+{
+  "case_id": "gazebosim/gz-physics#1117",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-10-12T23:14:12Z",
+  "expiry_sha256": "15773c4d8e29a2d56818b2079f5a4edc02a8f82fecae5b504a9c5a4f18b32a47",
+  "first_frozen_at": "2026-10-12T16:04:33Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-10-12T22:04:33Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "914208f9b0129a0dabb01bd49fd18c84fc73370c5170f6e44fb4333407426269"
+}
