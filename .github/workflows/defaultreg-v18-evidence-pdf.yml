@@ -1,0 +1,78 @@
+name: DefaultReg V18 fair predictive EEG result and research PDF
+on:
+  push:
+    branches:
+      - submission/defaultreg-v18-fair-predictive-paper-20261012
+    paths:
+      - 'research/defaultreg_bspc_v13/**'
+      - '.github/workflows/defaultreg-v18-evidence-pdf.yml'
+  pull_request:
+    paths:
+      - 'research/defaultreg_bspc_v13/**'
+      - '.github/workflows/defaultreg-v18-evidence-pdf.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  v18-independent-fair-baseline-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      GH_TOKEN: ${{ github.token }}
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install reproducibility checks and LaTeX
+        run: |
+          python -m pip install --quiet numpy scipy
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-pictures texlive-fonts-recommended lmodern poppler-utils
+      - name: Download BOTH immutable original and successful comparator artifacts
+        run: |
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11674238395/zip > /tmp/Shin-original.zip
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11722966174/zip > /tmp/Shin-proper-predictive.zip
+          echo 'cda3210d24a8e9c7f3bf2d48490e51ad51f023beb652816a8679088cc3fb1842  /tmp/Shin-original.zip' | sha256sum -c
+          echo 'd260a402bfbd9f4b8a49f6d0a47de766f71d7b399f1011039def302043d07467  /tmp/Shin-proper-predictive.zip' | sha256sum -c
+      - name: Independently re-check all 29 held-person AUCs and source lambda lock
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          python src/verify_v18_proper_predictive_artifact.py /tmp/Shin-original.zip /tmp/Shin-proper-predictive.zip --out v18_independent_proper_audit.json
+          python - <<'PY'
+          import json
+          a=json.load(open('v18_independent_proper_audit.json'))
+          assert a['status']=='PASS_29_SUBJECT_REAL_PROPER_NLL_POSTOUTCOME_ARTIFACT_AUDIT'
+          assert a['n']==29 and a['proper_lambda_counts']=={'0.2':29}
+          assert abs(a['macro_minus_proper_mean_delta_AUC']+0.0003065134099616916)<1e-12
+          assert abs(a['class_centred_minus_proper_mean_delta_AUC']+0.022528735632183904)<1e-12
+          assert a['new_confirmatory_test_performed'] is False
+          print('V18_ORIGINAL_AND_CORRECTED_PREDICTIVE_EEG_SCORES_PASS')
+          PY
+      - name: Verify exact between-person mean-shift decomposition on 300 SPD examples
+        working-directory: research/defaultreg_bspc_v13
+        run: python src/predictive_minus_centered_identity_v17.py | tee v18_exact_identity_regression.json
+      - name: Verify original publication family arithmetic
+        working-directory: research/defaultreg_bspc_v13
+        run: python verify_bspc_submission_claims.py --check-consistency
+      - name: Compile FULL V18 scientific manuscript with bibliography
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_bspc_v18_DRAFT.tex
+          test -s main_bspc_v18_DRAFT.pdf
+          pdftotext main_bspc_v18_DRAFT.pdf v18_manuscript.txt
+          grep -q 'Covariance Validation Is Not Predictive Likelihood' v18_manuscript.txt
+          grep -q '0.786207' v18_manuscript.txt
+          pdfinfo main_bspc_v18_DRAFT.pdf | grep Pages
+          echo 'V18_REAL_SHIN_EEG_PREDICTIVE_CONTROL_AND_PAPER_PASSED'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: defaultreg-v18-fair-predictive-EEG-reviewed-PDF-and-evidence
+          path: |
+            research/defaultreg_bspc_v13/main_bspc_v18_DRAFT.pdf
+            research/defaultreg_bspc_v13/main_bspc_v18_DRAFT.log
+            research/defaultreg_bspc_v13/main_bspc_v18_DRAFT.bbl
+            research/defaultreg_bspc_v13/v18_independent_proper_audit.json
+            research/defaultreg_bspc_v13/v18_exact_identity_regression.json
+          retention-days: 90
