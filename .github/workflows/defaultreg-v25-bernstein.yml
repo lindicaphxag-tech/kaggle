@@ -1,0 +1,63 @@
+name: DefaultReg V25 Bernstein spectral rank cells
+on:
+  push:
+    branches: [research/defaultreg-v25-bernstein-rank-cells-20261013]
+    paths:
+      - '.github/workflows/defaultreg-v25-bernstein.yml'
+      - 'research/defaultreg_bspc_v13/src/bernstein_rank_cells_v25.py'
+      - 'research/defaultreg_bspc_v13/src/run_real_weibo_bernstein_v25.py'
+      - 'research/defaultreg_bspc_v13/tests/test_bernstein_rank_cells_v25.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  bernstein-unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --quiet numpy
+      - name: Root-crossing, polynomial, dense AUC and null-control tests
+        run: |
+          python -m unittest discover -v -s research/defaultreg_bspc_v13/tests -p 'test_bernstein_rank_cells_v25.py'
+          python -m unittest discover -v -s research/defaultreg_bspc_v13/tests -p 'test_spectral_path_certificate_v23.py'
+  authentic-weibo-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    env:
+      MNE_DATA: /tmp/defaultreg-v25-weibo-mne
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Retrospective source-only Bernstein vs original Taylor interval algorithm
+        run: |
+          mkdir -p "$MNE_DATA" /tmp/defaultreg-v25
+          python research/defaultreg_bspc_v13/src/run_real_weibo_bernstein_v25.py --outer-person 1 --segments 12 --out /tmp/defaultreg-v25/weibo2014_source_spectral_bernstein_v25.json
+          python - <<'PY'
+          import json
+          p='/tmp/defaultreg-v25/weibo2014_source_spectral_bernstein_v25.json'
+          d=json.load(open(p))
+          assert d['status']=='RETROSPECTIVE_V25_SOURCE_BERNSTEIN_RANK_AUDIT'
+          assert d['source_people']==9 and d['source_spectral_dimension']==6
+          assert d['not_unseen_dataset_or_target_performance_evidence']
+          assert d['target_features_or_labels_not_passed_to_source_diagnostic']
+          t=d['interval_results']['full']
+          assert t['n_source_people']==9
+          assert 0<=t['mean_new_v25_stable_fraction']<=1
+          assert 0<=t['mean_old_v23_stable_fraction']<=1
+          print('PASS_V25_REAL_WEIBO_SOURCE_BERNSTEIN_PATH_ANALYSIS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-v25-Weibo2014-retrospective-source-Bernstein
+          path: /tmp/defaultreg-v25/**
+          if-no-files-found: warn
+          retention-days: 90

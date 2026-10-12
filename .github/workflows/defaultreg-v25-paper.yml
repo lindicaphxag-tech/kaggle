@@ -1,0 +1,41 @@
+name: DefaultReg V25 spectral rank-cell companion article
+on:
+  push:
+    branches: [research/defaultreg-v25-bernstein-rank-cells-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/**'
+      - '.github/workflows/defaultreg-v25-paper.yml'
+  pull_request:
+    paths:
+      - 'research/defaultreg_bspc_v13/**'
+      - '.github/workflows/defaultreg-v25-paper.yml'
+permissions:
+  contents: read
+jobs:
+  v25-technical-manuscript:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: install scientific typesetting
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-pictures texlive-fonts-recommended lmodern poppler-utils
+      - name: Compile rank-cell technical companion and reject broken crossreferences
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_bspc_v25_BERNSTEIN_TECHNICAL_COMPANION.tex
+          test -s main_bspc_v25_BERNSTEIN_TECHNICAL_COMPANION.pdf
+          pdftotext main_bspc_v25_BERNSTEIN_TECHNICAL_COMPANION.pdf /tmp/v25companion.txt
+          grep -q 'Bernstein' /tmp/v25companion.txt
+          grep -q '0.731405' /tmp/v25companion.txt
+          grep -q 'numerator' /tmp/v25companion.txt
+          if grep -Eq 'Reference.*undefined|Citation.*undefined|Undefined control sequence|multiply defined' main_bspc_v25_BERNSTEIN_TECHNICAL_COMPANION.log; then exit 3; fi
+          pdfinfo main_bspc_v25_BERNSTEIN_TECHNICAL_COMPANION.pdf | grep Pages
+      - uses: actions/upload-artifact@v4
+        with:
+          name: defaultreg-v25-spectral-rank-cell-technical-companion
+          path: |
+            research/defaultreg_bspc_v13/main_bspc_v25_BERNSTEIN_TECHNICAL_COMPANION.pdf
+            research/defaultreg_bspc_v13/main_bspc_v25_BERNSTEIN_TECHNICAL_COMPANION.log
+          if-no-files-found: error
