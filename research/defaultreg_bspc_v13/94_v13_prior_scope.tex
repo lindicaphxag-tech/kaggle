@@ -17,6 +17,22 @@ of whether selecting \emph{the same} scalar regulariser by
 validation-class-centred source covariance log score or by
 source-participant discrimination changes which EEG representation appears better.
 
+The distinction from earlier signal-processing work deserves particular
+care. Tomioka and M{\"u}ller's regularised discriminative EEG framework
+already treated regularised empirical risk as an explicit learning
+objective \cite{tomioka2010regularized}. Sosulski and coauthors
+developed time-decoupled covariance estimators for EEG event-related
+potential LDA, reporting results across 14 EEG datasets
+\cite{sosulski2021tinycovariance}. Our study does \emph{not}
+claim to discover that discrimination-oriented regularisation
+can beat Ledoit--Wolf or improve a new covariance estimate.
+Instead, it isolates the scientific \emph{estimand} chosen in a
+zero-target participant-transfer benchmark and the consequences for
+a predeclared spectral representation comparison. The present
+data do not establish superiority over the source-mean predictive
+Gaussian log-score alternative, which has not yet been successfully
+executed on a held-person EEG cohort.
+
 We deliberately keep the comparison narrower than studies introducing
 new classifiers. The use of target-person unlabeled moments,
 target-conditional geometry, entropy minimisation or a few labeled
