@@ -3,8 +3,10 @@ on:
   push:
     branches:
       - submission/defaultreg-v16-estimand-audit-20261011
+      - experiment/defaultreg-v16-cpred-posthoc-20261011
     paths:
       - 'research/defaultreg_bspc_v13/**'
+      - 'research/defaultreg_proper_predictive/**'
       - '.github/workflows/defaultreg-v16-estimand-audit.yml'
   pull_request:
     paths:
@@ -85,4 +87,61 @@ jobs:
             research/defaultreg_bspc_v13/v16_covariance_estimand_synthetic.json
             research/defaultreg_bspc_v13/v15_shin_score_order.json
             research/defaultreg_bspc_v13/SOURCE_MIRROR.json
+          retention-days: 90
+  true-predictive-source-only-shin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      GH_TOKEN: ${{ github.token }}
+      MNE_DATA: ${{ runner.temp }}/mne_data
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install exact previous EEG analysis dependency family
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Validate source-only experiment code
+        run: |
+          python -m py_compile research/defaultreg_proper_predictive/original_frozen_runner.py
+          python -m py_compile research/defaultreg_proper_predictive/run_proper_predictive_posthoc.py
+      - name: Synthetic grouped-source exact original tangent-path tests
+        run: |
+          cd research/defaultreg_proper_predictive
+          python -m unittest -v test_proper_predictive_source_only
+      - name: Download immutable ORIGINAL frozen Shin score family
+        run: |
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11674238395/zip > /tmp/defaultreg-Shin-original.zip
+          echo cda3210d24a8e9c7f3bf2d48490e51ad51f023beb652816a8679088cc3fb1842'  /tmp/defaultreg-Shin-original.zip' | sha256sum -c
+      - name: Execute actual source-only proper predictive NLL selection on public Shin2017A EEG
+        run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_proper_predictive/run_proper_predictive_posthoc.py \
+            --original-zip /tmp/defaultreg-Shin-original.zip \
+            --out /tmp/defaultreg-v16-proper-predictive
+      - name: Validate 29-source-selection receipts and non-confirmatory scope
+        run: |
+          python - <<'PY'
+          import json,pathlib
+          d=pathlib.Path('/tmp/defaultreg-v16-proper-predictive')
+          s=json.loads((d/'SOURCE_CHOICES_FROZEN_BEFORE_TARGET_OUTCOME_JOIN.json').read_text())
+          x=json.loads((d/'POSTHOC_PROPER_PREDICTIVE_VS_FROZEN_RESULTS.json').read_text())
+          assert len(s)==x['n']==29
+          assert all(q['no_outer_target_info_for_selection'] for q in s)
+          assert x['no_new_confirmatory_p_value'] is True
+          assert x['status']=='POST_OUTCOME_REAL_EEG_SENSITIVITY_NOT_CONFIRMATORY'
+          print('PASS_29_SOURCE_ONLY_PROPER_PREDICTIVE_REAL_EEG_POSTHOC',x['mean_source_macro_minus_proper_AUC'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-v16-real-source-mean-predictive-posthoc-NOT-confirmatory
+          path: |
+            /tmp/defaultreg-v16-proper-predictive/**
+            research/defaultreg_proper_predictive/original_frozen_runner.py
+            research/defaultreg_proper_predictive/run_proper_predictive_posthoc.py
+          if-no-files-found: warn
           retention-days: 90
