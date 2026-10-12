@@ -75,6 +75,8 @@ def certified_path_rank_stability(
     auc_a_sum = 0.
     auc_b_sum = 0.
     remaining = 0
+    max_gain_credit = 0.
+    max_loss_credit = 0.
 
     for k in range(0, len(pos), block_size):
         coeff = (pos[k:k + block_size, None, :]
@@ -98,6 +100,12 @@ def certified_path_rank_stability(
             sure_pos &= lower > slack
             sure_neg &= upper < -slack
         stable = sure_pos | sure_neg
+        # Endpoint class-credit accounting yields a tighter one-sided
+        # global AUC envelope than the total uncertain-pair fraction.
+        uncertain = ~stable
+        credit_a = (base > 0).astype(float) + .5 * (base == 0)
+        max_gain_credit += float(np.sum((1. - credit_a) * uncertain))
+        max_loss_credit += float(np.sum(credit_a * uncertain))
         certain += int(stable.sum())
         remaining += int(stable.size)
         first_state, last_state = np.sign(base), np.sign(end)
@@ -110,6 +118,9 @@ def certified_path_rank_stability(
         raise AssertionError("pair-accounting inconsistency")
     frac = float((total - certain) / total)
     before, after = auc_a_sum / total, auc_b_sum / total
+    if (after > before + max_gain_credit / total + 1e-12
+            or after < before - max_loss_credit / total - 1e-12):
+        raise AssertionError("endpoint AUC exceeds one-sided analytic path envelope")
     if abs(after - before) > frac + 1e-12:
         raise AssertionError("finite-person AUC outside analytic enclosure")
     return {
@@ -122,6 +133,8 @@ def certified_path_rank_stability(
         "uncertain_pairs": total - certain,
         "certified_stable_fraction": float(certain / total),
         "uniform_path_auc_change_bound": frac,
+        "uniform_path_auc_lower_bound": float(max(0., before - max_loss_credit / total)),
+        "uniform_path_auc_upper_bound": float(min(1., before + max_gain_credit / total)),
         "observed_endpoint_pair_sign_changes": changed,
         "observed_endpoint_auc_low": float(before),
         "observed_endpoint_auc_high": float(after),
