@@ -34,6 +34,12 @@ jobs:
           grep -q '0.77714' /tmp/v24.txt
           if grep -Eq 'Undefined control sequence|Citation.*undefined|multiply defined' main_bspc_v24_EVIDENCE_DRAFT.log; then exit 3; fi
           pdfinfo main_bspc_v24_EVIDENCE_DRAFT.pdf | grep Pages
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_bspc_v24_CONCISE_SUBMISSION_CANDIDATE.tex
+          test -s main_bspc_v24_CONCISE_SUBMISSION_CANDIDATE.pdf
+          pdftotext main_bspc_v24_CONCISE_SUBMISSION_CANDIDATE.pdf /tmp/v24_concise.txt
+          grep -q '0.731405' /tmp/v24_concise.txt
+          grep -q '0.01623' /tmp/v24_concise.txt
+          pdfinfo main_bspc_v24_CONCISE_SUBMISSION_CANDIDATE.pdf | grep Pages
       - uses: actions/upload-artifact@v4
         with:
           name: defaultreg-v24-source-target-gap-evidence-locked-PDF
@@ -41,5 +47,7 @@ jobs:
             research/defaultreg_bspc_v13/main_bspc_v24_EVIDENCE_DRAFT.pdf
             research/defaultreg_bspc_v13/main_bspc_v24_EVIDENCE_DRAFT.log
             research/defaultreg_bspc_v13/main_bspc_v24_EVIDENCE_DRAFT.bbl
+            research/defaultreg_bspc_v13/main_bspc_v24_CONCISE_SUBMISSION_CANDIDATE.pdf
+            research/defaultreg_bspc_v13/main_bspc_v24_CONCISE_SUBMISSION_CANDIDATE.log
           if-no-files-found: error
           retention-days: 90
