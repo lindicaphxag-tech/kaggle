@@ -1,15 +1,7 @@
-name: DefaultReg V16 proper predictive NLL real EEG posthoc
+name: DefaultReg V16 proper predictive EEG independent manual reproduction
 on:
-  push:
-    branches:
-      - submission/defaultreg-v16-estimand-audit-20261011
-    paths:
-      - 'research/defaultreg_proper_predictive/**'
-      - '.github/workflows/defaultreg-v16-real-predictive-posthoc.yml'
-  pull_request:
-    paths:
-      - 'research/defaultreg_proper_predictive/**'
-      - '.github/workflows/defaultreg-v16-real-predictive-posthoc.yml'
+  workflow_dispatch:
+
 permissions:
   contents: read
   actions: read
@@ -23,7 +15,7 @@ jobs:
       OMP_NUM_THREADS: '1'
       MKL_NUM_THREADS: '1'
       GH_TOKEN: ${{ github.token }}
-      MNE_DATA: ${{ runner.temp }}/mne_data
+      MNE_DATA: /tmp/defaultreg_mne_data
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
