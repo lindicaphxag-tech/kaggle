@@ -1,0 +1,57 @@
+% P1 additional finite-sample operational identity, no new EEG effect.
+\subsection{Finite-sample validation-score identity and falsification tests}
+\label{sec:p1-rational-witness}
+For a \emph{fixed} positive-definite covariance $A$ and
+held source-validation group $g$, write
+$x_{gci}=\mu_{gc}+r_{gci}$ with
+$\sum_i r_{gci}=0$ separately for each class $c$.
+Let $\mu_{sc}$ be a training-source class mean that is
+\emph{not} fitted using group $g$. The quadratic
+part of the proper predictive Gaussian log score minus
+the score centered at $\mu_{gc}$ is \emph{exactly}
+\[
+ \Delta_g={1\over2}\sum_c n_{gc}
+ (\mu_{gc}-\mu_{sc})^\top A^{-1}
+ (\mu_{gc}-\mu_{sc})\ \ge 0.
+\]
+Indeed, the cross terms in the squared residual
+expansion vanish because the validation residuals
+sum to zero within each group and class. The
+log-determinant and Gaussian normalisation terms
+cancel \emph{only because the covariance and
+scoring sample are identical in both sides}.
+This identity compares two \emph{scores}; it
+does not predict which selector yields superior
+unseen-participant AUC.
+
+In the balanced two-class case with $n_{g0}=n_{g1}=k$,
+let $h_c=\mu_{gc}-\mu_{sc}$,
+$m=(h_0+h_1)/2$, $h=(h_1-h_0)/2$.
+Then
+\[
+ \Delta_g=k\|m\|^2_{A^{-1}}
+ +k\|h\|^2_{A^{-1}}.
+\]
+For a \emph{fixed} discriminant $w$, write the whitened
+contrast $A^{-1/2}h$ as an orthogonal sum along
+$A^{1/2}w$ and perpendicular to it. The resulting
+three nonnegative terms are common location,
+score-orthogonal class contrast and score-aligned
+class contrast. The first two terms do not
+change \emph{within-group} pairwise AUC when the
+corresponding shifts are applied at fixed $w$ and
+fixed preprocessing, whereas the third may change it.
+The classification invariance is not an assertion of
+full predictive-distribution invariance. In particular,
+a subject-specific Riemannian reference fit would
+invalidate this fixed-coordinate argument.
+
+An independent exact-rational synthetic test
+reproduces the finite-sample identity and confirms
+both the invariant shifts and an aligned-shift
+counterexample. This is a \emph{mathematical regression
+test}, not a new EEG acquisition, not an independently
+registered confirmation, and not an algorithmic
+benefit experiment. The empirical three-source
+score decomposition is separately reported with
+its own retrospective evidence hierarchy.
