@@ -107,7 +107,7 @@ def result_block(label,persons,ids):
       "all_person_results":persons
     }
 
-def main(locked_path,locked_sha,out):
+def main(locked_path,locked_sha,out,block_to_run):
     if not lock.PROTO.exists():raise RuntimeError("original protocol missing")
     original=locked_path.read_bytes()
     if lock.sha(original)!=locked_sha:raise AssertionError("ORIGINAL_SHA_MISMATCH_STOP")
@@ -122,6 +122,7 @@ def main(locked_path,locked_sha,out):
     mdl=source_models(X,C,y,g)
     summary=[]
     for block,ids in [("A",lock.TARGET_A),("B",lock.TARGET_B)]:
+        if block!=block_to_run:continue
         persons=[]
         for sid in ids:
             Xv,Cv,yv,receipt=person(para,ds,sid)
@@ -140,37 +141,37 @@ def main(locked_path,locked_sha,out):
           "exact_p":data["gid_minus_original_exact_two_sided_signflip_p"],
           "macro_auc":data["macro_auc_per_method"],
           "n_loss_gt002":data["gid_losses_gt_002"]},sort_keys=True),flush=True)
-    new=source_original["chosen_source_only"]["decisions"]["gid"]
-    cosine=source_original["final_operator_cosine"]
-    passed=bool(source_original["positive_transfer_pre_prediction"]
-       and cosine<1-1e-5 and all(
-       b["gid_minus_original_mean_delta"]>=.01
+    b=summary[0]
+    promoted_block=bool(source_original["positive_transfer_pre_prediction"]
+       and source_original["final_operator_cosine"]<1-1e-5
+       and b["gid_minus_original_mean_delta"]>=.01
        and b["gid_minus_original_exact_two_sided_signflip_p"]<.05
-       and b["gid_losses_gt_002"]==0 for b in summary))
-    all_output={
-      "status":"TWO_HELD_GROUPS_COMPLETED_WITHOUT_RETUNE",
+       and b["gid_losses_gt_002"]==0)
+    output={
+      "status":"ONE_HELD_BLOCK_COMPLETED_WITHOUT_RETUNE",
+      "block":block_to_run,
       "original_source_sha256":locked_sha,
-      "source_only_signed_forecast_positive":source_original["positive_transfer_pre_prediction"],
-      "nonparallel_original_vs_gid_cosine":cosine,
-      "n_source_people":12,"n_held_people":24,
-      "held_A_B_no_retune":True,
-      "blocks":summary,
-      "stringent_method_promotion_passed":passed,
+      "source_only_forecast_positive":source_original["positive_transfer_pre_prediction"],
+      "nonparallel_original_vs_gid_cosine":source_original["final_operator_cosine"],
+      "n_source_people":12,"n_held_people":12,
+      "fixed_source_model_no_target_retrain":True,
+      "block_result":b,"block_gate_passed":promoted_block,
+      "two_block_overall_promotion_NOT_YET_ESTABLISHED":True,
       "not_independent_acquisition_replicated":True
     }
-    lock.write(all_output,out/"LEE2019_BOTH_HELD_GROUPS_RESULTS.json")
-    print("LEE2019_FROZEN_DOUBLE_HELD_FINAL",json.dumps({
-      "promotion":passed,
-      "source_sha":locked_sha,
-      "delta_A":summary[0]["gid_minus_original_mean_delta"],
-      "delta_B":summary[1]["gid_minus_original_mean_delta"],
-      "p_A":summary[0]["gid_minus_original_exact_two_sided_signflip_p"],
-      "p_B":summary[1]["gid_minus_original_exact_two_sided_signflip_p"]},sort_keys=True),flush=True)
+    lock.write(output,out/("LEE2019_BLOCK_"+block_to_run+"_HELD_RESULTS.json"))
+    print("LEE2019_LOCKED_HELD_BLOCK_FINAL",json.dumps({
+      "block":block_to_run,"source_sha":locked_sha,
+      "block_gate_passed":promoted_block,
+      "mean_delta":b["gid_minus_original_mean_delta"],
+      "exact_p":b["gid_minus_original_exact_two_sided_signflip_p"]
+    },sort_keys=True),flush=True)
 
 if __name__=="__main__":
     p=argparse.ArgumentParser()
     p.add_argument("--original-manifest",type=Path,required=True)
     p.add_argument("--original-sha",required=True)
     p.add_argument("--out",type=Path,required=True)
+    p.add_argument("--block",choices=["A","B"],required=True)
     a=p.parse_args()
-    main(a.original_manifest,a.original_sha,a.out)
+    main(a.original_manifest,a.original_sha,a.out,a.block)
