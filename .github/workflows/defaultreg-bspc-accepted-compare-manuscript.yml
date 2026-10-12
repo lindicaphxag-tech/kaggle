@@ -1,0 +1,59 @@
+name: DefaultReg BSPC accepted-paper comparison and submission-readiness audit
+on:
+  push:
+    branches: [research/defaultreg-bspc-accepted-topline-benchmark-20261013]
+    paths:
+      - '.github/workflows/defaultreg-bspc-accepted-compare-manuscript.yml'
+      - 'research/defaultreg_bspc_v13/main_bspc_v31_EVIDENCE_GATED_CANDIDATE.tex'
+      - 'research/defaultreg_bspc_v13/134_bspc_accepted_head_to_head_evidence_and_budgets.tex'
+      - 'research/defaultreg_bspc_v13/references_v10.bib'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compile-comparison-not-publication-approved:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install scientific LaTeX and PDF inspection utilities
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended lmodern poppler-utils
+      - name: Verify accepted-study comparisons and build DRAFT paper
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_bspc_v31_EVIDENCE_GATED_CANDIDATE.tex
+          test -s main_bspc_v31_EVIDENCE_GATED_CANDIDATE.pdf
+          pdftotext -layout main_bspc_v31_EVIDENCE_GATED_CANDIDATE.pdf /tmp/bspc_accepted_compare.txt
+          grep -q 'Gil' /tmp/bspc_accepted_compare.txt
+          grep -q 'Qin' /tmp/bspc_accepted_compare.txt
+          grep -q '98.59' /tmp/bspc_accepted_compare.txt
+          grep -q '99.29' /tmp/bspc_accepted_compare.txt
+          grep -q '99.77' /tmp/bspc_accepted_compare.txt
+          grep -q 'target' /tmp/bspc_accepted_compare.txt
+          ! grep -Eq 'Citation.*undefined|Reference.*undefined|Undefined control sequence' main_bspc_v31_EVIDENCE_GATED_CANDIDATE.log
+          python - <<'PY'
+          import re,subprocess
+          p='main_bspc_v31_EVIDENCE_GATED_CANDIDATE.pdf'
+          d=subprocess.check_output(['pdfinfo',p],text=True)
+          n=int(re.search(r'Pages:\s+(\d+)',d).group(1))
+          assert 9<=n<=35,n
+          print('BSPC_ACCEPTED_COMPETITOR_EDITION_PDF_PAGES',n)
+          print('BSPC_STILL_AUTHOR_DISCLOSURE_AND_DATA_RELEASE_NOT_APPROVED')
+          PY
+          mkdir -p /tmp/bspc_accepted_compare_preview
+          pdftoppm -f 1 -l 1 -png -r 150 main_bspc_v31_EVIDENCE_GATED_CANDIDATE.pdf /tmp/bspc_accepted_compare_preview/page
+          ls -l /tmp/bspc_accepted_compare_preview/*.png
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-BSPC-peer-compared-NOT-SUBMISSION-APPROVED
+          path: |
+            research/defaultreg_bspc_v13/main_bspc_v31_EVIDENCE_GATED_CANDIDATE.tex
+            research/defaultreg_bspc_v13/main_bspc_v31_EVIDENCE_GATED_CANDIDATE.pdf
+            research/defaultreg_bspc_v13/main_bspc_v31_EVIDENCE_GATED_CANDIDATE.log
+            research/defaultreg_bspc_v13/SUBMISSION_GO_NOGO_AUDIT_20261013.md
+            /tmp/bspc_accepted_compare_preview/**
+          if-no-files-found: warn
+          retention-days: 90
