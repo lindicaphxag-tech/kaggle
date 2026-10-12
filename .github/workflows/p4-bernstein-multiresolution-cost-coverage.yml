@@ -1,0 +1,33 @@
+name: P4 Bernstein subdivision source-coverage versus numerical runtime
+on:
+  push:
+    branches: [publication/default-eeg-p4-rank-certificates-20261013]
+    paths: ['.github/workflows/p4-bernstein-multiresolution-cost-coverage.yml','research/defaultreg_bspc_v13/src/p4_multiresolution_bernstein_cost_coverage.py']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  p4-conditional-numerical:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install numpy
+      - name: Full fifteen SPD fixtures with Bernstein 12 24 48 subdivision
+        run: |
+          python research/defaultreg_bspc_v13/src/p4_multiresolution_bernstein_cost_coverage.py /tmp/p4_15case_cost_coverage.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/p4_15case_cost_coverage.json'))
+          assert d['n_cases']==15 and len(d['results'])==15
+          assert all(set(x['segments'])=={'12','24','48'} for x in d['results'])
+          assert d['no_unseen_target_benefit_established']
+          print('P4_MULTIDIMENSIONAL_CERTIFICATION_COST_VS_COVERAGE_COMPLETE')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p4-15synthetic-spd-bernstein12-24-48-cost-coverage
+          path: /tmp/p4_15case_cost_coverage.json
