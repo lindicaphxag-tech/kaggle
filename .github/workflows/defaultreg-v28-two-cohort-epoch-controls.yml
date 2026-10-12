@@ -1,0 +1,51 @@
+name: DefaultReg V28 two exposed EEG acquisitions trial identity controls
+on:
+  push:
+    branches: [research/defaultreg-v28-epoch-group-certificate-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/run_two_held_eeg_epoch_controls_v28.py'
+      - '.github/workflows/defaultreg-v28-two-cohort-epoch-controls.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  negative-control-data-release-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    env:
+      MNE_DATA: /tmp/defaultreg-v28-epoch-negative-control
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Run all original subjects in two predetermined external acquisitions
+        run: |
+          python -m unittest discover -v -s research/defaultreg_bspc_v13/tests -p 'test_exact_epoch_identity_v27.py'
+          mkdir -p "$MNE_DATA" /tmp/defaultreg-v28-two-cohort
+          python research/defaultreg_bspc_v13/src/run_two_held_eeg_epoch_controls_v28.py --out /tmp/defaultreg-v28-two-cohort/BOTH_PRESELECTED_EEG_EPOCH_CONTROLS.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/defaultreg-v28-two-cohort/BOTH_PRESELECTED_EEG_EPOCH_CONTROLS.json'))
+          assert d['status']=='V28_TWO_PREVIOUSLY_EXPOSED_ACQUISITIONS_EPOCH_INTEGRITY'
+          assert d['not_new_independent_acquisition_validation']
+          assert d['global_recording_signal_inspection_not_strict_Z0']
+          assert set(d['datasets'])=={'Weibo2014','BNCI2014_002'}
+          assert d['datasets']['Weibo2014']['n_original_subject_ids']==10
+          assert d['datasets']['BNCI2014_002']['n_original_subject_ids']==14
+          for v in d['datasets'].values():
+              assert v['n_unique_exact_epoch_contents']<=v['n_total_trial_instances']
+              assert v['n_exact_epoch_connected_groups']<=v['n_original_subject_ids']
+          print('PASS_V28_TWO_PREDECLARED_RETROSPECTIVE_EEG_EXACT_EPOCH_CONTROLS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-v28-two-exposed-eeg-datasets-exact-epoch-audit
+          path: /tmp/defaultreg-v28-two-cohort/**
+          if-no-files-found: warn
+          retention-days: 90
