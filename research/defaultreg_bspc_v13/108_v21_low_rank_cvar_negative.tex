@@ -1,0 +1,98 @@
+\subsection{A low-dimensional, risk-aware EEG stress test}
+\label{sec:v21-lowrank-risk}
+To challenge the possibility that the
+estimand effect requires very high dimensionality,
+we independently tested BNCI2014\_004,
+BCI Competition IV Dataset 2b,
+containing three bipolar EEG channels
+and six covariance-tangent coordinates
+\cite{tangermann2012bciiv,jayaram2018moabb}.
+The 2026-10-12 repository-frozen first-run
+protocol held each of nine people out,
+using all available sessions. MOABB 1.7.2
+returned 6,520 balanced trials (680--760
+per person). These are measured per-person
+counts, not the nominal catalogue total.
+
+As a source-subject downside-risk
+stress test, we added the following
+fixed selector, alongside the original
+macro-AUC, genuine source-mean Gaussian
+predictive and historical validation
+class-centred covariance scores:
+\[
+\widehat\lambda_{\mathrm{CVaR}}=
+\arg\max_{\lambda\in\Lambda_{\rm src}}
+\frac{A^{\rm src}_{(1)}(\lambda)+
+A^{\rm src}_{(2)}(\lambda)}2 .
+\]
+Here $A^{\rm src}_{(j)}$ is the
+$j$-th smallest held-source-person AUC
+among eight SOURCE people in the fixed
+five grouped folds. This is a
+conventional worst-quarter CVaR
+risk functional, \emph{not} an
+independently novel learning operator.
+Source-only choice vectors were SHA-256
+locked before outer target AUC computation,
+and the policy/grid were fixed before
+this run. No target data entered model
+or regularisation selection.
+
+\begin{table}[tb]
+\centering\small
+\caption{New BNCI2014\_004 source-only
+evaluation (9 people; 6,520 held-person
+trials; 3 EEG channels, 6 tangent features).
+All gains are descriptive, not independently
+preregistered confirmation. CVaR stress
+testing is a source-domain baseline.}
+\label{tab:v21-lowdim-cvar}
+\begin{tabular}{lr}
+\toprule
+Selection criterion & Mean AUC\\
+\midrule
+Held-source-person macro-AUC & 0.778002\\
+Proper source-mean predictive Gaussian score & 0.776581\\
+Worst-quarter source AUC (CVaR) & 0.777141\\
+Historical source class-centred covariance & 0.770549\\
+Ledoit--Wolf & 0.770628\\
+OAS & 0.770640\\
+\midrule
+CVaR minus macro & $-0.000861$\\
+CVaR minus macro, conditional bootstrap 95\% &
+$[-0.00358,0.00067]$\\
+CVaR selected a different $\lambda$ & 8/9 folds\\
+$>0.02$ AUC harms relative to macro & 0/9\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The historical covariance criterion
+selected $\lambda=0$ in all nine
+source pools. The correctly predictive
+Gaussian criterion selected 0.10--0.30
+and source-macro discrimination
+selected 0.50--0.80. The source CVaR
+criterion changed the lambda choice
+in 8/9 folds but \emph{did not
+improve} mean held-person AUC,
+nor the count of subject harms above
+0.02 AUC. The class-mean-shift source
+log-score penalty, evaluated at
+properly selected shrinkage, was
+nonnegative as required by algebra,
+with empirical mean 0.92622 per feature.
+
+These observations extend the
+\emph{decision-instability mechanism}
+to very low dimensional EEG geometry,
+but reject a simplistic assumption
+that source downside-risk optimization
+must improve unseen-person AUC.
+All nine source pools overlap and
+there is one acquisition dataset,
+not nine independent sites. The
+protocol was committed before the
+run, but was not independently
+preregistered.
