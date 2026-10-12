@@ -1,0 +1,37 @@
+name: DefaultReg V25 vector external paired EEG figure
+on:
+  push:
+    branches: [research/defaultreg-v25-bernstein-rank-cells-20261013]
+    paths:
+      - '.github/workflows/defaultreg-v25-external-vector-figure.yml'
+      - 'research/defaultreg_bspc_v13/src/figure_v25_weibo_paired.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  paired-source-locked-figure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --quiet numpy matplotlib
+      - name: Download immutable ORIGINAL Weibo first-run
+        run: |
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11760219323/zip > /tmp/v24_weibo_original.zip
+          test -s /tmp/v24_weibo_original.zip
+      - name: Build source-locked vector paired external figure
+        run: |
+          mkdir -p /tmp/defaultreg-v25-vectors
+          python research/defaultreg_bspc_v13/src/figure_v25_weibo_paired.py /tmp/v24_weibo_original.zip --out /tmp/defaultreg-v25-vectors/weibo_10_person_paired_effects.pdf
+          test -s /tmp/defaultreg-v25-vectors/weibo_10_person_paired_effects.pdf
+          test -s /tmp/defaultreg-v25-vectors/weibo_10_person_paired_effects.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: defaultreg-v25-journal-quality-weibo-ten-person-vector-effects
+          path: /tmp/defaultreg-v25-vectors/**
+          if-no-files-found: error
