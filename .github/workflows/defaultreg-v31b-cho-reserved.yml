@@ -1,0 +1,55 @@
+name: DefaultReg V31B Cho2017 reserved IDs no-retune replication
+on:
+  push:
+    branches: [research/defaultreg-contrast-envelope-20261013]
+    paths: ['.github/workflows/defaultreg-v31b-cho-reserved.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  reserved-block-original-model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 165
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MNE_DATA: /tmp/defaultreg-v31b-cho-public
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Pin unchanged EEG experiment dependencies
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2 pytest
+      - name: Verify same V31 code and original theorem tests
+        run: |
+          python -m py_compile research/defaultreg_bspc_v13/src/run_v31b_cho_reserved_no_retune.py
+          python -m pytest -q research/defaultreg_bspc_v13/tests/test_source_contrast_envelope_v31.py
+      - name: Require prior immutable SOURCE SHA before touching reserved target
+        run: |
+          mkdir -p "$MNE_DATA" /tmp/defaultreg-v31b-cho-results
+          python research/defaultreg_bspc_v13/src/run_v31b_cho_reserved_no_retune.py --out /tmp/defaultreg-v31b-cho-results
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json
+          p=Path("/tmp/defaultreg-v31b-cho-results")
+          old=p/"CHO2017_V31_SOURCE_CHOICES_BEFORE_ANY_TARGET_READ.json"
+          new=p/"CHO2017_V31B_RESERVED_TARGET_AUC.json"
+          a=json.loads(old.read_text());b=json.loads(new.read_text())
+          s=hashlib.sha256(old.read_bytes()).hexdigest()
+          assert s==b["source_choice_sha256"]==b["original_preexisting_source_lock_sha256"]
+          assert s=="677f848de0e3bc3122892e5bec55b20dc7808ab04093bdaeb33f1bd0a923f796"
+          assert set(x["subject"] for x in b["participant_rows"])==set(range(33,53))
+          assert b["n_held_subjects"]==20 and b["n_source_subjects"]==12
+          assert b["not_an_independent_acquisition_or_formal_preregistration"]
+          print("V31B_20_RESERVED_REPRODUCED_SAME_FROZEN_SOURCE_CHOICES")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-v31b-cho-sequential-reserved20-no-retune
+          path: |
+            /tmp/defaultreg-v31b-cho-results/**
+            research/defaultreg_bspc_v13/V31B_CHO2017_RESERVED_BLOCK_BEFORE_TARGET_PROTOCOL.md
+          if-no-files-found: warn
+          retention-days: 90
