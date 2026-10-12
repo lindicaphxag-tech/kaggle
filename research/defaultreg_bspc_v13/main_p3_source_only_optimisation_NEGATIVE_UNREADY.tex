@@ -43,8 +43,12 @@ the separately run setup BEFORE accessing target data.
 \textbf{Conclusions.} Source-criterion optimization and
 invariance of a feature operator are not evidence of
 positive target-person benefit. This series motivates
-a falsifiable zero-target model-selection benchmark rather
-than a claim of a superior decoder.
+a new same-matrix source-only comparison on BNCI2014\_004:
+a pre-target-frozen participant-9 test found $+0.000656$
+AUC for proper predictive NLL versus source-macro;
+nine exploratory participant folds gave $-0.001421$
+AUC on average. These are descriptive, not evidence
+of a universal ranking or superior decoder.
 \end{abstract}
 \noindent\textbf{Keywords:} EEG; motor imagery; transfer;
 source-only model selection; negative results;
@@ -176,6 +180,7 @@ EEG. No B target AUC is reported.
 \input{P3_source_only_sign_unidentifiability_and_new_benchmark_protocol.tex}
 
 \input{P3_conditional_shift_bound_and_registered_matrix.tex}
+\input{P3_new_BNCI004_common_matrix_real_results.tex}
 
 \section{Discussion}
 This is currently an exploratory study with
@@ -183,10 +188,11 @@ a meaningful aggregation threat: it combines
 different methods, targets and chronology.
 The result does not establish a universal
 limit on source-only domain generalization.
-A future stand-alone comparative evaluation
-requires ALL candidates selected on the
-SAME precommitted shared source/target
-cohort matrix and the same information budget,
+Although BNCI2014\_004 now supplies one concrete
+shared six-selector matrix, a stand-alone
+confirmatory evaluation still requires all candidates
+selected on the same precommitted source/target
+cohort matrix across multiple acquisitions and the same information budget,
 and an operational measurement such as
 source-to-target ranking regret or selection
 error rate. New acquisitions must be allocated
