@@ -1,4 +1,4 @@
-name: DefaultReg V23 full 14-source-pool continuum audit
+name: DefaultReg V23 Taylor-tightened 14-source-pool continuum audit
 on:
   push:
     branches:
