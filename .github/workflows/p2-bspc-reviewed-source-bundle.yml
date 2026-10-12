@@ -57,9 +57,9 @@ jobs:
           "status":"AUTHOR_REVIEW_ONLY__NOT_JOURNAL_SUBMITTED",
           "source_branch":"publication/default-eeg-p2-record-identity-20261013",
           "requires_authorship_ethics_funding_competing_interests_and_exclusivity_signoff":True,
-          "input_files":[{"path":str(x),"sha256":hashlib.sha256(x.read_bytes()).hexdigest()} for x in assets]}
+          "input_files":[{"path":str(x.relative_to(Path.cwd()) if x.is_absolute() else x),"sha256":hashlib.sha256(x.read_bytes()).hexdigest()} for x in assets]}
           with ZipFile(dist/"P2-review-source-and-pdf.zip","w",ZIP_DEFLATED) as z:
-              for f in assets:z.write(f,str(f))
+              for f in assets:z.write(f,str(f.relative_to(Path.cwd()) if f.is_absolute() else f))
               z.writestr("AUTHOR_SIGNOFF_REQUIRED.json",json.dumps(manifest,indent=2))
           print("AUTHOR_REVIEW_ONLY_PACKAGE_READY",str(dist/"P2-review-source-and-pdf.zip"),len(assets))
           
