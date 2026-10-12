@@ -10,7 +10,7 @@
       inner sep=5pt,minimum height=1.50cm,text width=2.70cm,align=center},
   link/.style={->,line width=.55pt,draw=black!75}
 ]
-\node[step] (release) {Public release\\50 distinct IDs\\2,000 processed trials};
+\node[auditbox] (release) {Public release\\50 distinct IDs\\2,000 processed trials};
 \node[auditbox,right=of release] (hash) {Frozen EEG pipeline\\exact array + label\\candidate fingerprint};
 \node[auditbox,right=of hash] (group) {Byte-confirmed overlap\\ID 4 / ID 5 full alias\\49 content groups};
 \node[auditbox,right=of group] (cross) {Same 49 held groups\\old / purged source fit\\old / purged selection};
