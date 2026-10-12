@@ -29,8 +29,14 @@ including score ties:
 \end{equation}
 Gross pair-state churn
 $G_g(a,b)=\sum_{i\ne j}M_{ij}^{(g)}(a,b)/(|P_g||N_g|)$
-may be nonzero or large although the \emph{signed} difference in
-Eq.~\eqref{eq:v22-exact-pair-transition} is zero. Thus parameter
+always gives the within-participant deterministic bound
+\[
+ \left|A_g(b)-A_g(a)\right|\le G_g(a,b),
+\]
+because the difference between two pair credits is at most one and
+vanishes if the pair's sign class does not change.
+The churn may nevertheless be large although the \emph{signed}
+difference in Eq.~\eqref{eq:v22-exact-pair-transition} is zero. Thus parameter
 disagreement and even extensive pairwise reordering are insufficient to
 claim improved discrimination. This basic rank identity is not claimed
 as a new mathematical theorem. Its value here is an exact, inspectable
