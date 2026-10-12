@@ -1,0 +1,104 @@
+name: DefaultReg V31 combined immutable Cho40 audit
+on:
+  push:
+    branches: [research/defaultreg-contrast-envelope-20261013]
+    paths: ['.github/workflows/defaultreg-v31-cho40-two-block-audit.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independent-original-artifact-merge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy
+      - name: Download FIRST fixed source/test from independent prior run
+        uses: actions/download-artifact@v4
+        with:
+          name: defaultreg-v31-cho-source-locked-first-run
+          run-id: 38295151137
+          github-token: ${{ github.token }}
+          path: /tmp/cho-first
+      - name: Download unretuned RESERVED target records from independent run
+        uses: actions/download-artifact@v4
+        with:
+          name: defaultreg-v31b-cho-sequential-reserved20-no-retune
+          run-id: 38296239584
+          github-token: ${{ github.token }}
+          path: /tmp/cho-reserved
+      - name: Recompute every 20/20 individual AUC and pooled 40-participant effect
+        run: |
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          import numpy as np
+          def read(root,name):
+              a=list(Path(root).rglob(name))
+              assert len(a)==1,(root,name,a)
+              return a[0]
+          A=read("/tmp/cho-first","CHO2017_V31_REAL_FIRST_RUN_TARGET_AUC.json")
+          B=read("/tmp/cho-reserved","CHO2017_V31B_RESERVED_TARGET_AUC.json")
+          L1=read("/tmp/cho-first","CHO2017_V31_SOURCE_CHOICES_BEFORE_ANY_TARGET_READ.json")
+          L2=read("/tmp/cho-reserved","CHO2017_V31_SOURCE_CHOICES_BEFORE_ANY_TARGET_READ.json")
+          assert L1.read_bytes()==L2.read_bytes()
+          h=hashlib.sha256(L1.read_bytes()).hexdigest()
+          assert h=="677f848de0e3bc3122892e5bec55b20dc7808ab04093bdaeb33f1bd0a923f796"
+          a=json.loads(A.read_text());b=json.loads(B.read_text())
+          assert a["source_choice_sha256"]==b["source_choice_sha256"]==h
+          rows=[sorted(v["participant_rows"],key=lambda r:r["subject"]) for v in [a,b]]
+          assert [r["subject"] for r in rows[0]]==list(range(13,33))
+          assert [r["subject"] for r in rows[1]]==list(range(33,53))
+          methods=list(a["macro_auc_by_method"].keys())
+          assert set(methods)==set(b["macro_auc_by_method"])
+          dd=[]
+          for data,group in [(a,rows[0]),(b,rows[1])]:
+              D=np.array([r["auc"]["envelope_r1"]-r["auc"]["source_macro_grid"] for r in group])
+              dd.append(D)
+              assert np.allclose(D,[r["primary_delta"] for r in group])
+              assert abs(float(D.mean())-data["primary_mean_delta_envelope_minus_source_macro"])<1e-12
+              assert int((D<-.020000000001).sum())==data["harmed_gt_002"]
+              assert int((D>.020000000001).sum())==data["improved_gt_002"]
+              count=0
+              for low in range(0,1<<20,8192):
+                  bit=np.arange(low,min(low+8192,1<<20),dtype=np.uint32)
+                  sign=(1-2*((bit[:,None]>>np.arange(20,dtype=np.uint32))&1).astype(np.int8))
+                  count+=int((np.abs(sign@D)>=abs(float(D.sum()))-1e-12).sum())
+              exact=count/(1<<20)
+              assert abs(exact-data["exact_two_sided_sign_flip_pvalue"])<1e-12
+          d=np.concatenate(dd)
+          assert len(d)==40
+          macros={m:float(np.mean([r["auc"][m] for part in rows for r in part])) for m in methods}
+          assert abs(macros["envelope_r1"]-macros["source_macro_grid"]-float(d.mean()))<1e-12
+          rng=np.random.default_rng(20261013)
+          boots=d[rng.integers(0,len(d),size=(20000,len(d)))].mean(axis=1)
+          ci=np.quantile(boots,[.025,.975]).tolist()
+          # Monte Carlo sign flip on all 40 (not exactly 2^40; study sequential).
+          extreme=0;ns=200000
+          rng=np.random.default_rng(20261014)
+          for _ in range(ns//2000):
+              signs=rng.integers(0,2,size=(2000,len(d)),dtype=np.int8)*2-1
+              extreme+=int((abs(signs@d)>=abs(d.sum())-1e-12).sum())
+          print("V31_CHO40_INDEPENDENT_SHARED_SHA_AND_INDIVIDUAL_CONTRAST_PASS",h)
+          print("V31_CHO40_MACRO_AUC",json.dumps(macros,sort_keys=True))
+          print("V31_CHO40_SUMMARY",json.dumps({
+              "first_block_mean_delta":float(dd[0].mean()),
+              "reserved_block_mean_delta":float(dd[1].mean()),
+              "combined_mean_delta":float(d.mean()),
+              "descriptive_subject_bootstrap95":ci,
+              "exploratory_mc_signflip_p":extreme/ns,
+              "total_held_recording_ids":40,
+              "total_held_trials":int(a["n_target_trials"]+b["n_target_trials"]),
+              "positive":int((d>1e-12).sum()),
+              "negative":int((d< -1e-12).sum()),
+              "harm_gt_002":int((d<-.020000000001).sum()),
+              "benefit_gt_002":int((d>.020000000001).sum()),
+              "not_two_independent_acquisitions":True,
+              "sequential_optional_followup_not_a_confirmatory_p":True},sort_keys=True))
+          print("V31_CHO40_RESERVED_SIGNED_DELTAS",json.dumps([
+              {"subject":r["subject"],"delta":float(v)}
+              for r,v in zip(rows[1],dd[1])],sort_keys=True))
+          PY

@@ -1,0 +1,21 @@
+name: DefaultReg V31 endpoint saturation falsification
+on:
+  push:
+    branches: [research/defaultreg-contrast-envelope-20261013]
+    paths: ['.github/workflows/defaultreg-v31-endpoint-degeneracy.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  full-shrinkage-equivalence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy pytest
+      - name: Prove SCE selected endpoint has exactly fixed lambda1 ranks
+        run: |
+          python -m pytest -q research/defaultreg_bspc_v13/tests/test_v31_endpoint_degeneracy_control.py
+          echo 'SCE_CHO40_SELECTED_LAMBDA1_EQUALS_TRIVIAL_FIXED_FULL_SHRINKAGE_LDA'

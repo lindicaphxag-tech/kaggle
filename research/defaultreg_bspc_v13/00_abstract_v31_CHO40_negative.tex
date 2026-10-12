@@ -1,0 +1,41 @@
+\begin{abstract}
+\textbf{Objective:}
+Covariance fidelity, source-trained predictive likelihood, and
+discriminative transfer optimize different regularisation targets in
+cross-subject EEG. We examine whether objective disagreement changes
+unknown-person classification and whether more exact source
+optimisation or source-contrast robustness resolves the discrepancy.
+\textbf{Methods:}
+We study source-fitted tangent-space regularised LDA under a
+zero-target-information protocol, correct a validation-class-centred
+covariance score to source-mean Gaussian predictive likelihood,
+and examine exact pairwise rank transitions and conditional
+spectral shrinkage bounds. An exploratory source-only
+contrast-uncertainty-envelope criterion was evaluated against
+the original grouped 27-point source-AUC selector on an
+unchanged classifier path. All target results were retained.
+\textbf{Results:}
+In a frozen EEGMMIDB block ($N=20$), discriminative source
+selection exceeded the historical class-centred score by
+0.0561 AUC (Holm $p=0.00597$), but five people lost more
+than 0.02 AUC. A protocol-first Weibo2014 study ($N=10$)
+showed no target difference between continuous and discrete
+source optimisation (both macro AUC 0.73141).
+In Cho2017, source choices were frozen using 12 source people
+before examining target people 13--32: the contrast-envelope
+criterion improved over the source-AUC grid by only
+0.003395 AUC ($N=20$, exact sign-flip $p=0.0931$).
+Without retuning, a subsequent, explicitly sequential
+20-person block reversed the difference to $-0.003500$;
+the combined 40-person difference was $-0.000053$ AUC
+(descriptive bootstrap 95\% interval
+$[-0.003218,0.002973]$). The envelope selected
+full shrinkage $\lambda=1$, algebraically identical to a fixed
+full-shrinkage LDA classifier.
+\textbf{Conclusion:}
+More precise or conditionally robust source selection did not
+produce stable transfer gains in these tests. Explicit
+validation estimands, strict selection boundaries and
+honest adverse-person evidence are essential; no universally
+superior regularisation rule is established.
+\end{abstract}

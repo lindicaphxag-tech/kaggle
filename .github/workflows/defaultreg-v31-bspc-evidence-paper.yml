@@ -1,0 +1,60 @@
+name: DefaultReg V31 focused BSPC evidence-gated manuscript
+on:
+  push:
+    branches: [research/defaultreg-contrast-envelope-20261013]
+    paths:
+      - '.github/workflows/defaultreg-v31-bspc-evidence-paper.yml'
+      - 'research/defaultreg_bspc_v13/main_bspc_v31_EVIDENCE_GATED_CANDIDATE.tex'
+      - 'research/defaultreg_bspc_v13/127_v31_CHO2017_REAL_FROZEN_NON_SIGNIFICANT.tex'
+      - 'research/defaultreg_bspc_v13/128_v31b_CHO40_REVERSED_NO_RETUNE.tex'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  manuscript-compilation-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 32
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install LaTeX, bibliography and PDF layout validators
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended lmodern poppler-utils
+      - name: Compile revised BSPC draft and verify claims are evidence-gated
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_bspc_v31_EVIDENCE_GATED_CANDIDATE.tex
+          test -s main_bspc_v31_EVIDENCE_GATED_CANDIDATE.pdf
+          pdftotext -layout main_bspc_v31_EVIDENCE_GATED_CANDIDATE.pdf /tmp/v31-bspc-fulltext.txt
+          grep -q '0.618230' /tmp/v31-bspc-fulltext.txt
+          grep -q '0.614835' /tmp/v31-bspc-fulltext.txt
+          grep -q '0.003395' /tmp/v31-bspc-fulltext.txt
+          grep -q '0.0930843' /tmp/v31-bspc-fulltext.txt
+          grep -q '0.619261' /tmp/v31-bspc-fulltext.txt
+          grep -q '0.616996' /tmp/v31-bspc-fulltext.txt
+          grep -q '0.003500' /tmp/v31-bspc-fulltext.txt
+          grep -q 'negative' /tmp/v31-bspc-fulltext.txt
+          if grep -Eq 'Reference.*undefined|Citation.*undefined|Undefined control sequence|multiply defined' main_bspc_v31_EVIDENCE_GATED_CANDIDATE.log; then exit 3; fi
+          python - <<'PY'
+          import re,subprocess
+          data=subprocess.check_output(['pdfinfo','main_bspc_v31_EVIDENCE_GATED_CANDIDATE.pdf'],text=True)
+          pages=int(re.search(r'Pages:\s+(\d+)',data).group(1))
+          assert 7<=pages<=24,pages
+          print("V31_BSPC_CANDIDATE_PAGES",pages)
+          PY
+          mkdir -p /tmp/defaultreg-v31-page-preview
+          pdftoppm -f 1 -l 1 -png -r 130 main_bspc_v31_EVIDENCE_GATED_CANDIDATE.pdf /tmp/defaultreg-v31-page-preview/cover
+          test -n "$(find /tmp/defaultreg-v31-page-preview -name 'cover*.png' -size +0c -print -quit)"
+          echo "V31_BSPC_DRAFT_PDF_BUILD_AND_EVIDENCE_LOCK_PASS"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-v31-BSPC-evidence-gated-manuscript-draft
+          path: |
+            research/defaultreg_bspc_v13/main_bspc_v31_EVIDENCE_GATED_CANDIDATE.tex
+            research/defaultreg_bspc_v13/main_bspc_v31_EVIDENCE_GATED_CANDIDATE.pdf
+            research/defaultreg_bspc_v13/main_bspc_v31_EVIDENCE_GATED_CANDIDATE.log
+            research/defaultreg_bspc_v13/main_bspc_v31_EVIDENCE_GATED_CANDIDATE.bbl
+            /tmp/defaultreg-v31-page-preview/**
+          if-no-files-found: warn
+          retention-days: 90

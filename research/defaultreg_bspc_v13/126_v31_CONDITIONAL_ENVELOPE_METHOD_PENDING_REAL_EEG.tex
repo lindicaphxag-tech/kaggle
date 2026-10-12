@@ -1,0 +1,120 @@
+% V31 technically scoped research fragment; NOT yet part of the submitted paper.
+% All new EEG held-person outcomes remain pending until the first-run CI.
+\section{A source-contrast uncertainty envelope for regularisation}
+\label{sec:v31-contrast-envelope}
+\paragraph{Problem and distinction from generic source optimisation.}
+In zero-target-information transfer, maximizing held-source
+macro-AUC cannot identify the target-optimal shrinkage on arbitrary
+unseen domains. We test whether the *geometry of across-source
+class-contrast dispersion*, measured before seeing a new acquisition's
+held persons, is a useful surrogate for transfer susceptibility.
+The estimator is deliberately restricted to the same fixed pooled-LDA
+path and tangent-space features used in the original study. The
+ellipsoidal minimax identity itself is classical robust optimization;
+the scientific question is whether its source-estimated geometry
+predicts real EEG transfer risk.
+
+\paragraph{Operator.}
+Let the source-only tangent features be
+$X_{s,i}\in\mathbb R^p$ with recording-group label $g_s$ and class
+$y_{s,i}\in\{0,1\}$. Each source group contributes one contrast
+$d_s=\bar X_{s,1}-\bar X_{s,0}$, and
+\[
+ \bar d =G^{-1}\sum_{s=1}^G d_s,\quad
+ B={1\over G-1}\sum_{s=1}^G(d_s-\bar d)(d_s-\bar d)^\top
+       +0.01 \nu_{\rm within} I.
+\]
+The evaluation covariance $\Sigma_{\rm within}$ pools
+group-by-class centered source residuals, with predeclared isotropic
+ridge $10^{-8}\nu_{\rm within}I$. It deliberately omits between-group
+offsets from the noise model.
+Crucially, the classifier itself retains the original
+\[
+w_\lambda=\left[(1-\lambda)S_{\rm pooled}
+                   +\lambda\,{\mathrm{tr}(S_{\rm pooled})\over p}I
+             \right]^{-1}d_{\rm pooled}.
+\]
+$S_{\rm pooled}$ and $d_{\rm pooled}$ are the globally class-centred
+original LDA training moments. This separation is essential for a
+valid \emph{selection-only} contrast against the old source-macro
+grid, predictive Gaussian NLL, and analytic shrinkage baselines.
+
+\paragraph{Conditional theorem with sharp witness.}
+For fixed $\rho\ge0$, define
+$\mathcal D_\rho=\{\bar d+B^{1/2}u:\|u\|_2\le\rho\}$.
+Assume target classes are Gaussian with mean contrast $d_t\in
+\mathcal D_\rho$ and common within-class covariance
+$\Sigma_{\rm within}$. For any fixed nonzero $w$,
+\[
+ \inf_{d_t\in\mathcal D_\rho}
+   \operatorname{AUC}_t(w)
+ =\Phi\!\left(
+  {w^\top\bar d-\rho\sqrt{w^\top Bw}
+    \over\sqrt{2w^\top\Sigma_{\rm within}w}}\right).
+\]
+The bound is sharp: Cauchy--Schwarz is attained by the explicit
+contrast witness $d_t=\bar d-\rho Bw/\sqrt{w^\top Bw}$
+when $w^\top Bw>0$. Consequently define the precommitted
+source-envelope selection
+\[
+\hat\lambda_{\rm SCE}=\arg\max_{\lambda\in\Lambda}
+{w_\lambda^\top\bar d-\rho\sqrt{w_\lambda^\top B w_\lambda}
+    \over\sqrt{2w_\lambda^\top\Sigma_{\rm within}w_\lambda}}.
+\]
+For two *fixed* directions $w_a,w_b$, let
+$a=w_a/\sqrt{w_a^\top\Sigma_{\rm within}w_a}-
+  w_b/\sqrt{w_b^\top\Sigma_{\rm within}w_b}$.
+Then
+\[
+ \min_{d_t\in\mathcal D_\rho}a^\top d_t
+ =a^\top\bar d-\rho\sqrt{a^\top Ba}.
+\]
+If this quantity is strictly positive, $w_a$ outranks $w_b$
+in Gaussian target AUC under the stated assumptions.
+This does NOT imply real unseen-person coverage: the empirical
+source-group $B$ supplies neither a calibrated radius nor proof
+that real target group contrast and covariance satisfy the model.
+A different target covariance or a contrast outside the ellipsoid
+can reverse the ranking. There is no distribution-free source-only
+guarantee against unrestricted shift.
+
+\paragraph{Computational cost and implementation contracts.}
+The additional source-contrast scatter is
+$O(Np+Gp^2)$ for $N$ source feature rows and $G$ source
+record groups; the original path eigendecomposition is $O(p^3)$,
+and each candidate costs $O(p^2)$ with dense matrix evaluation.
+The implementation rejects missing group classes, missing
+source-group class information, non-finite
+features and infeasible shrinkage; duplicate physical recording
+content is NOT detected by this operator and must be audited separately.
+Its tests verify alignment with
+the original LDA path, the closed-form worst-case witness,
+positive-scale invariance, and an unconditional-transfer
+counterexample. True recording identity must be checked separately.
+
+\paragraph{External falsification and disclosure.}
+Cho2017 is a distinct public motor-imagery acquisition.
+The repository-committed protocol fixes source persons 1--12,
+never-inspected target persons 13--32, channels C3/Cz/C4, 8--30 Hz,
+160 Hz resampling, $\rho=1$ and ridge $0.01$.
+All source choices and the protocol digest must be written to
+an immutable SHA-256 manifest before any target-person EEG is read.
+Paired target-person AUC is the inferential unit; the sole primary
+comparison is SCE versus the 27-point source-macro selector.
+Source-covariance predictive NLL, historical class-centred
+likelihood, Ledoit--Wolf/OAS and the radius-zero ablation are
+precommitted controls. Twenty frozen target-person results,
+sign-flip inference, individual harms and uncertainty are reported
+whether the method wins, ties, or loses.
+Neither this precommitted repository protocol nor a successful
+workflow constitutes independent clinical validation, independent
+public preregistration, or a finding of state-of-the-art superiority.
+
+\paragraph{Editorial decision.}
+Do not merge this section into the BSPC headline based on
+mathematical tests or synthetic cases alone. A strong source-only
+mechanism requires a prospective first-run, the absence of target
+selection, honest negative cohorts, matched strong baseline
+comparisons, and a substantive transfer consequence.
+The original BSPC criterion-mismatch result remains a separate
+valid candidate even if SCE fails.
