@@ -37,7 +37,27 @@ Consequently, if every subinterval has $L_{pn}>0$, that pair
 remains positive throughout the complete path; similarly if
 every subinterval has $U_{pn}<0$, its sign remains negative.
 Pairs that fail the test are \emph{uncertain}, not observed
-reversals.
+reversals. We additionally intersect the termwise enclosure
+with a centered second-order Taylor interval.
+For $m=(l+r)/2$, $h=(r-l)/2$, define
+$z_m=z_{pn}(m)$, $z'_m$ from the spectral derivative,
+and the curvature envelope
+\[
+ B_{2,pn}[l,r]=
+ 2\sum_i\frac{|a_{i,pn}|(\nu-s_i)^2}
+ {\min\{(1-l)s_i+l\nu,(1-r)s_i+r\nu\}^{3}}.
+\]
+Taylor's theorem implies
+\[
+ z_{pn}(\lambda)\in
+ [z_m-R_{pn},z_m+R_{pn}],\quad
+ R_{pn}=h|z'_m|+\tfrac12h^2B_{2,pn}[l,r].
+\]
+Intersecting the two valid intervals retains the enclosure
+while exploiting first-derivative cancellation. This refinement
+was developed \emph{after} the first continuous-search pilot
+showed a loose residual gap and is not an independently
+prospectively confirmed improvement.
 
 \paragraph{Finite-trial AUC sensitivity bound.}
 For a fixed validation person $g$, denote by $\eta_g$
