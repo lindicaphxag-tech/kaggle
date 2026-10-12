@@ -39,6 +39,7 @@ jobs:
           pdftotext main_bspc_v24_CONCISE_SUBMISSION_CANDIDATE.pdf /tmp/v24_concise.txt
           grep -q '0.731405' /tmp/v24_concise.txt
           grep -q '0.01623' /tmp/v24_concise.txt
+          if grep -Eq 'Reference.*undefined|Citation.*undefined|Undefined control sequence|multiply defined' main_bspc_v24_CONCISE_SUBMISSION_CANDIDATE.log; then exit 3; fi
           pdfinfo main_bspc_v24_CONCISE_SUBMISSION_CANDIDATE.pdf | grep Pages
       - uses: actions/upload-artifact@v4
         with:
