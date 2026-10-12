@@ -1,0 +1,84 @@
+name: DefaultReg Lee2019 immutable held-A real EEG independent audit
+on:
+  push:
+    branches: [research/defaultreg-gid-unseen-lee2019-20261013]
+    paths: ['.github/workflows/defaultreg-lee2019-a-only-independent-audit.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify-original-a-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy
+      - uses: actions/download-artifact@v4
+        with:
+          name: defaultreg-Lee2019-first-source-only-frozen-12-SHA
+          run-id: 38305991164
+          github-token: ${{ github.token }}
+          path: /tmp/first-leesource
+      - uses: actions/download-artifact@v4
+        with:
+          name: defaultreg-Lee2019-first-source-sha-verified-untouched-held-A
+          run-id: 38306653777
+          github-token: ${{ github.token }}
+          path: /tmp/original-A-held
+      - name: Read-only independent SHA, 12 subject methods and exact signflip
+        run: |
+          python - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          import numpy as np
+          def only(path,basename):
+              r=list(Path(path).rglob(basename))
+              assert len(r)==1,r
+              return r[0]
+          src=only('/tmp/first-leesource',
+                   'LEE2019_S1_SOURCE12_IMMUTABLE_CHOICES.json')
+          original=src.read_bytes()
+          expect='27efc2565d5bc2bc22344b67ee994e42b985c16c34cabf6cdf55136270fa18f3'
+          assert hashlib.sha256(original).hexdigest()==expect
+          a=only('/tmp/original-A-held','LEE2019_BLOCK_A_HELD_RESULTS.json')
+          z=json.loads(a.read_bytes())
+          assert z['original_source_sha256']==expect
+          assert z['block']=='A'
+          assert z['status']=='ONE_HELD_BLOCK_COMPLETED_WITHOUT_RETUNE'
+          assert z['n_held_people']==12 and z['fixed_source_model_no_target_retrain']
+          rows=z['block_result']['all_person_results']
+          assert [q['person_id'] for q in rows]==list(range(13,25))
+          methods=['original','gid','within_only','balanced_only',
+             'LW','OAS','fixed_full_shrink','tangent_LogReg',
+             'riemannian_MDM','source_CSP3_LogReg']
+          for q in rows:
+              assert set(q['auc'])==set(methods)
+              assert all(0<=v<=1 for v in q['auc'].values())
+              assert q['trials']==100
+          means={k:float(np.mean([q['auc'][k] for q in rows])) for k in methods}
+          assert all(abs(means[k]-z['block_result']['macro_auc_per_method'][k])<1e-12
+                     for k in methods)
+          x=np.array([q['auc']['gid']-q['auc']['original'] for q in rows])
+          assert np.allclose(x,[q['gid_minus_original'] for q in rows])
+          assert np.isclose(x.mean(),-0.003933333333333344,atol=1e-12)
+          signs=1-2*((np.arange(4096,dtype=np.uint32)[:,None]
+                 >>np.arange(12,dtype=np.uint32))&1).astype(np.int8)
+          p=float(np.mean(np.abs(signs@x)>=abs(float(x.sum()))-1e-12))
+          assert p==0.12890625
+          assert p==z['block_result']['gid_minus_original_exact_two_sided_signflip_p']
+          boot=x[np.random.default_rng(20261013).integers(0,12,(20000,12))].mean(axis=1)
+          assert np.allclose(np.quantile(boot,[.025,.975]),
+             z['block_result']['gid_minus_original_descriptive_bootstrap95'],atol=1e-12)
+          assert np.allclose(means['original'],means['balanced_only'],atol=1e-12)
+          assert np.allclose(means['gid'],means['within_only'],atol=1e-12)
+          assert int((x<-.02).sum())==0
+          print('LEE_IMMUTABLE_A12_AUDIT_PASS',json.dumps({
+            'original_sha':expect,'n_held':len(rows),
+            'n_trials':sum(q['trials'] for q in rows),
+            'means':means,'gid_minus_original':float(x.mean()),'exact_p':p,
+            'B_NOT_COMPLETED_DUE_TO_SOURCE_SHA_DIVERGENCE':True
+          },sort_keys=True))
+          PY
