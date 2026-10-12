@@ -1,0 +1,159 @@
+% Accepted BSPC 2025--26 head-to-head editorial audit.
+% This is comparative research context, NOT a same-protocol accuracy leaderboard.
+\subsection{What recent accepted EEG studies actually establish}
+\label{sec:bspc-headtohead}
+An assessment against previously published biomedical
+signal-processing studies must distinguish a
+\emph{new high-performing decoder} from a
+\emph{new evaluation/measurement claim}.
+The most informative analogues are not exclusively
+large EEG networks. In BSPC, Gil and
+Hern\'andez-Sabat\'e \cite{gil2026subjectvalidation}
+tested six models under window-, state-, and
+participant-level EEG seizure validation:
+window-level mean recall/specificity of
+$0.96/1.00$ fell to $0.77/0.90$ at the
+participant level. Their hierarchical mixed-effects
+analysis experimentally demonstrated that evaluation
+unit changes the scientific conclusion.
+Qin \emph{et al.}\ \cite{qin2026spatialnorm}
+tested spatial normalization across nine EEG
+ERP/cognitive paradigms. They reported an
+average between-participant decoding effect
+size of Cohen's $d=1.39$ ($p<0.001$), but
+not a comparable within-participant improvement,
+and independently inspected morphology of
+the EEG difference waves.
+Those studies demonstrate that rigorous
+\emph{measurement/validation research} is a
+legitimate BSPC contribution, but their
+experimental reach and actionable consequences
+also impose a high standard.
+Our three-acquisition source-only
+held-group analysis has exact decompositions
+and independent artifact reproducibility,
+but has not established an analogous broad
+\emph{new-target} prospective benefit.
+
+Recent cross-domain decoder studies address
+different information budgets.
+Zhang \emph{et al.}\
+\cite{zhang2025crossdataset_gcn}
+used 62-channel teacher features, eight-channel
+student transfer, labelled target-session
+fine-tuning, and channel-count/transfer ablations.
+Its accepted-author manuscript compares CSP,
+FBCSP and multiple neural models, and reports
+eight-channel target classification accuracies
+of $71.19\%$ in cross-validation and
+$69.03\%$ in the cross-session scenario
+\emph{after} target adaptation.
+Morvay \emph{et al.}\
+\cite{morvay2026wbt}
+combined Wasserstein barycenter transport
+with four classifiers across three
+EEG datasets and four tasks; their
+unsupervised adaptation uses the
+\emph{unlabelled target recording} when
+mapping source to the new subject.
+The study reports 79.59\% balanced accuracy
+on VEPESS \emph{visual evoked potential}
+data and 53.97\% MI accuracy on
+BCIC4D2a; the two tasks themselves
+must not be conflated.
+Our original EEG estimand tests instead
+enforce zero held-target signal \emph{or}
+labels during source model selection.
+Therefore neither post-adaptation accuracy,
+cross-task balanced accuracy nor our
+person-macro binary ROC-AUC
+is an equal-information performance ranking.
+
+\begin{table}[tb]
+\centering\small
+\caption{Published BSPC EEG evidence versus the present
+zero-target-information scientific question.
+The entries describe \emph{study design}, not
+a directly comparable leaderboard:
+datasets, task and metrics can differ.}
+\label{tab:bspc-paper-budget}
+\setlength{\tabcolsep}{3.2pt}
+\begin{tabular}{p{.24\linewidth}p{.34\linewidth}p{.30\linewidth}}
+\toprule
+Published work & Verification/breadth & Target information\\
+\midrule
+Gil et al., 2026 \cite{gil2026subjectvalidation}
+& Six networks, seizure EEG, three split levels
+& Participant held-out evaluation\\
+Qin et al., 2026 \cite{qin2026spatialnorm}
+& Nine ERP paradigms, subject-level effects,
+waveform morphology
+& Within/between-person analyses\\
+Zhang et al., 2025 \cite{zhang2025crossdataset_gcn}
+& 62-to-8-channel transfer, CSP/FBCSP,
+deep baselines and ablations
+& Target-labelled fine-tuning\\
+Morvay et al., 2026 \cite{morvay2026wbt}
+& Three datasets, four tasks, four
+classifiers; MI and VEP
+& Unlabelled target-domain transport\\
+Murtaza et al., 2025 \cite{murtaza2025signature}
+& EEG channel-correlation intersubject
+distance and source similarity
+& Resting EEG may inform new-subject similarity\\
+This study
+& Exact three-factor score anatomy on
+three exposed source acquisitions;
+frozen positive and negative outer studies
+& Zero target signal/labels for source selection\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The neural-signature distance study by
+Murtaza \emph{et al.}\ \cite{murtaza2025signature}
+is especially relevant: a measured
+cross-participant quantity is valuable partly
+because it can inform subject similarity
+and downstream transfer. A large
+AUC-invariant source-likelihood penalty
+in our analysis is not yet an \emph{actionable}
+source-to-unseen-target predictor.
+Further BSPC studies offer complementary
+standards: cyclic domain adaptation
+\cite{he2026cyclic} tests new EEG
+representations, while DLSSNet
+\cite{wang2026dlssnet} combines
+high-accuracy decoding with interpretable
+sensorimotor-rhythm temporal states.
+The reported DLSSNet BCI2a and
+High Gamma accuracies of 78.51\%
+and 95.49\%, respectively, cannot
+be directly compared with a different
+zero-target person-macro ROC-AUC.
+For a stronger algorithm manuscript,
+our method would need a genuinely distinct
+selected operator, matched CSP/FBCSP and
+Riemannian/linear controls, an explicit
+target-information ledger, paired new-person
+effect sizes, and prospective replication
+under at least two independently recorded
+acquisitions. Neither the classical
+three-factor identity nor the
+currently unsupported V31/V32 improvements
+satisfies those requirements.
+
+\paragraph{Novelty limit relative to accepted studies.}
+The exact quadratic decomposition is
+standard linear algebra, and the
+prevalence of participant-location shifts
+in our released data is a descriptive,
+post-outcome source-validation observation.
+Our supported potential contribution is
+the EEG-specific \emph{estimand mismatch and
+its independently audited implications
+for interpreting source-only regularisation},
+not a newly proven globally optimal
+EEG decoder, a transfer guarantee or
+stronger performance than established
+BSPC networks.
