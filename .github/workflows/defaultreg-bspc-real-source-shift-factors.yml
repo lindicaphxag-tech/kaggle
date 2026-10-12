@@ -2,7 +2,10 @@ name: DefaultReg BSPC SOURCE-only two acquisition factor anatomy
 on:
   push:
     branches: [research/defaultreg-bspc-shift-factorization-20261013]
-    paths: ['.github/workflows/defaultreg-bspc-real-source-shift-factors.yml']
+    paths:
+      - '.github/workflows/defaultreg-bspc-real-source-shift-factors.yml'
+      - 'research/defaultreg_bspc_v13/tests/test_exact_prediction_shift_partition.py'
+      - 'research/defaultreg_bspc_v13/src/exact_prediction_shift_partition.py'
   workflow_dispatch:
 permissions:
   contents: read
