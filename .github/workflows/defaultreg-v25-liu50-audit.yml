@@ -1,0 +1,70 @@
+name: DefaultReg V25 Liu2024 fifty-patient independent audit
+on:
+  push:
+    branches: [research/defaultreg-v25-bernstein-rank-cells-20261013]
+    paths:
+      - '.github/workflows/defaultreg-v25-liu50-audit.yml'
+      - 'research/defaultreg_bspc_v13/src/verify_v25_liu50_first_run.py'
+      - 'research/defaultreg_bspc_v13/src/liu2024_4_5_fingerprint_v25.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independent-archive-arithmetic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --quiet numpy
+      - name: Download originally frozen 50-patient source-lock artifact
+        run: |
+          gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11760774972/zip > /tmp/liu2024_50_source_original.zip
+          test -s /tmp/liu2024_50_source_original.zip
+      - name: Recompute every participant effect and identify possible AUC fingerprint collisions
+        run: |
+          mkdir -p /tmp/defaultreg-v25-liu-audit
+          python research/defaultreg_bspc_v13/src/verify_v25_liu50_first_run.py /tmp/liu2024_50_source_original.zip --out /tmp/defaultreg-v25-liu-audit/independent_liu50_recheck.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/defaultreg-v25-liu-audit/independent_liu50_recheck.json'))
+          assert d['status']=='PASS_IMMUTABLE_LIU2024_50_PATIENT_FIRST_RUN_REAUDIT'
+          assert d['n_people']==50 and d['n_trials']==2000
+          assert d['all_v23_continuous_fallback_to_macro']
+          assert abs(d['macro_minus_proper_mean']-.00415)<1e-12
+          print('PASS_INDEPENDENT_50_ACUTE_STROKE_LIU_SOURCE_TARGET_FROZEN_AUDIT')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-v25-immutable-50-stroke-patient-first-run-audit
+          path: /tmp/defaultreg-v25-liu-audit/**
+          if-no-files-found: warn
+  raw-subject-equality-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      MNE_DATA: /tmp/defaultreg-v25-liu-eeg
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Compare SHA256 of patient 4 versus patient 5 preprocessed trials (no EEG samples shown)
+        run: |
+          mkdir -p "$MNE_DATA" /tmp/defaultreg-v25-liu-audit
+          python research/defaultreg_bspc_v13/src/liu2024_4_5_fingerprint_v25.py
+          test -s /tmp/defaultreg-v25-liu-audit/raw_subject4_5_fingerprint.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-v25-Liu2024-person4-5-EEG-fingerprint-investigation
+          path: /tmp/defaultreg-v25-liu-audit/**
+          if-no-files-found: warn
