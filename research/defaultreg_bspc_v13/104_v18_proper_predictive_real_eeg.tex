@@ -1,0 +1,85 @@
+\subsection{Retrospective real-EEG check of the properly predictive comparator}
+\label{sec:v18-fair-predictive}
+The original class-centred comparator does not account for
+between-source-person class-mean shifts
+(Section~\ref{sec:v17-mean-shift-decomposition}, Eq.~\eqref{eq:v17-exact-nll-shift}).
+We therefore executed a \emph{new secondary, post-outcome} comparison
+of the correctly defined $C_{\mathrm{pred}}$ selector on public
+Shin2017A EEG using the original, independent previously executed
+preprocessing and classifier implementation. This additional
+analysis is neither a new dataset nor a renewal of the earlier
+confirmatory study. The Shin2017A outcomes had been seen before
+the new score was specified.
+
+For each of 29 outer held participants, the entire source-only
+tangent reference and within-class state were reconstructed using
+the other 28 participants. The source-participant-grouped inner
+validation used only source-person trial labels; for each held
+\emph{source} validation fold, the class means appearing in
+Eq.~\eqref{eq:v16-conditional-prediction} were fitted exclusively
+on the corresponding inner \emph{training} source groups.
+The candidate set was that fold's originally source-feasible
+27-point shrinkage grid, and the per-person proper-predictive
+Gaussian log scores were averaged with equal source-person
+weight. All 29 selected shrinkage strengths were serialised to
+a machine-readable file and locked with SHA-256
+\texttt{fac20e7f1ec1e43f3fa01af8ce88e44869e80f624d9a10b6123a57a6687f9b5c}
+before re-opening the immutable original ZIP and reading the
+outer target AUC outcomes. The original class-centred comparator
+and source-macro policy were unchanged; the original Shin
+score archive retained its previously verified SHA-256.
+
+\begin{table}[tb]
+\centering
+\small
+\caption{Shin2017A real EEG secondary comparison (\(N=29\);
+1740 held-person test trials). The first and third rows were
+part of the original frozen comparisons; the proper-predictive
+row was newly run after the original target results were known.
+It is \emph{descriptive/post-outcome} and does not enter
+the original prospective Holm family. The proper-predictive
+strength was 0.2 in all 29 folds.}
+\label{tab:v18-real-predictive}
+\begin{tabular}{lcc}
+\toprule
+Source selection objective & Mean AUC & Evidence tier\\
+\midrule
+Source participant macro-AUC & 0.785900 & Original frozen\\
+Proper Gaussian class-conditional predictive log score &
+ \textbf{0.786207} & New post-outcome\\
+Validation-class-centred covariance score & 0.763678 & Original frozen\\
+\midrule
+Source-macro minus proper predictive & $-0.000307$ &
+ Descriptive only\\
+Class-centred minus proper predictive & $-0.022529$ &
+ Descriptive only\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The newly implemented proper-predictive objective selected
+\(\lambda=0.2\) in \emph{all 29} outer folds. It differs from the
+original class-centred covariance choice in 29/29 folds, yet its
+person-macro target AUC of \(0.786207\) was almost identical
+to the source-macro policy's \(0.785900\). Proper predictive
+scoring exceeded the original class-centred covariance
+selection by \(0.022529\) person-macro AUC. In this
+single previously exposed EEG dataset, the large comparison
+against the class-centred score therefore does
+\emph{not} translate into a discrimination-selector advantage
+against genuine predictive likelihood.
+
+The agreement between the two better-performing methods
+should not be misrepresented as a general statistical
+equivalence or proven non-inferiority. The new result
+contains no new hypothesis test or adjusted $p$-value,
+and equal source-population folds remain strongly dependent.
+All 29 proper-predictive choices being 0.2 demonstrates
+\emph{selection stability on highly overlapping training pools},
+not successful participant-specific adaptation.
+This new comparison narrows the paper's conclusion to
+the \emph{measurement target itself}: a held-source
+class-centred covariance log score can omit the
+class-mean-shift penalty, changing the selected
+regularisation regime and biasing the interpretation
+of EEG decoding method comparisons.
