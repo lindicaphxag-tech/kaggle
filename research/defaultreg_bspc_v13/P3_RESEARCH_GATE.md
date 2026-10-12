@@ -39,3 +39,15 @@ pool these as one predeclared hypothesis or aggregate p value.
 Journal route only after these gates. Consider a brief negative
 methods note if the journal explicitly accepts, but not
 as a new algorithm performance paper.
+
+
+## PROVISIONAL OUTLET ONLY: Brain Topography
+Legacy 2025 CAS large category Medicine 3; Springer traditional
+publication normally no APC, with possible colour/page fees.
+Scope: EEG neurophysiology plus genuinely validated analytic methods.
+https://link.springer.com/journal/10548
+This target is **NOT LOCKED** because the current P3 is a mixture
+of failed different methods, overlapping P1 results, and no
+standalone physiology/transfer mechanism. It remains publication
+HOLD. Choosing a named journal does not make P3 ready.
+No presumption of acceptance from historical review or paper count.
