@@ -6,15 +6,15 @@
   >=latex,
   node distance=0.45cm,
   every node/.style={font=\footnotesize},
-  step/.style={draw=black!70,rounded corners=1.5pt,fill=black!3,
+  auditbox/.style={draw=black!70,rounded corners=1.5pt,fill=black!3,
       inner sep=5pt,minimum height=1.50cm,text width=2.70cm,align=center},
   link/.style={->,line width=.55pt,draw=black!75}
 ]
 \node[step] (release) {Public release\\50 distinct IDs\\2,000 processed trials};
-\node[step,right=of release] (hash) {Frozen EEG pipeline\\exact array + label\\candidate fingerprint};
-\node[step,right=of hash] (group) {Byte-confirmed overlap\\ID 4 / ID 5 full alias\\49 content groups};
-\node[step,right=of group] (cross) {Same 49 held groups\\old / purged source fit\\old / purged selection};
-\node[step,right=of cross] (effect) {Outcome audit\\reporting weight vs\\paired fit / selector};
+\node[auditbox,right=of release] (hash) {Frozen EEG pipeline\\exact array + label\\candidate fingerprint};
+\node[auditbox,right=of hash] (group) {Byte-confirmed overlap\\ID 4 / ID 5 full alias\\49 content groups};
+\node[auditbox,right=of group] (cross) {Same 49 held groups\\old / purged source fit\\old / purged selection};
+\node[auditbox,right=of cross] (effect) {Outcome audit\\reporting weight vs\\paired fit / selector};
 \draw[link] (release) -- (hash);
 \draw[link] (hash) -- (group);
 \draw[link] (group) -- (cross);
