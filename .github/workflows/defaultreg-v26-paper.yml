@@ -1,0 +1,38 @@
+name: DefaultReg V26 record-identity paper companion
+on:
+  push:
+    branches: [research/defaultreg-v26-record-identity-purged-lopo-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/118_v26_signal_identity_training_contamination.tex'
+      - 'research/defaultreg_bspc_v13/main_bspc_v26_RECORD_INTEGRITY_COMPANION.tex'
+      - '.github/workflows/defaultreg-v26-paper.yml'
+permissions:
+  contents: read
+jobs:
+  evidence-scoped-clinical-record-integrity-paper:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install publisher-research typesetting
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-pictures texlive-fonts-recommended lmodern poppler-utils
+      - name: Compile verified recording-identity appendix without target gain claims
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_bspc_v26_RECORD_INTEGRITY_COMPANION.tex
+          test -s main_bspc_v26_RECORD_INTEGRITY_COMPANION.pdf
+          pdftotext main_bspc_v26_RECORD_INTEGRITY_COMPANION.pdf /tmp/v26_companion.txt
+          grep -q '49 unique' /tmp/v26_companion.txt
+          grep -q 'IDs 4 and 5' /tmp/v26_companion.txt
+          grep -q 'not' /tmp/v26_companion.txt
+          if grep -Eq 'Reference.*undefined|Citation.*undefined|Undefined control sequence|multiply defined' main_bspc_v26_RECORD_INTEGRITY_COMPANION.log; then exit 3; fi
+          pdfinfo main_bspc_v26_RECORD_INTEGRITY_COMPANION.pdf | grep Pages
+      - uses: actions/upload-artifact@v4
+        with:
+          name: defaultreg-v26-record-identity-reproducibility-companion
+          path: |
+            research/defaultreg_bspc_v13/main_bspc_v26_RECORD_INTEGRITY_COMPANION.pdf
+            research/defaultreg_bspc_v13/main_bspc_v26_RECORD_INTEGRITY_COMPANION.log
+          if-no-files-found: error
