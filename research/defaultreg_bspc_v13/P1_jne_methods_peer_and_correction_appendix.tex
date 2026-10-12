@@ -1,0 +1,138 @@
+% JNE-specific replacement of original BSPC editorial comparison.
+\subsection{Relation to established neural-engineering validation studies}
+\label{sec:p1-jne-peer}
+Recent accepted research in Journal of Neural Engineering shows
+that a neural decoding methods paper need not report a new SOTA
+network, but does need a generalisable, experimentally resolved
+measurement or methodological question.
+Eder et al.\ \cite{eder2024jnebenchmark} compared Riemannian
+decoding against EEGNet and other convolutional models
+across motor imagery, P300 and SSVEP paradigms with multiple
+validation protocols and reproducible open-source pipelines.
+Seibel et al.\ \cite{seibel2026jnedata}
+measured how CNN decoding performance responds to subject
+count and recorded EEG duration across three tasks.
+Their conclusions are operational: they directly inform
+model family or data acquisition decisions.
+Our scope is narrower---binary motor-imagery
+tangent-space linear discriminants and the
+selection \emph{criterion}, not a deep learning
+architecture leaderboard nor a data-acquisition
+learning curve.
+
+\begin{table}[tb]
+\centering\small
+\caption{Comparison with representative published
+JNE methods studies, preserving non-comparable
+endpoints. This is a design/evidence comparison,
+not an accuracy leaderboard.}
+\label{tab:p1-jne-peer}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{p{.24\linewidth}p{.31\linewidth}p{.33\linewidth}}
+\toprule
+Study & Experimental scope & Actionable conclusion\\
+\midrule
+Eder et al.\ \cite{eder2024jnebenchmark}
+& MI/P300/SSVEP; CNN and Riemannian; multiple split budgets
+& Comparative model-family tradeoffs\\
+Seibel et al.\ \cite{seibel2026jnedata}
+& Three EEG tasks and CNN structures; varied training sample supply
+& Estimate marginal data-acquisition value\\
+This study
+& Four original frozen AUC experiment strata; three
+  exposed source-only EEG score-anatomy collections
+& Separate genuinely predictive from class-centred
+  source scoring and disclose invariant penalties;
+  no new optimal transfer selector established\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+We aim to supply an equally \emph{verifiable} conclusion
+within our constrained decoder family: a historical
+validation covariance score can be misidentified as
+source-trained class-conditional predictive likelihood,
+and even a correctly computed Gaussian score can be
+dominated by source validation shifts invisible to
+a fixed within-person rank metric.
+The scientific value lies in the distinction
+between these estimands and the downstream
+interpretation of historical source choices.
+Unlike the two cited JNE examples, we have
+\emph{not} demonstrated that a replacement
+scoring policy gives consistently better
+future-participant decoding. That limitation
+is an explicit boundary of the manuscript.
+
+\subsection{Outcome consequences after correcting the comparator}
+\label{sec:p1-correct-comparator-decision}
+The original pre-data comparison of source-macro
+AUC selection against the historical class-centred
+CovScore is an authentic outcome comparison but
+not a test against properly predictive Gaussian
+model selection. The latter evaluation was
+specified after earlier outcomes had been read.
+To prevent an invalid upgrade of the original
+test, we report the corrected post-outcome
+matched contrasts separately:
+\begin{table}[tb]
+\centering\small
+\caption{Proper predictive source-selection
+comparisons on already exposed EEG results.
+These are \emph{descriptive exploratory}
+target outcomes, not two new confirmatory wins.
+Person-macro ROC-AUC values must not be
+compared directly with accuracy percentages
+from different EEG paradigms.}
+\label{tab:p1-correct-predictive}
+\begin{tabular}{lrrr}
+\toprule
+Cohort & Macro source AUC & Proper NLL AUC &
+Macro minus proper\\
+\midrule
+Shin2017A ($n=29$) &0.785900&0.786207&$-0.000307$\\
+BNCI2014\_002 ($n=14$) &0.778705&0.771886&$+0.006819$\\
+\bottomrule
+\end{tabular}
+\end{table}
+For the 14-person BNCI2014\_002 comparison,
+the exploratory interval for the final contrast
+was $[-0.00595,0.02027]$, containing zero.
+The Shin2017A corrected comparator performed
+slightly \emph{better} than source-macro
+selection. Both observations are counterevidence
+to any strong claim that one selection objective
+is universally superior. The source-selected
+shrinkage choices also differ between acquisitions,
+and the large fixed-model density-score
+penalties cannot settle the sign of an
+unseen-person AUC difference.
+The practical recommendation is therefore a
+\emph{measurement and reporting protocol},
+not an unvalidated replacement algorithm:
+\begin{enumerate}
+\item Label each covariance-validation
+metric by the origin of every class mean
+(train-source versus validation-subject).
+\item State whether held source labels enter
+the evaluation score, and distinguish such
+source labels from prohibited held-target
+information.
+\item Report paired held-person rank metrics
+and negative effects independently of
+the density-score change and model-family
+choice.
+\item Distinguish pre-outcome source
+decisions from any post-outcome diagnostic,
+even if both use public EEG data.
+\item Keep constant the sensor configuration,
+training source participants, target information
+budget and original frozen parameter grid
+in any algorithmic superiority comparison.
+\end{enumerate}
+The exact three-factor decomposition can serve
+as a diagnostic explaining density-score
+variance in this particular linear family.
+It is not proven to forecast whom to calibrate,
+whether to abstain, or which model to deploy
+on an unseen individual.
