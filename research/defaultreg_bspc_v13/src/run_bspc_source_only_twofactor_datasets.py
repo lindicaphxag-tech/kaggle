@@ -66,6 +66,13 @@ def run(name,out):
             "class_centred":row["class_centred_mean"],
             "proper_predictive":row["proper_predictive_mean"],
             "translation_component":t,"contrast_component":k,
+            "score_aligned_contrast_component":
+                row["contrast_shift_score_aligned_contribution"],
+            "score_orthogonal_contrast_component":
+                row["contrast_shift_score_orthogonal_contribution"],
+            "total_auc_invariant_location_plus_orthogonal_fraction":
+                float((t+row["contrast_shift_score_orthogonal_contribution"])/(t+k))
+                if t+k>1e-12 else None,
             "translation_fraction":float(t/(t+k)) if t+k>1e-12 else None
         }
     summary={
