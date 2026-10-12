@@ -59,6 +59,18 @@ The two target blocks share the same source model and
 acquisition; they cannot be counted as two independently
 collected experiments.
 
+There is a more basic algorithmic falsification: at the
+selected $\lambda_{\mathrm{SCE}}=1$, the pooled LDA path has
+$A_1=\nu I$ and $w_1=d_{\mathrm{pooled}}/\nu$.
+Consequently its target scores and all ROC-AUC ranks
+are exactly those of an \emph{untuned fixed
+$\lambda=1$} full-shrinkage LDA, up to a positive
+scale. Thus the Cho2017 results do not establish
+any added classifier value from the SCE ellipsoid
+over the trivial fixed endpoint. A source-only
+conditional guarantee of superiority over the
+original grid was also not obtained.
+
 The source-group ellipsoid and a pre-outcome locked
 choice therefore did not suffice to predict a stable
 advantage in this public acquisition. Even though the
