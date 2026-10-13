@@ -6,6 +6,7 @@ on:
       - publication/default-eeg-p4-rank-certificates-20261013
     paths:
       - research/defaultreg_bspc_v13/src/p4_exact_rank_event_sweep_prototype.py
+      - research/defaultreg_bspc_v13/src/p4_joint_spectral_coefficient_box_certificate.py
       - .github/workflows/p4-exact-rank-event-prototype.yml
 
 jobs:
@@ -21,3 +22,11 @@ jobs:
         run: python -m pip install sympy==1.13.3
       - name: Exact rational two-event and tie tests
         run: python research/defaultreg_bspc_v13/src/p4_exact_rank_event_sweep_prototype.py
+      - name: Joint spectral and coefficient interval-box soundness regression
+        run: |
+          python research/defaultreg_bspc_v13/src/p4_joint_spectral_coefficient_box_certificate.py --out p4_joint_spectral_box_results.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p4-joint-spectral-coefficient-box-results
+          path: p4_joint_spectral_box_results.json
+          retention-days: 90
