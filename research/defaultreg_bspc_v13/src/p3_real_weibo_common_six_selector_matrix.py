@@ -76,16 +76,16 @@ def main():
     p=MotorImagery(n_classes=2,events=["left_hand","right_hand"],
                    channels=["C3","Cz","C4"],fmin=8,fmax=30,resample=160,baseline=None,
                    reject_by_annotation=False)
-    # Source phase: the reserved final person 9 is NEVER read here.
+    # Source phase: the reserved final person 10 is NEVER read here.
     C_SOURCE,Y_SOURCE,G_SOURCE,rec=load_people(list(range(1,10)),ds,p)
     selected10=selectors(C_SOURCE,Y_SOURCE,G_SOURCE)
     chosen_file=out/"BEFORE_SUBJECT10_SIGNAL_SOURCE_ONLY_CHOICES.json"
-    lock=jsonwrite({"status":"PRE_RESERVED_HELD_9_SOURCE_LOCK",
+    lock=jsonwrite({"status":"PRE_RESERVED_HELD_10_SOURCE_LOCK",
         "dataset":"Weibo2014","source_ids":list(range(1,10)),"held_id":10,
         "fmin":8,"fmax":30,"resample":160,"seed":SEED,
         "source_processing_receipts":rec,"selection":selected10,
         "no_subject10_EEG_loaded_before_lock":True},chosen_file)
-    print("P3_RESERVED_ID9_CHOICES_SHA_BEFORE_EEG_READ",lock,flush=True)
+    print("P3_RESERVED_ID10_CHOICES_SHA_BEFORE_EEG_READ",lock,flush=True)
     # Only NOW is final held subject10's EEG opened.
     C_HELD,Y_HELD,G_HELD,receipt10=load_people([10],ds,p)
     scores10=auc_record(score(C_SOURCE,Y_SOURCE,C_HELD,selected10),Y_HELD)
@@ -105,7 +105,7 @@ def main():
     second_lock=jsonwrite({"dataset":"Weibo2014",
         "methods":list(METHODS),"design":"post-reserved-9 exposed retrospective 10-fold LOPO",
         "source_choices":selected,"overlapping_source_training_sets":True,
-        "not_9_independent_acquisitions":True,
+        "not_10_independent_acquisitions":True,
         "source_choices_not_from_held_labels_per_fold":True},out/"EXPLORATORY_10FOLD_CHOICES_BEFORE_AUC.json")
     for item in selected:
         held=item["held_id"]
@@ -114,7 +114,7 @@ def main():
             tr=g!=held; va=~tr
             vals=auc_record(score(C[tr],y[tr],C[va],item["source_selected_parameters"]),y[va])
         receipt.append({"held_id":held,"n_held":int(np.sum(g==held)), "AUC":vals})
-        print("P3_SHARED_9_FOLD_RESULT",held,vals,flush=True)
+        print("P3_SHARED_10_FOLD_RESULT",held,vals,flush=True)
     differences={}
     for m in METHODS:
         vals=np.asarray([r["AUC"][m] for r in receipt])
@@ -124,11 +124,11 @@ def main():
            "n_material_harm_vs_source_macro":int(np.sum(vals<against-0.02)),
            "n_material_benefit_vs_source_macro":int(np.sum(vals>against+0.02))}
     final={"status":"EXECUTED_Weibo2014_SOURCE_ONLY_COMMON_CANDIDATE_MATRIX",
-      "reserved_subject10_source_sha":lock,"exploratory_all9_source_lock_sha":second_lock,
+      "reserved_subject10_source_sha":lock,"exploratory_all10_source_lock_sha":second_lock,
       "one_reserved_held_person_no_independent_confirmation":strict,
       "all10_held_people_EXPLORATORY_not_independent":receipt,
       "summary_descriptive_no_causal_inference":differences,
-      "information_budget":"all policies selected from corresponding eight source IDs only",
+      "information_budget":"all policies selected from corresponding nine source IDs only",
       "no_new_general_universal_negative_theorem":True,
       "manuscript_gate":"do not call four old negative methods jointly replicated",
       "no_clinical_participant_identity_access":True}
