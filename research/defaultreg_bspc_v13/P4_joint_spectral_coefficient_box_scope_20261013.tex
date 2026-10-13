@@ -1,0 +1,52 @@
+\subsection{Joint spectral- and coefficient-box sign certification}
+\label{sec:p4-joint-box}
+The previous coefficient-only certificate assumes exact spectral poles.
+We additionally consider a strictly positive \emph{input box}
+$s_i\in[\underline s_i,\overline s_i]$ and an independent
+coefficient box $a_i\in[\bar a_i-\varepsilon_i,\bar a_i+\varepsilon_i]$.
+Define $\nu=p^{-1}\sum_i s_i$, and for
+$\lambda\in[L,R]\subseteq[0,1]$ let
+$q_i(\lambda)=(1-\lambda)s_i+\lambda\nu$.
+Because all spectral coordinates are positive, every $q_i$ is positive.
+
+At each parameter endpoint $t\in\{L,R\}$ the bounds
+\[
+(1-t)\underline s_i+t\underline\nu
+\leq q_i(t)\leq
+(1-t)\overline s_i+t\overline\nu,\quad
+\underline\nu=p^{-1}\sum_j\underline s_j,\quad
+\overline\nu=p^{-1}\sum_j\overline s_j
+\]
+hold despite correlations among the $s_i$.
+The affine function $q_i(L+(R-L)u)$ has a degree-one Bernstein
+representation whose two controls lie in these bounded intervals.
+Multiplying these interval Bernstein polynomials with the
+positive combinatorial weights
+\[
+{m\choose i}{n\choose j}/{m+n\choose i+j}
+\]
+and accumulating interval-valued coefficients yields sound
+enclosures $[\underline b_k,\overline b_k]$ for the degree-$(p-1)$
+numerator $N(u)=\sum_i a_i\prod_{j\neq i}q_j(u)$.
+If every $\underline b_k>0$, then for \emph{all} admissible
+spectra, coefficients and parameters, the underlying rational
+pair score difference is positive. If every
+$\overline b_k<0$, it is negative. Otherwise return
+\texttt{UNKNOWN}. This conservative test does not assume the
+eigenvalues are independent in the true covariance; it encloses
+a larger independent box and may refuse valid instances.
+
+An implementation based solely on Python exact rational
+arithmetic completed 126 seeded synthetic instances with
+$p=2$--$5$: 52 positive, 50 negative and 24 unknown
+certifications. A separate exact-rational point oracle evaluated
+208,560 admissible spectral/coefficient box corners and parameter
+probes without a contradictory classification. The oracle is
+only a regression test; soundness follows from interval
+inclusion and the Bernstein convex-hull property. A negative
+or positive box result is valid only if the \emph{input}
+bounds are valid. Neither this check nor its fixed-pole
+predecessor derives intervals from sample noise, numerical
+eigendecomposition, eigenvector motion or IEEE-754 rounding.
+No end-to-end EEG safety, external predictive improvement,
+or novel root-isolation theorem follows from these experiments.
