@@ -101,6 +101,11 @@ def checks():
     p=sp.Poly((lam-repeated[0])**2,lam)
     touch=[sp.simplify(v) for v in mat.inv()*sp.Matrix([p.nth(i) for i in range(3)])]
     assert incremental_event_map(s,pairs+[touch,touch])==event_map(s,pairs+[touch,touch])
+    for expression in (lam*(lam-1), lam**2-sp.Rational(1,2),
+                       (lam-sp.Rational(1,1000))*(lam-sp.Rational(1001,1000000))):
+        exact=sp.Poly(expression,lam)
+        coeff=[sp.simplify(v) for v in mat.inv()*sp.Matrix([exact.nth(i) for i in range(3)])]
+        assert incremental_event_map(s,[coeff,touch])==event_map(s,[coeff,touch])
 
 
 def run():
@@ -111,14 +116,22 @@ def run():
         s,pairs=constructed_coefficients(n,dimension)
         if fixture=='no_event':
             pairs=[[sp.Rational(1+i+k, i+k+2) for i in range(dimension)] for k in range(n)]
+        a=event_map(s,pairs);b=incremental_event_map(s,pairs)
+        assert a==b
         slow=[];fast=[]
-        for _ in range(3):
-            t=time.perf_counter();a=event_map(s,pairs);slow.append(time.perf_counter()-t)
-            t=time.perf_counter();b=incremental_event_map(s,pairs);fast.append(time.perf_counter()-t)
-            assert a==b
+        for rep in range(6):
+            order=(('naive','incremental') if rep%2==0 else ('incremental','naive'))
+            for method in order:
+                t=time.perf_counter()
+                result=event_map(s,pairs) if method=='naive' else incremental_event_map(s,pairs)
+                elapsed=time.perf_counter()-t
+                assert result==a
+                (slow if method=='naive' else fast).append(elapsed)
         rows.append({'dimension':dimension,'fixture':fixture,'pairs':n,'events':len(a[1])-2,
                      'cells':len(a[2]),'naive_median_seconds':statistics.median(slow),
                      'incremental_median_seconds':statistics.median(fast),
+                     'naive_range_seconds':[min(slow),max(slow)],
+                     'incremental_range_seconds':[min(fast),max(fast)],
                      'exact_outputs_equal':True})
         print('P4_INCREMENTAL_EXACT_EVENT_ROW',rows[-1],flush=True)
     return {'status':'EXECUTED_EXACT_RATIONAL_INCREMENTAL_EVENT_BENCHMARK',
@@ -127,6 +140,7 @@ def run():
             'fixed_dimensions':[3,6], 'fixed_pair_counts_by_dimension':{'3':[4,8,16,32],'6':[4,8,16]},
             'controls':['no_event_3d_32pairs','no_event_6d_16pairs'],
             'time_is_machine_dependent':True,
+            'timing_protocol':'one untimed warmup, six timed repetitions with alternating order',
             'no_new_root_isolator_or_float_EEG_certificate':True,
             'no_unseen_subject_gain':True}
 
