@@ -33,7 +33,8 @@ are about digital samples, not participant identity. The nominal
 50-ID source-macro ROC-AUC was 0.594000, falling to 0.588673
 after evaluating 49 unique held contents with original
 training and source choices, and to 0.582551 under
-content-disjoint refitting. The matched 49-group difference
+exact-full-epoch-duplicate purging and source refitting.
+The matched 49-group difference
 ($-0.006122$) was dominated by the aliased group
 ($-0.262500$); the other 48 groups averaged $-0.000781$.
 Two further frozen-classifier analyses produced aliased-group
@@ -215,7 +216,9 @@ or overlapping source windows with different sampled arrays.
 The original source-macro average of 0.594000 over 50 nominal IDs
 declined to 0.588673 after retaining only 49 recording representatives
 with ORIGINAL fits and lambdas, a denominator-only contrast of
-$-0.005327$. Under a fully purged, newly fitted source model,
+$-0.005327$. Under a newly fitted source model that removes all
+\emph{exact full-epoch content aliases} identified by
+the pinned fingerprint criterion,
 the matched 49-record mean was 0.582551, an additional
 $-0.006122$. The aggregate $-0.011449$ difference is
 not by itself a causal EEG leakage-effect estimate.
