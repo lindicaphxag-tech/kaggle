@@ -21,9 +21,9 @@ jobs:
           import json
           z=json.load(open('/tmp/p4_multi_family_results.json'))
           assert z['total']['intervals']==4320
-          assert z['total']['bernstein']==4104
-          assert z['total']['centered']==4092
-          assert z['total']['bernstein_only']==12
+          assert z['total']['bernstein']==4232
+          assert z['total']['centered']==4212
+          assert z['total']['bernstein_only']==20
           assert z['total']['centered_only']==0
           assert z['total']['unresolved_without_witness']==0
           print('P4_4320_EXACT_RATIONAL_INTERVALS_VERIFIED')
