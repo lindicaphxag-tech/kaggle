@@ -57,13 +57,16 @@ machine-dependent microbenchmark.
 All 36 remaining intervals contain exact rational
 positive and negative witnesses, so 924/960 is the
 strict whole-interval sign-coverage ceiling for
-this particular fixture family.
-This is not a floating EEG pipeline proof.
+this particular fixture family. A separate predefined
+4,320-interval rational suite certified 4,104 with
+Bernstein versus 4,092 with midpoint-centered Horner,
+with all twelve additional signs in one 12-dimensional,
+eight-bin configuration. This is not a floating EEG pipeline proof.
 \textbf{Conclusion.} Whole-numerator
 bounds certify source rank constancy, but
-the demonstrated Bernstein advantage
-does not persist against the stronger
-midpoint-centered Horner baseline.
+a small Bernstein advantage over
+midpoint-centered Horner appears only
+in one high-dimensional, coarse-bin synthetic condition.
 No exclusive state-of-the-art numerical
 method, end-to-end floating EEG certificate,
 or prospective transfer gain is established.
@@ -130,6 +133,7 @@ machine-verification claims.
 \input{P4_synthetic_multidimensional_numeric_appendix.tex}
 \input{P4_exact_rational_horner_comparison_results.tex}
 \input{P4_strong_centered_horner_negative_comparison_20261013.tex}
+\input{P4_multi_family_strong_baseline_sweep_results_20261013.tex}
 
 \input{P4_realized_interval_refinement_negative.tex}
 
@@ -156,8 +160,9 @@ additional Bernstein certificates, but the new
 midpoint-centered Horner baseline achieved the
 same strict rational coverage with lower measured
 time than full Bernstein on these 960 intervals.
-Thus no current strong-baseline exclusive
-Bernstein coverage advantage has been established.
+A second 4,320-case rational sweep found twelve
+additional Bernstein signs in one configuration,
+but no speed or real-input advantage was established.
 A publishable method note would
 need a substantial independent benchmark
 on multiple spectral dimensions and
