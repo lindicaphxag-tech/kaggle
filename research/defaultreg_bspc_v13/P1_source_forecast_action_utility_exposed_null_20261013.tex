@@ -1,0 +1,46 @@
+\subsection{Forecast action utility against a trivial always-macro policy}
+\label{sec:p1-exposed-action-null}
+The previously exposed BNCI2014\_001 nine-person
+independent LDA scoring implementation generated
+nine \emph{positive} source-only forecasts for the
+macro-AUC minus proper-predictive-AUC advantage,
+where only seven target advantages were positive.
+Thus its $7/9$ sign accuracy equals the trivial
+always-positive sign predictor. We additionally
+asked whether magnitude thresholds on this \emph{same
+frozen prediction vector} would have produced
+nontrivial decisions, without any model refit.
+Always selecting source macro achieved a descriptive
+$+0.01260824$ target mean AUC relative to always
+selecting the proper-predictive shrinkage. A
+post-outcome subject-specific oracle would have
+achieved $+0.01515346$ on these same already
+observed targets; its availability is entirely
+counterfactual and is not a practical selector.
+
+At an illustrative source-forecast threshold
+$\tau=0.005$ AUC, a target-blind policy would
+select source macro for five held targets
+and proper predictive shrinkage for four.
+Its descriptive outcome was $-0.00254522$
+AUC relative to \emph{always macro};
+two target records were worse than macro
+by over $0.005$ AUC. With threshold zero,
+all nine forecasts favour macro and the
+decision is exactly the same as always macro.
+The smaller inspected $\tau=0.0025$ produces
+a descriptive gain of only $+0.00015003$
+AUC over always macro, but these thresholds
+were inspected \emph{after} target outcomes
+were known and cannot be called prospective,
+optimised or statistically established.
+The machine-readable source scalar records
+are re-audited with exact decimal arithmetic,
+and zero-target feature access does not undo
+prior \emph{project-wide outcome exposure}.
+
+This counterexample distinguishes apparently
+reasonable forecast error from the decision
+value of the prediction. No new shrinkage
+algorithm, individual safety policy, or
+independent target validation follows.
