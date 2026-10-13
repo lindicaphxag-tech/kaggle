@@ -339,3 +339,46 @@ latest build and human page-by-page inspection both pass.
 5. Human coauthors must verify manuscript ownership, independent ethical
    data use, conflict/funding statements, citations, final figure layout
    and corresponding-author-controlled editorial submission.
+
+
+## Verified actual-author-review PDFs — post-layout correction (2026-10-13)
+
+The following is a NEWER audit than prior pending-run descriptions.
+All four actual GitHub Actions artifact ZIPs were downloaded; four
+individual PDF SHA256 sums matched the in-artifact EXACT_HEAD_PDF_RECEIPT
+JSON; PDFs opened successfully, page counts matched, and pdf text-blocks
+were checked not to extend outside the physical paper media box.
+All four TeX logs have ZERO overfull hboxes.
+
+| Paper | Exact branch head | Pages | Overfull hboxes | Successful run |
+| --- | --- | ---: | ---: | --- |
+| P1 JNE | 1b65914cdd1e443d8fca2303375e5bea9b148df2 | 27 | 0 | https://github.com/lindicaphxag-tech/kaggle/actions/runs/38395087320 |
+| P2 BSPC | 322ed0a4d6fd1a2ce0502a37b1d7c136d558f225 | 22 | 0 | https://github.com/lindicaphxag-tech/kaggle/actions/runs/38394187739 |
+| P3 PLOS ONE | f54312402281509d82a51ed852528ef4e7c3a7a5 | 10 | 0 | https://github.com/lindicaphxag-tech/kaggle/actions/runs/38394850027 |
+| P4 Numerical Algorithms | 08cd3dfe0ae67778b70e09b110dd6bdc7b991554 | 15 | 0 | https://github.com/lindicaphxag-tech/kaggle/actions/runs/38393607317 |
+
+Substantive P1 diagram correction: historic class-centred CovScore is
+no longer inaccurately labelled covariance-NLL or mistaken for true
+source-mean predictive Gaussian likelihood. An unsupported "TRUE
+PRE-DATA external cohort" assertion was removed, and the grayscale
+participant forest plot was actually rendered and inspected; an
+overlapping graph subtitle detected on the rendered page was deleted
+in the above P1 exact-HEAD run. All outcomes from those cohorts remain
+retrospective at project level.
+
+Substantive P3 chronology correction: "target was acquired" replaced by
+the accurate "previously publicly released target EEG was first
+LOADED after source-choice SHA lock." This is not a newly recruited
+clinical acquisition nor external preregistration.
+
+P2's 50-ID complete 1,225-pair triangular matrix was rendered and
+inspected. The immutable provenance URL was converted to a clickable
+descriptive label for print, and the separate 49-content-group figure
+now uses a black square rather than a red mark; last PGFPlots width
+overrun was corrected. P1/P3/P4 have no overfull line warnings, and P2
+has zero in its last completed build.
+
+**Zero overfull lines and media-box containment DO NOT establish
+submission-ready scientific design, journal template compliance,
+patient source identity, independent prospective validation,
+all-author signoff, or paper acceptance. All four remain DRAFT.**
