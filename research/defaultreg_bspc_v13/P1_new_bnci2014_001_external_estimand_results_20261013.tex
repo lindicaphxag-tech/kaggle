@@ -1,0 +1,71 @@
+% Executed real public EEG run 38326645328. Descriptive, previously public.
+\subsection{Additional independent-acquisition estimand comparison on BNCI2014\_001}
+\label{sec:p1-bnci001-external-estimand}
+We added a distinct public motor-imagery acquisition,
+BNCI2014\_001, using released participants 1--9,
+left/right imagery, C3/Cz/C4, 8--30~Hz, 160~Hz and
+a fixed 27-point scalar shrinkage grid.
+Six prespecified source-only policies were compared:
+grouped macro-AUC, proper source-trained-class-mean
+Gaussian predictive NLL, historical validation-class-centred
+CovScore, Ledoit--Wolf, OAS, and a fixed $\lambda=0.1$.
+This is a new computation on an existing public
+acquisition, \emph{not} a preregistered independent
+prospective recruitment or clinical validation.
+
+In one traceable chronological stage, the source
+parameters for eight released persons were selected
+and serialized as SHA-256
+\texttt{a0fa2206f9ec4bf274c168095e8fa7b4a782158d560cffa4a0c97f00ec076c9c}
+\emph{before the ninth person's EEG was read by that script}.
+For the held ninth participant (288 trials), source-macro
+scored 0.746480 ROC-AUC and the corrected predictive-NLL
+source policy 0.709394; the difference was
+$+0.037085$ AUC for source-macro. These choices
+were source-only within the run but were formulated
+after related EEG studies; the chronological file lock
+is not independent preregistration.
+
+The corresponding nine-person leave-one-person-out
+reanalysis, completed after opening the ninth participant,
+is explicitly retrospective. Each held fold refitted
+the same tangent reference and predictive/discriminative
+source models on eight other participants; source
+training sets overlap heavily.
+\begin{table}[tb]
+\centering\small
+\caption{BNCI2014\_001, nine \emph{exploratory} person-held
+folds, three channels. No prospective superiority or
+population-level paired significance claim is made.
+All methods used corresponding source data only.}
+\label{tab:p1-bnci001-new}
+\begin{tabular}{lr}
+\toprule
+Source-only choice / comparator & Macro ROC-AUC\\
+\midrule
+Source-macro selection & 0.739423\\
+Proper predictive Gaussian NLL & 0.730158\\
+Fixed $\lambda=0.1$ & 0.729928\\
+OAS & 0.724842\\
+Ledoit--Wolf & 0.724784\\
+Historical validation-class-centred score & 0.724655\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The mean source-macro minus proper-predictive
+difference was $+0.009265$ AUC, with two
+participants differing by more than 0.02 AUC
+in favour of source-macro and no participants
+differing by more than 0.02 in the other direction.
+This differs in magnitude from earlier corrected
+predictive controls (including Shin2017A), again
+suggesting acquisition-dependent source-selection
+behaviour rather than a universal performance law.
+The executed source-lock, individual outcomes and
+frozen experiment artifact are available at
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38326645328}.
+The result validates the need to name the
+proper predictive estimand, but does not
+establish a superior decoder or general prospective
+selection policy.
