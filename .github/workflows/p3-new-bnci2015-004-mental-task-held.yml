@@ -1,0 +1,52 @@
+name: P3 BNCI2015-004 first-repo mental-task cross-paradigm five-policy holdout
+on:
+  push:
+    branches: [publication/default-eeg-p3-transfer-negative-20261013]
+    paths:
+      - '.github/workflows/p3-new-bnci2015-004-mental-task-held.yml'
+      - 'research/defaultreg_bspc_v13/src/p3_bnci2015_004_mental_task_eight_source_one_held.py'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  source_eight_then_target_nine_crossparadigm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    env:
+      MNE_DATA: /tmp/bnci2015-004-p3-new
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python3 -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Freeze eight labelled SOURCE IDs before one unseen mental-task target
+        run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_bspc_v13/src/p3_bnci2015_004_mental_task_eight_source_one_held.py --out /tmp/p3_new_mental_task
+      - name: Require exact common five-operator and no false motor-imagery claim
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=Path('/tmp/p3_new_mental_task')
+          s=json.loads((d/'P3_BNCI2015_004_SOURCE_BEFORE_ID9.json').read_text())
+          t=json.loads((d/'P3_BNCI2015_004_FIRST_REAL_HELD_TARGET_RESULT.json').read_text())
+          assert s['source_ids']==list(range(1,9))
+          assert s['target_id9_not_yet_requested']
+          assert s['no_target_labels_or_features_for_choices']
+          assert s['same_common_operator_matrix']
+          assert t['one_held_person_in_one_acquisition']
+          assert t['not_proof_of_EEG_motor_imagery_generalisation']
+          assert set(t['auc'])=={'source_macro','continuous','SCE','anisotropic','group_centered'}
+          assert all(0<=v<=1 for v in t['auc'].values())
+          print('P3_BNCI2015_004_CROSS_PARADIGM_REAL_COMMON_FIVE_POLICY_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p3-new-bnci2015-004-8source-1target-mental-task-fixed-policy
+          path: /tmp/p3_new_mental_task/*.json
+          if-no-files-found: warn
+          retention-days: 90
