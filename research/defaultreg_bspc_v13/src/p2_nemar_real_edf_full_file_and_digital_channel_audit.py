@@ -37,15 +37,23 @@ def parse_edf(blob):
            for i in range(count)]
     if len(blob)!=hd+2*records*sum(sizes):
         raise ValueError("EDF size / sample layout mismatch")
+    labels=[field(blob,256+16*i,256+16*(i+1)) for i in range(count)]
     streams=[hashlib.sha256() for _ in range(count)]
+    first_word=[None]*count
+    variable=[False]*count
     pos=hd
     for _ in range(records):
         for i,k in enumerate(sizes):
             chunk=blob[pos:pos+2*k]
             if len(chunk)!=2*k:raise AssertionError("EDF record underflow")
-            streams[i].update(chunk);pos+=2*k
+            streams[i].update(chunk)
+            if first_word[i] is None:first_word[i]=chunk[:2]
+            if not variable[i] and chunk!=first_word[i]*k:variable[i]=True
+            pos+=2*k
     if pos!=len(blob):raise AssertionError("EDF record overflow")
     return {"channels":count,"records":records,"samples_per_record":sizes,
+            "channel_labels":labels,
+            "channel_has_digital_variation":variable,
             "channel_digest":[h.hexdigest() for h in streams]}
 
 def compare(x,y):
@@ -53,7 +61,13 @@ def compare(x,y):
         or x["samples_per_record"]!=y["samples_per_record"]):
         return {"comparable":False}
     aa=x["channel_digest"];bb=y["channel_digest"]
+    common=[i for i,(a,b) in enumerate(zip(aa,bb)) if a==b]
     return {"comparable":True,
+            "exact_identical_channel_summary":[
+                {"zero_based_index":i, "label_in_first_file":x["channel_labels"][i],
+                 "label_in_second_file":y["channel_labels"][i],
+                 "is_time_varying_digital_signal":x["channel_has_digital_variation"][i]}
+                for i in common],
             "same_index_exact_digital_channel_count":
                 sum(a==b for a,b in zip(aa,bb)),
             "permutation_invariant_exact_channel_count":
@@ -95,8 +109,11 @@ def selftest():
     x=make([[1,2,3,4,5,6],[10,20,30,40,50,60]])
     y=make([[1,2,3,4,5,6],[10,20,30,40,50,61]])
     z=make([[10,20,30,40,50,60],[1,2,3,4,5,6]])
-    assert compare(parse_edf(x),parse_edf(y))[
-        "same_index_exact_digital_channel_count"]==1
+    cmp=compare(parse_edf(x),parse_edf(y))
+    assert cmp["same_index_exact_digital_channel_count"]==1
+    assert cmp["exact_identical_channel_summary"]==[{
+        "zero_based_index":0, "label_in_first_file":"ch0",
+        "label_in_second_file":"ch0", "is_time_varying_digital_signal":True}]
     assert compare(parse_edf(x),parse_edf(z))[
         "permutation_invariant_exact_channel_count"]==2
     try:parse_edf(x[:-2])
