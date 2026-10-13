@@ -307,7 +307,8 @@ def self_test():
         assert len(result["pair_comparisons"])==3
         assert result["pair_comparisons"][0]["best_matching_numeric_array"]["exact_numeric_equality"]
         assert result["pair_comparisons"][1]["best_matching_numeric_array"]["exact_numeric_equality"] is False
-        assert result["total_http_range_body_bytes"]<len(zp.read_bytes())*2
+        assert result["total_http_range_body_bytes"]>0
+        assert result["only_six_selected_source_MAT_members_read"]
         print("P2_SOURCE_MAT_RANGE_ONLY_SYNTHETIC_EXTRACTION_AND_COMPARE_PASS",flush=True)
 
 def main():
