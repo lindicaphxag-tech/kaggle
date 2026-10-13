@@ -119,7 +119,7 @@ def self_test():
     # Global covariance can be dominated by one extreme channel,
     # but the per-channel median resists this confound.
     huge=rng.standard_normal((40,33,4000))
-    v=huge.copy()
+    v=rng.standard_normal((40,33,4000))
     huge[:,0,:]*=1e7;v[:,0,:]=huge[:,0,:]
     q=compare(huge,v)
     assert q["globally_aligned_numeric_pearson"]>.99
