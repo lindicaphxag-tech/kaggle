@@ -46,20 +46,23 @@ found coverage improvements ranging from zero
 at $p=2$ to more than 16 percentage points on
 some higher-dimensional synthetic configurations;
 it does not constitute new EEG validation.
-An additional exact-rational microbenchmark certified
-924/960 intervals using Bernstein versus 912/960
-using interval Horner, but Bernstein's core
-sign tests took approximately $5.65$ times longer.
-These synthetic results also do not test an
-external EEG target improvement.
+A stronger 960-interval exact-rational comparison
+certified 912 intervals using unshifted Horner,
+but \emph{924 each} with midpoint-centered Horner,
+Bernstein or their selective hybrid. The 12
+Bernstein-only certificates against the weaker
+baseline therefore vanished against centered
+Horner; the latter was faster in this
+machine-dependent microbenchmark.
+This is not a floating EEG pipeline proof.
 \textbf{Conclusion.} Whole-numerator
-polynomial bounding gives a small,
-measurable technical improvement in
-source rank stability coverage. Classical
-polynomial algebra is not newly invented
-here; no formally rounded numerical
-proof or prospective EEG transfer gain
-has been established.
+bounds certify source rank constancy, but
+the demonstrated Bernstein advantage
+does not persist against the stronger
+midpoint-centered Horner baseline.
+No exclusive state-of-the-art numerical
+method, end-to-end floating EEG certificate,
+or prospective transfer gain is established.
 \end{abstract}
 \noindent\textbf{Keywords:} EEG;
 regularised discriminant analysis;
