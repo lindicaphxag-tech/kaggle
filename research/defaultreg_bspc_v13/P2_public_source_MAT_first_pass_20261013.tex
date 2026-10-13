@@ -1,75 +1,106 @@
-% Executed GitHub Actions 38333234894, Figshare v5 file 38516555.
-% Retrospective source MAT evidence, no subject-identity conclusion.
-\subsection{Separately released source MAT arrays: first-pass comparison}
+% Real public Figshare v5 original SOURCE MAT files.
+% First bulk-array run 38333234894; channel/trial falsification 38333754177.
+% No source-MAT/EDF clinical channel map or identity claim.
+\subsection{Source MAT correlations: a falsifying channel-wise control}
 \label{sec:p2-source-MAT}
-To test whether the EDF-layer relationship
-could be an artifact introduced solely
-\emph{after} source-file publication, we
-examined the independently distributed
-Figshare v5 \texttt{sourcedata.zip} archive.
-Its ZIP central directory identified
-one MAT member for each of the six
-previously flagged public identifiers.
-Strict HTTP partial-content range requests
-retrieved only those six selected members,
-totalling about 228 MB of transfer
-without downloading the full
-1.875 GB archive. Their ZIP CRC values
-were validated, and the full MAT
-numerical contents were examined
-within ephemeral runner storage
-without publishing patient metadata
-or waveform arrays.
+We independently obtained six designated
+MAT members of Figshare v5 \texttt{sourcedata.zip}
+using strict HTTP byte ranges. The ZIP
+CRC values verified, and no waveform
+arrays or patient metadata were included
+in the public numerical receipts.
+Each selected public MAT contained one
+large numerical array of shape
+$40\times33\times4000$.
+This is a separately published source
+artifact, \emph{not} verified access to
+a clinical acquisition-session log.
 
-Each of the six released MAT files
-contained a large numeric array with
-identical $40\times33\times4000$ shape.
-The first-pass, aligned full-array
-correlations are:
+Naively flattening all 5,280,000
+numbers in each corresponding
+pair produced apparent
+$r\simeq0.99995$. Critically, that
+quantity is \emph{not} a
+channel-wise EEG similarity estimate.
+We therefore recomputed correlations
+separately for each corresponding
+MAT array channel index and counted
+exactly equal numeric trial--channel
+blocks on the original
+$40\times33\times4000$ grids.
 \begin{table}[tb]
 \centering\small
-\caption{Retrospective correlations of
-corresponding numerical arrays in the
-separately distributed public source
-MAT files. They are \emph{not}
-claims of identical patients or
-independent original acquisition sessions.
-The arrays are numerically unequal
-and their mapping to the 29 named
-EEG channels of the processed EDF
-must be verified separately.}
+\caption{Falsification of naive pooled-source
+MAT correlations. The median is
+taken over nonconstant source-array
+channel indices (one of the 33 is
+constant). The final count is
+aligned exact equality of
+$40\times33=1,320$ numerical
+trial--channel blocks, not
+independent clinical trials or people.
+No complete MAT channel pair reached
+$r\geq0.9999$.}
 \label{tab:p2-source-mat-initial}
-\begin{tabular}{lrr}
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{lrrr}
 \toprule
-Released public IDs & Whole-array Pearson $r$ & Exact?\\
+IDs & Pooled $r$ & Median channel $r$ & Exact / 1,320\\
 \midrule
-4/5   & 0.9999645144 & No\\
-47/49 & 0.9999576227 & No\\
-11/15 & 0.9999536829 & No\\
+4/5   & 0.999965 & 0.625329 & 15\\
+47/49 & 0.999958 & 0.818365 & 14\\
+11/15 & 0.999954 & 0.763512 & 10\\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The existence of high similarity in
-the separately released source MAT
-\emph{products} means the relationship
-cannot safely be attributed exclusively
-to our additional MOABB filtering
-or to one EDF reader. However,
-whole-array correlations can be distorted
-by a single high-variance channel,
-shared reference or data-export structure.
-Thus these initial values do \emph{not}
-prove that each EEG channel or each
-motor-imagery trial is a near duplicate.
-A subsequent channel-by-trial audit,
-and the publisher's MAT--EDF channel
-mapping, are needed before identifying
-the signal-level mechanism.
-The successful real-public-source
-receipt is archived at
-\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38333234894}.
-The authors have no access to clinical
-acquisition lineage records; MAT filename
-distinctness and array correlation do
-not determine participant identity.
+The same MAT channel index 17
+contains a full-length constant
+high-magnitude value, with root
+mean square amplitude about 187,500
+in the inspected files; its
+within-channel Pearson correlation
+is undefined. Pooling channels of
+unequal offsets/variances can therefore
+give spuriously reassuring
+cross-file agreement. In fact,
+no corresponding nonconstant
+MAT array channel had full-length
+Pearson $r\geq0.9999$, and there
+were only 15, 14 and 10
+exact trial--channel blocks
+respectively out of 1,320.
+Thus the first-pass pooled
+MAT correlations are \emph{not
+evidence that almost all
+original-source EEG waveforms
+were equal}. A separate explicit
+within-channel centering and
+between-channel mean-variance
+decomposition is needed for a
+mechanistic explanation of why the
+pooled values were so large.
+
+These source-MAT findings do
+\emph{not} invalidate the separate,
+directly verified preprocessed-EDF
+digital block identities in
+Table~\ref{tab:p2-temporal-exact-edf}.
+Instead they make source-MAT to
+EDF signal/channel mapping,
+processing and export lineage
+an even more important unresolved
+question. No direct source-MAT
+to EDF channel correspondence,
+clinical person identity or
+shared acquisition session
+has been established.
+
+The verified exploratory results
+are available in GitHub Actions
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38333234894}
+and
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38333754177}.
+They are analyses of previously
+examined public recordings, not
+prospectively uninspected cohorts.
