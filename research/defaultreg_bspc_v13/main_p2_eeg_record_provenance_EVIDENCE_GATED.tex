@@ -28,7 +28,8 @@ trial contents and 49 recording-content groups. Under a second
 cross-identifier alias persisted. An independent EDF raw
 digital-sample comparison found 32 of 33 original channel
 streams equal byte-for-byte for identifiers 4 and 5,
-versus one of 33 for a negative-control pair. The nominal
+with one additional unnamed channel differing; these findings
+are about digital samples, not participant identity. The nominal
 50-ID source-macro ROC-AUC was 0.594000, falling to 0.588673
 after evaluating 49 unique held contents with original
 training and source choices, and to 0.582551 under
@@ -75,6 +76,20 @@ underlying recruitment metadata. The research questions are whether
 exact epoch contents recur under different released IDs and whether
 their removal affects decoding through altered evaluation weights,
 source fitting, source regularisation choice, or interactions.
+
+More generally, information leakage can invalidate scientific
+machine-learning claims even when an evaluation protocol has a
+conventional train/test split \cite{kaufman2012leakage,kapoor2023leakage}.
+Correlated train/test partitions and limited independent units also
+complicate uncertainty interpretation in neuroimaging
+\cite{varoquaux2018cv}. These studies motivate a stronger
+independence audit, but none establishes that a released EEG
+participant identifier uniquely identifies its digital signals.
+Our narrower contribution tests exact cross-identifier signal
+content and separates a retrospective fit/selection contrast
+from a denominator-only reporting contrast. We additionally
+report aligned-record similarity as an exploratory screening
+signal, not as proof of clinical or acquisition identity.
 
 \section{Methods}
 \subsection{Preprocessing, exact identity and content-safe splits}
@@ -162,16 +177,21 @@ that ID 4 and ID 5 are stored in different EDF binary files yet
 EDF data. The sole differing channel was index 32 (zero-based),
 reported with an empty name by the pinned MNE EDF reader.
 Thus the identity evidence extends beyond the resampled,
-post-filtering model inputs. The negative-control pair IDs 47
-and 49 had coincident previously recorded target AUC vectors
-but different signal arrays; equal classifier outcomes alone
-must not be used as an identity criterion.
+post-filtering model inputs. The initially nominated raw digital non-identity comparator,
+IDs 47 and 49, had coincident historical target AUC vectors
+but different integer arrays. Subsequent exploratory analysis
+also found extremely high aligned-waveform similarity in this
+pair; it is therefore \emph{not} a valid negative control for
+near-overlap. Coincident classifier outcomes alone are never
+used as an identity fingerprint.
 The independent digital EDF payload reader confirmed
 exact byte-for-byte equality of 32 of 33 original
 channel sample streams for the released ID 4/5 pair,
 with sole difference at unnamed channel index 32.
-The negative-control released pair 47/49 shared
-only one of 33 digital channels. A strict pyEDFlib
+The released pair 47/49 shared only one of 33
+\emph{exact} digital channel streams, but was later flagged
+for high waveform correlation; byte inequality does not
+imply physiologically independent recordings. A strict pyEDFlib
 physical-signal reader rejected the source EDF
 header because its Physical Maximum metadata
 were noncompliant; thus our separate raw digital
@@ -207,8 +227,8 @@ not by itself a causal EEG leakage-effect estimate.
 \section{Discussion}
 Our observation is more specific than generic random-window leakage:
 the public released label unit was not enough to ensure disjoint
-processed signal contents. The full data-integrity audit and two
-four separately processed public-acquisition controls make the particular duplicate
+processed signal contents. The full data-integrity audit and four
+separately processed public-acquisition controls make the particular duplicate
 verifiable and falsifiable, while the same-held-target factorial
 prevents silently attributing the whole correction to a changing
 regularisation parameter.
@@ -229,6 +249,18 @@ classifier loss functions retained the localized large change in the
 aliased content group. This does not provide an independent cohort or
 establish prevalence across public EEG datasets.
 
+The post-discovery aligned-waveform screen additionally flagged
+IDs 11/15 and 47/49 as highly similar but non-identical
+recordings. The 47-held-group source-exclusion experiment is
+\emph{only} a sensitivity scenario conditional on grouping
+those pairs; it is not an empirically verified count of
+independent human participants, nor a population leakage
+estimate. Raw channelwise correlations and digital affine
+checks do not resolve the acquisition or export mechanism.
+The dataset custodians' clarification is outstanding.
+A general purpose, automatically validated near-duplicate
+threshold has therefore \emph{not} been established here.
+
 The overlap finding pertains to a fixed processed software
 representation. Authoritative resolution of whether patient
 records themselves were duplicated requires the original
@@ -247,7 +279,11 @@ An EEG subject label is not automatically an independent
 signal identity. Full processed epoch-content checks found
 one complete cross-ID duplicate in a 50-ID acute-stroke
 motor-imagery acquisition, and no exact cross-ID matches
-in four other public acquisitions (two added post-discovery). A 49-recording-group
+in four other public acquisitions (two added post-discovery).
+Two additional nearly identical but not byte-equivalent
+record pairs were flagged for provenance investigation;
+no clinical identity or definitive 47-group interpretation
+is inferred. A 49-recording-group
 full refit and $2\times2$ frozen fit--selector contrast
 showed that reporting weights, model fitting and source
 selection must not be collapsed into a single asserted
@@ -257,8 +293,9 @@ regularisation comparisons.
 
 \section*{Statements and Declarations}
 \textbf{Data and code availability:}
-Liu2024, Weibo2014 and BNCI2014\_002 are publicly
-distributed at their original repositories.
+Liu2024, Weibo2014, BNCI2014\_002,
+BNCI2014\_001 and BNCI2015\_001 are publicly
+distributed at their respective original repositories.
 No EEG waveform recordings are redistributed here.
 The implemented exact cross-ID content audit and
 full source-refit study, with experiment protocol,
