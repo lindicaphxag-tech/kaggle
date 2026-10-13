@@ -57,15 +57,34 @@ no fixed eigenvectors and no sampled noise law
 are required for this conditional conclusion.
 
 The included synthetic exact-rational test uses
-24-record two-class input feature matrices, a
-positive pooled covariance ridge and independently
-generated admissible feature perturbations. It
-recomputes \emph{all} class means, within-class
-residuals, covariance and test pair differences
-after perturbation, rather than merely injecting
-a matrix-level error. The test probes original
-and perturbed rational score signs on the interval.
-It is an operator regression, not EEG classification,
-an estimated patient-level risk, or a
-proof that an unverified feature pipeline
-satisfies the hypothesised $\eta$ bound.
+64 seeded two-class, 24-record final-feature matrices
+with a common positive ridge. Of these deliberately
+well-separated fixtures, 48 have proved positive
+score signs and 16 proved negative signs over the
+entire continuous $\lambda$ interval and every
+admissible entrywise feature perturbation; no
+candidate was inconclusive in this \emph{easy}
+synthetic subset. Independently reconstructed
+admissible feature perturbations produced 576 exact
+rational score checks without a contradiction.
+A separate, deliberately adversarial \emph{exact
+counterexample} perturbs one positive and one
+negative record, each by $\eta=0.1$: the nominal
+score is positive and an admissible score is
+negative across tested shrinkage values; the
+algorithm correctly returns \texttt{UNKNOWN}.
+This demonstrates that the apparatus can
+refuse certification when input uncertainty
+permits a genuine decision reversal.
+The program recomputes all class means,
+within-class residuals, covariance and pair
+differences rather than merely injecting
+a matrix-level error. The successful code,
+exact samples and fail-closed counterexample
+are archived in
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38389194383}.
+These are conditional operator regressions,
+not real EEG classification, a patient-level
+risk model, or proof that any unverified
+preprocessing/tangent pipeline satisfies
+the assumed final-feature $\eta$ bound.
