@@ -177,6 +177,10 @@ def real(out):
         "previously_public_retrospective_research":True,
         "rows":[],
     }
+    # Retain just six numeric arrays in memory for a targeted cross-ID
+    # contrast; do not export source or EDF samples to the artifact.
+    source_arrays={}
+    edf_arrays={}
     with tempfile.TemporaryDirectory() as tmp:
         for sid in IDS:
             wanted=f"sourcedata/sub-{sid:02d}/sub-{sid:02d}_task-motor-imagery_eeg.mat"
@@ -201,6 +205,8 @@ def real(out):
                 "source_member_verified_crc":True,
             })
             meta["rows"].append(result)
+            source_arrays[sid]=mat
+            edf_arrays[sid]=digi
             print("P2_SOURCE_TO_EDF_PAIR",sid,
                   "same_index",result["same_channel_index_abs_pearson_median"],
                   "permuted",result["one_to_one_assignment_median_abs_r"],
@@ -208,6 +214,21 @@ def real(out):
                   "trial_match_ge_0p95",result["same_index_optimal_trial_assignment_abs_r_ge_0p95"],
                   "trial_match_n",result["same_index_channel_optimal_trial_assignment_eligible"],flush=True)
             del arrays,mat,digi
+    # For each observed release-layer pair, test both cross-ID directions
+    # against the same-ID comparisons; matching is exploratory and post hoc.
+    meta["cross_released_id_trial_assignment"]=[]
+    for first,second in ((4,5),(11,15),(47,49)):
+        for source_id,edf_id in ((first,second),(second,first)):
+            result=pair_correlations(source_arrays[source_id],edf_arrays[edf_id])
+            row={"source_mat_public_id":source_id,
+                 "processed_edf_public_id":edf_id,
+                 "trial_match_median_abs_r":result["same_index_optimal_trial_assignment_abs_r_median"],
+                 "trial_match_ge_0p95":result["same_index_optimal_trial_assignment_abs_r_ge_0p95"],
+                 "trial_match_n":result["same_index_channel_optimal_trial_assignment_eligible"],
+                 "same_order_channel_median_abs_r":result["same_channel_index_abs_pearson_median"],
+                 "posthoc_trial_matching_does_not_establish_acquisition_identity":True}
+            meta["cross_released_id_trial_assignment"].append(row)
+            print("P2_CROSS_RELEASE_LAYER_PAIR",json.dumps(row,sort_keys=True),flush=True)
     meta["total_public_Figshare_HTTP_206_bytes"]=reader.total_received
     out.parent.mkdir(parents=True,exist_ok=True)
     text=json.dumps(meta,indent=2,sort_keys=True,allow_nan=False)+"\n"
