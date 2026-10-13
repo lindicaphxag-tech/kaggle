@@ -1,0 +1,25 @@
+\paragraph{Independent-distributor whole-file digest inventory.}
+An external derivative distributor of the same Liu2024 acquisition,
+NEMAR \texttt{nm000158} v1.0.3, publicly records that its
+\texttt{sourcedata} EDF files were retrieved through MOABB 1.5.0
+on 11 August 2026. Its version-pinned provenance JSON lists
+50 EDF files, each 10,568,704 bytes, with 50 distinct
+recorded full-file SHA-256 values. The reported full-file
+digest pairs 4/5, 11/15 and 47/49 are unequal.
+The source JSON can be inspected at
+\url{https://github.com/nemarDatasets/nm000158/blob/11e3eeb4b439d5f8ee1b5e3b8e6032824bc2de83/sourcedata/sourcedata_provenance.json}.
+These are checksums recorded by the distributor;
+we have not recomputed them by independently downloading
+the full EDF bytes. Whole-file inequality can reflect
+headers or auxiliary channels, and is \emph{not}
+a negative control for channel-level reuse or partially
+overlapping numeric time series. In particular,
+NEMAR's \texttt{sourcedata} path should not be mistaken
+for acquisition-original MAT data: its provenance
+documents a MOABB retrieval of public \emph{EDF} products.
+Because NEMAR republishes the same underlying Liu2024
+study, it supplies a versioned release trace rather than
+an independent patient/acquisition validation.
+No original MAT-to-EDF operator, acquisition session
+identity, or physiological correspondence follows from
+this manifest alone.
