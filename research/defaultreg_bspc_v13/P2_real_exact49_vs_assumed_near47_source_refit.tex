@@ -1,0 +1,65 @@
+% Executed previously exposed Liu2024 near-pair scenario. Non-confirmatory.
+\subsection{Sensitivity to alternative digital-content grouping}
+\label{sec:p2-similarity-group-sensitivity}
+The primary analysis defines group identity by exact processed trial
+content and therefore has 49 content groups. The exploratory
+whole-record screen also found two \emph{non-identical but strongly
+correlated} ID pairs (11/15 and 47/49). We examined how a deliberately
+more conservative training exclusion rule would change
+\emph{the same held recording outcomes}, without asserting that
+those pairs came from the same actual human or acquisition.
+
+For each of the 47 shared held representative IDs, we compared
+two source training strategies. The exact-content strategy
+retained 48 other exact-content representatives in the fit;
+the conservative scenario removed the additional ID15 and ID49
+representatives, retaining 46. Both strategies refitted their
+tangent reference, standardisation and fixed classifier,
+and were evaluated on the \emph{same 47 held recordings}.
+This comparison is a post-discovery sensitivity analysis, not
+a newly recruited cohort, a preregistered group-identification
+rule or a patient-level contamination estimate.
+
+\begin{table}[tb]
+\centering\small
+\caption{Exploratory matched 47-target scenario comparison on
+Liu2024 public EEG. The 47-target exact-content source policy
+is compared with a stricter \emph{assumed} 47-content-group
+source exclusion rule. The \(\Delta\) values are
+conservative-minus-exact source-fit AUC, not causal leakage
+estimates or comparisons over different held denominators.}
+\label{tab:p2-near47-sensitivity}
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{lrrrr}
+\toprule
+Fixed model & Exact fit & Conservative fit & Mean $\Delta$ & Other 45 $\Delta$\\
+\midrule
+Logistic $C{=}1$ & 0.567872 & 0.556436 & $-0.011436$ & $+0.000222$\\
+Ridge $\alpha{=}10$ & 0.570585 & 0.560000 & $-0.010585$ & $+0.001167$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The large shifts were concentrated in the two additionally
+screened representatives: logistic regression changed by
+$-0.2925$ for ID11 and $-0.2550$ for ID47; ridge
+classification changed by $-0.2975$ and $-0.2525$,
+respectively. In contrast, the other 45 held groups
+showed near-zero \emph{mean} shifts and individual shifts
+of mixed signs. All 47 source models share much of their
+training data, so these results are \emph{not} 47
+independent training-study replications.
+The comparison was executed on already inspected recordings
+using the exact source policy and fixed model definitions;
+the numerical receipt is available at
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38323188651}.
+
+We do \emph{not} redefine the primary sample as 47 confirmed
+physiological recordings. Whole-record correlation is
+insufficient evidence of shared acquisition identity.
+The scenario instead shows that the \emph{operational
+definition of a disjoint training source} can materially
+alter reported classifier outcomes in this public release.
+An independent raw-digital calibration/affine forensic analysis
+and clarification from the custodians are therefore required
+before stronger provenance conclusions can be drawn.
