@@ -222,6 +222,7 @@ not by itself a causal EEG leakage-effect estimate.
 \input{P2_raw_digital_affine_fingerprint_real_results.tex}
 \input{P2_EDF_block_temporal_localisation_results_20261013.tex}
 \input{P2_public_source_MAT_first_pass_20261013.tex}
+\input{P2_source_mat_vs_preprocessed_edf_alignment_20261013.tex}
 \input{P2_additional_BNCI2014_001_BNCI2015_001_controls_20261013.tex}
 \input{P2_figure_frozen49_group_paired_auc.tex}
 
@@ -262,10 +263,15 @@ A first comparison of corresponding numeric
 arrays in separately released public source MAT
 files is now available
 (Table~\ref{tab:p2-source-mat-initial}).
-However, the source MAT--EDF channel mapping,
-explanation of the persistent similarity and
-clinical acquisition-session provenance
-remain unresolved. Merely reading the
+A directly executed six-ID release-layer test
+(Table~\ref{tab:p2-mat-edf-alignment}) also found
+generally low channelwise MAT-to-EDF numeric
+correlation under identical sample order,
+even when allowing one-to-one channel permutations.
+This does not identify the cause:
+the source MAT--EDF channel mapping, preprocessing,
+temporal reference and clinical acquisition-session
+provenance remain unresolved. Merely reading the
 EDF with a second parser does not establish
 independence from upstream preprocessing.
 The dataset custodians' clarification is outstanding.
