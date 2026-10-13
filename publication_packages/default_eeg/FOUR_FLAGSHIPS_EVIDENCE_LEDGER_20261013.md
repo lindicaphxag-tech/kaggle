@@ -5,14 +5,14 @@ A manuscript standard or a locally passing program is not evidence
 of independent transfer benefit, journal acceptance or novelty superiority.
 
 ## Branch heads reviewed and pushed
-- P1 JNE PR #143, head 30c8f7180a96dc8484238b670dc709b96df1f2f7
+- P1 JNE PR #143, head d18415349974afe32c5c7a6a2c58704bd701bc6c
 - P2 BSPC PR #144, head f7926f70eef31e15dfb10d6eec8a19b5665360ba
 - P3 PLOS ONE PR #145, head e1279e5882b3c9712aacd8f5d43476d8370887dd
 - P4 Numerical Algorithms PR #146, head eae40b0764680bddfd76926bf233eb993420567f
 
 ## What this review actually adds
 
-### P1: a hard trivial-baseline falsification on EXPOSED REAL EEG
+### P1: a hard trivial-baseline falsification on EXPOSED REAL EEG\n- Manuscript Results now explicitly replace misleading unqualified\n  covariance-NLL references with historical class-centred CovScore;\n  this is NOT a proper source-mean predictive Gaussian likelihood.
 - From frozen BNCI2014_001 9-person second-scorer JSON, all nine
   source forecasts were positive; 7/9 observed deltas positive.
 - The advertised 7/9 sign accuracy **equals always-positive**.
