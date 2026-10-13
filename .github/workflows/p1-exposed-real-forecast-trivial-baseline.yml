@@ -1,0 +1,26 @@
+name: P1 exposed real EEG forecast trivial-baseline falsification
+on:
+  push:
+    branches: [publication/default-eeg-p1-estimand-20261013]
+    paths:
+      - '.github/workflows/p1-exposed-real-forecast-trivial-baseline.yml'
+      - 'research/defaultreg_bspc_v13/src/p1_exposed_forecast_trivial_baseline_audit.py'
+      - 'research/defaultreg_bspc_v13/results/P1_second_LDA_scorer_subject_forecast_20261013.json'
+      - 'research/defaultreg_bspc_v13/main_p1_estimand_mismatch_EVIDENCE_GATED.tex'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exposed-only-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          python3 research/defaultreg_bspc_v13/src/p1_exposed_forecast_trivial_baseline_audit.py \
+            --input research/defaultreg_bspc_v13/results/P1_second_LDA_scorer_subject_forecast_20261013.json \
+            --out p1_retrospective_nine_baseline_audit.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p1-exposed-nine-subject-trivial-baseline-comparator
+          path: p1_retrospective_nine_baseline_audit.json
