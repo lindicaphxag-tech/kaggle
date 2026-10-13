@@ -14,6 +14,8 @@ Our reproducible *public digital signal* observations are:
 2. **IDs 47 and 49:** full aligned processed EEG arrays are exceptionally highly correlated (about 0.99999999166) but are not fully identical in the raw digital EDF data. In our raw-int16 analysis, 13 of 32 nonconstant channels exceeded 0.9999 Pearson correlation. We explicitly **do not call this pair an independent near-duplicate negative control**.
 3. **IDs 11 and 15:** full aligned processed EEG arrays are similarly correlated (about 0.99999998340). In raw-int16 data, 13 of 32 nonconstant channels exceeded 0.9999 correlation, but the complete streams were not byte-identical.
 
+A subsequent retrospective **record-block** analysis of the preprocessed EDF digital payload found exact equality in 6,957/9,280 aligned, nonconstant named EEG channel-record blocks for 47/49, including 245/320 native EDF records with at least 90% of named EEG channel blocks equal (longest contiguous run: 179 EDF records). In 11/15, exact equality was only 171/9,280 such blocks. These blocks are not independent physiological trials or clinical patient counts.
+
 These correlations are post-discovery measurements of publicly released digital content, **not identification of a shared person**. A strict physical-unit reader reported a nonconforming EDF Physical Maximum header, so the digital payload audit is not an independent check of absolute physiological amplitude. The publicly described original MAT/\`sourcedata.zip\` layer has **not yet been compared**. We have no access to private clinical enrolment records and do not request them.
 
 **Would you be able to clarify, without sharing identifiable patient data:**
