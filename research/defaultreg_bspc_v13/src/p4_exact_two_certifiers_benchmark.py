@@ -54,6 +54,8 @@ def run():
              "bernstein_only":0,"horner_only":0,
              "centered_horner_certified":0,"bernstein_only_vs_centered":0,
              "centered_only_vs_bernstein":0,"centered_horner_seconds":0.,
+             "uncertifiable_sign_change_witnesses":0,
+             "unresolved_without_sign_change_witness":0,
              "identically_tied":0,"bernstein_seconds":0.,
              "horner_seconds":0.}
         s=[Q(i*i+1) for i in range(1,p+1)]
@@ -78,6 +80,14 @@ def run():
                 if one.startswith("strict_") and three.startswith("strict_") and one!=three:
                     raise AssertionError("Bernstein and centered Horner contradictory")
                 if three.startswith("strict_"):rec["centered_horner_certified"]+=1
+                if one=="unresolved" and three=="unresolved":
+                    # Opposite signed rational evaluations prove that no
+                    # sound whole-interval strict-sign certificate can hold.
+                    vals=[eval_poly(poly,lo+(hi-lo)*Q(j,128)) for j in range(129)]
+                    if min(vals)<0<max(vals):
+                        rec["uncertifiable_sign_change_witnesses"]+=1
+                    else:
+                        rec["unresolved_without_sign_change_witness"]+=1
                 if one.startswith("strict_") and three=="unresolved":rec["bernstein_only_vs_centered"]+=1
                 if three.startswith("strict_") and one=="unresolved":rec["centered_only_vs_bernstein"]+=1
                 if one!="unresolved" and two!="unresolved" and one!=two:
@@ -88,6 +98,7 @@ def run():
                 if one.startswith("strict_") and two=="unresolved":rec["bernstein_only"]+=1
                 if two.startswith("strict_") and one=="unresolved":rec["horner_only"]+=1
         assert rec["intervals"]==192
+        assert rec["unresolved_without_sign_change_witness"]==0
         report["per_dimension"].append(rec)
         print("P4_EXACT_TWO_METHODS",p,rec,flush=True)
     report["interval_count"]=sum(x["intervals"] for x in report["per_dimension"])
