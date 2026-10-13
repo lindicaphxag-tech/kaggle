@@ -26,9 +26,28 @@ The parser includes independently constructed two-channel
 two-record fixtures that exercise exact channel equality,
 permutation invariance and rejection of truncated payloads.
 A parser self-test is not a public-byte replication.
-\emph{Numerical results from this external-hosted six-file
-byte check must not be inserted until the specific CI run
-has completed and its checksums have been verified.}
+The real public-byte replication completed successfully
+in frozen GitHub Actions run \texttt{38384783079}
+(\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38384783079}),
+with independently recalculated SHA-256 matching the
+published NEMAR manifest for all six EDF binary files.
+Each is 10,568,704 bytes with 33 digital channels
+and 320 EDF records. Exactly 32 of 33 channel streams
+are identical at the same digital positions between
+released IDs 4 and 5; the exact permutation-invariant
+count is also 32. For ID pairs 11/15 and 47/49,
+the exact channel-stream counts are both 1 of 33,
+under either positional or permutation-invariant
+comparison. The whole-file SHA-256 values remain
+different for all three pairs. A non-identifying
+machine-readable scalar receipt is preserved
+as artifact \texttt{11804714208} in the run.
+This check is an independent \emph{implementation
+and hosted-release byte retrieval}, not an
+independent original EEG recording cohort.
+The single shared digital channel on each near-similar
+pair does not establish their nonoverlap in
+other transformed or temporally offset channels.
 Successful byte reproduction, if observed, can establish
 that an anomaly is visible in a second distribution channel
 but cannot distinguish reuse at a shared upstream EDF
