@@ -1,0 +1,43 @@
+\subsection{Prespecified multi-family exact-rational stress test}
+\label{sec:p4-multifamily}
+We further varied the spectral fixture without selecting an
+interval from its observed outcome: three deterministic strictly
+positive spectral families (linear, quadratic, and alternating),
+five dimensions $p=2,3,6,9,12$, the same twelve deterministic
+contrast patterns per dimension, and both eight and sixteen equal
+rational subintervals. This produces 4,320 matched interval cases.
+The numerator construction, coefficients, interval endpoints and
+both methods use exact rational arithmetic. These are synthetic
+classifier spectra, not an end-to-end certificate of the numerical
+EEG preprocessing pipeline.
+
+\begin{table}[tb]\centering\small
+\caption{Exact rational whole-interval strict-sign certifications
+on the predefined 4,320-case sweep. Opposite-sign rational point
+witnesses invalidate a whole-interval constant strict sign for
+216 unresolved cases. The additional twelve Bernstein certificates
+all occur at dimension twelve with the alternating spectrum and
+eight intervals per pattern.}
+\label{tab:p4-multifamily}
+\begin{tabular}{lr}\toprule
+Method or diagnostic & Interval count\\\midrule
+Midpoint-centered Horner certified & 4,092\\
+Bernstein certified & 4,104\\
+Bernstein only versus centered Horner & 12\\
+Centered Horner only versus Bernstein & 0\\
+Both unresolved with opposite-sign rational witnesses & 216\\
+Both unresolved without such a witness & 0\\
+\bottomrule\end{tabular}
+\end{table}
+
+The Bernstein fallback raises the 
+strict-sign count from 4,092 to 4,104 on this fixed
+synthetic suite, a 0.278-percentage-point change in
+coverage (12/4,320). It does not repair the 216 genuinely
+sign-changing intervals and does not prove an asymptotic
+speed advantage. In the earlier quadratic-spectrum 960-case
+fixture, the advantage remains zero. This result narrows the
+claim to a reproducible high-dimensional coarse-partition
+condition; tests of rounding-safe floating implementations,
+root isolation, runtime and more diverse polynomials remain
+necessary before a numerical-algorithm journal submission.
