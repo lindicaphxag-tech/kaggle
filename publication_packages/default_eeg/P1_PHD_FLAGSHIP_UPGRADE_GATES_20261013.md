@@ -43,3 +43,5 @@ If B/C fail, publish an estimand audit with narrower claims; do not retrofit the
 - Seibel et al. JNE 2026 DOI 10.1088/1741-2552/ae453d (data marginal-value predictive study).
 - Xiong et al. ICML 2026 EEG-FM-Bench: https://proceedings.mlr.press/v306/xiong26f.html (14 datasets, 10 paradigms; outside-journal high bar).
 A paper cannot claim top 10% journal placement without a predeclared same-topic accepted-paper sample and external validation.
+## Executed second scoring implementation (retrospective)
+The independently implemented pooled within-class shrinkage LDA score on BNCI2014_001 used the same tangent EEG feature preprocessing. Source-person cross-fit forecasted sign 7/9, mean absolute forecast error .015381 AUC; observed source-macro minus proper NLL mean +.012608 AUC. Held IDs 1 and 8 had wrong direction, and held ID9 observed +.06645 versus predicted +.00694. Workflow https://github.com/lindicaphxag-tech/kaggle/actions/runs/38363352983. All acquisition outcomes were previously exposed projectwide. The required untouched dataset and genuinely distinct EEG model family remain open; no reliable new-person prediction claimed.
