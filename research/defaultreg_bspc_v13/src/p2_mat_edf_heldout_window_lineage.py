@@ -26,7 +26,7 @@ def heldout_pair(mat,edf):
     a=np.asarray(mat,dtype=np.float64);b=np.asarray(edf,dtype=np.float64)
     if a.shape!=b.shape or a.ndim!=2 or a.shape[1]!=40*4000:
         raise ValueError('expected same-shape 40x4000 sampled release products')
-    train=[];test=[];valid=0
+    train=[];test=[];valid=0;channel_rows=[]
     for ch in range(a.shape[0]):
         u=a[ch].reshape(40,4000);v=b[ch].reshape(40,4000)
         A,na=standardized(u[:,:2000]);B,nb=standardized(v[:,:2000])
@@ -36,8 +36,16 @@ def heldout_pair(mat,edf):
         C,nc=standardized(u[:,2000:]);D,nd=standardized(v[:,2000:])
         good=(nc[rr]>0)&(nd[cc]>0)
         if not good.any():continue
-        train.extend(np.abs(corr[rr[good],cc[good]]).tolist())
-        test.extend(np.abs(np.sum(C[rr[good]]*D[cc[good]],axis=1)).tolist())
+        channel_train=np.abs(corr[rr[good],cc[good]])
+        channel_test=np.abs(np.sum(C[rr[good]]*D[cc[good]],axis=1))
+        train.extend(channel_train.tolist())
+        test.extend(channel_test.tolist())
+        channel_rows.append({'stored_channel_index':ch,
+                             'eligible_trials':int(good.sum()),
+                             'train_median_abs_r':float(np.median(channel_train)),
+                             'heldout_median_abs_r':float(np.median(channel_test)),
+                             'heldout_ge_0p9999':int(np.sum(channel_test>=.9999)),
+                             'all_40_heldout_ge_0p9999':bool(len(channel_test)==40 and np.all(channel_test>=.9999))})
         valid+=int(good.sum())
     tr=np.asarray(train);te=np.asarray(test)
     if valid==0:raise RuntimeError('no nonconstant channel trial comparisons')
@@ -46,6 +54,8 @@ def heldout_pair(mat,edf):
             'heldout_last_2000_median_abs_r':float(np.median(te)),
             'heldout_last_2000_abs_r_ge_0p95':int(np.sum(te>=.95)),
             'heldout_last_2000_abs_r_ge_0p9999':int(np.sum(te>=.9999)),
+            'per_stored_channel_scalar_summary':channel_rows,
+            'all_40_near_perfect_channel_indices':[x['stored_channel_index'] for x in channel_rows if x['all_40_heldout_ge_0p9999']],
             'trial_permutation_fitted_only_on_first_half':True,
             'channel_index_assumed_same_for_exploratory_screen':True}
 
@@ -93,6 +103,7 @@ def real(out):
                   'heldout_median',result['heldout_last_2000_median_abs_r'],
                   'heldout_ge95',result['heldout_last_2000_abs_r_ge_0p95'],
                   'heldout_ge9999',result['heldout_last_2000_abs_r_ge_0p9999'],
+                  'all40_channels',result['all_40_near_perfect_channel_indices'],
                   'eligible',result['eligible_channel_trial_matches'],flush=True)
     payload={'status':'PUBLIC_RELEASE_CROSS_LAYER_HELDOUT_TEMPORAL_SCREEN',
              'source_figshare_file_id':38516555,
