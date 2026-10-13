@@ -1,0 +1,37 @@
+\subsection{Externally hosted public EDF digital-payload replication gate}
+\label{sec:p2-nemar-real-gate}
+A further replication gate has been implemented using
+NEMAR \texttt{nm000158} version \texttt{v1.0.3}, which is an
+independent \emph{distribution channel} for the same
+underlying Liu2024 data, not an independently acquired
+patient cohort. The public provenance manifest at
+\url{https://github.com/nemarDatasets/nm000158/blob/11e3eeb4b439d5f8ee1b5e3b8e6032824bc2de83/sourcedata/sourcedata_provenance.json}
+records a per-file SHA-256 checksum for its MOABB-1.5.0 EDF
+derivatives. The CI protocol fetches six public EDF
+products (IDs 04, 05, 11, 15, 47, 49), recomputes their
+\emph{complete binary file} checksums, and refuses to
+compare signal content if any one differs from the pinned
+distributor manifest. A second, standard-library EDF
+reader then extracts as-stored little-endian digital sample
+payloads record-by-record without accepting the source
+files' physiological-amplitude header calibration.
+SHA-256 is computed per complete channel stream and
+compared both at equal channel positions and across
+permuted channel multisets. Channel comparisons require
+matching record and per-record sample counts.
+Only scalar checks and hashes are retained; this
+workflow publishes no EEG waveform arrays.
+
+The parser includes independently constructed two-channel
+two-record fixtures that exercise exact channel equality,
+permutation invariance and rejection of truncated payloads.
+A parser self-test is not a public-byte replication.
+\emph{Numerical results from this external-hosted six-file
+byte check must not be inserted until the specific CI run
+has completed and its checksums have been verified.}
+Successful byte reproduction, if observed, can establish
+that an anomaly is visible in a second distribution channel
+but cannot distinguish reuse at a shared upstream EDF
+source from genuine raw acquisition or same-patient
+identity. The data stewards' MAT-to-EDF conversion
+metadata remain outstanding.
