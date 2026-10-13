@@ -14,31 +14,35 @@ Our subsequent 8--30~Hz and resampling
 pipeline is a \emph{further} transformation.
 These layers must not be conflated.
 
-The strictest current evidence is therefore
-\emph{release-content} evidence at two levels:
-(i) the additional MOABB-transformed labelled
-epochs, and (ii) the stored EDF 16-bit
-digital channel payload \emph{before}
-our additional filtering. Using two libraries
-or an independent digital integer reader on
-the \emph{same EDF file} reduces software
-reader error but does not introduce an
-independent original acquisition.
+The currently inspected \emph{release-content}
+layers are (i) additionally MOABB-transformed
+labelled epochs; (ii) publisher-supplied EDF
+16-bit digital payloads \emph{before} our
+further filtering; and (iii) separately published
+source MAT numerical arrays. The source MAT
+archive was acquired by verified public HTTP
+byte-range extraction without distributing any
+waveform data. A preliminary same-shape
+whole-array comparison is reported separately
+in Section~\ref{sec:p2-source-MAT}.
 
-The data release separately describes a
-source-data MAT archive. Comparison of
-the \emph{original acquisition MAT records}
-against each other and against the
-publisher's EDF export is a separate
-uncompleted provenance gate. Even
-agreement at that earlier data layer
-would establish numerical signal ancestry,
-not that two public IDs identify the same
-clinical person or session. The latter
-requires contextual, nonidentifying
-confirmation from the dataset custodians.
-No original MAT results or custodian replies
-are reported in this study.
+Using two EDF libraries reduces reader-specific
+software error, but it does not establish
+original acquisition provenance. Likewise,
+the distributed MAT source product is an
+earlier \emph{release artifact}, not
+a clinical acquisition log. MAT-to-EDF
+channel mapping, trial provenance and source
+conversion operations remain unverified.
+Even further agreement between published
+MAT and EDF would establish numerical
+signal ancestry, not that two released
+IDs identify the same person or recording
+session. Contextual, nonidentifying
+clarification from the custodians remains
+outstanding. No clinical identities or
+source-session explanations have been
+inferred from the released files.
 
 Consequently, our labels \emph{exact EDF
 content overlap}, \emph{highly similar
