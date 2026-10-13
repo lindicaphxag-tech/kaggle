@@ -1,0 +1,34 @@
+name: P4 strong isolator exact AUC event path comparison
+on:
+  push:
+    branches: [publication/default-eeg-p4-rank-certificates-20261013]
+    paths:
+      - research/defaultreg_bspc_v13/src/p4_strong_isolator_full_path_comparison.py
+      - .github/workflows/p4-strong-isolator-end-to-end-event-path.yml
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  exact-event-path:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check sympy==1.14.0
+      - run: python research/defaultreg_bspc_v13/src/p4_strong_isolator_full_path_comparison.py --out /tmp/p4-strong-isolator-full-path.json
+      - name: Verify strict event-path parity
+        run: |
+          python - <<'PY'
+          import json
+          z=json.load(open('/tmp/p4-strong-isolator-full-path.json'))
+          assert len(z['rows'])==6
+          assert all(r['same_rational_root_isolator_and_exact_output'] for r in z['rows'])
+          assert z['identical_root_engine_both_methods']
+          print('P4_STRONG_ISOLATOR_EXACT_FULL_PATH_PARITY_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p4-strong-isolator-full-event-path
+          path: /tmp/p4-strong-isolator-full-path.json
+          retention-days: 90
