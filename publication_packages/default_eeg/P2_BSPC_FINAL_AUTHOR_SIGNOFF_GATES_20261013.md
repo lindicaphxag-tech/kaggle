@@ -41,3 +41,21 @@ Published paper, acceptance, and formal Elsevier submission are NOT claimed.
 ## Overlap restrictions
 
 P2 alone claims exact ID4/5 content alias and matched 49-group full refit-by-selector analysis. P1 alone claims Gaussian validation-estimand anatomy; P3 and P4 cannot reuse these exact results as separate original discoveries. The 37/67-paper comparison is a mixed accepted-paper sample and is not a calibrated acceptance probability.
+
+
+## Subsequent complete cross-ID real EDF census / latest PDF
+- SUCCESS verified 50 full EDF file bytes and all 1,225 pairwise comparisons:
+  https://github.com/lindicaphxag-tech/kaggle/actions/runs/38388066957.
+  Exactly 1 pair (4/5) has ANY complete identical time-varying named
+  EEG channel; 1 pair (47/49) has 6,957/9,280 aligned EEG EDF storage
+  block matches, 1 pair (11/15) 171/9,280, and 1,222 other pairs zero.
+  CPz constant reference excluded; no patient/acquisition identity claims.
+- P2 latest-article exact HEAD PDF through complete census source at
+  `1727439c4338ef4fee673b5f5d71c9d31db57008`:
+  https://github.com/lindicaphxag-tech/kaggle/actions/runs/38388523969,
+  SUCCESS, **21 pages, 6 overfull hboxes**. This replaces the older
+  pre-results PDF as the authoritative later build.
+- Formal submission still **not approved or executed**.
+  Correct an inappropriate inferential interpretation of 1,225 pairs,
+  independently inspect PDF pages/figures, and obtain all-author rights,
+  funding, ethical disclosures and permission before any submission.
