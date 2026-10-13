@@ -45,9 +45,32 @@ as artifact \texttt{11804714208} in the run.
 This check is an independent \emph{implementation
 and hosted-release byte retrieval}, not an
 independent original EEG recording cohort.
-The single shared digital channel on each near-similar
-pair does not establish their nonoverlap in
-other transformed or temporally offset channels.
+A follow-up, independently rerun location audit
+(\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38386864421})
+re-read the EDF channel labels and tested whether
+each exact channel stream had any sample variation.
+For released IDs 4/5, 31 of the 32 identical channels
+were \emph{time-varying} digital streams; the
+remaining identical channel is CPz, reference-channel
+index 17, whose digital samples were constant.
+The only different channel was index 32
+(unnamed in the earlier MNE reader audit).
+In contrast, for each of 11/15 and 47/49,
+the \emph{sole} identical stream was the
+\emph{constant CPz reference} at index 17.
+Therefore these two one-channel exact matches
+have \emph{no evidentiary force} as a positive
+fingerprint of a repeated physiological waveform.
+The near-pair correspondence remains a separate,
+non-identifying \emph{approximate similarity}
+screen requiring transformation and source logs.
+The strong 4/5 digital reuse conclusion rests
+on the 31 \emph{variable} matching streams
+and cannot be dismissed as a shared reference
+constant. These are statements about integer EDF
+payloads, not about the identity of patients or
+a provenance-proven conversion of raw MAT signals.
+
 Successful byte reproduction, if observed, can establish
 that an anomaly is visible in a second distribution channel
 but cannot distinguish reuse at a shared upstream EDF
