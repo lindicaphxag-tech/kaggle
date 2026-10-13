@@ -102,11 +102,21 @@ No cross-ID exact processed epoch matches were
 found within the indicated pre-processing pipelines.
 Zero exact overlaps cannot rule out near duplicates,
 window overlaps, or other release errors.
-A second negative control arises within Liu2024:
-two IDs with coincident historical target AUC
-vectors exhibited \emph{different} signal contents.
-Equal classifier outcomes are therefore not an
-admissible identity fingerprint.
+An additional \emph{exact-byte nonidentity} check
+compared released Liu2024 IDs 47 and 49, whose historical
+target AUC vectors happened to coincide. Their raw EDF
+sample streams were not exactly identical, establishing
+only that coincident decoder outcomes are not an identity
+fingerprint. A subsequently executed aligned-waveform
+screen found this \emph{same pair} to be exceptionally
+similar after preprocessing, with substantial raw digital
+channelwise correlation. It therefore \emph{cannot}
+serve as a negative control for near-duplicate signal
+content or independent physiological acquisition.
+The separate pairs 2/3 and 6/7 are low-correlation
+\emph{post-discovery diagnostic comparisons}, not
+prospectively sampled negative controls or a
+false-positive-rate estimate.
 
 \subsection{Matched model-by-selection design and dependence}
 \label{sec:p2-analysis-units}
