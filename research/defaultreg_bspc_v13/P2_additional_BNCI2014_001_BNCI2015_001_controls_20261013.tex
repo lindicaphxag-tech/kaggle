@@ -1,0 +1,74 @@
+% Real public EEG executed run 38326859467, post-discovery.
+\subsection{Two additional public-acquisition recording-content controls}
+\label{sec:p2-two-additional-controls}
+After the initial exact ID4/5 finding and the
+three-pair aligned similarity screen, we
+added two \emph{post-discovery} public-EEG
+controls. BNCI2014\_001 contributed nine
+released IDs and 2,592 processed motor-imagery
+trials, using C3/Cz/C4 for left/right imagery.
+BNCI2015\_001 contributed 12 released IDs
+and 5,600 right-hand/feet trials, using its
+13-channel recording montage. Both used
+MOABB 1.7.2, 8--30~Hz, 160~Hz and the
+same SHA-256 exact EEG-trial-array/label
+fingerprint definition as the P2 screen;
+these were \emph{not} new clinical cohorts
+or independently prespecified confirmations.
+
+All 2,592 processed labelled epochs in the
+first control and all 5,600 in the second
+had distinct content fingerprints across
+the checked released IDs. No cross-ID
+exact trial-content edges were detected.
+For an additional, explicitly limited,
+aligned-whole-record screen, all
+$\binom92=36$ BNCI2014\_001 released-ID
+pairs had compatible record-array shapes.
+Among BNCI2015\_001's
+$\binom{12}{2}=66$ possible ID pairs,
+only 34 had identical whole-record array
+shapes and were directly comparable;
+the other 32 were \emph{not} screened by
+this equal-shape metric. None of the 36
+or 34 comparable pairs reached an
+aligned full-record Pearson correlation
+of 0.95, much less 0.9999.
+The highest compatible aligned correlations
+were 0.015458 and 0.005760,
+respectively. The absence of such
+pairs says nothing about undetected time
+shifts, epoch permutations, unequal-duration
+overlaps or re-montaged recordings.
+
+\begin{table}[tb]
+\centering\small
+\caption{New post-discovery public data
+identity controls, not an alias-prevalence
+estimate. The second dataset includes
+32 shape-incompatible ID pairs that the
+aligned whole-record screen cannot classify.}
+\label{tab:p2-added-controls}
+\begin{tabular}{lrrrr}
+\toprule
+Acquisition & IDs & Trials & Exact cross-ID edges & Near $\rho\geq .95$/comparable pairs\\
+\midrule
+BNCI2014\_001 & 9 & 2,592 & 0 & 0/36\\
+BNCI2015\_001 & 12 & 5,600 & 0 & 0/34\\
+\bottomrule
+\end{tabular}
+\end{table}
+Unlike the Liu2024 affected release, the
+new experiments provide negative findings
+under their \emph{chosen} equality and
+aligned-correlation definitions. They do
+not justify a population estimate of
+cross-ID duplication frequency or
+rule out partial, reordered and
+nonlinearly transformed similarity.
+The executed source, numeric receipt and
+input-boundary flags are available at
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38326859467}.
+No classification outcome, human clinical
+identity or new regularisation gain
+was used to make these audit decisions.
