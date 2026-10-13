@@ -1,17 +1,18 @@
-# P4 / Numerical Algorithms — rank-event sweep and verified numerical boundaries (NOT executed)
-Date: 2026-10-13 | This is an advanced method design, NOT a new demonstrated algorithmic win.
+# P4 / Numerical Algorithms — rank-event sweep and verified numerical boundaries (PARTIAL PROTOTYPE)
+Date: 2026-10-13 | The exact rational event aggregation prototype has been executed; root isolation and real-input guarantees remain open.
 
 ## Evidence hierarchy
 - For fixed source-fitted SPD S, class contrast d and held source pair v, score difference N(lambda)/prod_i q_i(lambda), positive denominator on feasible interval. deg N<=p-1. Elementary rational polynomial identity; not original root-isolation mathematics.
 - Real Weibo 3ch p6 source rank coverage: old termwise 94.121%, Bernstein 94.267% (full interval): +.146 pp; previously examined source folds, NOT new target AUC.
 - Original rational 960 fixture: centered Horner and Bernstein 924/960, centered faster, 36 actual crossing intervals: **no exclusive Bernstein edge there**.
 - NEW corrected 3-family, p=2,3,6,9,12, 4320-rational-case exploratory sweep: centered Horner 4212, Bernstein 4232; +20/4320 = 0.463 pp, with 88 genuine sign crossings. Tiny but nonzero selected synthetic advantage, NOT floating EEG end-to-end guarantee. First sweep had generator scalar-multiple defect and was corrected post inspection.
+- Executed exact rational incremental event-map parity: dimensions p=3,6; constructed full-degree p=6 numerators; 4–32 pair crossing fixtures; ties, endpoint roots and even-multiplicity touching events. Identical complete event outputs to full pair re-evaluation using the SAME SymPy exact root routine. Local median p=3/32 pairs/64 events 0.450 versus 0.037 s; p=6/16 pairs/32 events 0.380 versus 0.056 s. In no-event controls the incremental form is slightly SLOWER (p=3: 0.461 versus 0.482 s; p=6: 3.523 versus 3.547 s). Machine-dependent and constructed; independent CI: https://github.com/lindicaphxag-tech/kaggle/actions/runs/38354399661.
 - A new journal novelty argument cannot be based on standard Bernstein coefficients or merely recovering from a weak Horner baseline.
 
 ## Doctoral-level problem
 Compute and VERIFY the entire scalar-shrinkage held-source ROC-AUC event map (all rank changes and tie values) efficiently and with a controllable numerical error budget, exploiting shared spectral poles and low-degree rational numerators. Certified constant-sign intervals are only a subroutine; the principal product should be exact or reliably enclosed event locations and an accurate continuous AUC-optimum set.
 
-## Proposed algorithm: pole-shared rank event sweep (working prototype, not yet verified)
+## Proposed algorithm: pole-shared rank event sweep (event aggregation parity verified on rational fixtures; remaining parts unverified)
 1. For each source-trained SPD eigensystem, factor q_i(lambda)=s_i+(nu-s_i)lambda. Positive feasible interval must be proved; reject singular bounds.
 2. Precompute p leave-one-factor numerator basis polynomials B_i(lambda)=prod_{j!=i} q_j(lambda), so for each held positive-negative pair N_pair(lambda)=sum_i a_{i,pair} B_i(lambda). Share B_i across ALL pairs to reduce redundant polynomial construction.
 3. For every nonzero N_pair, isolate ALL roots in feasible interval by an independently verified exact-rational Sturm/Descartes method for rational inputs, or outward-rounded interval arithmetic + input-error enclosure for floating EEG. Multiplicities, exact ties, endpoint equality and near-coincident roots need explicit treatment.
