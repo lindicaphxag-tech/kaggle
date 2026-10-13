@@ -25,9 +25,9 @@ in subject-held classification. Of 50 released identifiers and
 shared all 40 labelled epochs, leaving 1,960 distinct processed
 trial contents and 49 recording-content groups. Under a second
 6--35 Hz/128 Hz processing configuration, the same complete
-cross-identifier alias persisted. An independent EDF raw
-digital-sample comparison found 32 of 33 original channel
-streams equal byte-for-byte for identifiers 4 and 5,
+cross-identifier alias persisted. An EDF digital-payload comparison found 32 of 33
+as-stored, publisher-supplied EDF channel streams
+byte-for-byte equal for identifiers 4 and 5,
 with one additional unnamed channel differing; these findings
 are about digital samples, not participant identity. The nominal
 50-ID source-macro ROC-AUC was 0.594000, falling to 0.588673
@@ -176,17 +176,22 @@ that ID 4 and ID 5 are stored in different EDF binary files yet
 32 of 33 numerical channels are equal over the full corresponding
 EDF data. The sole differing channel was index 32 (zero-based),
 reported with an empty name by the pinned MNE EDF reader.
-Thus the identity evidence extends beyond the resampled,
-post-filtering model inputs. The initially nominated raw digital non-identity comparator,
+Thus numerical-content equality is present in the
+released EDF layer before our additional MOABB filtering,
+but the publisher's EDF is itself a preprocessed
+representation (the dataset also advertises original MAT data).
+This EDF observation is \emph{not} an independent
+comparison of acquisition-original MAT signals. The initially nominated raw digital non-identity comparator,
 IDs 47 and 49, had coincident historical target AUC vectors
 but different integer arrays. Subsequent exploratory analysis
 also found extremely high aligned-waveform similarity in this
 pair; it is therefore \emph{not} a valid negative control for
 near-overlap. Coincident classifier outcomes alone are never
 used as an identity fingerprint.
-The independent digital EDF payload reader confirmed
-exact byte-for-byte equality of 32 of 33 original
-channel sample streams for the released ID 4/5 pair,
+The independently implemented digital EDF payload reader
+confirmed exact byte-for-byte equality of 32 of 33
+\emph{as-stored preprocessed EDF} channel streams
+for the released ID 4/5 pair,
 with sole difference at unnamed channel index 32.
 The released pair 47/49 shared only one of 33
 \emph{exact} digital channel streams, but was later flagged
@@ -257,6 +262,10 @@ those pairs; it is not an empirically verified count of
 independent human participants, nor a population leakage
 estimate. Raw channelwise correlations and digital affine
 checks do not resolve the acquisition or export mechanism.
+Independent verification against the separately released
+acquisition-original MAT files is outstanding; merely
+reading the EDF with a second parser does not establish
+independence from the publisher's upstream preprocessing.
 The dataset custodians' clarification is outstanding.
 A general purpose, automatically validated near-duplicate
 threshold has therefore \emph{not} been established here.
