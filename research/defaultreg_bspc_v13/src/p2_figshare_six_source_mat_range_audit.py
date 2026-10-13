@@ -41,9 +41,13 @@ class StrictRange:
         self.total_received=0
         self.remote_total=None
     def get(self,start,end):
-        assert end is not None
-        if start>=0 and end<start:raise ValueError("empty range")
+        if start>=0 and (end is None or end<start):
+            raise ValueError("empty/invalid forward range")
+        if start<0 and end is not None:
+            raise ValueError("suffix HTTP range cannot have explicit end")
         expected=(end-start+1) if start>=0 else -start
+        if self.local_bytes is not None and start<0:
+            expected=min(expected,len(self.local_bytes))
         if expected>CHUNK_BYTES+131072:
             raise ValueError("requested range too large")
         self.total_received+=expected
