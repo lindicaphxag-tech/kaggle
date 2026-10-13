@@ -9,6 +9,7 @@ on:
       - research/defaultreg_bspc_v13/src/p4_joint_spectral_coefficient_box_certificate.py
       - research/defaultreg_bspc_v13/src/p4_joint_box_adaptive_refinement_and_falsification.py
       - research/defaultreg_bspc_v13/src/p4_covariance_coordinate_resolvent_bound.py
+      - research/defaultreg_bspc_v13/src/p4_final_feature_entrywise_error_to_covariance_certificate.py
       - .github/workflows/p4-exact-rank-event-prototype.yml
 
 jobs:
@@ -27,6 +28,23 @@ jobs:
       - name: Joint spectral and coefficient interval-box soundness regression
         run: |
           python research/defaultreg_bspc_v13/src/p4_joint_spectral_coefficient_box_certificate.py --out p4_joint_spectral_box_results.json
+      - name: Feature-matrix entrywise rounding box to pooled covariance and ranking proof
+        run: |
+          python research/defaultreg_bspc_v13/src/p4_final_feature_entrywise_error_to_covariance_certificate.py --out p4_final_feature_perturbation_certificate.json
+          python - <<'PY'
+          import json
+          z=json.load(open('p4_final_feature_perturbation_certificate.json'))
+          assert z['status']=='PASS'
+          assert z['synthetic_feature_matrices']==64
+          assert z['entrywise_error_bound_assumed_externally']
+          assert z['no_bound_through_EEG_preprocessing_or_tangent_transform']
+          print('P4_FINAL_FEATURE_TO_POOLED_COVARIANCE_CERTIFICATE_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p4-final-feature-quantization-to-covariance-conditional-certificate
+          path: p4_final_feature_perturbation_certificate.json
+          retention-days: 90
       - name: Eigenspace-invariant covariance-space perturbation theorem regression
         run: |
           python research/defaultreg_bspc_v13/src/p4_covariance_coordinate_resolvent_bound.py --out p4_covariance_resolvent_oracle.json
