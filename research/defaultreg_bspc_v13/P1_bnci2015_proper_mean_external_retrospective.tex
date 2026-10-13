@@ -75,3 +75,18 @@ No target labels or target-specific covariance
 are involved in choosing a participant's
 source training policy, but all these
 observations are retrospectively inspected.
+
+\paragraph{Source-to-held directional prediction check.}
+For each of the 12 outer holds, we additionally recorded the
+source-only inner-fold AUC difference between the selected
+source-macro and proper predictive-NLL shrinkage choices
+before evaluating that held participant. The sign of this
+source difference predicted the held-participant AUC contrast
+in 8/12 cases; mean absolute prediction error was
+0.070620 AUC. This is a descriptive, previously exposed
+12-person check, with neither an independent acquisition nor
+an error-controlled prospective prediction claim. Four
+incorrect directions and substantial error prevent using this
+result as evidence of a reliable individual-level forecasting
+rule. The outcome receipt is the successful workflow
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38337523347}.
