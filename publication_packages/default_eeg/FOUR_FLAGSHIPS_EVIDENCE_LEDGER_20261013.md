@@ -5,10 +5,10 @@ A manuscript standard or a locally passing program is not evidence
 of independent transfer benefit, journal acceptance or novelty superiority.
 
 ## Branch heads reviewed and pushed
-- P1 JNE PR #143, head d18415349974afe32c5c7a6a2c58704bd701bc6c
-- P2 BSPC PR #144, head fb2c85f889ebe2f7a728fb0f5ced014b8ce8fc60
-- P3 PLOS ONE PR #145, head e1279e5882b3c9712aacd8f5d43476d8370887dd
-- P4 Numerical Algorithms PR #146, head 29d5f83feb7a5b2add3c637dbf52837d1bd75a6d
+- P1 JNE PR #143, head bc692d166be48e52d7f1c8be7422ebcd54850849
+- P2 BSPC PR #144, head 5ebc7ae8b476400f168c89dcd17bd0eabe94b580
+- P3 PLOS ONE PR #145, head 5d4aeb0618dc2a4965db0315ab28d4dd125f965d
+- P4 Numerical Algorithms PR #146, head 10f6bad2d7482b4d42a3efa2bd385cbd275b4d81
 
 ## What this review actually adds
 
@@ -98,7 +98,7 @@ papers and acquisition-level dependencies MUST be disclosed.
 
 
 ## 2026-10-13 subsequent joint-uncertainty and external-manifest audit
-- P4 #146 head 29d5f83feb7a5b2add3c637dbf52837d1bd75a6d.
+- P4 #146 head 10f6bad2d7482b4d42a3efa2bd385cbd275b4d81.
   New exact-rational *joint* positive spectral-eigenvalue BOX and
   score-coefficient BOX Bernstein certificate, not simply fixed spectral poles.
   A local standalone regression checked 126 synthetic boxes, outcomes
@@ -112,7 +112,7 @@ papers and acquisition-level dependencies MUST be disclosed.
   Real EEG input-error bounds and external numerical superiority
   are NOT verified. The exact new CI job is NOT individually
   confirmed just because generic repository workflows succeeded.
-- P2 #144 head fb2c85f889ebe2f7a728fb0f5ced014b8ce8fc60.
+- P2 #144 head 5ebc7ae8b476400f168c89dcd17bd0eabe94b580.
   Audited version-pinned NEMAR nm000158 JSON manifest at external
   commit 11e3eeb4b439d5f8ee1b5e3b8e6032824bc2de83.
   It states 50 whole EDF files imported via MOABB 1.5.0 on
@@ -131,3 +131,79 @@ papers and acquisition-level dependencies MUST be disclosed.
 - All four remain Draft; author declarations, PDF HEAD/layout
   verification and release decisions are not closed.
 
+
+## 2026-10-13 conclusive CI receipts from this work session
+
+All findings below have SPECIFIC completed GitHub Actions receipts, not merely
+source-code commits or a pending hypothetical experiment.
+
+### P2 -- six actual independent-hosted public EDF downloads, SHA & digital content
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38384783079
+Artifact 11804714208; status SUCCESS. All six NEMAR v1.0.3 public EDF files
+independently downloaded and complete-file SHA256 recomputed, all matching
+the fixed distributor manifest. Each is 10,568,704 bytes, 33 channels,
+320 EDF records. Entire digital channel streams identical (same position
+and permutation-invariant): public released ID 04/05 = 32/33;
+11/15 = 1/33; 47/49 = 1/33. The six whole-file digests differ.
+THIS PROVES REPRODUCIBLE DIGITAL CONTENT ON TWO DISTRIBUTION PATHS;
+IT DOES NOT PROVE DUPLICATE PATIENTS, RAW MAT EXPORT LINEAGE,
+INDEPENDENT CLINICAL ACQUISITIONS OR CAUSAL TRAIN/TEST LEAKAGE.
+
+### P4 -- completed exact-rational certificates and perturbation controls
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38384340046
+Artifacts 11804563432 (222 full synthetic-box decisions with
+36 exact rational counterexample receipts) and 11804168928
+(covariance-coordinate perturbation results). 222 constructed
+rational spectral/score boxes: whole Bernstein certifies 173,
+direct rational interval bound 174; lambda splitting 184;
+deep spectral rescue two more; 186 certified signs
+(95 POS, 91 NEG), and remaining 36 exact admissible
+falsifications; zero unknown for THIS FIXTURE SET only.
+A distinct covariance-coordinate (no fixed eigenspace) resolvent
+guarantee certified 46 POS + 65 NEG of 120 rational SPD matrices;
+9 UNKNOWN; 2,220 exact rational perturbation point oracles agree.
+Input error norms are EXTERNALLY ASSUMED, not measured real-EEG
+estimation error or IEEE754 outward-rounded guaranteed bounds.
+
+### P3 -- original real-EEG outcome artifacts independently replayed
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38385255017
+Artifact 11805555945. Original two acquisitions, three previously
+EXPOSED person outcomes, five fixed within-acquisition policies.
+Three-record descriptive mean paired AUC delta:
+continuous 0, SCE -0.011218492798354,
+anisotropic -0.0026266718106996434,
+group-centred -0.004235468106995895.
+Max nonbaseline advantage across original records was
++0.0004012345679011986, while SCE worst loss -0.021875.
+NO PROSPECTIVE / INDEPENDENT population superiority/null test.
+
+### P1 -- decision utility of nine exposed source-forecast scalar results
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38385539468
+Previously exposed real EEG nine people: all source forecasts positive
+and observed signs seven positive, so 7/9 directional accuracy is
+identical to always-positive. Source predictor MAE .015380524477
+vs zero forecast .017698688272; exploratory signflip p=.3203125.
+Source macro compared to proper predictive NLL averaged +.012608239026 AUC.
+Post-outcome threshold .005 selected macro 5/9 and performed
+-.002545224623 AUC worse than always macro.
+No new risk calibration, dataset or prospectively validated action benefit.
+
+### Exact HEAD PDFs
+A single branch-specific fail-closed TeX build exists in ALL FOUR paper
+branches, producing a PDF with a SHA256 receipt, reference diagnostics,
+page count and overfull/underfull warning count. At the verified time:
+P1 latest head build success, https://github.com/lindicaphxag-tech/kaggle/actions/runs/38385789367
+P2 latest actual-byte-result head build is triggered,
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38386085148
+P3 current head build is triggered,
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38385798263
+P4 current head build is triggered,
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38385803415
+Do not promote QUEUED/RUNNING to SUCCESS. Successful LaTeX is NOT
+camera-ready graphical inspection or authorship/ethics signoff.
+
+The four PRs all remain DRAFT / NOT JOURNAL SUBMITTED.
+True doctoral flagship acceptance additionally requires independent
+validation not yet run, fair cross-journal accepted-paper benchmarking,
+author-approved declarations, exact latest PDF proofing, and
+external publication/maintainer evidence.
