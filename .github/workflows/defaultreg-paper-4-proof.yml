@@ -6,7 +6,7 @@ on:
       - '.github/workflows/defaultreg-paper-4-proof.yml'
       - 'research/defaultreg_bspc_v13/main_p4_rank_cell_certificates_NOT_READY.tex'
       - 'research/defaultreg_bspc_v13/P4_synthetic_multidimensional_numeric_appendix.tex'
-      - 'research/defaultreg_bspc_v13/P4_realized_interval_refinement_negative.tex'
+      - 'research/defaultreg_bspc_v13/P4_*.tex'
   workflow_dispatch:
 permissions:
   contents: read
@@ -30,6 +30,8 @@ jobs:
           grep -q '16.667' /tmp/p4text.txt
           grep -q 'Synthetic' /tmp/p4text.txt
           grep -q '0.0412' /tmp/p4text.txt
+          grep -q '924' /tmp/p4text.txt
+          grep -q 'midpoint-centered' /tmp/p4text.txt
           ! grep -Eq 'Citation.*undefined|Reference.*undefined|Undefined control sequence' main_p4_rank_cell_certificates_NOT_READY.log
           pdfinfo main_p4_rank_cell_certificates_NOT_READY.pdf | grep Pages
       - uses: actions/upload-artifact@v4
