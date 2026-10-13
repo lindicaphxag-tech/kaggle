@@ -1,7 +1,7 @@
 % Exact within-release display, based on SUCCESS run 38388066957.
 \begin{figure}[ht]
 \centering
-\begin{tikzpicture}[x=.100cm,y=.100cm]
+\begin{tikzpicture}[x=.128cm,y=.120cm]
   % Triangular comparison domain: x=i, y=j, 1<=i<j<=50.
   \fill[gray!9] (0.5,0.5)--(0.5,50.5)--(50.5,50.5)--cycle;
   \draw[gray!40,line width=.4pt] (0.5,0.5)--(0.5,50.5)--
@@ -16,19 +16,19 @@
   \node[font=\scriptsize,rotate=90,anchor=south] at (-5.5,25.5) {Released ID $j$};
   % Black = full 29 EEG streams, dark grey = >=50% native EEG blocks,
   % open = <2% nonzero exact blocks.
-  \fill[black] (4,5) circle [radius=1.5pt];
-  \fill[gray!70] (47,49) circle [radius=1.5pt];
-  \draw[black,line width=.7pt] (11,15) circle [radius=1.5pt];
+  \fill[black] (4,5) circle [radius=2.15pt];
+  \fill[gray!70] (47,49) circle [radius=2.15pt];
+  \draw[black,line width=.7pt] (11,15) circle [radius=2.15pt];
   \begin{scope}[shift={(58,43)}]
      \node[font=\scriptsize,anchor=west] at (0,5)
        {All $1{,}225$ unordered released-ID pairs};
-     \fill[black] (1,0) circle [radius=1.5pt];
+     \fill[black] (1,0) circle [radius=2.15pt];
      \node[font=\scriptsize,anchor=west] at (4,0)
        {4/5: 100\% (9,280 blocks)};
-     \fill[gray!70] (1,-8) circle [radius=1.5pt];
+     \fill[gray!70] (1,-8) circle [radius=2.15pt];
      \node[font=\scriptsize,anchor=west] at (4,-8)
        {47/49: 74.97\%};
-     \draw[black,line width=.7pt] (1,-16) circle [radius=1.5pt];
+     \draw[black,line width=.7pt] (1,-16) circle [radius=2.15pt];
      \node[font=\scriptsize,anchor=west] at (4,-16)
        {11/15: 1.84\%};
      \node[font=\scriptsize,anchor=west] at (0,-25)
