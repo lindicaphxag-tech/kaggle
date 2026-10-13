@@ -99,6 +99,32 @@ def regression():
                   "eps_covariance":str(es),"eps_contrast":str(ed),
                   "epsilon_source":str(eta),
                   "uncertainty_margin":decision.get("whole_interval_score_error_upper")})
+    # An adversarial and VALID final-feature quantization-box counterexample.
+    # The nominal pair and class contrast are aligned, but perturbing
+    # one trial in each class flips the pair's sign while group mean
+    # contrast remains positive. The theorem MUST refuse certification.
+    labs=[0]*12+[1]*12
+    X0=sp.Matrix([[F(-1,100) if lab==0 else F(1,100),F(0)]
+                  for lab in labs])
+    s0,d0,_=fit_pooled(X0,labs,F(1,5))
+    pair0=(X0.row(12)-X0.row(0)).T
+    eps0,epsd0,epsv0=error_bound(X0,labs,F(1,10))
+    cert0=certify(s0,pair0,d0,eps0,epsv0,epsd0)
+    assert cert0["status"]=="UNKNOWN"
+    X1=X0.copy();X1[12,0]-=sp.Rational(1,10)
+    X1[0,0]+=sp.Rational(1,10)
+    s1,d1,_=fit_pooled(X1,labs,F(1,5))
+    pair1=(X1.row(12)-X1.row(0)).T
+    for t in (sp.Rational(0),sp.Rational(1,2),sp.Rational(1)):
+        assert score(s0,pair0,d0,t)>0
+        assert score(s1,pair1,d1,t)<0
+    signed_flip_witness={
+       "status":"EXACT_ADMISSIBLE_FINAL_FEATURE_SIGN_REVERSAL",
+       "entrywise_epsilon":"1/10",
+       "changed_final_feature_coordinates":[[0,0],[12,0]],
+       "nominal_pair_score_positive_for_tested_lambda":True,
+       "admissible_perturbed_pair_score_negative_for_tested_lambda":True,
+       "certifier_correctly_returned_UNKNOWN":True}
     assert sum(counts.values())==cases
     return {"status":"PASS",
        "synthetic_feature_matrices":cases,"seed":20261013,
@@ -109,6 +135,7 @@ def regression():
        "sample_count_unit_not_independent_acquisition":True,
        "no_bound_through_EEG_preprocessing_or_tangent_transform":True,
        "not_IEEE754_or_actual_EEG_calibration":True,
+       "adversarial_quantized_feature_sign_flip":signed_flip_witness,
        "examples":examples}
 
 if __name__=="__main__":
