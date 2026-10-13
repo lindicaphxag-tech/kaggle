@@ -1,0 +1,87 @@
+\subsection{Newly source-locked external AlexMI acquisition: two held people}
+\label{sec:p1-alexmi-lock}
+After the previously analysed motor-imagery cohorts, we
+performed a separate \emph{repository-protocol-first} test
+on publicly released \emph{AlexMI} (Barachant),
+DOI \url{https://doi.org/10.5281/zenodo.806022}.
+This dataset was not found in the tracked repository
+code search before the experiment, but its absence from
+the search is not independent preregistration or proof
+it had never been used outside the repository.
+The acquisition contains eight released participants
+performing right-hand, feet and rest imagery.
+We selected the right-hand-versus-feet pair only,
+with C3/Cz/C4, 8--30 Hz, resampling to 160 Hz,
+and source-fitted tangent coordinates.
+The two new reserved people used the SAME
+source pool of people 1--6; both are one
+\emph{named acquisition}, not two independent
+external datasets. The raw 40-epoch per-person
+test signals were not read before the source
+parameters and SHA-256 lock were written.
+The successful machine receipt is
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38389770062}.
+
+Importantly, the independent shrinkage-LDA
+implementation in this exploratory test used a
+\emph{separate eight-point} source-only shrinkage
+grid $(0,.01,.05,.1,.25,.5,.75,1)$, NOT the
+original manuscript's 27-point primary family.
+A source-person-grouped five-fold cross-fit
+selected source macro-AUC and \emph{proper}
+source-trained-mean predictive Gaussian
+log score without accessing either reserved
+target. Fixed $\lambda=0.1$ shrinkage LDA
+and tangent-space logistic regression with
+fixed $C=1$ supplied non-optimised baselines.
+
+\begin{table}[ht]\centering\small
+\caption{First-run, internally source-locked AlexMI
+held-subject ROC-AUC. Neither person was used to
+select source parameters; the same two test people
+are not independent acquisitions. This eight-grid
+experiment belongs to a distinct, exploratory
+inference family.}
+\label{tab:p1-alexmi}
+\begin{tabular}{lrr}
+\toprule
+Selection / decoder & Held 7 & Held 8\\
+\midrule
+Source macro LDA & 1.0000 & .9950\\
+Proper predictive-NLL LDA & .9950 & .8450\\
+Fixed $\lambda=.1$ LDA & .9875 & .7350\\
+Fixed tangent logistic $C=1$ & .9700 & .6425\\
+\midrule
+Macro minus proper NLL & +.0050 & +.1500\\
+\bottomrule
+\end{tabular}
+\end{table}
+The source-macro-minus-proper-NLL AUC margin was
+$+0.0775$ averaged descriptively across these
+two previously uninspected targets.
+The source-only signed-margin forecast was
+$+0.05042$ for both held targets,
+correctly predicting their \emph{positive sign}
+but not explaining the observed $+.005$ versus
+$+.150$ heterogeneity. An always-positive
+sign forecast likewise scored 2/2, so no
+independent source-only \emph{directional}
+prediction gain is established.
+The two-person empirical margin forecast
+MAE was $.0725$ AUC, only marginally below
+the trivial zero forecast's $.0775$, with
+no statistically interpretable comparison.
+The unusually high source-macro held AUC
+and small one-dataset sample warrant
+independent rechecking of event timing,
+representation leakage controls and other
+model families before extending any
+claim beyond this public acquisition.
+
+This is a limited external \emph{data}
+sensitivity, not an externally registered
+or confirmatory replication of the
+27-grid estimand finding, not a new
+neural decoding method, and not an
+independent patient-level validation of
+a personalised risk policy.
