@@ -213,7 +213,7 @@ sensitivity are not relabelled as new confirmatory tests.
 \section{Results}
 \subsection{Objective conflict remains after restoring the near-zero region}
 In EEGMMIDB S001--S008, held-source macro AUC selected
-\(\lambda_D=0.8\) while covariance-NLL selected \(\lambda_C=0.075\).
+\(\lambda_D=0.8\) while historical class-centred CovScore selected \(\lambda_C=0.075\).
 Analytic Ledoit--Wolf selected about 0.01567. Source macro AUC reached
 0.67833 at 0.8; moving from 0.075 to 0.8 improved this source macro
 score by 0.05801 and increased held-source class-centred covariance score by 0.92233.
@@ -223,9 +223,9 @@ universally correct EEG parameter.
 \subsection{Held-out discrimination gains coexist with individual harm}
 On the prospective EEGMMIDB S021--S040 target block (\(N=20\)),
 source-macro selection obtained 0.72116 macro AUC, source
-covariance-NLL 0.66509, and Ledoit--Wolf 0.62919.
+historical class-centred CovScore 0.66509, and Ledoit--Wolf 0.62919.
 The paired mean gains were +0.05607 (95\% participant-bootstrap
-[0.02185,0.09049], Holm \(p=0.00597\)) against covariance-NLL and
+[0.02185,0.09049], Holm \(p=0.00597\)) against historical class-centred CovScore and
 +0.09197 ([0.04108,0.14310], Holm \(p=0.00510\)) against
 Ledoit--Wolf. Five and four participants, respectively, lost more
 than 0.02 AUC. After completely reselecting the method and refitting
@@ -237,13 +237,13 @@ not a single stable regularisation constant.
 
 \subsection{External evidence distinguishes direction from adjusted significance}
 BNCI2014\_002 (\(N=14\)) showed +0.01763 macro AUC over
-covariance-NLL, with adjusted \(p=0.13965\).
+historical class-centred CovScore, with adjusted \(p=0.13965\).
 BNCI2015\_001 (\(N=12\)) showed +0.04329, \(p=0.18555\).
 Both effect directions were positive and the source optima differed in
 26/26 outer folds; these folds are not 26 independent study replications.
 Neither BNCI cohort passed its own frozen family-wise superiority test.
 Separately frozen Shin2017A (\(N=29\)) reported +0.02222 over
-covariance-NLL (Holm \(p=0.02232\)) and +0.04866 over Ledoit--Wolf
+historical class-centred CovScore (Holm \(p=0.02232\)) and +0.04866 over Ledoit--Wolf
 (Holm \(p=0.00051\)), with five and three materially harmed
 participants. The original Kaggle PR97 execution and 29 frozen per-person
 score files have now been independently checksum-checked, with
