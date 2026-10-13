@@ -1,0 +1,35 @@
+name: P4 multi-family exact strong baseline sweep
+on:
+  push:
+    branches: [publication/default-eeg-p4-rank-certificates-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/p4_multi_family_strong_baseline_sweep.py'
+      - '.github/workflows/p4-multi-family-strong-baseline-sweep.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  exact-sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python research/defaultreg_bspc_v13/src/p4_multi_family_strong_baseline_sweep.py --out /tmp/p4_multi_family_results.json
+      - run: |
+          python - <<'PY'
+          import json
+          z=json.load(open('/tmp/p4_multi_family_results.json'))
+          assert z['total']['intervals']==4320
+          assert z['total']['bernstein']==4104
+          assert z['total']['centered']==4092
+          assert z['total']['bernstein_only']==12
+          assert z['total']['centered_only']==0
+          assert z['total']['unresolved_without_witness']==0
+          print('P4_4320_EXACT_RATIONAL_INTERVALS_VERIFIED')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p4-multi-family-strong-baseline-exact-results
+          path: /tmp/p4_multi_family_results.json
+          retention-days: 90
