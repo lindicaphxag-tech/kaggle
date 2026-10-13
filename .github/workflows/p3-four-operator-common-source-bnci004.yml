@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: '3.11'}
       - run: python -m pip install --disable-pip-version-check moabb==1.7.2
-      - run: python research/defaultreg_bspc_v13/src/p3_bnci004_four_operator_same_source.py --out /tmp/p3-four-operator-results
+      - run: mkdir -p "$MNE_DATA" /tmp/p3-four-operator-results && python research/defaultreg_bspc_v13/src/p3_bnci004_four_operator_same_source.py --out /tmp/p3-four-operator-results
       - name: Verify source-lock and result integrity
         run: |
           python - <<'PY'
