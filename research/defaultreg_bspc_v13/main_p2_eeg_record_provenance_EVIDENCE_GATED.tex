@@ -132,16 +132,20 @@ LOPO source training pools overlap heavily.
 \input{P2_content_group_split_safety_scope.tex}
 
 \section{Results}
-\subsection{Identity across three EEG acquisitions}
+\subsection{Exact identity across five public EEG acquisitions}
 \begin{table}[ht]\centering\small
-\caption{Exact processed trial-content audit under preselected
-pipelines. Unique contents do not imply uniquely identified patients.}
+\caption{Exact processed trial-content audit under
+specified pipelines. BNCI2014\_001 and BNCI2015\_001
+were added after the primary finding. Unique digital
+contents do not imply uniquely identified patients.}
 \begin{tabular}{lrrrr}
 \toprule
 Acquisition & Released IDs & Trial instances & Unique & Cross-ID edges\\\midrule
 Liu2024 &50&2,000&1,960&1\\
 Weibo2014 &10&1,580&1,580&0\\
 BNCI2014\_002 &14&2,240&2,240&0\\
+BNCI2014\_001 &9&2,592&2,592&0\\
+BNCI2015\_001 &12&5,600&5,600&0\\
 \bottomrule
 \end{tabular}\end{table}
 In the processed Liu2024 signals, IDs 4 and 5 have the same complete
@@ -173,7 +177,7 @@ auditor and successful nonidentifying log are at
 \url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38319951161}.
 Neither EDF channel matching nor a source file's different
 basename resolves the identity of clinical participants.
-Zero exact overlaps in the two controls cannot rule out near-duplicates
+Zero exact overlaps in the four public control acquisitions cannot rule out near-duplicates
 or overlapping source windows with different sampled arrays.
 
 \subsection{Matched fit--parameter factorial and reporting denominator}
@@ -192,13 +196,14 @@ not by itself a causal EEG leakage-effect estimate.
 \input{P2_real_whole_record_nearmatch_screen.tex}
 \input{P2_real_exact49_vs_assumed_near47_source_refit.tex}
 \input{P2_raw_digital_affine_fingerprint_real_results.tex}
+\input{P2_additional_BNCI2014_001_BNCI2015_001_controls_20261013.tex}
 \input{P2_figure_frozen49_group_paired_auc.tex}
 
 \section{Discussion}
 Our observation is more specific than generic random-window leakage:
 the public released label unit was not enough to ensure disjoint
 processed signal contents. The full data-integrity audit and two
-independent-acquisition controls make the particular duplicate
+four separately processed public-acquisition controls make the particular duplicate
 verifiable and falsifiable, while the same-held-target factorial
 prevents silently attributing the whole correction to a changing
 regularisation parameter.
@@ -237,7 +242,7 @@ An EEG subject label is not automatically an independent
 signal identity. Full processed epoch-content checks found
 one complete cross-ID duplicate in a 50-ID acute-stroke
 motor-imagery acquisition, and no exact cross-ID matches
-in two preselected other acquisitions. A 49-recording-group
+in four other public acquisitions (two added post-discovery). A 49-recording-group
 full refit and $2\times2$ frozen fit--selector contrast
 showed that reporting weights, model fitting and source
 selection must not be collapsed into a single asserted
