@@ -20,7 +20,7 @@ FILE_ID=38516555
 URL=f"https://ndownloader.figshare.com/files/{FILE_ID}"
 
 def decode_zip_central(tail: bytes,read_range):
-    marker=b"PK\\x05\\x06".decode("unicode_escape").encode("latin1")
+    marker=bytes.fromhex("504b0506")
     where=tail.rfind(marker)
     if where<0 or where+22>len(tail):raise ValueError("ZIP end of central directory missing")
     _,disk,central_disk,n_disk,n_entries,nbytes,offset,comment=struct.unpack_from("<I4H2IH",tail,where)
@@ -32,7 +32,7 @@ def decode_zip_central(tail: bytes,read_range):
     if len(central)!=nbytes:raise IOError("truncated ZIP central directory range")
     entries=[];pos=0
     for i in range(n_entries):
-        if central[pos:pos+4]!=b"PK\\x01\\x02".decode("unicode_escape").encode("latin1"):
+        if central[pos:pos+4]!=bytes.fromhex("504b0102"):
             raise ValueError("ZIP central directory signature mismatch")
         size_compressed,size_uncompressed=struct.unpack_from("<II",central,pos+20)
         l_name,l_extra,l_comment=struct.unpack_from("<HHH",central,pos+28)
@@ -65,7 +65,7 @@ def public_index():
                 raise RuntimeError("Incomplete requested central-directory bytes")
             return body,typ
     tail,source_range=request_range(-131072,None)
-    match=re.search(r"/(\\d+)$",source_range)
+    match=re.search(r"/([0-9]+)$",source_range)
     if not match:raise ValueError("no content-size in HTTP Content-Range")
     total=int(match.group(1))
     def reader(l,r):
@@ -75,7 +75,7 @@ def public_index():
     candidates=[e for e in entries if e["name"].lower().endswith(".mat")]
     targets=[]
     for subject in (4,5,11,15,47,49):
-        regex=re.compile(r"(?:^|[/_\\-])(?:sub(?:ject)?[/_\\-]?0*|s)"+str(subject)+r"(?:[/_\\-.]|$)",re.I)
+        regex=re.compile(r"(?:^|[-_/ ])(?:sub(?:ject)?[-_/ ]?0*|s)"+str(subject)+r"(?:[-_/. ]|$)",re.I)
         matches=[e["name"] for e in candidates if regex.search(e["name"])]
         targets.append({"public_released_id":subject,"mat_member_count_candidate":len(matches),
                         "candidate_public_mat_members":matches[:10]})
