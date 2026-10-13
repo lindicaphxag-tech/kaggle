@@ -1,0 +1,38 @@
+name: P4 exact-rational adaptive centered-Horner vs Bernstein benchmark
+on:
+  push:
+    branches: [publication/default-eeg-p4-rank-certificates-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/p4_adaptive_centered_horner_bernstein.py'
+      - '.github/workflows/p4-adaptive-centered-horner-bernstein.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  exact-rational-hybrid:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy
+      - name: Reproduce 960 matched rational tests with root and zero falsification
+        run: |
+          python -m py_compile research/defaultreg_bspc_v13/src/p4_adaptive_centered_horner_bernstein.py
+          python research/defaultreg_bspc_v13/src/p4_adaptive_centered_horner_bernstein.py --out /tmp/p4-centered-hybrid.json
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/p4-centered-hybrid.json'))
+          assert x['total_intervals']==960
+          assert all(v['intervals']==192 for v in x['per_dimension'])
+          assert all(v['selective_certified']>=max(v['centered_certified'],v['bernstein_certified']) for v in x['per_dimension'])
+          assert x['not_a_formal_float_machine_proof'] is True
+          print('P4_STRONG_CENTERED_HORNER_BASELINE_AND_SELECTIVE_CERTIFICATION_RECORDED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: P4-960-EXACT-RATIONAL-CENTERED-HORNER-HYBRID-NOT-EEG-AUC
+          path: /tmp/p4-centered-hybrid.json
+          if-no-files-found: warn
+          retention-days: 90
