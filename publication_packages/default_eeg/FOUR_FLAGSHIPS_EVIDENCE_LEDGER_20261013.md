@@ -225,3 +225,117 @@ remains a separate unverified correspondence question.
 The new independent channel-localization script and its result
 are incorporated in P2 source and the journal draft. The claims
 remain restricted to *digital signal products*, not patients.
+
+
+## 2026-10-13 end-of-session second experimental wave and PDF visual proofing
+
+All four PRs remain DRAFT; journal submission, acceptance, true external
+preregistration and held-acquisition-level generalisation remain OPEN.
+
+### P2 -- full public-EDF census is now executed, not planned
+SUCCESS run https://github.com/lindicaphxag-tech/kaggle/actions/runs/38388066957.
+All 50 NEMAR v1.0.3 public preprocessed EDF files independently re-fetched
+and SHA-256-matched against fixed distributor JSON; all
+(50 choose 2) = 1,225 ID pairs checked for equal 29 labelled EEG
+whole time-varying channels and each of 320 aligned native storage
+blocks. ID 04/05 has 29/29 complete variable EEG channels and
+9,280/9,280 exact blocks. ID 47/49 has 0/29 complete and
+6,957/9,280 aligned blocks. ID 11/15 has 0/29 complete and
+171/9,280 aligned blocks. **All remaining 1,222 pairs = zero exact
+matching whole EEG channels and zero corresponding aligned blocks.**
+Common constant CPz reference not counted. This is digital product
+reproduction, not source MAT lineage, clinical acquisition identity,
+patient identity, a causal performance penalty or population FPR.
+A scalable 50-ID triangular grayscale vector map was integrated in
+P2 PDF. Exact 22-page PDF run success
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38393701265
+(head a959d53c...) with 1 residual ~0.75pt PGFPlots axis overfull.
+Final PGFPlots axis shrunk and color replaced with a print-safe square
+on head 322ed0a4...; subsequent exact-HEAD PDF run
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38394187739
+was pending last check. Do not assume zero warnings before that run.
+
+### P1 -- first-repo, source-locked AlexMI real held subjects
+SUCCESS run https://github.com/lindicaphxag-tech/kaggle/actions/runs/38389770062.
+AlexMI public right-hand-versus-feet EEG, 3 electrodes C3/Cz/C4,
+source IDs 1--6 frozen in a SHA-256 selection receipt before reading
+held IDs 7--8, 40 trials each. Independent shrinkage-LDA scorer with
+a distinct EIGHT-point lambda grid (NOT the main 27-grid method):
+held AUC macro 1.000/.995, proper predictive NLL .995/.845,
+fixed .1 LDA .9875/.735, fixed tangent logistic C1 .970/.6425.
+Macro-minus-proper average +.0775 AUC across ONLY two held people
+in ONE named acquisition. Both signed source-only forecasts positive,
+and always-positive trivial forecast also 2/2: novel individual
+direction forecasting NOT proved. No independent external registration.
+Its independent TeX subsection is integrated. Exact-HEAD article
+27 pages, **zero overfull lines**, success
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38393587140.
+
+### P3 -- new mental-task and MI acquisitions; both positive and negative outcomes
+BNCI2015_004 *math versus letter* (NOT motor imagery):
+SUCCESS https://github.com/lindicaphxag-tech/kaggle/actions/runs/38390289317,
+8 source people source-locked before target ID9 (160 trials).
+Macro AUC .51796875; SCE .527500 (+.00953125),
+group-centred .52546875 (+.0075), anisotropic -.00015625.
+This is a one-person new-task exploratory improvement, not a
+population proof or confirmation of MI-specific transfer.
+
+Dreyer2023B left/right motor imagery (same broader Dreyer study as
+an earlier explored A subset):
+SUCCESS https://github.com/lindicaphxag-tech/kaggle/actions/runs/38390737635.
+Eight source public IDs61--68 fully frozen before held IDs69,70,
+240 trials each. Continuous and macro identical, SCE source-macro
+mean paired delta -.0145138888889, anisotropic -.0159027777778,
+group-centred +.0009027777778. New public cohort but one collection;
+no policy superiority. Both results integrated in P3 TeX.
+Zhou2016 attempted download failed on upstream Zenodo HTTP read
+timeout and was already method-infeasible under the originally
+selected 3-source design (<8 required by these operators);
+no target opened, no evidence from it.
+P3 exact-HEAD 10-page PDF with zero overfull and zero underfull:
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38393639245.
+
+### P4 -- conditionally exact numerical theorem, real final EEG features
+Previous results: 186/222 rational synthetic joint spectral/score
+boxes have strict sign certificates and remaining 36 each have
+an admissible exact rational falsifying witness. An orientation-free
+covariance resolvent sufficient bound certifies 111/120 rational SPD
+fixtures; 9 unknown. The final-feature rounding-to-pooled-covariance
+chain certifies 64/64 intentionally well-separated synthetic cases
+(48 positive, 16 negative); a separate constructed admissible
+opposite-sign feature-error example correctly returns UNKNOWN.
+Executed CI https://github.com/lindicaphxag-tech/kaggle/actions/runs/38389194383.
+
+Real previously exposed BNCI2014_001 public EEG person1 numerical
+fixed-point demonstration: final tangent feature *binary64 values*
+rounded on a rational grid 2^-18 with verified entrywise eta=2^-19,
+12 preselected positive/negative sample pairs: 8 strict positive,
+4 strict negative signs certified over ALL lambda in [0,1].
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38391746843.
+This is NOT a proof of IEEE-754 error propagation through MNE,
+covariance/tangent operations, physical acquisition error,
+cross-subject AUC benefit or superiority over mature numerical methods.
+P4 15-page latest-head build zero overfull/underfull:
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38393607317.
+
+### Deliverable QA
+All four exact-GitHub-head PDF ZIPs have been fetched via authenticated
+GitHub connector, unzipped, and page-count/text-bound sanity checked.
+Old and current PDF snapshots are versioned by their GitHub SHA receipts.
+P1/P3/P4 zero overfull, P2 final after print-safe PGFPlots microedit
+PENDING run; no file can be called final publisher proof unless this
+latest build and human page-by-page inspection both pass.
+
+### Remaining hard barriers
+1. P2 released digital content vs ORIGINAL MAT->EDF provenance records and
+   nonidentifying owner clarification remain unsolved. Avoid accusation.
+2. P1 forecast advantage over always-positive and source-only naive
+   policies is not established, despite strong AlexMI AUC contrast.
+3. P3 candidate utility on genuinely independent uninspected acquisitions
+   with calibrated acquisition-level uncertainty is not established.
+4. P4 source-to-binary IEEE-754 error accounting, dimension-scalable
+   strong external numeric comparator and mathematical novelty remain
+   insufficient for confident Numerical Algorithms acceptance.
+5. Human coauthors must verify manuscript ownership, independent ethical
+   data use, conflict/funding statements, citations, final figure layout
+   and corresponding-author-controlled editorial submission.
