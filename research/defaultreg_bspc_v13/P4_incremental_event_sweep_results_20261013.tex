@@ -15,6 +15,26 @@ The exact output (all event points, event AUC values, and open-cell
 AUC values) agrees with the original implementation that recomputes
 every pair's sign in every cell. The local tests include coincident events, double roots, full-path ties, endpoint equality,
 closely spaced rational roots and algebraic irrational roots.
+\paragraph{Correctness and operation count.}
+Assume each source-fitted spectral denominator is strictly positive
+throughout the feasible parameter interval and every nonzero rational
+pair numerator has had all its roots isolated exactly. Between
+consecutive distinct roots, each pair sign is constant. At a root,
+its ROC-AUC credit is $1/2$; across the root, the sign changes if
+and only if its multiplicity is odd. Thus initializing pair credits
+in the first open cell and updating only the incident pairs at each
+root gives, by induction over ordered roots, exactly the same AUC
+at every event and open cell as evaluating all pair numerators
+anew. Zero-polynomial pairs contribute $1/2$ everywhere and
+endpoint values are evaluated separately. For $P$ pairs, $E$
+interior roots counted with pair incidence, and $R$ distinct event
+locations, the combinatorial work after root isolation is $O(P)$
+initialization plus $O(E\log E)$ algebraic comparisons for sorting
+and $O(E+R)$ pair-credit/output operations. Re-evaluating all
+$P$ pairs on each of $R+1$ cells uses $O(P(R+1))$ sign evaluations.
+These counts exclude algebraic number bit complexity and root
+isolation, which may dominate total time.
+
 A deterministic rational SPD synthetic benchmark used dimensions
 $p=3,6$, pair counts 4--32, and 8--64 interior events. At $p=6$
 we used a full degree-five numerator; the two in-range roots per
