@@ -63,6 +63,23 @@ def pair_correlations(source_mat,edf_digital):
                 denom=np.linalg.norm(u)*np.linalg.norm(v)
                 if denom>0:local.append(float(np.dot(u,v)/denom))
     local=np.asarray(local,dtype=float)
+    # Relax trial order inside each same-index channel, keeping the published
+    # 4000-sample trial coordinate fixed. This is an exploratory best match,
+    # not an externally verified source-to-EDF trial correspondence.
+    trial_matches=[]
+    if a.shape[1]==40*4000:
+        for channel in sorted(set(idxa.tolist()) & set(idxb.tolist())):
+            u=a[channel].reshape(40,4000).copy()
+            v=b[channel].reshape(40,4000).copy()
+            u-=u.mean(axis=1,keepdims=True)
+            v-=v.mean(axis=1,keepdims=True)
+            un=np.linalg.norm(u,axis=1);vn=np.linalg.norm(v,axis=1)
+            goodu=un>0;goodv=vn>0
+            if not goodu.any() or not goodv.any():continue
+            corr=(u[goodu]/un[goodu,None])@(v[goodv]/vn[goodv,None]).T
+            rr,cc=linear_sum_assignment(-np.abs(corr))
+            trial_matches.extend(np.abs(corr[rr,cc]).tolist())
+    trial_matches=np.asarray(trial_matches,dtype=float)
     return {
         "source_channels":int(a.shape[0]),
         "edf_channels":int(b.shape[0]),
@@ -78,6 +95,10 @@ def pair_correlations(source_mat,edf_digital):
         "same_index_blockwise_abs_r_median":float(np.median(np.abs(local))) if local.size else None,
         "same_index_blockwise_abs_r_ge_0p95":int(np.sum(np.abs(local)>=.95)),
         "blockwise_comparison_assumes_40_ordered_4000_sample_blocks":True,
+        "same_index_channel_optimal_trial_assignment_eligible":int(trial_matches.size),
+        "same_index_optimal_trial_assignment_abs_r_median":float(np.median(trial_matches)) if trial_matches.size else None,
+        "same_index_optimal_trial_assignment_abs_r_ge_0p95":int(np.sum(trial_matches>=.95)),
+        "trial_assignment_is_posthoc_and_does_not_verify_acquisition_identity":True,
         "best_unconstrained_source_channel_match_median_abs_r":float(np.median(max_per_source)),
         "one_to_one_assignment_matched_channels":int(len(rows)),
         "one_to_one_assignment_median_abs_r":float(np.median(permuted)),
@@ -124,6 +145,14 @@ def synthetic_test():
     shifted=np.roll(blocks,4000,axis=1)
     check=pair_correlations(blocks,shifted)
     assert check["same_index_4000_sample_blocks_eligible"]==160
+    # One-to-one trial permutation should be recovered on exact affine blocks.
+    trial_rng=np.random.default_rng(24)
+    q=trial_rng.normal(size=(3,40,4000))
+    perm=trial_rng.permutation(40)
+    rearranged=(q[:,perm,:]*3+11).reshape(3,160000)
+    permuted=pair_correlations(q.reshape(3,160000),rearranged)
+    assert permuted["same_index_optimal_trial_assignment_abs_r_ge_0p95"]==120
+    assert permuted["same_index_blockwise_abs_r_ge_0p95"]<120
     test=np.arange(40*33*4000).reshape(40,33,4000)
     m=matrix_from_source(test)
     assert np.array_equal(m[9],test[:,9,:].reshape(-1))
