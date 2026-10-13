@@ -1,0 +1,81 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 5,
+  "new_candidates": [
+    {
+      "author_login": "JunSeongKW",
+      "body": "Hi,\n\nThanks for the quick reply. It fully answered our TensorRT questions.\n\nOne follow-up on the README's \"0.1 seconds or less of model work per Drive call\":\n\n    Is this per single decision of one rollout (one forward pass), or should a replica serve\n    both of its concurrent rollouts within 0.1 s?\n    Is it checked per call (e.g. a Drive timeout), or enforced only through the throughput\n    budget? If the budget, is the PAI limit still 14,400 s?\n\nFor reference: on an H100 our model forward takes about 51 ms. Under the full ec2 load\n(16 replicas x 2 rollouts), the Drive RPC takes about 150 ms at p50.\n\nThanks!",
+      "created_at": "2026-10-13T15:21:29Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/206",
+      "id": "NVlabs/alpasim#206",
+      "issue_number": 206,
+      "labels": [],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "741c393b900b0e0e62a2785dfe6f234fc39300cd608dab6dec3de1bc65d53534",
+      "title": "[Alpasim E2E Challenge] Clarification on the 0.1 s per-Drive model-work limit"
+    },
+    {
+      "author_login": "tyler-yankee",
+      "body": "**Is your feature request related to a problem? Please describe.**\n\nSphinx is currently [pinned](https://github.com/RobotLocomotion/drake/blob/0401464adbe8819130ea50cbf52c6d60bd0e7711/setup/python/sphinx/requirements.in#L1) to `<9`. [Sphinx 9.0](https://www.sphinx-doc.org/en/master/changes/9.0.html) was released almost one year ago.\n\n**Describe the solution you'd like**\n\nDrake should move towards supporting it, so we don't fall behind.\n\nThe main challenge here is going to be working around upstream's rewrite of `sphinx.ext.autodoc`. See https://github.com/sphinx-doc/sphinx/issues/13751 for the outline of the changes that went in, and https://github.com/sphinx-doc/sphinx/issues/14089 for a tracking issue of problems they've since discovered after releasing it. Drake's `pydrake_sphinx_extension.py` relies on this module pretty heavily. \n\n**Describe alternatives you've considered**\n\nThere is a [autodoc_use_legacy_class_based](https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#confval-autodoc_use_legacy_class_based) option which would allow us to maintain our current extension code and defer the porting to the new `autodoc` a little bit longer.\n\nIn the context of #24895, we could consider waiting for another future release (10.*, etc.) and hope that upstream provides better first-class support for nanobind, so we can jump straight to that and remove some of our workaround extension code.\n\n**Additional context**\n\nSee #24970 for the upgrade to 8.*.\n\nSee #24931 for the shuffling of where we obtain Sphinx from, which gives more flexibility in the upgrades moving forward.\n\nThis effort should wait until #24895 (adapting the docs to nanobind) lands and is stable for a while.",
+      "created_at": "2026-10-13T14:30:10Z",
+      "html_url": "https://github.com/RobotLocomotion/drake/issues/25080",
+      "id": "RobotLocomotion/drake#25080",
+      "issue_number": 25080,
+      "labels": [
+        "type: feature request",
+        "priority: low",
+        "component: tutorials"
+      ],
+      "repository": "RobotLocomotion/drake",
+      "surface_sha256": "7d4187aee0134798990d213480b730df57752906c743d183d9f9fa3db5e754cb",
+      "title": "Support for Sphinx 9"
+    },
+    {
+      "author_login": "urfeex",
+      "body": "I would like to change the way that we use test registration. Currently, we use CMake variables to decide at configure time which tests should be registered. Instead, I would like to use [CTest labels](https://cmake.org/cmake/help/latest/prop_test/LABELS.html) to categorize the tests into unittests and integration-tests that require a robot / URSim.\n\nPotentially, we can then use CMake presets to easily select the tests that should be run (or just append the `-L` and `-LE` arguments to the ctest calls in the different workflows.\n\nThis is from my side currently only an idea and will be quite low-priority. If someone wants to pick that up, please let us know.",
+      "created_at": "2026-10-13T14:45:40Z",
+      "html_url": "https://github.com/UniversalRobots/Universal_Robots_Client_Library/issues/595",
+      "id": "UniversalRobots/Universal_Robots_Client_Library#595",
+      "issue_number": 595,
+      "labels": [
+        "good first issue",
+        "CI"
+      ],
+      "repository": "UniversalRobots/Universal_Robots_Client_Library",
+      "surface_sha256": "3123ad5b71db73b71658198efccb46ec963b70dc7b8b000e96691bfb0d312759",
+      "title": "Rework ctest registration to use labels"
+    },
+    {
+      "author_login": "xiexiexie0315",
+      "body": "### The feature, motivation and pitch\n\n## Feature request\nI want MuJoCo to support native GPU-accelerated LiDAR point cloud generation, which behaves like the laser sensor in Gazebo.\n\n### Use case\nWhen building embodied AI / VLA datasets, we need to generate dense LiDAR point clouds together with RGB/depth camera images in batch simulation.\nCurrently, MuJoCo only provides depth camera. To get LiDAR point clouds, users have to manually convert depth images to point clouds on CPU after rendering.\nThis extra CPU conversion step becomes a bottleneck when running many parallel environments with MJX.\n\n### What I expect\n1. A built-in LiDAR sensor primitive (like `lidar` geom/sensor in XML)\n2. Point cloud generation runs on GPU (compatible with MJX)\n3. Direct output of 3D point cloud (x,y,z + intensity) without CPU post-processing\n4. Support common LiDAR parameters: vertical/horizontal FOV, number of beams, range limit, noise, drop-out simulation\n\n### Alternatives I tried\n- Using MuJoCo depth camera + CPU unprojection to compute point cloud. This works but limits parallel simulation throughput.\n- Implement custom GPU kernel outside MuJoCo, which increases integration complexity.\n\n### Additional context\nGazebo can natively generate laser point cloud on the render backend. It will be very helpful for robot SLAM and VLA data collection if MuJoCo has this feature.\n\n\n### Alternatives\n\n_No response_\n\n### Additional context\n\n_No response_",
+      "created_at": "2026-10-13T13:22:40Z",
+      "html_url": "https://github.com/google-deepmind/mujoco/issues/3688",
+      "id": "google-deepmind/mujoco#3688",
+      "issue_number": 3688,
+      "labels": [
+        "enhancement"
+      ],
+      "repository": "google-deepmind/mujoco",
+      "surface_sha256": "ead9aba532ebf48274b1cec50222215f52b67a5d32f0a88a12a211c6cb43800c",
+      "title": "Feature request: Native GPU-accelerated LiDAR point cloud generation similar to Gazebo"
+    },
+    {
+      "author_login": "corot",
+      "body": "## Feature request\n\n#### Feature description\n`RangeSensorLayer::processVariableRangeMsg` drops any reading above `max_range` before checking `clear_on_max_reading`, so only a reading of exactly `max_range` clears the sensor cone. REP 117 says a ranger that detects nothing reports +Inf, so a compliant variable ranger never clears; its marks stay until an in-range reading replaces them.\n\nI hit this with sonars and IR sensors simulated on Gazebo Harmonic. `ros_gz_bridge` reported `max_range + 1` when nothing was detected; https://github.com/gazebosim/ros_gz/pull/982 changed it to +Inf, as REP 117 says, but the layer drops that too.\n\n#### Implementation considerations\nWith `clear_on_max_reading`, treat readings above `max_range`, +Inf included, as max readings: clear the cone up to `max_range` instead of returning. `processFixedRangeMsg` already clears on +Inf. Happy to make a PR if this sounds good.\n\nHappy to do myself if the maintainers agree with the change.\n",
+      "created_at": "2026-10-13T12:34:33Z",
+      "html_url": "https://github.com/ros-navigation/navigation2/issues/6650",
+      "id": "ros-navigation/navigation2#6650",
+      "issue_number": 6650,
+      "labels": [],
+      "repository": "ros-navigation/navigation2",
+      "surface_sha256": "de88e66c38f6663ee543223dc1208e4dd0ec3e26641e29e138622687c281545c",
+      "title": "[range_sensor_layer] clear on readings above max_range"
+    }
+  ],
+  "post_activation_issue_identities_observed": 113,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-13T15:55:15Z",
+  "schema_version": 1
+}
