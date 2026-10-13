@@ -1,0 +1,49 @@
+name: P2 source MAT six-public-ID strict HTTP-range provenance investigation
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/p2_figshare_six_source_mat_range_audit.py'
+      - '.github/workflows/p2-figshare-six-source-mat-range-forensics.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  public-raw-mat-content-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Install numerical MAT readers
+        run: python -m pip install --disable-pip-version-check numpy scipy h5py
+      - name: Validate synthetic ZIP extraction, strict CRC and exact versus shifted value semantics
+        run: |
+          python -m py_compile research/defaultreg_bspc_v13/src/p2_figshare_six_source_mat_range_audit.py
+          python research/defaultreg_bspc_v13/src/p2_figshare_six_source_mat_range_audit.py --self-test
+      - name: Read only six public original source MAT files by HTTP Range, compare numerical arrays
+        run: |
+          python research/defaultreg_bspc_v13/src/p2_figshare_six_source_mat_range_audit.py --out /tmp/p2-six-public-source-mat-range-audit.json
+          python - <<'PY'
+          import json
+          p='/tmp/p2-six-public-source-mat-range-audit.json'
+          x=json.load(open(p))
+          assert x['only_six_selected_source_MAT_members_read']
+          assert x['full_archive_not_downloaded']
+          assert x['no_eeg_waveform_content_or_patient_metadata_exported']
+          assert [p['released_public_ids'] for p in x['pair_comparisons']]==[[4,5],[47,49],[11,15]]
+          assert x['total_http_range_body_bytes']<x['full_archive_bytes']
+          assert all(f['zip_crc32_matches'] for f in x['per_file'])
+          print('P2_SIX_ORIGINAL_SOURCE_MAT_PUBLIC_DIGITAL_COMPARISON_COMPLETED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: P2-SIX-SOURCE-MAT-RANGE-ONLY-AGGREGATED-DIGITAL-FORENSICS-NOT-PATIENT-ID
+          path: /tmp/p2-six-public-source-mat-range-audit.json
+          if-no-files-found: warn
+          retention-days: 90
