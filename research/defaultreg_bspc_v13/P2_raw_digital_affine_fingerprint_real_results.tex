@@ -1,0 +1,70 @@
+% Executed real public raw EDF digital sample test 2026-10-13.
+\subsection{Raw digital integer evidence for the high-similarity pairs}
+\label{sec:p2-raw-digital-affine}
+A new independent numerical operation on the released
+\emph{raw EDF digital integer sample payloads} interrogated
+the two non-identical, highly correlated processed-record
+pairs. The auditor reads EDF channel samples in their original
+record ordering and accumulates exact integer sums of first
+and second moments and cross-products. Pearson correlation
+and the least-squares affine-fit residual are calculated
+from these integer moments only after the full stream has
+been processed. The algorithm was first checked on
+self-generated EDF examples that include identical,
+perfectly affine but non-identical, and non-matching
+integer streams. No processed EEG feature, fitted decoder,
+held AUC or EDF physical-unit calibration value is used.
+
+\begin{table}[tb]
+\centering\small
+\caption{New retrospective public Liu2024 raw EDF digital
+sample diagnostics. Strict channel alignment is required.
+Exact equality counts all 33 EDF channels, while the
+high-correlation count excludes a constant channel.
+Raw digital similarity is not evidence of identical
+patient or acquisition identity.}
+\label{tab:p2-raw-affine}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrr}
+\toprule
+Released ID pair & Exact/33 & Median raw $\rho$ & $\rho\geq .9999$/32\\
+\midrule
+4/5 & 32 & 1.000000 & 31\\
+47/49 & 1 & 0.999884 & 13\\
+11/15 & 1 & 0.999854 & 13\\
+2/3 (control) & 1 & 0.013885 & 0\\
+6/7 (control) & 1 & $-0.002453$ & 0\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The full-stream raw digital comparison corroborates
+the already reported 32/33 exact-channel relationship
+for ID4/5. More importantly, substantial
+channelwise correlation for 47/49 and 11/15
+is detectable \emph{before} the common 8--30~Hz
+filtering and resampling steps. Neither pair has
+more than one exactly equal raw channel.
+Although 13/32 nonconstant channels of each
+pair exceed $\rho=0.9999$, no channel in
+these two pairs had a relative linear
+affine-fit residual below 0.001.
+The two fixed additional contrast pairs did not
+exhibit comparably high raw channel correlations.
+These controls were selected \emph{after} the main
+dataset had already been examined, so they do
+not estimate false positive rates or cohort
+prevalence. The successful executable record and
+aggregate, nonidentifying report are archived at
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38325795037}.
+
+The method handles the integer payload separately
+from the physically calibrated signal: the source EDF
+metadata had previously caused strict pyEDFlib physical
+reading to fail. Similar digital samples could reflect
+release transformations, related recording intervals,
+or other unknown provenance. No clinical recruitment
+record or raw acquisition history was available to
+resolve those alternatives. Accordingly, the primary
+49 exact-content groups and the conditional, noncausal
+47-group scenario remain separate scientific claims.
