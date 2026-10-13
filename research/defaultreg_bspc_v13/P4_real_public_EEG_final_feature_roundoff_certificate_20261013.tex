@@ -1,0 +1,70 @@
+\subsection{Real publicly released EEG: exact rounding bounds on final tangent features}
+\label{sec:p4-real-feature-quantisation}
+To test the conditional input-to-covariance certification
+on \emph{non-synthetic EEG features}, we executed a
+new numerical-representation experiment using
+\emph{previously analysed} BNCI2014\_001
+public released person 1.
+Two EEG channels (C3/C4) were band-pass filtered
+8--30 Hz and resampled at 160 Hz using
+MOABB 1.7.2. The source-only tangent geometry
+yielded three real \emph{binary64} final feature
+coordinates. A fixed 64-trial (32 per class)
+feature matrix and positive ridge $1/5$
+were used in an ordinary within-class
+covariance estimate. Twelve positive--negative
+sample pairs were fixed by a seed
+\texttt{20261013}, before any certification
+results were inspected; the experiment is
+a rank-sign \emph{numerical accuracy}
+demonstration and does \emph{not} evaluate
+cross-person decoding benefit.
+
+Each final binary64 feature was converted
+\emph{exactly} to its IEEE finite-binary
+rational value, then rounded to a fixed
+rational grid with resolution $2^{-18}$.
+The exact original rational and quantized
+rational values were compared
+\emph{elementwise}, confirming the bound
+$\eta=2^{-19}$ without relying on
+machine-rounding approximations.
+The deterministic covariance- and
+contrast-error radii derived in
+Section~\ref{sec:p4-final-feature-chain}
+were then submitted to the eigenvector-
+independent resolvent certificate in
+Section~\ref{sec:p4-cov-resolvent}.
+For the preselected twelve held pair
+comparisons, eight strict positive
+and four strict negative score signs
+were proved simultaneously for
+\emph{all} $\lambda\in[0,1]$ and
+\emph{every} rational or real
+final-feature matrix inside the
+verified $\eta$ input box; none
+returned unknown. The complete
+public EEG execution, frozen
+sample selectors and rational
+certificate parameters are archived at
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38391746843}.
+
+This is an actual EEG \emph{final-feature
+fixed-point representation test},
+but it does not certify that a
+true physical EEG acquisition
+satisfies any analogous input
+bound. The original MNE filtering,
+covariance, manifold tangent mapping
+and eigenvalue computations
+are \emph{outside} the verified
+input error box. Nor do 12
+sample-pair signs imply a general
+classification accuracy, population
+transfer advantage, novel root
+isolation algorithm, or meaningful
+worst-person BCI benefit.
+The all-12 result is descriptive
+for this deliberately small
+three-coordinate previously exposed
+recording only.
