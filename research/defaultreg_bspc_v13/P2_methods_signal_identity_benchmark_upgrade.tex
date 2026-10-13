@@ -75,14 +75,14 @@ event alignment, filtering, channel order, data dtype,
 and the specified MOABB processing path.
 Here those choices are pinned, and the total number
 of analysed trials is reported explicitly.
-We additionally compared the raw public EDF data:
+We additionally compared as-stored digital samples in the\n\emph{publisher-supplied, preprocessed EDF files}:
 32 of 33 reader-interpreted channel arrays were equal
 over the corresponding record pair, whereas one
 channel reported an empty name and different values.
 This is independent supporting \emph{digital signal}
 evidence but not proof of clinical identity or an
 explanation of how these files were created.
-An additional public-EDF numerical check used an
+An additional published-EDF numerical check used an
 independent byte-level parser of each EDF record's 16-bit
 \emph{digital} channel payload, without calling the MNE or
 pyEDFlib signal readers. This comparison does not assume
@@ -93,8 +93,10 @@ All raw digital channel records were compared pairwise
 as literal bytes. Corresponding digital channel equality
 is a reproducible file-content fact, not proof of EEG
 physical-amplitude equivalence under every reader or of
-clinical participant identity. Clarification from the
-data custodians remains pending.
+clinical participant identity. The original-acquisition MAT files were not examined by
+this EDF-only analysis; it is not an independent
+verification of upstream acquisition records.
+Clarification from the data custodians remains pending.
 
 Weibo2014 and BNCI2014\_002 were retained as
 two previously exposed control acquisitions.
