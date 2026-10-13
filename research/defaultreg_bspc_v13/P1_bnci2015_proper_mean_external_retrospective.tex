@@ -80,10 +80,13 @@ observations are retrospectively inspected.
 For each of the 12 outer holds, we additionally recorded the
 source-only inner-fold AUC difference between the selected
 source-macro and proper predictive-NLL shrinkage choices
-before evaluating that held participant. The sign of this
-source difference predicted the held-participant AUC contrast
-in 8/12 cases; mean absolute prediction error was
-0.070620 AUC. This is a descriptive, previously exposed
+before evaluating that held participant. The first diagnostic reused the selected inner-source
+folds and predicted the held-participant AUC direction
+in 8/12 cases, with mean absolute error 0.070620 AUC.
+A subsequent source-choice cross-fitting analysis has been
+specified in the code and must replace this preliminary
+figure after its separate real-data execution; no cross-fit
+accuracy is asserted here. This is a descriptive, previously exposed
 12-person check, with neither an independent acquisition nor
 an error-controlled prospective prediction claim. The source
 contrast reuses the same inner folds that selected both shrinkage
