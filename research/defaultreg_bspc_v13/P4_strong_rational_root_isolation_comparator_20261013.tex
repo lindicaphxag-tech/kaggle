@@ -1,0 +1,40 @@
+% Independent CI run 38363154062; exact rational polynomial root-stage scope.
+\paragraph{Strong exact root-isolation comparator.}
+The incremental event update previously held the exact SymPy
+\texttt{real\_roots} engine fixed, comparing only full per-cell
+re-evaluation with incident-pair updates. We separately compared that
+root engine with SymPy's established exact rational isolating
+intervals at width at most $10^{-8}$, using identical constructed
+rational pair polynomials in 3 and 6 spectral dimensions. All
+intervals contained the corresponding exact algebraic roots with
+their multiplicities; an exact root-count check also covered the
+interior $\lambda\in(0,1)$. The intervals algorithm is a strong
+\emph{existing} comparator, not our contribution.
+
+\begin{table}[h!]\centering\small
+\caption{Exact root-stage timing on the public CI machine, median
+seconds over four alternating-order repeats. Each method isolates all
+real roots of every polynomial, not an end-to-end AUC path.
+Times depend on the machine and fixed constructed examples.}
+\label{tab:p4-root-isolator}
+\begin{tabular}{llrrr}
+\toprule
+Dimension & Pattern & Pairs & Rational intervals & \texttt{real\_roots}\\
+\midrule
+3 & Crossing & 16 & .00416 & .01081\\
+6 & Crossing & 16 & .00888 & .03562\\
+6 & No event & 16 & .04569 & .02819\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The rational isolator is already faster at the \emph{root stage} in
+the crossing examples, while it is slower in the six-dimensional
+no-event control. Thus the previous speedup over full AUC
+re-evaluation cannot be interpreted as superiority to a strong
+root-isolation method. A complete strict algorithm must combine
+root isolation, equality and ordering of roots across pairs, tie
+scores, incident updates and floating input error control in one
+fair end-to-end benchmark. The comparator code and full eight-case
+receipt ran in
+\href{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38363154062}{the successful independent CI workflow}.
