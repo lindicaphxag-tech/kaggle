@@ -88,11 +88,14 @@ def real(out):
             backend,arrays=candidate_arrays(dest)
             if len(arrays)!=1:raise RuntimeError('ambiguous MAT signal candidate')
             mat[sid]=matrix_from_source(arrays[0][0])
-            edf[sid],_=edf_digital_samples(ds.data_path(sid)[0])
+            edf[sid],channel_names=edf_digital_samples(ds.data_path(sid)[0])
             if mat[sid].shape!=edf[sid].shape:raise RuntimeError('shape mismatch')
             receipts.append({'public_id':sid,'source_member_crc_verified':True,
-                             'source_backend':backend,'shape':list(mat[sid].shape)})
-            print('P2_HELDOUT_LAYER_PRODUCTS_LOADED',sid,flush=True)
+                             'source_backend':backend,'shape':list(mat[sid].shape),
+                             'edf_stored_channel_index_32_label':str(channel_names[32]),
+                             'edf_33_channel_count':len(channel_names)})
+            print('P2_HELDOUT_LAYER_PRODUCTS_LOADED',sid,
+                  'EDF_INDEX32_LABEL',str(channel_names[32]),flush=True)
     rows=[]
     for src in IDS:
         for dst in IDS:
