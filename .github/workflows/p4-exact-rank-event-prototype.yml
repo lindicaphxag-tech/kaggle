@@ -8,6 +8,7 @@ on:
       - research/defaultreg_bspc_v13/src/p4_exact_rank_event_sweep_prototype.py
       - research/defaultreg_bspc_v13/src/p4_joint_spectral_coefficient_box_certificate.py
       - research/defaultreg_bspc_v13/src/p4_joint_box_adaptive_refinement_and_falsification.py
+      - research/defaultreg_bspc_v13/src/p4_covariance_coordinate_resolvent_bound.py
       - .github/workflows/p4-exact-rank-event-prototype.yml
 
 jobs:
@@ -26,6 +27,22 @@ jobs:
       - name: Joint spectral and coefficient interval-box soundness regression
         run: |
           python research/defaultreg_bspc_v13/src/p4_joint_spectral_coefficient_box_certificate.py --out p4_joint_spectral_box_results.json
+      - name: Eigenspace-invariant covariance-space perturbation theorem regression
+        run: |
+          python research/defaultreg_bspc_v13/src/p4_covariance_coordinate_resolvent_bound.py --out p4_covariance_resolvent_oracle.json
+          python - <<'PY'
+          import json
+          z=json.load(open('p4_covariance_resolvent_oracle.json'))
+          assert z['status']=='PASS'
+          assert z['decisions']==dict(POS=46,NEG=65,UNKNOWN=9)
+          assert z['exact_covariance_perturbation_oracle_checks']==2220
+          print('P4_COVARIANCE_COORDINATE_CERTIFICATE_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p4-rational-covariance-perturbation-oracle
+          path: p4_covariance_resolvent_oracle.json
+          retention-days: 90
       - name: Full synthetic box proof-or-exact-witness replay
         run: |
           python research/defaultreg_bspc_v13/src/p4_joint_box_adaptive_refinement_and_falsification.py --out p4_proof_or_counterexample.json
