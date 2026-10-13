@@ -1500,6 +1500,28 @@
       "source": "inbox/FIRST_SEEN_20261012T231517Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "f517f265d63e627a9efca7e85fb2e7a72c2f69d31ddcede62117a42bc02277d5"
+    },
+    {
+      "created_at": "2026-10-13T02:25:50Z",
+      "first_frozen_at": "2026-10-13T03:50:59Z",
+      "id": "gazebosim/gz-physics#1119",
+      "issue_number": 1119,
+      "prediction_deadline_at": "2026-10-13T09:50:59Z",
+      "repository": "gazebosim/gz-physics",
+      "source": "inbox/FIRST_SEEN_20261013T035059Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "39b313652ded6264bdf5ecd3dd3e3e43b87a0b2e47b0cd426062c615444791cf"
+    },
+    {
+      "created_at": "2026-10-13T03:46:17Z",
+      "first_frozen_at": "2026-10-13T03:50:59Z",
+      "id": "ros-navigation/navigation2#6648",
+      "issue_number": 6648,
+      "prediction_deadline_at": "2026-10-13T09:50:59Z",
+      "repository": "ros-navigation/navigation2",
+      "source": "inbox/FIRST_SEEN_20261013T035059Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "5b1f02ab1cabfc2b486a5e769abbf1da2eddf577938e25c2a9a804fd5d694a0e"
     }
   ]
 }
