@@ -73,16 +73,84 @@ Pearson $r\geq0.9999$, and there
 were only 15, 14 and 10
 exact trial--channel blocks
 respectively out of 1,280 eligible blocks.
-Thus the first-pass pooled
-MAT correlations are \emph{not
-evidence that almost all
-original-source EEG waveforms
-were equal}. A separate explicit
-within-channel centering and
-between-channel mean-variance
-decomposition is needed for a
-mechanistic explanation of why the
-pooled values were so large.
+Thus the first-pass pooled MAT correlations are
+\emph{not evidence that almost all original-source
+EEG waveforms were equal}.
+
+\paragraph{Exact covariance decomposition of the misleading pooled statistic.}
+Let $X_{j,t}$ and $Y_{j,t}$ denote paired numerical
+MAT values at source-array channel index $j$ and
+within-channel location $t$; all channels here
+contain the same number of sampled values.
+Denote the channel-specific means by
+$\mu_{X,j},\mu_{Y,j}$ and global means
+by $\mu_X,\mu_Y$. By the law of
+total covariance,
+\[
+\operatorname{Cov}(X,Y)
+=\underbrace{\frac1J\sum_j
+ \operatorname{Cov}_{t}(X_{j,t},Y_{j,t})}
+ _{\text{within-channel covariance}}
++\underbrace{\operatorname{Cov}_{j}
+ (\mu_{X,j},\mu_{Y,j})}
+ _{\text{between-channel mean covariance}}.
+\]
+The analogous law decomposes
+$\operatorname{Var}(X)$ and
+$\operatorname{Var}(Y)$ into within- and
+between-channel parts. Consequently,
+a near-unit Pearson coefficient computed after
+flattening all channels may be dominated
+by aligned channel offsets, even when the
+time-varying EEG within each channel differs.
+We re-executed this decomposition on all
+six separately published source MAT arrays,
+not on example or invented signals.
+
+\begin{table}[tb]
+\centering\small
+\caption{Executed source MAT Pearson comparisons
+before and after subtracting each MAT channel's
+own mean. Between-channel fraction is
+$\operatorname{Var}_j(\mu_{X,j})/
+\operatorname{Var}(X)$ for the first file
+in each pair. All array indices are
+unlabelled source-MAT indices; MAT-to-EDF
+channel identity remains unverified.}
+\label{tab:p2-source-mat-covariance}
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{lrrr}
+\toprule
+IDs & Flattened $r$ & Within-channel $r$
+ & Between/total var.\\
+\midrule
+4/5   & 0.999965 & 0.728604 & 99.9926\%\\
+47/49 & 0.999958 & 0.849534 & 99.9798\%\\
+11/15 & 0.999954 & 0.932343 & 99.9435\%\\
+\bottomrule
+\end{tabular}
+\end{table}
+The second file in each pair likewise had
+between-channel fractions of
+99.9861\%, 99.9720\%, and 99.9349\%.
+This quantitatively explains why
+flattened $r\simeq0.99995$ was misleading:
+nearly all pooled MAT variance lies
+\emph{between} channel means rather than
+in each channel's changing signal.
+The within-channel pooled coefficient
+remains a variance-weighted aggregate,
+not a majority-channel agreement
+guarantee; the channelwise medians and
+exact trial--channel block counts in
+Table~\ref{tab:p2-source-mat-initial}
+must be considered separately.
+The decomposition was executed with a
+successful independent workflow run
+\texttt{38334394283} and
+the JSON artifact contains the component
+covariances for reproduction.
+
 
 These source-MAT findings do
 \emph{not} invalidate the separate,
