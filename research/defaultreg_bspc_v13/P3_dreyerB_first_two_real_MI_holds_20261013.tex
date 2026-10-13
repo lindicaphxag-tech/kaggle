@@ -1,0 +1,64 @@
+\subsection{A second new source-locked motor-imagery cohort: Dreyer2023B}
+\label{sec:p3-new-dreyerb}
+To examine task-specific variability without recycling
+the previously exposed BNCI2014\_004 and Weibo2014
+targets, we ran the same five policies on a newly
+tracked \emph{Dreyer2023B} subset. This dataset is
+related to the broader Dreyer2023 study; a distinct
+Dreyer2023A subset had been examined in our
+earlier research. Thus this constitutes a
+new \emph{within-repository} held cohort and
+not independent external preregistration or
+a separately recruited research laboratory.
+
+We fitted all source-only algorithms on IDs
+61--68, using C3/Cz/C4, left/right motor imagery,
+8--30 Hz, 160 Hz and exactly the same
+source-fitted tangent geometry and model family.
+The source choices were frozen to SHA-256
+\texttt{3b2022007a22076951ae09f3ba4ce7e312edc37816ae62e13233179c90fca3aa}
+\emph{before requesting either target}. With
+no subsequent target hyperparameter selection,
+we evaluated held IDs 69 and 70 (240 labelled
+trials each). The completed code and untouched
+within-run target receipts are archived in
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38390737635}.
+
+\begin{table}[ht]\centering\small
+\caption{Newly source-locked Dreyer2023B
+held MI targets. Entries are paired held
+$\Delta$ROC-AUC relative to source macro.
+Both records are from \emph{one} data cohort,
+not two independent acquisitions.}
+\label{tab:p3-dreyerb}
+\begin{tabular}{lrr}
+\toprule
+Method & ID 69 & ID 70\\
+\midrule
+Source macro & 0 & 0\\
+Continuous & 0 & 0\\
+SCE & -.016528 & -.012500\\
+Anisotropic & -.024583 & -.007222\\
+Group-centred & +.000972 & +.000833\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+SCE and anisotropic selection were worse than
+the source macro on \emph{both} newly read people,
+with an anisotropic loss exceeding $0.02$
+AUC on held ID 69. Group-centred selection
+gained less than $0.001$ AUC on each, while
+continuous agreed exactly with the default.
+This contrasts with the mild SCE improvement
+observed on one newly read BNCI2015\_004
+\emph{mental-task} participant. The
+differences are descriptive across a few
+different acquisition/task conditions:
+they do not prove which dataset property
+causes a sign reversal. We do \emph{not}
+pool trials, target people or source folds
+as independent acquisition-level calibration
+units, and the available study does not
+provide a valid conformal meta-acquisition
+risk guarantee or a new clinical policy.
