@@ -79,3 +79,23 @@ publication HOLD. This is a synthetic exact-input result,
 not a certified floating-point EEG pipeline or a proof of
 universal method equivalence. The three-way execution record
 is \url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38337557905}.
+
+\paragraph{Exact sign-change ceiling for this fixture family.}
+We further evaluated each unresolved interval at 129 rational grid
+points, including both endpoints. For all 36 intervals unresolved
+by both Bernstein and centered Horner (12 each at $p=2,6,12$),
+two evaluated rational points had strictly opposite signs.
+By continuity, each such interval contains a zero and cannot
+admit any sound certificate that its polynomial is strictly
+positive or strictly negative over the whole interval.
+The other 924 intervals were certified by both methods.
+Thus 924/960 is the attainable strict-sign coverage ceiling
+for this particular fixture collection, rather than a
+recoverable failure of either enclosure. This is an exact-input,
+synthetic benchmark finding; it does not imply completeness
+for other polynomials, interval partitions, or floating-point EEG
+processing. The executable witness count passed in
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38339203347}.
+A method paper cannot claim improved coverage on these fixed
+whole intervals; a new problem definition or meaningful
+computational advantage on a broader benchmark is required.
