@@ -1,0 +1,51 @@
+name: P4 real public EEG final tangent-feature exact rounding audit
+on:
+  push:
+    branches: [publication/default-eeg-p4-rank-certificates-20261013]
+    paths:
+      - '.github/workflows/p4-real-eeg-final-feature-rounding-sign.yml'
+      - 'research/defaultreg_bspc_v13/src/p4_real_EEG_final_tangent_feature_rounding_certificate.py'
+      - 'research/defaultreg_bspc_v13/src/p4_final_feature_entrywise_error_to_covariance_certificate.py'
+      - 'research/defaultreg_bspc_v13/src/p4_covariance_coordinate_resolvent_bound.py'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  published_binary64_tangent_only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    env:
+      MNE_DATA: /tmp/p4-real-bnci001-public-eeg
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Install public EEG processing and symbolic rational dependencies
+        run: |
+          python3 -m pip install --disable-pip-version-check moabb==1.7.2 sympy==1.14.0
+      - name: Independently fetch public EEG and certify real floating final-feature quantisation
+        run: |
+          mkdir -p "$MNE_DATA"
+          python3 research/defaultreg_bspc_v13/src/p4_real_EEG_final_tangent_feature_rounding_certificate.py --out p4_real_final_feature_rounding_certificates.json
+      - name: Gate exact input-bound and no-full-pipeline-claim
+        run: |
+          python3 - <<'PY'
+          import json
+          z=json.load(open('p4_real_final_feature_rounding_certificates.json'))
+          assert z['status']=='REAL_PUBLIC_EEG_FINAL_FEATURE_QUANTIZATION_BOX_AUDIT'
+          assert z['sampled_precommitted_pair_count']==12
+          assert sum(z['counts'].values())==12
+          assert z['input_error_box_checked_as_exact_binary64_fractions']
+          assert z['no_end_to_end_EEG_pipeline_error_certification']
+          assert z['no_new_unseen_EEG_acquisition_or_decoder_gain']
+          print('P4_REAL_EEG_FINAL_FEATURE_DIGITIZATION_SCOPE_AND_EXACT_CERTIFICATES_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p4-real-eeg-final-feature-quantization-exact-rational-sign
+          path: p4_real_final_feature_rounding_certificates.json
+          if-no-files-found: warn
+          retention-days: 90
