@@ -1,0 +1,68 @@
+name: Default EEG exact-HEAD manuscript PDF and reference preflight
+on:
+  push:
+    branches:
+      - publication/default-eeg-p1-estimand-20261013
+      - publication/default-eeg-p2-record-identity-20261013
+      - publication/default-eeg-p3-transfer-negative-20261013
+      - publication/default-eeg-p4-rank-certificates-20261013
+    paths:
+      - '.github/workflows/default-eeg-exact-head-manuscript-preflight.yml'
+      - 'research/defaultreg_bspc_v13/**'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  strict-current-head-manuscript:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: TeX and Poppler dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended lmodern poppler-utils
+      - name: Compile the precise research HEAD with fatal TeX errors
+        run: |
+          set -euo pipefail
+          case "$GITHUB_REF_NAME" in
+            publication/default-eeg-p1-estimand-20261013) MAIN=main_p1_estimand_mismatch_EVIDENCE_GATED ;;
+            publication/default-eeg-p2-record-identity-20261013) MAIN=main_p2_eeg_record_provenance_EVIDENCE_GATED ;;
+            publication/default-eeg-p3-transfer-negative-20261013) MAIN=main_p3_source_only_optimisation_NEGATIVE_UNREADY ;;
+            publication/default-eeg-p4-rank-certificates-20261013) MAIN=main_p4_rank_cell_certificates_NOT_READY ;;
+            *) echo "Unexpected branch" >&2; exit 1 ;;
+          esac
+          cd research/defaultreg_bspc_v13
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error "$MAIN.tex"
+          test -s "$MAIN.pdf"
+          if grep -Eiq 'Citation.*undefined|Reference.*undefined|Undefined control sequence|There were undefined references' "$MAIN.log"; then
+            echo "Undefined-reference/TeX fatal error present" >&2
+            exit 1
+          fi
+          pdfinfo "$MAIN.pdf" | grep -E 'Pages:|Page size:'
+          pdftotext "$MAIN.pdf" /tmp/paper-text.txt
+          test -s /tmp/paper-text.txt
+          mkdir -p "$GITHUB_WORKSPACE/pdf-head-build"
+          cp "$MAIN.pdf" "$MAIN.log" "$GITHUB_WORKSPACE/pdf-head-build/"
+          python - "$MAIN" "$GITHUB_SHA" "$GITHUB_REF_NAME" "$GITHUB_WORKSPACE/pdf-head-build" <<'PY'
+          import hashlib,json,subprocess,sys,re
+          from pathlib import Path
+          main,sha,branch,out=sys.argv[1:]
+          pdf=Path(out)/(main+'.pdf');log=(Path(out)/(main+'.log')).read_text(errors='replace')
+          meta=subprocess.check_output(['pdfinfo',str(pdf)],text=True)
+          pages=re.search(r'^Pages:\s+(\d+)',meta,re.M)
+          x={'status':'EXACT_GITHUB_HEAD_AUTHOR_REVIEW_ONLY_NOT_SUBMITTED',
+             'head_sha':sha,'branch':branch,'tex_main':main+'.tex',
+             'pdf_sha256':hashlib.sha256(pdf.read_bytes()).hexdigest(),
+             'pdf_pages':int(pages.group(1)) if pages else None,
+             'overfull_hbox_count':len(re.findall(r'Overfull \\hbox',log)),
+             'underfull_hbox_count':len(re.findall(r'Underfull \\hbox',log)),
+             'source_author_approval_still_required':True,
+             'new_real_EEG_independent_validation_not_implied':True}
+          (Path(out)/'EXACT_HEAD_PDF_RECEIPT.json').write_text(json.dumps(x,indent=2)+'\n')
+          print('EXACT_HEAD_MANUSCRIPT_ARTIFACT_PREPARED',x)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DefaultEEG-exact-head-research-PDF-${{ github.sha }}
+          path: pdf-head-build/
+          retention-days: 90
