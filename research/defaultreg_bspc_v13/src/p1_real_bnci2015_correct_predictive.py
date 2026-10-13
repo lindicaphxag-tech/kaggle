@@ -78,8 +78,21 @@ def choose(c,y,g):
     macro=max(viable,key=lambda l:(mean(l,"auc"),l))
     proper=min(viable,key=lambda l:(mean(l,"proper"),l))
     historical=min(viable,key=lambda l:(mean(l,"historical"),l))
-    predicted=float(mean(macro,"auc")-mean(proper,"auc"))
+    optimistic=float(mean(macro,"auc")-mean(proper,"auc"))
+    # Cross-fit the *choice* over source-validation participants. Each j-th
+    # source AUC is held out when choosing both policies for that j. The
+    # underlying fitted source models still share training groups, so this
+    # is a descriptive source estimate, not independent acquisition proof.
+    oof=[]
+    for j in range(len(ids)):
+        training=[i for i in range(len(ids)) if i!=j]
+        m=max(viable,key=lambda l:(float(np.mean([store[l]["auc"][i] for i in training])),l))
+        p=min(viable,key=lambda l:(float(np.mean([store[l]["proper"][i] for i in training])),l))
+        oof.append(float(store[m]["auc"][j]-store[p]["auc"][j]))
+    predicted=float(np.mean(oof))
     return {"source_macro":macro,"true_source_train_mean_predictive":proper,
+            "source_in_sample_selected_macro_minus_proper_auc":optimistic,
+            "source_choice_crossfit_over_validation_groups":True,
             "source_predicted_macro_minus_proper_auc":predicted,
             "source_predicted_direction":("macro" if predicted>0 else "proper" if predicted<0 else "tie"),
             "historical_val_class_centred":historical,
