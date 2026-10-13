@@ -1,0 +1,75 @@
+% Executed GitHub Actions 38333234894, Figshare v5 file 38516555.
+% Retrospective source MAT evidence, no subject-identity conclusion.
+\subsection{Separately released source MAT arrays: first-pass comparison}
+\label{sec:p2-source-MAT}
+To test whether the EDF-layer relationship
+could be an artifact introduced solely
+\emph{after} source-file publication, we
+examined the independently distributed
+Figshare v5 \texttt{sourcedata.zip} archive.
+Its ZIP central directory identified
+one MAT member for each of the six
+previously flagged public identifiers.
+Strict HTTP partial-content range requests
+retrieved only those six selected members,
+totalling about 228 MB of transfer
+without downloading the full
+1.875 GB archive. Their ZIP CRC values
+were validated, and the full MAT
+numerical contents were examined
+within ephemeral runner storage
+without publishing patient metadata
+or waveform arrays.
+
+Each of the six released MAT files
+contained a large numeric array with
+identical $40\times33\times4000$ shape.
+The first-pass, aligned full-array
+correlations are:
+\begin{table}[tb]
+\centering\small
+\caption{Retrospective correlations of
+corresponding numerical arrays in the
+separately distributed public source
+MAT files. They are \emph{not}
+claims of identical patients or
+independent original acquisition sessions.
+The arrays are numerically unequal
+and their mapping to the 29 named
+EEG channels of the processed EDF
+must be verified separately.}
+\label{tab:p2-source-mat-initial}
+\begin{tabular}{lrr}
+\toprule
+Released public IDs & Whole-array Pearson $r$ & Exact?\\
+\midrule
+4/5   & 0.9999645144 & No\\
+47/49 & 0.9999576227 & No\\
+11/15 & 0.9999536829 & No\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The existence of high similarity in
+the separately released source MAT
+\emph{products} means the relationship
+cannot safely be attributed exclusively
+to our additional MOABB filtering
+or to one EDF reader. However,
+whole-array correlations can be distorted
+by a single high-variance channel,
+shared reference or data-export structure.
+Thus these initial values do \emph{not}
+prove that each EEG channel or each
+motor-imagery trial is a near duplicate.
+A subsequent channel-by-trial audit,
+and the publisher's MAT--EDF channel
+mapping, are needed before identifying
+the signal-level mechanism.
+The successful real-public-source
+receipt is archived at
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38333234894}.
+The authors have no access to clinical
+acquisition lineage records; MAT filename
+distinctness and array correlation do
+not determine participant identity.
