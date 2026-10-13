@@ -228,6 +228,7 @@ not by itself a causal EEG leakage-effect estimate.
 \input{P2_real_exact49_vs_assumed_near47_source_refit.tex}
 \input{P2_raw_digital_affine_fingerprint_real_results.tex}
 \input{P2_EDF_block_temporal_localisation_results_20261013.tex}
+\input{P2_public_source_MAT_first_pass_20261013.tex}
 \input{P2_additional_BNCI2014_001_BNCI2015_001_controls_20261013.tex}
 \input{P2_figure_frozen49_group_paired_auc.tex}
 
@@ -264,10 +265,16 @@ those pairs; it is not an empirically verified count of
 independent human participants, nor a population leakage
 estimate. Raw channelwise correlations and digital affine
 checks do not resolve the acquisition or export mechanism.
-Independent verification against the separately released
-acquisition-original MAT files is outstanding; merely
-reading the EDF with a second parser does not establish
-independence from the publisher's upstream preprocessing.
+A first comparison of corresponding numeric
+arrays in separately released public source MAT
+files is now available
+(Table~\ref{tab:p2-source-mat-initial}).
+However, the source MAT--EDF channel mapping,
+explanation of the persistent similarity and
+clinical acquisition-session provenance
+remain unresolved. Merely reading the
+EDF with a second parser does not establish
+independence from upstream preprocessing.
 The dataset custodians' clarification is outstanding.
 A general purpose, automatically validated near-duplicate
 threshold has therefore \emph{not} been established here.
