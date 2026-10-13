@@ -106,14 +106,17 @@ def checks():
 def run():
     checks()
     rows=[]
-    for dimension,n in [(3,k) for k in (4,8,16,32)]+[(6,k) for k in (4,8,16)]:
+    fixtures=[(3,k,'crossing') for k in (4,8,16,32)]+[(6,k,'crossing') for k in (4,8,16)]+[(3,32,'no_event'),(6,16,'no_event')]
+    for dimension,n,fixture in fixtures:
         s,pairs=constructed_coefficients(n,dimension)
+        if fixture=='no_event':
+            pairs=[[sp.Rational(1+i+k, i+k+2) for i in range(dimension)] for k in range(n)]
         slow=[];fast=[]
         for _ in range(3):
             t=time.perf_counter();a=event_map(s,pairs);slow.append(time.perf_counter()-t)
             t=time.perf_counter();b=incremental_event_map(s,pairs);fast.append(time.perf_counter()-t)
             assert a==b
-        rows.append({'dimension':dimension,'pairs':n,'events':len(a[1])-2,
+        rows.append({'dimension':dimension,'fixture':fixture,'pairs':n,'events':len(a[1])-2,
                      'cells':len(a[2]),'naive_median_seconds':statistics.median(slow),
                      'incremental_median_seconds':statistics.median(fast),
                      'exact_outputs_equal':True})
@@ -122,6 +125,7 @@ def run():
             'rows':rows,'baseline':'same SymPy real_roots; full AUC reevaluation per event',
             'method':'same roots; bundled sign-credit updates',
             'fixed_dimensions':[3,6], 'fixed_pair_counts_by_dimension':{'3':[4,8,16,32],'6':[4,8,16]},
+            'controls':['no_event_3d_32pairs','no_event_6d_16pairs'],
             'time_is_machine_dependent':True,
             'no_new_root_isolator_or_float_EEG_certificate':True,
             'no_unseen_subject_gain':True}
