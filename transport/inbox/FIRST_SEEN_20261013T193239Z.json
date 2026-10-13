@@ -1,0 +1,52 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 3,
+  "new_candidates": [
+    {
+      "author_login": "dundysm",
+      "body": "### describe the bug\n\n`G1_29DOF_CFG` and the dex3 G1 cfg in `isaaclab_assets/robots/unitree.py` set `.*_hip_roll_joint` to effort 88.0 and velocity 32.0. those are the values from the original G1. on G1 rev 1.0 unitree moved hip roll to the 7520-22 motor, and `g1_29dof_rev_1_0.urdf` has `effort=\"139\" velocity=\"20\"` for both hip roll joints (unitree_ros commit adb48c7, \"update hip_roll_joint for g1 rev 1.0\").\n\nother references agree on 139 / 20: mujoco menagerie `unitree_g1/g1.xml`, mjlab `g1_constants.py` (hip roll on the 7520-22 actuator), and the contributed G1 asset in #8408.\n\nso policies trained on the 29 dof cfg get about 37% less hip roll torque than the robot has, and a speed limit above what the motor can do.\n\n### steps to reproduce\n\n```python\nfrom isaaclab_assets.robots.unitree import G1_29DOF_CFG\nlegs = G1_29DOF_CFG.actuators[\"legs\"]\nprint(legs.effort_limit_sim[\".*_hip_roll_joint\"], legs.velocity_limit_sim[\".*_hip_roll_joint\"])  # 88.0 32.0\n```\n\n### expected behavior\n\nhip roll at 139 Nm and 20 rad/s, matching the rev 1.0 urdf (same as the knee).\n\n### question\n\nwhich G1 revision does `Robots/Unitree/G1/g1.usd` on nucleus model? if it is rev 1.0, i can open a small pr like #7564 that updates both cfgs and adds a changelog entry. if it is the older robot, maybe a note in the docstring is enough.\n\n### system info\n- isaac lab develop @ 830c815",
+      "created_at": "2026-10-13T18:29:09Z",
+      "html_url": "https://github.com/isaac-sim/IsaacLab/issues/8530",
+      "id": "isaac-sim/IsaacLab#8530",
+      "issue_number": 8530,
+      "labels": [],
+      "repository": "isaac-sim/IsaacLab",
+      "surface_sha256": "5d3e0c04a299bad12241d2b26932d92c46e86eb410ae0f03bc353d983b61366e",
+      "title": "[Bug Report] G1_29DOF_CFG hip roll uses pre rev 1.0 limits (88 Nm, 32 rad/s) instead of 139 Nm, 20 rad/s"
+    },
+    {
+      "author_login": "liminallyspaced",
+      "body": "Describe the bug\nOn Isaac Lab 3.0 the contrib AMP task (IsaacContrib-Humanoid-AMP-Walk-Direct, and the Run and Dance variants) reads the motion file's body rotations as wxyz but passes them unconverted into APIs that expect xyzw. Each reset spawns the humanoid with its torso upside down, and the reference AMP observations the discriminator treats as \"real\" also show an upside-down torso. The policy learns exactly that. Training looks healthy (mean episode length rises to near the 10 s limit, because the only early termination is torso height below 0.5 m), but the trained character moves on its head.\n\nThe facts\ndocs/source/refs/release_notes.rst, line 460: \"Quaternion Format: WXYZ \u2192 XYZW. All quaternions throughout Isaac Lab now use XYZW ordering\". isaaclab/utils/math.py quat_apply documents its quaternion as (x, y, z, w), and the articulation's root-pose write takes (x, y, z, w).\nThe task's loader, contrib/humanoid_amp/motions/motion_loader.py, is wxyz. Line 133 reads qw, qx, qy, qz = 0, 1, 2, 3  # wxyz, and its docstrings say \"as wxyz quaternion\". The bundled humanoid_walk.npz / humanoid_run.npz / humanoid_dance.npz store wxyz: read as wxyz, the walk clip's torso +z points up.\ncontrib/humanoid_amp/humanoid_amp_env.py passes the loader's wxyz values straight through in two places:\nline 154, the reset: root_state[:, 3:7] = body_rotations[:, motion_torso_index]\nline 191, the reference AMP observation: compute_obs(..., body_rotations[:, self.motion_ref_body_index], ...)\nBoth lines are unchanged on develop as of 2026-10-12.\nWhat we measured (before the fix)\nThe env's own reference AMP observations give the clip's torso normal z = \u22120.998.\nAfter 160,000 timesteps of skrl AMP training (4,096 envs), the deterministic policy's torso up-vector z is \u22120.99, at 0.27 m/s forward against the clip's 1.51 m/s. Evaluated over 256 envs \u00d7 600 steps.\nThe trained discriminator scores the clip 0.84 and the policy 0.18. The imitation signal works, but its target is upside down.\nTo reproduce\nTrain the task at its defaults: isaaclab train --rl_library skrl --algorithm AMP --task IsaacContrib-Humanoid-AMP-Walk-Direct\nEvaluate the trained policy deterministically and read the reference body's (torso's) up-vector: quat_apply(body_quat_w[:, ref_body_index], [0, 0, 1])[:, 2]. It reads about \u22121 (upside down); a correct walker reads about +1.\nA check with no training: apply quat_apply to the walk clip's stored torso rotations with (0, 0, 1). It returns about (0.03, \u22120.04, \u22121.0), i.e. the stored wxyz values read as xyzw point the torso down.\nThe fix (two lines)\ndiff --git a/source/isaaclab_tasks/isaaclab_tasks/contrib/humanoid_amp/humanoid_amp_env.py b/source/isaaclab_tasks/isaaclab_tasks/contrib/humanoid_amp/humanoid_amp_env.py\nindex 1b8c3ee86..9eb766289 100644\n--- a/source/isaaclab_tasks/isaaclab_tasks/contrib/humanoid_amp/humanoid_amp_env.py\n+++ b/source/isaaclab_tasks/isaaclab_tasks/contrib/humanoid_amp/humanoid_amp_env.py\n@@ -13,3 +13,3 @@ import warp as wp\n from isaaclab.envs import DirectRLEnv\n-from isaaclab.utils.math import quat_apply\n+from isaaclab.utils.math import convert_quat, quat_apply\n \n@@ -153,3 +153,4 @@ class HumanoidAmpEnv(DirectRLEnv):\n         root_state[:, 2] += 0.15  # lift the humanoid slightly to avoid collisions with the ground\n-        root_state[:, 3:7] = body_rotations[:, motion_torso_index]\n+        # FIX (local, 2026-10-12): the motion file stores wxyz (MotionLoader docstring); Isaac Lab 3.0 is xyzw everywhere\n+        root_state[:, 3:7] = convert_quat(body_rotations[:, motion_torso_index], to=\"xyzw\")\n         root_state[:, 7:10] = body_linear_velocities[:, motion_torso_index]\n@@ -190,3 +191,3 @@ class HumanoidAmpEnv(DirectRLEnv):\n             body_positions[:, self.motion_ref_body_index],\n-            body_rotations[:, self.motion_ref_body_index],\n+            convert_quat(body_rotations[:, self.motion_ref_body_index], to=\"xyzw\"),  # FIX (local, 2026-10-12): wxyz file -> xyzw library\n             body_linear_velocities[:, self.motion_ref_body_index],\nThe motion files and the loader's internal slerp stay wxyz; only the two places where the values leave for xyzw APIs convert. (Converting the files to xyzw instead would also work, provided the loader's documentation and slerp change with them.)\n\nResult with the fix\nThe reference torso normal z becomes +0.997.\nskrl AMP at the task's default length (80,000 timesteps, 4,096 envs, about 44 minutes on one RTX 3090) trains a walker. Evaluated over 256 envs \u00d7 600 steps (deterministic policy):\nforward speed 1.56 m/s against the clip's 1.51;\ntorso up-vector z 1.00;\n0 falls: 512 of 512 episodes ran to the 10 s time-out.\nThe discriminator scores the clip 0.69 and the policy 0.51 (66 % of policy frames above 0.5).\nThe Run task trained the same way gives 2.66 m/s against the clip's 3.37, upright (up-vector z 0.95).\nVersions\nIsaac Lab release/3.0.0, commit 5c517eb292f52e28a7e6816530bfa2d3f835c51a (develop unchanged in the two files as of 2026-10-12)\nIsaac Sim 6.1.0.0\nPyTorch 2.11.0+cu130\nskrl 2.1.0\nUbuntu 24.04, NVIDIA RTX 3090, driver 595.99.02",
+      "created_at": "2026-10-13T18:55:11Z",
+      "html_url": "https://github.com/isaac-sim/IsaacLab/issues/8534",
+      "id": "isaac-sim/IsaacLab#8534",
+      "issue_number": 8534,
+      "labels": [],
+      "repository": "isaac-sim/IsaacLab",
+      "surface_sha256": "cd630801a355f6a91a1e5d2cfc54656ef2291f8dec2dd96302c7253878318dae",
+      "title": "[Bug] contrib humanoid_amp: wxyz motion-file quaternions are passed to xyzw APIs, so the humanoid spawns and trains upside down (3.0)"
+    },
+    {
+      "author_login": "christophebedard",
+      "body": "### Description\n\nThe `DeclareBooleanLaunchArgument` class docstring has YAML & XML examples, but we have tests that actually exercise the YAML & XML frontends, see #1037\n\nWe should add YAML and XML tests, like the simple tests for `<arg>` in https://github.com/ros2/launch/blob/rolling/launch_xml/test/launch_xml/test_arg.py\n\n1. YAML tests in `launch_yaml`\n2. XML tests in `launch_xml`\n\n### Motivation\n\nCoverage for the YAML and XML frontends.\n\n### Design / Implementation Considerations\n\n_No response_\n\n### Additional Information\n\n_No response_",
+      "created_at": "2026-10-13T16:36:45Z",
+      "html_url": "https://github.com/ros2/launch/issues/1038",
+      "id": "ros2/launch#1038",
+      "issue_number": 1038,
+      "labels": [
+        "enhancement",
+        "help wanted",
+        "good first issue"
+      ],
+      "repository": "ros2/launch",
+      "surface_sha256": "9467f522d1b0af56b83254412ccf8003e7d9393f55c664b46c1e5f850b3db655",
+      "title": "Add YAML & XML tests for DeclareBooleanLaunchArgument aka `<bool_arg>`"
+    }
+  ],
+  "post_activation_issue_identities_observed": 116,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-13T19:32:39Z",
+  "schema_version": 1
+}

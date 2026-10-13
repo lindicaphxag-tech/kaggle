@@ -1590,35 +1590,47 @@
     },
     {
       "created_at": "2026-10-13T09:40:41Z",
+      "expiry_recorded_at": "2026-10-13T19:30:51Z",
+      "expiry_sha256": "371520f28f3a4ccd3c1d1c2df51d3882b393cd1c5021ddb70afdaf0fb0b3f432",
+      "expiry_source": "expirations/gazebosim__gz-transport__985.json",
       "first_frozen_at": "2026-10-13T12:09:34Z",
       "id": "gazebosim/gz-transport#985",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 985,
       "prediction_deadline_at": "2026-10-13T18:09:34Z",
       "repository": "gazebosim/gz-transport",
       "source": "inbox/FIRST_SEEN_20261013T120934Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "db182816b1012b05380ca3eb7b7085a6da5a06cf043230d53a631966653dbba0"
     },
     {
       "created_at": "2026-10-13T09:32:43Z",
+      "expiry_recorded_at": "2026-10-13T19:30:51Z",
+      "expiry_sha256": "fdff3676921cffb0a097467efae0202ecd046f457ad6d206be485ee386308b50",
+      "expiry_source": "expirations/isaac-sim__IsaacLab__8517.json",
       "first_frozen_at": "2026-10-13T12:09:34Z",
       "id": "isaac-sim/IsaacLab#8517",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 8517,
       "prediction_deadline_at": "2026-10-13T18:09:34Z",
       "repository": "isaac-sim/IsaacLab",
       "source": "inbox/FIRST_SEEN_20261013T120934Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "15f61b002daf866946c6cb696df2642c2939242bcd1e40f1bd00e6b01e86861c"
     },
     {
       "created_at": "2026-10-13T10:42:04Z",
+      "expiry_recorded_at": "2026-10-13T19:30:51Z",
+      "expiry_sha256": "01829b176e5c4ef499a83a2713a405b2ab59a51b394ddc336c791eccfcd69873",
+      "expiry_source": "expirations/isaac-sim__IsaacSim__878.json",
       "first_frozen_at": "2026-10-13T12:09:34Z",
       "id": "isaac-sim/IsaacSim#878",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 878,
       "prediction_deadline_at": "2026-10-13T18:09:34Z",
       "repository": "isaac-sim/IsaacSim",
       "source": "inbox/FIRST_SEEN_20261013T120934Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "e13a90950d9a21605d1e02f3d3cdf718445259ced8eaee000cbd6873a5c83eeb"
     },
     {
@@ -1675,6 +1687,39 @@
       "source": "inbox/FIRST_SEEN_20261013T155515Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "de88e66c38f6663ee543223dc1208e4dd0ec3e26641e29e138622687c281545c"
+    },
+    {
+      "created_at": "2026-10-13T18:29:09Z",
+      "first_frozen_at": "2026-10-13T19:32:39Z",
+      "id": "isaac-sim/IsaacLab#8530",
+      "issue_number": 8530,
+      "prediction_deadline_at": "2026-10-14T01:32:39Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261013T193239Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "5d3e0c04a299bad12241d2b26932d92c46e86eb410ae0f03bc353d983b61366e"
+    },
+    {
+      "created_at": "2026-10-13T18:55:11Z",
+      "first_frozen_at": "2026-10-13T19:32:39Z",
+      "id": "isaac-sim/IsaacLab#8534",
+      "issue_number": 8534,
+      "prediction_deadline_at": "2026-10-14T01:32:39Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261013T193239Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "cd630801a355f6a91a1e5d2cfc54656ef2291f8dec2dd96302c7253878318dae"
+    },
+    {
+      "created_at": "2026-10-13T16:36:45Z",
+      "first_frozen_at": "2026-10-13T19:32:39Z",
+      "id": "ros2/launch#1038",
+      "issue_number": 1038,
+      "prediction_deadline_at": "2026-10-14T01:32:39Z",
+      "repository": "ros2/launch",
+      "source": "inbox/FIRST_SEEN_20261013T193239Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "9467f522d1b0af56b83254412ccf8003e7d9393f55c664b46c1e5f850b3db655"
     }
   ]
 }
