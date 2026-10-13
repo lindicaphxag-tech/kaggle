@@ -1,4 +1,4 @@
-# P2 / BSPC — release lineage and content-independent validation: doctoral-level workplan (NOT executed)
+# P2 / BSPC — release lineage and content-independent validation: doctoral-level workplan (PARTIALLY EXECUTED)
 Date: 2026-10-13 | Proposed mechanism only; no publication, custodian reply or clinical patient identification.
 
 ## What is actually verified
@@ -40,3 +40,9 @@ E: supervised downstream improvement is secondary; reproducible split-integrity 
 
 ## Published comparators and scope
 Gil & Hernandez-Sabate BSPC 2026 DOI 10.1016/j.bspc.2026.110020 (six architectures / validation levels); Qin et al. BSPC 2026 DOI 10.1016/j.bspc.2026.109535 (nine paradigms and spatial normalisation). Proposed method must add cross-layer provenance inference not already covered by these validation studies. Do not claim journal top percentile from a one-release anomaly.
+## Executed 36-pair held-out temporal correspondence screen (2026-10-13)
+- A one-to-one trial assignment within each stored channel index was fitted on the first 2,000 of each 4,000-sample trial and evaluated on the remaining 2,000. All six source MAT × six processed EDF public-ID pairs were reported; source archive members passed ZIP CRC. This is an exploratory post-discovery, within-trial temporal holdout, not an independent acquisition.
+- Held-out median absolute r for source MAT 4→EDF 4/5: .8024/.7960 versus MAT 5→EDF 4/5: .0472/.0514. MAT 11→EDF 11/15: .3744/.3642 versus MAT 15→EDF 11/15: .0215/.0225. MAT 47→EDF 47/49: .7261/.7186 versus MAT 49→EDF 47/49: .0196/.0205.
+- The 40 matched trial correlations above .9999 in every same-ID comparison came only from stored channel index 32. Excluding that index removes all ≥.9999 items in the 12 flagged-pair cells; the median of 31 channel-level held-out medians retains the reported direction (e.g. MAT 47→EDF 47/49 .7081/.7081 versus MAT 49→EDF 47/49 .0174/.0174). Channel 32's physiological role is unverified.
+- Successful workflow: https://github.com/lindicaphxag-tech/kaggle/actions/runs/38360228555 ; scalar summary: research/defaultreg_bspc_v13/results/P2_mat_edf_heldout_temporal_scalar_summary_20261013.json ; full CI artifact SHA-256 cb26f8b91c306fc9ac3f917b5f38476dde52ad006168136c59e92070cea618ff.
+- Still open: custodian's MAT→EDF conversion log and channel map, independent release/acquisition controls, calibrated false-positive rate, and original clinical patient/session identity. Do not claim provenance or manuscript submission readiness from this experiment.
