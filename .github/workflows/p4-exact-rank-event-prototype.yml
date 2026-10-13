@@ -1,0 +1,23 @@
+name: P4 exact-rational rank-event prototype selftest
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - publication/default-eeg-p4-rank-certificates-20261013
+    paths:
+      - research/defaultreg_bspc_v13/src/p4_exact_rank_event_sweep_prototype.py
+      - .github/workflows/p4-exact-rank-event-prototype.yml
+
+jobs:
+  test-toy-exact-rank-events:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install exact symbolic dependency
+        run: python -m pip install sympy==1.13.3
+      - name: Exact rational two-event and tie tests
+        run: python research/defaultreg_bspc_v13/src/p4_exact_rank_event_sweep_prototype.py
