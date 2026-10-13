@@ -46,8 +46,10 @@ def ci(k,n):
 
 def run(ncal=120,ntest=120):
     rng=np.random.default_rng(20261013)
-    negatives=[(subspace_score(make_record(rng),make_record(rng)),
-                pearson_score(make_record(rng),make_record(rng))) for _ in range(ncal)]
+    negatives=[]
+    for _ in range(ncal):
+        x=make_record(rng);y=make_record(rng)
+        negatives.append((subspace_score(x,y),pearson_score(x,y)))
     # Values exceed all fitted negative controls, but no population FPR guarantee.
     thresholds=np.asarray(negatives).max(axis=0)
     tst=np.random.default_rng(20261014)
