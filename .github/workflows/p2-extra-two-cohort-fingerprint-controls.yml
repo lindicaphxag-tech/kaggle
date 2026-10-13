@@ -1,0 +1,43 @@
+name: P2 two additional public EEG recording identity controls
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/p2_third_fourth_public_cohort_identity_controls.py'
+      - '.github/workflows/p2-extra-two-cohort-fingerprint-controls.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  extra-cohorts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      MNE_DATA: /tmp/p2-extra-public-eeg
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Compute paired raw-epoch-content fingerprints in BNCI2014-001 and BNCI2015-001
+        run: |
+          mkdir -p "$MNE_DATA"
+          python -m py_compile research/defaultreg_bspc_v13/src/p2_third_fourth_public_cohort_identity_controls.py
+          python research/defaultreg_bspc_v13/src/p2_third_fourth_public_cohort_identity_controls.py --out /tmp/p2-two-more-public-controls.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/p2-two-more-public-controls.json'))
+          assert set(d['results'])=={'BNCI2014_001','BNCI2015_001'}
+          assert all(v['pairs_total']==v['pairs_same_shape_scanned']+v['pairs_unscannable_shape_mismatch'] for v in d['results'].values())
+          assert d['is_not_prospective_Z0_or_population_alias_rate_estimate']
+          print('P2_TWO_MORE_PUBLIC_COHORT_OVERLAP_CONTROLS_EXECUTED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: P2-TWO-MORE-PUBLIC-COHORTS-FINGERPRINT-NEGATIVE-CONTROLS
+          path: /tmp/p2-two-more-public-controls.json
+          if-no-files-found: warn
+          retention-days: 90
