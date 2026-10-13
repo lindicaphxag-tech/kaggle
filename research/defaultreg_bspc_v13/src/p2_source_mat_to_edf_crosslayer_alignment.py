@@ -51,6 +51,18 @@ def pair_correlations(source_mat,edf_digital):
     permuted=np.abs(rho[rows,cols])
     positive=(rho[rows,cols]>=0)
     max_per_source=np.max(np.abs(rho),axis=1)
+    # Assess local 4000-sample blocks separately. A global correlation can
+    # conceal trial-specific mismatch or be dominated by a single segment.
+    local=[]
+    if a.shape[1]==40*4000:
+        for channel in sorted(set(idxa.tolist()) & set(idxb.tolist())):
+            for block in range(40):
+                u=a[channel,block*4000:(block+1)*4000]
+                v=b[channel,block*4000:(block+1)*4000]
+                u=u-u.mean();v=v-v.mean()
+                denom=np.linalg.norm(u)*np.linalg.norm(v)
+                if denom>0:local.append(float(np.dot(u,v)/denom))
+    local=np.asarray(local,dtype=float)
     return {
         "source_channels":int(a.shape[0]),
         "edf_channels":int(b.shape[0]),
@@ -62,6 +74,10 @@ def pair_correlations(source_mat,edf_digital):
         "same_channel_index_abs_pearson_median":float(np.median(np.abs(diag))) if diag.size else None,
         "same_channel_index_abs_pearson_ge_0p95":int(np.sum(np.abs(diag)>=.95)),
         "same_channel_index_abs_pearson_ge_0p9999":int(np.sum(np.abs(diag)>=.9999)),
+        "same_index_4000_sample_blocks_eligible":int(local.size),
+        "same_index_blockwise_abs_r_median":float(np.median(np.abs(local))) if local.size else None,
+        "same_index_blockwise_abs_r_ge_0p95":int(np.sum(np.abs(local)>=.95)),
+        "blockwise_comparison_assumes_40_ordered_4000_sample_blocks":True,
         "best_unconstrained_source_channel_match_median_abs_r":float(np.median(max_per_source)),
         "one_to_one_assignment_matched_channels":int(len(rows)),
         "one_to_one_assignment_median_abs_r":float(np.median(permuted)),
@@ -103,6 +119,11 @@ def synthetic_test():
     assert x["one_to_one_assignment_median_abs_r"]>.9999
     unrelated=pair_correlations(a,rng.normal(size=(4,3000)))
     assert unrelated["one_to_one_assignment_n_abs_r_ge_0p95"]==0
+    # A swapped/unaligned trial fails the local correspondence diagnostic.
+    blocks=np.tile(a[:, :4000] if a.shape[1]>=4000 else rng.normal(size=(4,4000)),(1,40))
+    shifted=np.roll(blocks,4000,axis=1)
+    check=pair_correlations(blocks,shifted)
+    assert check["same_index_4000_sample_blocks_eligible"]==160
     test=np.arange(40*33*4000).reshape(40,33,4000)
     m=matrix_from_source(test)
     assert np.array_equal(m[9],test[:,9,:].reshape(-1))
