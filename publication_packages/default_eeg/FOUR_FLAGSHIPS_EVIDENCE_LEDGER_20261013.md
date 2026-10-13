@@ -6,9 +6,9 @@ of independent transfer benefit, journal acceptance or novelty superiority.
 
 ## Branch heads reviewed and pushed
 - P1 JNE PR #143, head d18415349974afe32c5c7a6a2c58704bd701bc6c
-- P2 BSPC PR #144, head f7926f70eef31e15dfb10d6eec8a19b5665360ba
+- P2 BSPC PR #144, head fb2c85f889ebe2f7a728fb0f5ced014b8ce8fc60
 - P3 PLOS ONE PR #145, head e1279e5882b3c9712aacd8f5d43476d8370887dd
-- P4 Numerical Algorithms PR #146, head eae40b0764680bddfd76926bf233eb993420567f
+- P4 Numerical Algorithms PR #146, head 29d5f83feb7a5b2add3c637dbf52837d1bd75a6d
 
 ## What this review actually adds
 
@@ -95,3 +95,39 @@ of independent transfer benefit, journal acceptance or novelty superiority.
 
 All four have a separate research endpoint. Outcome reuse across
 papers and acquisition-level dependencies MUST be disclosed.
+
+
+## 2026-10-13 subsequent joint-uncertainty and external-manifest audit
+- P4 #146 head 29d5f83feb7a5b2add3c637dbf52837d1bd75a6d.
+  New exact-rational *joint* positive spectral-eigenvalue BOX and
+  score-coefficient BOX Bernstein certificate, not simply fixed spectral poles.
+  A local standalone regression checked 126 synthetic boxes, outcomes
+  52 POS / 50 NEG / 24 UNKNOWN, with 208,560 exact rational
+  uncertainty-corner/parameter point checks. The mathematics is a
+  sufficient interval enclosure; corner samples are not proof.
+  New script: research/defaultreg_bspc_v13/src/
+  p4_joint_spectral_coefficient_box_certificate.py
+  and new TeX:
+  P4_joint_spectral_coefficient_box_scope_20261013.tex.
+  Real EEG input-error bounds and external numerical superiority
+  are NOT verified. The exact new CI job is NOT individually
+  confirmed just because generic repository workflows succeeded.
+- P2 #144 head fb2c85f889ebe2f7a728fb0f5ced014b8ce8fc60.
+  Audited version-pinned NEMAR nm000158 JSON manifest at external
+  commit 11e3eeb4b439d5f8ee1b5e3b8e6032824bc2de83.
+  It states 50 whole EDF files imported via MOABB 1.5.0 on
+  2026-08-11 and 50 distinct recorded SHA-256 whole-file digests.
+  Published pairs 04/05, 11/15, 47/49 have distinct
+  full-file digests. This does not contradict their numeric
+  within-file channel similarity, does not independently
+  hash raw downloaded file bytes, and does not establish
+  raw MAT ancestry or clinical identity.
+  Metadata-only audit:
+  research/defaultreg_bspc_v13/src/p2_nemar_release_manifest_audit.py.
+  Embedded P2 manuscript paragraph:
+  P2_nemar_whole_EDF_manifest_scope_20261013.tex.
+- P1 #143 and P3 #145: previous limitations unchanged,
+  and no new prospective independent-acquisition data.
+- All four remain Draft; author declarations, PDF HEAD/layout
+  verification and release decisions are not closed.
+
