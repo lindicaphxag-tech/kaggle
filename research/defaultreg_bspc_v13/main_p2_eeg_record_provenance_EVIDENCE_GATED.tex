@@ -15,46 +15,36 @@ A Matched Audit of Validation Denominators, Model Refitting and Regularisation}
 \date{}
 \begin{document}\maketitle
 \begin{abstract}
-Distinct participant identifiers in released electroencephalography
-(EEG) datasets do not necessarily denote independent digital
-recording contents. We audited exact EEG trial and label identity
-under pinned motor-imagery pipelines and investigated the effect
-of using recording-content groups instead of released identifiers
-in subject-held classification. Of 50 released identifiers and
-2,000 processed trials in Liu2024, two identifiers (4 and 5)
-shared all 40 labelled epochs, leaving 1,960 distinct processed
-trial contents and 49 recording-content groups. Under a second
-6--35 Hz/128 Hz processing configuration, the same complete
-cross-identifier alias persisted. An EDF digital-payload comparison found 32 of 33
-as-stored, publisher-supplied EDF channel streams
-byte-for-byte equal for identifiers 4 and 5,
-with one additional unnamed channel differing; these findings
-are about digital samples, not participant identity. The nominal
-50-ID source-macro ROC-AUC was 0.594000, falling to 0.588673
-after evaluating 49 unique held contents with original
-training and source choices, and to 0.582551 under
-exact-full-epoch-duplicate purging and source refitting.
-The matched 49-group difference
-($-0.006122$) was dominated by the aliased group
-($-0.262500$); the other 48 groups averaged $-0.000781$.
-Two further frozen-classifier analyses produced aliased-group
-changes of $-0.212500$ (logistic) and $-0.222500$ (ridge),
-but near-zero mean changes elsewhere. These retrospective
-results identify a concrete validation-unit failure and motivate
-content-aware splitting; they do not establish duplicated
-clinical participant identities, a universal bias correction
-or independence from previously inspected public data.
-A retrospective 1,225-pair aligned-record
-screen also identified two further
-nearly identical but not byte-equivalent
-whole-record pairs (ID47/49 and ID11/15);
-they were not automatically merged
-into exact-content groups.
-Two further, post-discovery public EEG controls
-(BNCI2014\_001, 2,592 trials; BNCI2015\_001,
-5,600 trials) showed no exact cross-ID
-trial-content overlap, with no aligned whole-record
-near matches among shape-compatible ID pairs.
+Released electroencephalography (EEG) participant identifiers
+need not imply disjoint numerical recording contents.
+We audited labelled EEG trials, publisher-supplied EDF digital
+samples, and separately released source MAT arrays, then
+quantified the effect of content-aware exclusion in
+cross-subject model evaluation. In Liu2024 (50 released IDs;
+2,000 processed trials), IDs 4/5 shared all 40 processed
+labelled trials, leaving 1,960 unique trial contents and
+49 exact-content groups. The published preprocessed EDF
+files shared 32/33 complete digital channel streams for 4/5.
+A retrospective EDF block analysis also identified
+partial exact identity for 47/49 (6,957/9,280
+named EEG channel--record blocks), whereas 11/15 showed
+predominantly nonexact similarity (171/9,280).
+Neither additional pair was merged into the 49-group
+primary analysis. Crucially, separately released source
+MAT arrays were not wholly identical for any of these
+three ID pairs: zero of 33 full numeric channels
+matched exactly. Their apparently near-unity flattened
+correlations were dominated by between-channel means,
+not equivalent EEG waveforms.
+The nominal 50-ID macro ROC-AUC was 0.594000;
+reweighting to 49 unique held contents gave 0.588673,
+and content-disjoint source refitting gave 0.582551
+(matched change $-0.006122$). Four other public EEG
+acquisitions showed no exact cross-ID trial matches
+under specified processing. These retrospective findings
+motivate release-layer provenance checks and content-aware
+validation; they do not establish clinical identity,
+acquisition-session overlap, or a causal leakage penalty.
 \end{abstract}
 
 \noindent\textbf{Keywords:} EEG; motor imagery; recording identity;
