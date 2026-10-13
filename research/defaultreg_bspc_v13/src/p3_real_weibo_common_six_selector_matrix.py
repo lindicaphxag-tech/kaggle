@@ -123,11 +123,25 @@ def main():
            "vs_source_macro_mean_delta":float(np.mean(vals-against)),
            "n_material_harm_vs_source_macro":int(np.sum(vals<against-0.02)),
            "n_material_benefit_vs_source_macro":int(np.sum(vals>against+0.02))}
+    # The per-person oracle uses held labels; it is only a retrospective upper bound.
+    regrets=[]
+    for row in receipt:
+        oracle=max(row["AUC"].values())
+        regrets.append({"held_id":row["held_id"],"oracle_auc":float(oracle),
+                        "regret":{m:float(oracle-row["AUC"][m]) for m in METHODS},
+                        "best_methods":[m for m in METHODS if abs(oracle-row["AUC"][m])<1e-12]})
+    regret_summary={m:{"mean":float(np.mean([r["regret"][m] for r in regrets])),
+                       "max":float(np.max([r["regret"][m] for r in regrets])),
+                       "n_gt_0p02":int(np.sum([r["regret"][m]>.02 for r in regrets]))}
+                    for m in METHODS}
     final={"status":"EXECUTED_Weibo2014_SOURCE_ONLY_COMMON_CANDIDATE_MATRIX",
       "reserved_subject10_source_sha":lock,"exploratory_all10_source_lock_sha":second_lock,
       "one_reserved_held_person_no_independent_confirmation":strict,
       "all10_held_people_EXPLORATORY_not_independent":receipt,
       "summary_descriptive_no_causal_inference":differences,
+      "held_label_oracle_posthoc_upper_bound_not_selectable":regrets,
+      "regret_summary_exploratory":regret_summary,
+      "oracle_regret_is_not_prospective_policy_performance":True,
       "information_budget":"all policies selected from corresponding nine source IDs only",
       "no_new_general_universal_negative_theorem":True,
       "manuscript_gate":"do not call four old negative methods jointly replicated",
