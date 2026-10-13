@@ -1,0 +1,44 @@
+name: P1 independent pooled shrinkage LDA score risk forecast
+on:
+  push:
+    branches: [publication/default-eeg-p1-estimand-20261013]
+    paths:
+      - research/defaultreg_bspc_v13/src/p1_second_model_shrinkage_lda_forecast.py
+      - .github/workflows/p1-second-lda-scorer-risk-forecast.yml
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  real-eeg:
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    env:
+      MNE_DATA: /tmp/p1-second-scorer-eeg
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Execute second scorer and source forecast
+        run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_bspc_v13/src/p1_second_model_shrinkage_lda_forecast.py --out /tmp/p1-second-scorer
+      - name: Verify exploratory scope
+        run: |
+          python - <<'PY'
+          import json
+          z=json.load(open('/tmp/p1-second-scorer/P1_LDA_SECOND_SCORER_RESULTS.json'))
+          assert len(z['rows'])==9
+          assert [x['target_id'] for x in z['rows']]==list(range(1,10))
+          assert z['all_subject_outcomes_previously_exposed_projectwide']
+          print('P1_SECOND_LDA_SCORER_SCOPE_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p1-second-lda-scorer-risk-forecast
+          path: /tmp/p1-second-scorer/*.json
+          if-no-files-found: warn
+          retention-days: 90
