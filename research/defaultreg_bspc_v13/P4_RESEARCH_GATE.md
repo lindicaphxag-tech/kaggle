@@ -60,3 +60,13 @@ and unverified rounding. It is **NOT a submission-ready DSP method
 paper**. Substantive numerical method novelty, runtime savings,
 multiple signal families and reproducible independent comparisons
 are required. Outlet not locked until promotion gates pass.
+
+
+## 2026-10-13 NEW STRONG BASELINE — EXECUTED, JOURNAL HOLD UNCHANGED
+
+- Exact rational 960-interval test on p=2,3,6,9,12, same deterministic intervals and numerator polynomials. [Successful run](https://github.com/lindicaphxag-tech/kaggle/actions/runs/38326786180).
+- Power-basis unshifted Horner: 912/960 signs; **midpoint-centered interval Horner: 924/960**; Bernstein: 924/960; selective centered-Horner then Bernstein: 924/960.
+- Internal measured times, respectively: 0.0742s, 0.2623s, 0.4057s, 0.2753s (machine dependent). 36 hybrid fallbacks, ZERO extra certificates beyond centered Horner.
+- The old +12 Bernstein-versus-unshifted-Horner advantage **disappears under a stronger classical baseline**. Do not headline it as a general new algorithm advantage.
+- New rigorous certificate-union proposition: the selective method is exact-rational sound and its certified interval set equals the union of centered-Horner and Bernstein sets; this proves coverage monotonicity, NOT runtime speedup.
+- Blocking before a numerical methods submission: input-uncertainty-aware IEEE754/outward rounding, root isolation or interval Newton, independent signal families and a genuinely favorable accuracy-cost Pareto region.
