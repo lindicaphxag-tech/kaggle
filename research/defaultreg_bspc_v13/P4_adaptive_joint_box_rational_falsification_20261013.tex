@@ -1,0 +1,54 @@
+\subsection{Adaptive certified sign or rational falsification on spectral boxes}
+\label{sec:p4-rational-adaptive-counterexamples}
+The preceding joint spectral--coefficient box is intentionally
+overinclusive. We now consider two sound procedures that operate
+on exactly the same \emph{input} boxes: (i) a whole-interval
+Bernstein enclosure of the rational numerator and (ii) a
+whole-interval termwise rational bound, each using exact fractions.
+If either returns a strict sign, no sampling is needed to
+justify its claim. When both are indeterminate, the refinement
+procedure bisects the continuous regularisation interval at
+rational midpoints and requires \emph{all} child boxes to certify
+the \emph{same} strict sign. It may also bisect the widest
+normalised uncertain eigenvalue interval, again requiring
+all descendants to agree; the original box is the exact
+union of the two sub-boxes. Therefore an accepted parent sign
+is sound by induction on the refinement tree.
+
+If refinement remains undecided, an independent rational
+point oracle searches admissible corners of the eigenvalue
+and coefficient boxes at a fixed grid of rational values of
+$\lambda$. Opposite exact signs at two admissible points,
+or a single admissible exact zero, are \emph{witnesses that a
+strict invariant sign is impossible}. Mere absence of an
+opposite-sign sample is \emph{not} a proof of robustness,
+so the algorithm otherwise reports \texttt{UNKNOWN}.
+
+In a fixed-seed \emph{constructed} suite with dimensions
+$p=2$--$5$, comprising 126 earlier spectral-box fixtures
+and 96 additional mixed-sign fixtures (all retained),
+whole-interval Bernstein proved 173/222 cases, whole-interval
+direct rational bounds 174/222, and $\lambda$ refinement
+184/222. Additional independent spectral splitting proved
+two further cases. The resulting 186 cases consist of
+95 robust positive and 91 robust negative signs.
+For the other 36, actual valid exact rational zero/opposite-sign
+witnesses refute strict invariance. Consequently the fixture
+suite has zero unclassified cases, but this is
+\emph{not} a complete algorithm for arbitrary coefficient
+boxes and not an independent EEG result.
+The machine-readable record stores all 36 falsifying
+examples, with exact numerator/denominator values, and
+the scripts regenerate each fixture and check admissibility
+and sign with a separate rational score formula.
+The all-same-sign corner regression for the 186 certified
+fixtures is supportive only; formal soundness derives from
+positivity of rational denominators, interval enclosure and
+the Bernstein convex-hull property.
+
+This exercise illustrates an important negative control:
+a greater numerical sign-coverage ratio would be misleading
+if exact admissible counterexamples already preclude the
+stability property. We do not attribute a new optimality theorem,
+IEEE-754 rounding control, eigenvector motion bound or
+improvement of EEG transfer AUC to this constructed result.
