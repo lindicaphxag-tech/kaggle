@@ -14,48 +14,47 @@ Evidence, Identifiability Limits and Source-Only Experiments}
 \begin{document}
 \maketitle
 \begin{abstract}
-\textbf{Objective.} Can increasingly precise or structured source-only
-regularisation optimization improve unknown-participant EEG decoding
-without access to target signals or labels?
-\textbf{Approach.} We retain a case series of separately executed
-source-locked protocols, using the original participant-grouped
-27-point shrinkage LDA as a reference, and distinguish a
-continuous source optimizer, a source-contrast envelope (SCE),
-an anisotropic covariance proposal and a classical
-group-centred discriminant operator. Individual and
-group-mean ROC-AUC changes, exact source-freezing evidence
-and mathematical degeneration are recorded without pooling
-dissimilar algorithms as if they were a single policy.
-\textbf{Results.} On Weibo2014 (10 people) the continuous
-choice was identical to the original grid (both 0.731405 macro
-ROC-AUC). Cho2017 (40 target people) gave a pooled SCE-minus-grid
-difference of $-0.00005264$, with SCE selecting the fixed-full-shrinkage
-endpoint, invalidating a nondegenerate novel-operator claim.
-The Dreyer2023A anisotropic design selected zero anisotropy
-and differed from the baseline by $-0.001088$ ROC-AUC on 12 people.
-A separate pre-target Lee2019 group-centred estimator selected
-$\lambda=0.15$ versus original $0.4$ and had source-forecast
-NEGATIVE; its first untouched 12-person block yielded
-$-0.003933$ AUC (exact two-sided paired sign-flip $p=0.1289$).
-A planned second Lee block did not produce interpretable
-outcomes, because a bitwise source-covariance SHA check rejected
-the separately run setup BEFORE accessing target data.
-\textbf{Conclusions.} Two new retrospective
-\emph{identical six-policy matrices} on
-BNCI2014\_004 ($n=9$) and Weibo2014 ($n=10$)
-yielded source-macro versus proper predictive-NLL
-macro AUC of 0.778002 versus 0.776581, and
-0.731405 versus 0.729358, respectively.
-Source-macro's post-target six-policy oracle
-regret averaged 0.000840 and 0.001766 AUC.
-These were previously exposed public acquisitions.
-A further same-source BNCI2014\_004 comparison included
-the four original proposal families on one exposed held
-person: continuous $0.836798$, SCE $0.836111$,
-anisotropic $0.837199$, group-centred $0.833935$
-versus source macro $0.836798$ ROC-AUC.
-No universal negative theorem or new
-superior decoder is established.
+\textbf{Objective.} Source-only improvements in regularisation
+objectives need not improve performance on an unseen EEG
+participant. We examine whether candidate source-selection
+operators retain practical discrimination gains under
+matched source and target information budgets.
+\textbf{Methods.} Four candidate families
+(continuous source optimisation, source-contrast envelope
+[SCE], anisotropic covariance and within-group
+centred discriminant selection) were compared with
+source-macro-AUC shrinkage selection. We separate
+previously exposed public results from new
+within-workflow source-locked holdouts, and use
+only source EEG when selecting each target's model.
+We also derive a conditional distribution-shift bound
+and a split-conformal abstention rule whose validity
+requires independent exchangeable \emph{acquisitions},
+not correlated trial folds.
+\textbf{Results.} In earlier fixed-source
+BNCI2014\_004 and Weibo2014 comparisons,
+continuous optimisation tied the reference, while
+SCE, anisotropic and centred operators showed
+mostly null or negative held-person contrasts.
+For one newly source-locked BNCI2015\_004
+\emph{math-versus-letter} participant, SCE improved
+ROC-AUC by $+0.009531$ over source macro
+($0.527500$ versus $0.517969$), whereas
+centred selection gained $+0.007500$.
+On two newly source-locked \emph{Dreyer2023B}
+motor-imagery participants, SCE instead declined
+by $-0.016528$ and $-0.012500$ AUC;
+anisotropic selection declined by $-0.024583$
+and $-0.007222$, and continuous again tied
+the reference. An additional Lee2019 experiment
+was halted before target access when the
+bitwise source-feature lock changed.
+\textbf{Interpretation.} These small, heterogeneous
+comparisons provide reproducible positive and
+negative case studies, not a proved universal
+transfer limitation, an independently
+preregistered multi-acquisition benchmark, or
+a calibrated target-selection rule.
 \end{abstract}
 \noindent\textbf{Keywords:} EEG; motor imagery; transfer;
 source-only model selection; negative results;
