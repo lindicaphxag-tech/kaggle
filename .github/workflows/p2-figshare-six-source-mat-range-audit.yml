@@ -1,0 +1,50 @@
+name: P2 six original source MAT strict remote-range forensic comparison
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/p2_figshare_six_source_mat_range_audit.py'
+      - '.github/workflows/p2-figshare-six-source-mat-range-audit.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  source-mat-compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Scientific and strict-range dependencies
+        run: python -m pip install --disable-pip-version-check numpy scipy h5py
+      - name: Synthetic independent ZIP range, CRC, source-array comparison
+        run: |
+          python -m py_compile research/defaultreg_bspc_v13/src/p2_figshare_six_source_mat_range_audit.py
+          python research/defaultreg_bspc_v13/src/p2_figshare_six_source_mat_range_audit.py --self-test
+      - name: Read six original public MAT members using strict HTTP 206 ranges only
+        run: |
+          python research/defaultreg_bspc_v13/src/p2_figshare_six_source_mat_range_audit.py --out /tmp/p2-source-mat-six-pair-aggregates-only.json
+          python - <<'PY'
+          import json
+          f='/tmp/p2-source-mat-six-pair-aggregates-only.json'
+          o=json.load(open(f))
+          assert [r['released_public_id'] for r in o['per_file']]==[4,5,11,15,47,49]
+          assert [r['released_public_ids'] for r in o['pair_comparisons']]==[[4,5],[47,49],[11,15]]
+          assert o['full_archive_not_downloaded']
+          assert o['no_eeg_waveform_content_or_patient_metadata_exported']
+          assert o['no_source_mat_to_processed_EDF_alignment_proven']
+          assert all(r['zip_crc32_matches'] for r in o['per_file'])
+          print('P2_SIX_ORIGINAL_MAT_SIGNAL_COMPARISON_EXECUTED_WITHOUT_EXPORTING_WAVEFORMS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: P2-SIX-PUBLIC-SOURCE-MAT-RANGE-ONLY-NONIDENTIFYING-AGGREGATES
+          path: /tmp/p2-source-mat-six-pair-aggregates-only.json
+          if-no-files-found: warn
+          retention-days: 90
