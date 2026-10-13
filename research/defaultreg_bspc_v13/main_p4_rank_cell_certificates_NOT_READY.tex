@@ -122,6 +122,7 @@ machine-verification claims.
 \section{Synthetic multi-dimensional numerical experiment}
 \input{P4_synthetic_multidimensional_numeric_appendix.tex}
 \input{P4_exact_rational_horner_comparison_results.tex}
+\input{P4_strong_centered_horner_negative_comparison_20261013.tex}
 
 \input{P4_realized_interval_refinement_negative.tex}
 
@@ -143,9 +144,13 @@ than a formal outward-directed rounding
 guarantee. Earlier numerical problems,
 large tangent dimensions and finite
 root conditioning remain test cases.
-The actual interval-Horner comparison documented
-both additional certificates and a substantial
-runtime penalty, rather than algorithm dominance.
+The original unshifted Horner comparison found
+additional Bernstein certificates, but the new
+midpoint-centered Horner baseline achieved the
+same strict rational coverage with lower measured
+time than full Bernstein on these 960 intervals.
+Thus no current strong-baseline exclusive
+Bernstein coverage advantage has been established.
 A publishable method note would
 need a substantial independent benchmark
 on multiple spectral dimensions and
