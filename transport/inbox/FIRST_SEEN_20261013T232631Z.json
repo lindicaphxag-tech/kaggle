@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "JeremiahM37",
+      "body": "## Summary\n\nWith `use_sim_time=true`, a node's `now()` (and the controller manager's time, which is built on it) can hold still for about 0.33 s while the simulator keeps running. Gazebo's own clock stream is smooth in the same run, so the gap appears after Gazebo publishes `/clock`: either in `ros_gz_bridge` or in DDS delivery to the subscriber. I have not yet separated those two.\n\nThis matters for `ros2_control`, which uses the node clock to time controllers. A frozen clock freezes the controller's reference, and the arm then jumps when the clock catches up. Related: ros2_control#3683 (issue) and #3684 (PR, which makes the controller manager use the time argument it is given when sim time is in use).\n\n## What we measured\n\nSetup: ROS 2 Jazzy (RoboStack), `rmw_fastrtps_cpp` with `FASTDDS_BUILTIN_TRANSPORTS=UDPv4`, Gazebo Harmonic `empty` world, UR5e via `ur_simulation_gz` (`ur_sim_control.launch.py`), 24 busy CPU-bound processes on a 32-core host. Arm commanded through `example_move` (12 runs, all succeeded).\n\nRun of 420 s:\n\n| Source | Largest arrival gap | Gaps > 0.2 s |\n|---|---|---|\n| Gazebo transport `/world/<w>/clock`, subscribed directly | 0.100 s | 0 |\n| `/clock` on ROS, after `ros_gz_bridge` | 0.335 s | 8 (0.333\u20130.335 s) plus one at 0.213 s |\n\nThe same load on `mujoco_ros2_control` (basic demo, arm moving, 6 \u00d7 60 s): no `/clock` gap over 0.2 s, and the largest lag between `/clock` and the controller-manager time in `/joint_states` was 32 ms. Its `/clock` comes from a physics thread in the same process, with no bridge.\n\nEarlier A/B on the same Gazebo setup, from the ros2_control issue: the unpatched controller manager aborted 7 of 60 trajectories, and the patched one 0 of 60. Those aborts all coincided with `/clock` gaps of 0.27\u20130.33 s, with controller time frozen during each gap.\n\n## What I'd like rclcpp's view on\n\n1. Is a 0.33 s stall in `/clock` delivery to a `use_sim_time` node expected behaviour, or a defect in the clock subscription path?\n2. Is it expected that `now()` on a `RCL_ROS_TIME` clock holds still while `/clock` is late, rather than extrapolating from the last stamp?\n3. Does the answer change if the stall is caused by the bridge process rather than DDS? If it's a bridge issue, I'll raise it in `ros_gz`.\n\nRelated: #2535 (timer callbacks delayed under simulation time), #3122 (no sim-time-aware monotonic clock).\n\n## Reproduce\n\n```\nexport FASTDDS_BUILTIN_TRANSPORTS=UDPv4\nros2 launch ur_simulation_gz ur_sim_control.launch.py   # arm and controllers\n# 24 busy processes:  python3 -c \"while True: pass\" &\n# record /clock arrival wall times (reliable QoS, depth 100) and /joint_states stamps,\n# and drive the arm with JointTrajectory goals\n```\n\nThe recorder and analysis scripts are available on request.\n",
+      "created_at": "2026-10-13T22:27:54Z",
+      "html_url": "https://github.com/ros2/rclcpp/issues/3329",
+      "id": "ros2/rclcpp#3329",
+      "issue_number": 3329,
+      "labels": [],
+      "repository": "ros2/rclcpp",
+      "surface_sha256": "1c49480f1d30150a75f0aa2c0c222c8b41b9ba22a1cb5f6d0a8f1855df546d29",
+      "title": "Late /clock delivery under use_sim_time stalls node now() for ~0.33 s (found via ros2_control controller time)"
+    }
+  ],
+  "post_activation_issue_identities_observed": 119,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-13T23:26:31Z",
+  "schema_version": 1
+}
