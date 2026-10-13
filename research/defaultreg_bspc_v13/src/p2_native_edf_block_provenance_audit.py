@@ -29,6 +29,11 @@ from p2_raw_edf_channel_affine_fingerprint import _make_small_edf
 
 PAIR_IDS = ((4,5),(47,49),(11,15),(2,3),(6,7))
 DISCOVERY_PAIRS = {(4,5),(47,49),(11,15)}
+EEG_LABELS = {
+    "C3","C4","CP3","CP4","Cz","F3","F4","F7","F8","FC3",
+    "FC4","FCz","FP1","FP2","FT7","FT8","Fz","O1","O2",
+    "Oz","P3","P4","Pz","T3","T4","T5","T6","TP7","TP8"
+}
 
 def _records(path, h):
     """Read exactly the native EDF digital int16 per-channel record blocks."""
@@ -66,6 +71,13 @@ def one_pair(path_a,path_b):
         raise ValueError("nonmatching EDF channel/record schema: report as unsupported, not negative")
     if A["records"]<1:
         raise ValueError("no native EDF records")
+    eeg_indices={i for i,label in enumerate(A["names"])
+                 if label.strip().casefold() in {n.casefold() for n in EEG_LABELS}}
+    if A["n"]==33 and len(eeg_indices)!=29:
+        raise ValueError("Unexpected published EDF EEG channel-label schema; no guessed 29/33 attribution")
+    eeg_block_by_channel={i:{"eligible":0,"exact":0,"near":0} for i in eeg_indices}
+    per_record_eligible=[]
+    per_record_eeg_exact=[]
     # Per-channel SHA256 indexed by EDF record number. Skip constant blocks:
     # identical zero blocks are not evidence of meaningful EEG signal reuse.
     map_a=[defaultdict(set) for _ in range(A["n"])]
@@ -91,6 +103,8 @@ def one_pair(path_a,path_b):
     source=_records(path_a,A)
     destination=_records(path_b,B)
     for (idx,aa),(check_idx,bb) in zip(source,destination):
+        rec_eligible=0
+        rec_eeg_exact=0
         if idx!=check_idx:
             raise AssertionError("native record order drift")
         for ch,(x,y) in enumerate(zip(aa,bb)):
@@ -106,10 +120,19 @@ def one_pair(path_a,path_b):
             rho=_pearson_nonconstant(x,y)
             if rho is None:
                 continue
+            if ch in eeg_indices:
+                rec_eligible+=1
+                eeg_block_by_channel[ch]["eligible"]+=1
+                eeg_block_by_channel[ch]["near"]+=int(rho>=.9999)
+                if x==y:
+                    rec_eeg_exact+=1
+                    eeg_block_by_channel[ch]["exact"]+=1
             result["aligned_nonconstant_channel_blocks"]+=1
             result["aligned_raw_nonconstant_corr_ge_0p95"]+=int(rho>=.95)
             result["aligned_raw_nonconstant_corr_ge_0p9999"]+=int(rho>=.9999)
             corrs.append(rho)
+        per_record_eligible.append(rec_eligible)
+        per_record_eeg_exact.append(rec_eeg_exact)
     if corrs:
         result["native_block_correlation_median"]=float(np.median(corrs))
         result["native_block_correlation_p10"]=float(np.quantile(corrs,.1))
@@ -118,7 +141,38 @@ def one_pair(path_a,path_b):
         result["native_block_correlation_median"]=None
         result["native_block_correlation_p10"]=None
         result["native_block_correlation_p90"]=None
-    result["comparison"]="Same EDF channel and record index for Pearson; SHA256 of original channel/block digital bytes also matched across record indices"
+    if eeg_indices:
+        exact=sum(x["exact"] for x in eeg_block_by_channel.values())
+        eligible=sum(x["eligible"] for x in eeg_block_by_channel.values())
+        channel_fractions=[
+            x["exact"]/x["eligible"] for x in eeg_block_by_channel.values()
+            if x["eligible"]>0
+        ]
+        def longest_run(flags):
+            best=cur=0
+            for t in flags:
+                cur=(cur+1) if t else 0
+                best=max(best,cur)
+            return best
+        event=[eligible>0 and exact/eligible>=.9
+               for eligible,exact in zip(per_record_eligible,per_record_eeg_exact)]
+        result.update({
+            "n_eeg_channels_from_whitelisted_labels":len(eeg_indices),
+            "aligned_eeg_nonconstant_channel_blocks":eligible,
+            "aligned_exact_eeg_nonconstant_blocks":exact,
+            "eeg_exact_block_fraction":exact/eligible if eligible else None,
+            "median_eeg_channel_exact_block_fraction":float(np.median(channel_fractions)) if channel_fractions else None,
+            "n_edf_records_90percent_eeg_channels_byte_identical":sum(event),
+            "longest_consecutive_edf_records_90percent_eeg_byte_identical":longest_run(event),
+            "per_eeg_channel_aggregates":[{"edf_channel_index":i,
+                 "channel_label":A["names"][i],
+                 "eligible_blocks":v["eligible"],
+                 "exact_blocks":v["exact"],
+                 "correlated_blocks_ge_0p9999":v["near"]}
+                 for i,v in sorted(eeg_block_by_channel.items())],
+        })
+    result["publisher_preprocessed_EDF_not_acquisition_original_MAT"]=True
+    result["comparison"]="Same publisher-processed EDF channel and record index for Pearson; SHA256 of as-stored digital channel/block bytes also matched across indices"
     return result
 
 def self_test():
