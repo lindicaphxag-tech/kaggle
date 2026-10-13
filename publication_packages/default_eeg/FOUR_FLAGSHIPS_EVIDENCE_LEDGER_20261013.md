@@ -207,3 +207,21 @@ True doctoral flagship acceptance additionally requires independent
 validation not yet run, fair cross-journal accepted-paper benchmarking,
 author-approved declarations, exact latest PDF proofing, and
 external publication/maintainer evidence.
+
+
+### P2 crucial channel-variation and physiological-reference negative control
+A separate full-EDF rehash / digital channel *location* run completed
+SUCCESS https://github.com/lindicaphxag-tech/kaggle/actions/runs/38386864421,
+artifact 11807041377. As-stored EDF IDs 04/05 share 32/33
+whole digital channel time series at the same positions, of which
+**31 are time-varying waveforms** and one is a static **CPz
+reference** channel (zero-based channel 17). ID pairs 11/15
+and 47/49 each share **ONLY the constant CPz channel (index 17)**
+and NO full time-varying exactly identical digital channel.
+Therefore one-channel matches in those near-pairs are trivial
+reference artifacts and cannot serve as exact physiological
+duplicate evidence; their approximate digital-waveform similarity
+remains a separate unverified correspondence question.
+The new independent channel-localization script and its result
+are incorporated in P2 source and the journal draft. The claims
+remain restricted to *digital signal products*, not patients.
