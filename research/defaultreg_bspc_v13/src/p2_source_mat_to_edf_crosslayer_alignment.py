@@ -203,7 +203,10 @@ def real(out):
             meta["rows"].append(result)
             print("P2_SOURCE_TO_EDF_PAIR",sid,
                   "same_index",result["same_channel_index_abs_pearson_median"],
-                  "permuted",result["one_to_one_assignment_median_abs_r"],flush=True)
+                  "permuted",result["one_to_one_assignment_median_abs_r"],
+                  "trial_match_median",result["same_index_optimal_trial_assignment_abs_r_median"],
+                  "trial_match_ge_0p95",result["same_index_optimal_trial_assignment_abs_r_ge_0p95"],
+                  "trial_match_n",result["same_index_channel_optimal_trial_assignment_eligible"],flush=True)
             del arrays,mat,digi
     meta["total_public_Figshare_HTTP_206_bytes"]=reader.total_received
     out.parent.mkdir(parents=True,exist_ok=True)
