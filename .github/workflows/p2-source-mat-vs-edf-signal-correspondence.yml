@@ -1,0 +1,50 @@
+name: P2 original-source MAT versus processed EDF channel correspondence
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/p2_source_mat_to_edf_crosslayer_alignment.py'
+      - '.github/workflows/p2-source-mat-vs-edf-signal-correspondence.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  release-layer-provenance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      MNE_DATA: /tmp/p2-edf-cache
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check moabb==1.7.2 scipy h5py
+      - name: Unit tests (affine calibration, channel order swap and negative noise)
+        run: |
+          python -m py_compile research/defaultreg_bspc_v13/src/p2_source_mat_to_edf_crosslayer_alignment.py
+          python research/defaultreg_bspc_v13/src/p2_source_mat_to_edf_crosslayer_alignment.py --self-test
+      - name: Compare six public source MAT arrays with same-ID published EDF channel streams
+        run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_bspc_v13/src/p2_source_mat_to_edf_crosslayer_alignment.py --out /tmp/p2-source-mat-edf-crosslayer.json
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/p2-source-mat-edf-crosslayer.json'))
+          assert [r['released_public_id'] for r in x['rows']]==[4,5,11,15,47,49]
+          assert x['only_six_source_mat_members_requested']
+          assert x['full_source_archive_not_downloaded']
+          assert x['no_EEG_waveforms_or_EDF_patient_header_released']
+          assert all(r['source_member_verified_crc'] for r in x['rows'])
+          assert all(r['EDF_digital_samples_shape']==[33,160000] for r in x['rows'])
+          print('P2_ORIGINAL_RELEASE_SOURCE_MAT_EDF_SIX_ID_AGGREGATES_EXECUTED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: P2-SIX-MAT-VS-EDF-CROSSLAYER-SCALAR-CORRELATIONS-ONLY
+          path: /tmp/p2-source-mat-edf-crosslayer.json
+          if-no-files-found: warn
+          retention-days: 90
