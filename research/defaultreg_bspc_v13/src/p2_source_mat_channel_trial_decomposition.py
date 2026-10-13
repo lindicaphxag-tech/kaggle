@@ -42,7 +42,7 @@ def compare(a,b):
     epoch_90_corr=[]
     epoch_90_exact=[]
     channel_block_exact=0;channel_block_near=0;nonconstant=0
-    sse_a=[];sse_b=[]
+    sse_a=[];sse_b=[];means_a=[];means_b=[];within_covs=[]
     for j in range(nchan):
         x=a[:,j,:].astype(np.float64)
         y=b[:,j,:].astype(np.float64)
@@ -58,6 +58,8 @@ def compare(a,b):
             "rms_signal_b":float(np.sqrt(np.mean(y**2))),
         })
         sse_a.append(v_a);sse_b.append(v_b)
+        means_a.append(float(x.mean()));means_b.append(float(y.mean()))
+        within_covs.append(float(np.mean((x-x.mean())*(y-y.mean()))))
     for trial in range(ntrial):
         exact=0;near=0;nonconst=0
         for j in range(nchan):
@@ -79,9 +81,27 @@ def compare(a,b):
             out=max(out,run)
         return out
     variances=np.asarray(sse_a,dtype=np.float64)
+    ma=np.asarray(means_a,dtype=np.float64)
+    mb=np.asarray(means_b,dtype=np.float64)
+    within_cov=float(np.mean(within_covs))
+    within_variance_a=float(np.mean(sse_a))
+    within_variance_b=float(np.mean(sse_b))
+    between_variance_a=float(np.var(ma))
+    between_variance_b=float(np.var(mb))
+    between_covariance=float(np.mean((ma-ma.mean())*(mb-mb.mean())))
+    within_denom=np.sqrt(within_variance_a*within_variance_b)
+    within_r=within_cov/within_denom if within_denom>0 else None
+    between_frac_a=between_variance_a/(between_variance_a+within_variance_a)
+    between_frac_b=between_variance_b/(between_variance_b+within_variance_b)
     out={
         "source_mat_candidate_shape":list(a.shape),
         "globally_aligned_numeric_pearson":corr(a,b),
+        "within_channel_centered_pooled_pearson":float(np.clip(within_r,-1,1)) if within_r is not None else None,
+        "between_channel_mean_variance_fraction_source_a":float(between_frac_a),
+        "between_channel_mean_variance_fraction_source_b":float(between_frac_b),
+        "between_channel_mean_covariance":between_covariance,
+        "within_channel_mean_covariance":within_cov,
+        "number_constant_source_mat_channel_indices":sum(z["channel_full_pearson"] is None for z in channel),
         "exact_full_array":bool(np.array_equal(a,b)),
         "n_nonconstant_trial_channel_blocks":nonconstant,
         "exact_trial_channel_blocks":channel_block_exact,
@@ -125,6 +145,14 @@ def self_test():
     assert q["globally_aligned_numeric_pearson"]>.99
     assert q["fraction_channel_centered_variance_from_single_largest"]>.99
     assert q["channel_full_pearson_median"]<.25
+    offset1=rng.standard_normal((40,33,4000))
+    offset2=rng.standard_normal((40,33,4000))
+    offset1[:,17,:]+=187500.0
+    offset2[:,17,:]+=187500.0
+    fake=compare(offset1,offset2)
+    assert fake["globally_aligned_numeric_pearson"]>.9999
+    assert abs(fake["within_channel_centered_pooled_pearson"])<.1
+    assert fake["between_channel_mean_variance_fraction_source_a"]>.999
     print("P2_SOURCE_MAT_CHANNEL_TRIAL_FALSE_GLOBAL_CORRELATION_SELFTEST_PASS",flush=True)
 
 def main():
@@ -171,6 +199,8 @@ def main():
                   "glob",row["globally_aligned_numeric_pearson"],
                   "medianch",row["channel_full_pearson_median"],
                   "dominance",row["fraction_channel_centered_variance_from_single_largest"],
+                  "within_channel",row["within_channel_centered_pooled_pearson"],
+                  "between_mean_variance_frac",row["between_channel_mean_variance_fraction_source_a"],
                   "near",row["channel_full_pearson_ge_0p9999"],flush=True)
     report["total_http_range_body_bytes"]=reader.total_received
     args.out.parent.mkdir(parents=True,exist_ok=True)
