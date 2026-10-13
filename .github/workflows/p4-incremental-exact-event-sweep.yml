@@ -1,0 +1,36 @@
+name: P4 incremental exact event map comparison
+on:
+  push:
+    branches: [publication/default-eeg-p4-rank-certificates-20261013]
+    paths:
+      - research/defaultreg_bspc_v13/src/p4_incremental_exact_event_sweep.py
+      - .github/workflows/p4-incremental-exact-event-sweep.yml
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  compare-exact-event-maps:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install sympy==1.13.3
+      - run: python research/defaultreg_bspc_v13/src/p4_incremental_exact_event_sweep.py --out /tmp/p4-incremental-exact-event.json
+      - name: Check exact outputs and denominators
+        run: |
+          python - <<'PY'
+          import json
+          z=json.load(open('/tmp/p4-incremental-exact-event.json'))
+          assert len(z['rows'])==7
+          assert all(r['exact_outputs_equal'] for r in z['rows'])
+          assert {r['dimension'] for r in z['rows']}=={3,6}
+          assert next(r for r in z['rows'] if r['dimension']==3 and r['pairs']==32)['events']==64
+          assert z['no_new_root_isolator_or_float_EEG_certificate'] is True
+          print('P4_INCREMENTAL_EXACT_EVENT_MAP_PARITY_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p4-incremental-exact-event-comparison
+          path: /tmp/p4-incremental-exact-event.json
+          retention-days: 90
