@@ -1,0 +1,44 @@
+name: P2 NEMAR pinned public EDF bytes and digital channel verification
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths:
+      - '.github/workflows/p2-nemar-real-edf-content-rehash.yml'
+      - 'research/defaultreg_bspc_v13/src/p2_nemar_real_edf_full_file_and_digital_channel_audit.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-public-six-file-as-stored-edf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Verify pure synthetic EDF parser controls without network
+        run: |
+          python research/defaultreg_bspc_v13/src/p2_nemar_real_edf_full_file_and_digital_channel_audit.py --self-test
+      - name: Independently fetch and SHA256-check six version-pinned EDF files
+        run: |
+          python research/defaultreg_bspc_v13/src/p2_nemar_real_edf_full_file_and_digital_channel_audit.py --out /tmp/p2_nemar_six_edf_digital_check.json
+      - name: Fail closed unless six actual EDFs were rehashed
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/p2_nemar_six_edf_digital_check.json'))
+          assert x['status']=='PUBLIC_NEMAR_EDF_BYTES_DIGITALLY_AUDITED'
+          assert x['independent_rehash_of_6_full_EDF_files']
+          assert len(x['public_file_results'])==6
+          assert len(x['pair_results'])==3
+          assert all(v['verified_whole_file_sha256'] for v in x['public_file_results'].values())
+          assert x['MAT_to_EDF_export_operator_unverified']
+          print('P2_PUBLIC_EDF_AS_STORED_SIX_FILE_SHA_AND_CHANNEL_AUDIT_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p2-nemar-six-public-edf-hashes-and-digital-channel-scope
+          path: /tmp/p2_nemar_six_edf_digital_check.json
+          if-no-files-found: warn
+          retention-days: 90
