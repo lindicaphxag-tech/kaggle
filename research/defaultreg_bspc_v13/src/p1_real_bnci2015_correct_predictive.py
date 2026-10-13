@@ -78,7 +78,10 @@ def choose(c,y,g):
     macro=max(viable,key=lambda l:(mean(l,"auc"),l))
     proper=min(viable,key=lambda l:(mean(l,"proper"),l))
     historical=min(viable,key=lambda l:(mean(l,"historical"),l))
+    predicted=float(mean(macro,"auc")-mean(proper,"auc"))
     return {"source_macro":macro,"true_source_train_mean_predictive":proper,
+            "source_predicted_macro_minus_proper_auc":predicted,
+            "source_predicted_direction":("macro" if predicted>0 else "proper" if predicted<0 else "tie"),
             "historical_val_class_centred":historical,
             "n_source_participants":len(ids),"feasible_grid_count":len(viable),
             "proper_not_target_val_class_centred":True,
@@ -114,7 +117,12 @@ def main():
     rows=[]
     for x in selected:
         t=x["held_participant"];metrics=one(c,y,g,t,x["source_only_selectors"])
-        rows.append({"held_participant":t,"auc":metrics})
+        predicted=x["source_only_selectors"]["source_predicted_macro_minus_proper_auc"]
+        observed=metrics["source_macro"]-metrics["true_source_train_mean_predictive"]
+        rows.append({"held_participant":t,"auc":metrics,
+                     "source_predicted_macro_minus_proper_auc":predicted,
+                     "held_observed_macro_minus_proper_auc":observed,
+                     "direction_correct_excluding_ties":bool(predicted*observed>0)})
         print("P1_BNCI2015_CORRECT_PROPER_HELD",t,metrics,flush=True)
     summary={k:float(np.mean([r["auc"][k] for r in rows])) for k in METHODS}
     for alternative in ("historical_val_class_centred","true_source_train_mean_predictive","LedoitWolf","OAS"):
@@ -136,6 +144,13 @@ def main():
     summary["retrospective_macro_minus_proper_exact_signflip_two_sided_p"]=exact
     summary["retrospective_macro_minus_proper_bootstrap_95"]=[float(x) for x in percentile]
     summary["paired_nonzero"]=int(np.sum(np.abs(paired)>1e-12))
+    predictions=np.asarray([r["source_predicted_macro_minus_proper_auc"] for r in rows])
+    non_ties=(np.abs(predictions)>1e-12)&(np.abs(paired)>1e-12)
+    summary["source_predicted_direction_evaluable"]=int(non_ties.sum())
+    summary["source_predicted_direction_correct"]=int(np.sum(predictions[non_ties]*paired[non_ties]>0))
+    summary["source_predicted_direction_accuracy"]=float(np.mean(predictions[non_ties]*paired[non_ties]>0)) if non_ties.any() else None
+    summary["source_prediction_mean_absolute_error_auc"]=float(np.mean(np.abs(predictions-paired)))
+    summary["prediction_evaluation_exploratory_previously_exposed_dataset"]=True
     summary["inference_not_original_prospective"]=True
     print("P1_BNCI2015_CORRECT_PROPER_EXPLORATORY_STATISTICS",
           json.dumps({"mean":observed,"exact_two_sided_p":exact,
