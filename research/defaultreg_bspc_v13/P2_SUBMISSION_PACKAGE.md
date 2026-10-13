@@ -94,3 +94,10 @@ textbook warning about data leakage.
 Non-negotiable: notify data custodians on clinical release ID4/ID5;
 verify raw/independent processing and avoid patient-identity claims.
 **BSPC is the one selected PREPARATION target, NOT a submission.**
+
+## Additional public EEG identity controls — executed 2026-10-13
+- [SUCCESS: BNCI2014_001 and BNCI2015_001](https://github.com/lindicaphxag-tech/kaggle/actions/runs/38326859467): respectively 9 IDs / 2,592 trial instances and 12 IDs / 5,600 trial instances; no exact cross-ID epoch/label content hashes under specified pipelines.
+- BNCI2014_001: 0/36 comparable ID pairs aligned whole-record rho>=0.95. BNCI2015_001: 0/34 shape-compatible; **32 of 66 pairs not evaluated by this metric** due unequal shapes.
+- These are POST-DISCOVERY, previously available public controls, not preregistered independent cohorts; exact negatives do not prove absence of reordered or time-shifted near duplicates. The study has five released acquisitions in its content audit, but one identified exact-alias acquisition.
+- [New raw EDF digital exact-moment affine test](https://github.com/lindicaphxag-tech/kaggle/actions/runs/38325795037) independently verifies a substantial difference between exact 4/5 alias and high processed similarity of 11/15 and 47/49; neither source data identity nor clinical patient identity can be inferred solely from similarity.
+- Still BLOCKED: data-steward consultation; independent clinical release provenance; final PDF at current HEAD; authorship/ethics/rights approvals. No formal journal submission occurred.
