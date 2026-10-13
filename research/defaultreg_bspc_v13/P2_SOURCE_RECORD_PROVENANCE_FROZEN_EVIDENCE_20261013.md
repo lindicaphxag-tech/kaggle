@@ -32,3 +32,40 @@
 - [ ] Actual BSPC submission only after author-controlled approval
 
 **No custodian reply, publisher acceptance or true clinical patient identity is claimed.**
+
+
+## Independently rehashed complete public-EDF cohort (2026-10-13 follow-up)
+- SUCCESS exact GitHub Actions https://github.com/lindicaphxag-tech/kaggle/actions/runs/38388066957
+  (run artifact 11806394377, 50 original NEMAR EDF full-file SHA256 digests
+  recomputed from downloaded public bytes, all matching NEMAR immutable
+  provenance manifest at 11e3eeb4b439d5f8ee1b5e3b8e6032824bc2de83).
+- All **1,225 unordered different released-ID pairs**, not a hand-picked
+  subset, tested at 29 EEG channel labels and 320 native EDF records:
+  - 4/5: 29/29 complete variable EEG channels identical; 9,280/9,280
+    corresponding EEG-labelled EDF digital blocks exactly identical.
+  - 47/49: 0/29 complete variable EEG channels identical, but
+    6,957/9,280 corresponding native storage blocks exactly identical.
+  - 11/15: 0/29 complete variable EEG channels identical,
+    171/9,280 native storage blocks identical.
+  - **Remaining 1,222 ID pairs**: zero full-channel and zero
+    same-position native EEG-block byte-exact comparisons.
+- The separate exact single-constant-CPz reference identity in all
+  three nominated pairs has **no physiological fingerprint value**;
+  CPz is excluded throughout the 29-channel census.
+- The public EDF product was retrieved originally through MOABB 1.5.0
+  in NEMAR; our primary 40-epoch alias comparison uses MOABB 1.7.2.
+  The two tests are different representation levels.
+- 1,225 pair comparisons are not 1,225 independent human patients.
+  Storage blocks are not independent trials. The empirical zero
+  count is conditional on this release and exact alignment,
+  not a calibrated clinical false-positive probability.
+- The source MAT->EDF export pipeline and original physical acquisition
+  ancestry remain UNVERIFIED. No claims of duplicated clinical
+  patient identity or publisher culpability.
+- New executable:
+  `research/defaultreg_bspc_v13/src/p2_nemar_complete_fifty_pairwise_digital_scan.py`.
+- Manuscript subsection and full pair table:
+  `research/defaultreg_bspc_v13/P2_nemar_complete_all_1225_pairwise_native_EEG_20261013.tex`.
+- Exact source-head article build SUCCESS
+  https://github.com/lindicaphxag-tech/kaggle/actions/runs/38388523969
+  (21 pages, 6 overfull hbox warnings; not visually publication-cleared).
