@@ -16,47 +16,32 @@ A Matched Audit of Validation Denominators, Model Refitting and Regularisation}
 \date{}
 \begin{document}\maketitle
 \begin{abstract}
-Released electroencephalography (EEG) participant identifiers
-need not imply disjoint numerical recording contents.
-We audited labelled EEG trials, publisher-supplied EDF digital
-samples, and separately released source MAT arrays, then
-quantified the effect of content-aware exclusion in
-cross-subject model evaluation. In Liu2024 (50 released IDs;
-2,000 processed trials), IDs 4/5 shared all 40 processed
-labelled trials, leaving 1,960 unique trial contents and
-49 exact-content groups. An independent-hosted, fully rehashed census
-of all 50 preprocessed EDF files tested all 1,225
-cross-ID pairs: the 4/5 pair shared all 29 named
-EEG channel streams and 9,280/9,280 aligned
-native EEG storage blocks; 1,222 pairs had
-no exact aligned native EEG block overlap.
-A retrospective EDF block analysis also identified
-partial exact identity for 47/49 (6,957/9,280
-named EEG channel--record blocks), whereas 11/15 showed
-predominantly nonexact similarity (171/9,280).
-Neither additional pair was merged into the 49-group
-primary analysis. Crucially, separately released source
-MAT arrays were not wholly identical for any of these
-three ID pairs: zero of 33 full numeric channels
-matched exactly. Their apparently near-unity flattened
-correlations were dominated by between-channel means,
-not equivalent EEG waveforms.
-After post hoc within-channel trial assignment, the
-source MAT from the first ID in each selected pair
-matched both processed EDF files more strongly than
-the second source MAT did (median absolute correlations
-0.492--0.724 versus 0.042--0.094). This is a
-release-layer diagnostic, not a verified conversion
-map or acquisition identity.
-The nominal 50-ID macro ROC-AUC was 0.594000;
-reweighting to 49 unique held contents gave 0.588673,
-and content-disjoint source refitting gave 0.582551
-(matched change $-0.006122$). Four other public EEG
-acquisitions showed no exact cross-ID trial matches
-under specified processing. These retrospective findings
-motivate release-layer provenance checks and content-aware
-validation; they do not establish clinical identity,
-acquisition-session overlap, or a causal leakage penalty.
+Cross-subject EEG evaluation often assumes that different released
+participant identifiers correspond to disjoint digital recording
+contents. We audited the public Liu2024 motor-imagery dataset at
+three representation levels: processed labelled epochs, preprocessed
+EDF integer samples, and separately distributed source MAT arrays.
+All 50 published EDF files were independently rehashed against a
+version-fixed distribution manifest; every unordered pair of
+released IDs (1,225 pairs) was then compared across 29 named EEG
+channels and their aligned native storage blocks. IDs 4 and 5
+shared all 40 processed labelled epochs and 29 complete
+time-varying EDF EEG channel streams. Of the remaining pairs,
+only 47/49 and 11/15 shared any exactly aligned EEG storage
+blocks (6,957/9,280 and 171/9,280, respectively); the other
+1,222 pairs shared none. The source MAT products, however, had
+no entirely identical numeric channels across these nominated
+pairs, and near-unity flattened correlations were confounded by
+a high-offset channel. Thus neither partial EDF overlap nor a
+filename establishes original acquisition identity. In matched
+retrospective cross-subject analyses, nominal 50-ID macro ROC-AUC
+was 0.594000; content-group reweighting to 49 distinct processed
+contents gave 0.588673, and content-disjoint model refitting
+gave 0.582551. Four other public EEG datasets showed no exact
+cross-ID processed-epoch overlaps under the specified pipelines.
+These results demonstrate a reproducible digital-content identity
+discrepancy and measurable evaluation sensitivity, without
+identifying patients or proving a causal leakage effect.
 \end{abstract}
 
 \noindent\textbf{Keywords:} EEG; motor imagery; recording identity;
