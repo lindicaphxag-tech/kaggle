@@ -93,7 +93,7 @@ def main():
             "n_target_trials":len(Y_HELD),
             "source_only_Z0_at_time_of_selection":True,
             "reserved_targets_in_this_replay":1}
-    print("P3_RESERVED_HELD_ID9_RESULT",json.dumps(strict,sort_keys=True),flush=True)
+    print("P3_RESERVED_HELD_ID10_RESULT",json.dumps(strict,sort_keys=True),flush=True)
     # Supplementary LOPO: now released ALL trial contents have been read.
     # Not an independent confirmation and NOT globally blinded.
     C=np.concatenate([C_SOURCE,C_HELD]);y=np.concatenate([Y_SOURCE,Y_HELD]);g=np.concatenate([G_SOURCE,G_HELD])
