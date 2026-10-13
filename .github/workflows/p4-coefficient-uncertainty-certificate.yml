@@ -1,0 +1,25 @@
+name: P4 exact rational coefficient-uncertainty certificate
+on:
+  push:
+    branches: [publication/default-eeg-p4-rank-certificates-20261013]
+    paths:
+      - '.github/workflows/p4-coefficient-uncertainty-certificate.yml'
+      - 'research/defaultreg_bspc_v13/src/p4_coefficient_uncertainty_rational_certificate.py'
+      - 'research/defaultreg_bspc_v13/P4_coefficient_uncertainty_exact_scope.tex'
+      - 'research/defaultreg_bspc_v13/main_p4_rank_cell_certificates_NOT_READY.tex'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact-rational-independent-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Exact rational proof-scope tests and interval corner regressions
+        run: |
+          python3 research/defaultreg_bspc_v13/src/p4_coefficient_uncertainty_rational_certificate.py --out p4_coeff_robust.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p4-coefficient-only-robustness-frozen-fixtures
+          path: p4_coeff_robust.json
