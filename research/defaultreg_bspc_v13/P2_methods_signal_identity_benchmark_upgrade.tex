@@ -18,9 +18,13 @@ If $g$ is held out by its released ID but $g'$ in the
 training set shares all of $g$'s processed labelled EEG
 trials, a nominal participant-independent evaluation
 is not independent at the level of digital signal
-contents. A content-disjoint split instead removes
-every member of the held content component from
-training. The graph construction is deterministic and
+contents. An \emph{exact-fingerprint component-disjoint}
+split instead removes every member of the held
+exact-content component from training. This
+criterion does not guarantee disjointness under
+partial EDF record-block reuse, unequal-length
+window overlaps or transformed near-duplicates;
+those are separate provenance questions. The graph construction is deterministic and
 standard; its scientific value is in making the
 claimed independence unit inspectable.
 
