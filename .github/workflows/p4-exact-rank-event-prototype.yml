@@ -7,6 +7,7 @@ on:
     paths:
       - research/defaultreg_bspc_v13/src/p4_exact_rank_event_sweep_prototype.py
       - research/defaultreg_bspc_v13/src/p4_joint_spectral_coefficient_box_certificate.py
+      - research/defaultreg_bspc_v13/src/p4_joint_box_adaptive_refinement_and_falsification.py
       - .github/workflows/p4-exact-rank-event-prototype.yml
 
 jobs:
@@ -25,6 +26,22 @@ jobs:
       - name: Joint spectral and coefficient interval-box soundness regression
         run: |
           python research/defaultreg_bspc_v13/src/p4_joint_spectral_coefficient_box_certificate.py --out p4_joint_spectral_box_results.json
+      - name: Full synthetic box proof-or-exact-witness replay
+        run: |
+          python research/defaultreg_bspc_v13/src/p4_joint_box_adaptive_refinement_and_falsification.py --out p4_proof_or_counterexample.json
+          python - <<'PY'
+          import json
+          x=json.load(open('p4_proof_or_counterexample.json'))
+          assert x['status']=='PASS'
+          assert x['final']==dict(ROBUST_POS=95,ROBUST_NEG=91,FALSIFIED=36,UNKNOWN=0)
+          assert len(x['falsifications'])==36
+          print('P4_RATIONAL_CERTIFICATION_OR_FALSIFICATION_FIXTURES_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p4-exact-rational-proofs-and-falsifying-witnesses
+          path: p4_proof_or_counterexample.json
+          retention-days: 90
       - uses: actions/upload-artifact@v4
         with:
           name: p4-joint-spectral-coefficient-box-results
