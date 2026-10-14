@@ -27,8 +27,26 @@ def pass_one(ds,p):
         yy=y[ix]
         hashes=[hashlib.sha256(cc[i].tobytes()+bytes([int(yy[i])])).hexdigest()
                 for i in range(len(yy))]
+        traces=np.trace(cc,axis1=1,axis2=2)
+        if not np.isfinite(cc).all() or not np.all(traces>0):
+            raise ValueError("nonfinite or nonpositive covariance trace")
+        # Relative shape / global amplitude fingerprints are diagnostic
+        # numerical roundings, not exact equality certificates.
+        normalized=cc/traces[:,None,None]
+        shape_bin=np.rint(normalized*1e9).astype("<i8")
+        trace_bin=np.rint(np.log10(traces)*1e8).astype("<i8")
+        shape_fingerprints=[
+            hashlib.sha256(np.ascontiguousarray(shape_bin[i]).tobytes()
+            +bytes([int(yy[i])])).hexdigest() for i in range(len(yy))]
+        amp_fingerprints=[
+            hashlib.sha256(trace_bin[i].tobytes()
+            +bytes([int(yy[i])])).hexdigest() for i in range(len(yy))]
         details.append({"public_id":sid,"n":len(yy),
             "positive":int(yy.sum()),
+            "quantized_relative_covariance_9decimals_hash":
+                hashlib.sha256(b"".join(bytes.fromhex(h) for h in shape_fingerprints)).hexdigest(),
+            "quantized_log10_trace_8decimals_hash":
+                hashlib.sha256(b"".join(bytes.fromhex(h) for h in amp_fingerprints)).hexdigest(),
             "ordered_epoch_digest":hashlib.sha256(
                 b"".join(bytes.fromhex(z) for z in hashes)).hexdigest(),
             "sorted_epoch_digest":hashlib.sha256(
