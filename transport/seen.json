@@ -1755,35 +1755,47 @@
     },
     {
       "created_at": "2026-10-13T20:05:07Z",
+      "expiry_recorded_at": "2026-10-14T06:06:11Z",
+      "expiry_sha256": "23deb874a8ae0b5964fa070b0ed55b62c6cdf76ecd72e54a533fb92dc87237cb",
+      "expiry_source": "expirations/isaac-sim__IsaacLab__8537.json",
       "first_frozen_at": "2026-10-13T21:12:32Z",
       "id": "isaac-sim/IsaacLab#8537",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 8537,
       "prediction_deadline_at": "2026-10-14T03:12:32Z",
       "repository": "isaac-sim/IsaacLab",
       "source": "inbox/FIRST_SEEN_20261013T211232Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "47849e2a525ad72a41a7a17f24c3928a18eeac76aeb477cf6195ca94bfeff3e1"
     },
     {
       "created_at": "2026-10-13T20:46:56Z",
+      "expiry_recorded_at": "2026-10-14T06:06:11Z",
+      "expiry_sha256": "8192fecdf1de69b1360fe70eea36952abea6574545837ead92b89f4521288807",
+      "expiry_source": "expirations/ros2__rclcpp__3328.json",
       "first_frozen_at": "2026-10-13T21:12:32Z",
       "id": "ros2/rclcpp#3328",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3328,
       "prediction_deadline_at": "2026-10-14T03:12:32Z",
       "repository": "ros2/rclcpp",
       "source": "inbox/FIRST_SEEN_20261013T211232Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "064b8e7c0b9c0068e4581926eb071dd2a1dd24d6bff9b68635518b66be58b9ca"
     },
     {
       "created_at": "2026-10-13T22:27:54Z",
+      "expiry_recorded_at": "2026-10-14T06:06:11Z",
+      "expiry_sha256": "64744d1779d3f8abadfdc6eae229e9646116ef83f8f90c15a77aaa0583cc8f4c",
+      "expiry_source": "expirations/ros2__rclcpp__3329.json",
       "first_frozen_at": "2026-10-13T23:26:31Z",
       "id": "ros2/rclcpp#3329",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3329,
       "prediction_deadline_at": "2026-10-14T05:26:31Z",
       "repository": "ros2/rclcpp",
       "source": "inbox/FIRST_SEEN_20261013T232631Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "1c49480f1d30150a75f0aa2c0c222c8b41b9ba22a1cb5f6d0a8f1855df546d29"
     },
     {
@@ -1807,6 +1819,50 @@
       "source": "inbox/FIRST_SEEN_20261014T011042Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "65dd704a51294b101a12e5bf40bf3f88bafbcd3248801da1aa0a71c72e2ba9d8"
+    },
+    {
+      "created_at": "2026-10-14T04:54:46Z",
+      "first_frozen_at": "2026-10-14T06:07:57Z",
+      "id": "Genesis-Embodied-AI/genesis-world#3536",
+      "issue_number": 3536,
+      "prediction_deadline_at": "2026-10-14T12:07:57Z",
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "source": "inbox/FIRST_SEEN_20261014T060757Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "2d4d97758516c196b0adb5a2294a37a3d5392dff86b25d59c1a45bd367c86fa6"
+    },
+    {
+      "created_at": "2026-10-14T05:41:26Z",
+      "first_frozen_at": "2026-10-14T06:07:57Z",
+      "id": "isaac-sim/IsaacSim#880",
+      "issue_number": 880,
+      "prediction_deadline_at": "2026-10-14T12:07:57Z",
+      "repository": "isaac-sim/IsaacSim",
+      "source": "inbox/FIRST_SEEN_20261014T060757Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "a1f283861536443429eb0431d3adc6766ca2d9ebfcd4bb26ed6c8d5e1aaa568a"
+    },
+    {
+      "created_at": "2026-10-14T02:36:05Z",
+      "first_frozen_at": "2026-10-14T06:07:57Z",
+      "id": "ros-controls/ros2_controllers#2702",
+      "issue_number": 2702,
+      "prediction_deadline_at": "2026-10-14T12:07:57Z",
+      "repository": "ros-controls/ros2_controllers",
+      "source": "inbox/FIRST_SEEN_20261014T060757Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "7d29fcc6b723ac370e1fb3c1fce4fbaf04bb07761c4933a35f3dfbc82a3fb30b"
+    },
+    {
+      "created_at": "2026-10-14T03:52:07Z",
+      "first_frozen_at": "2026-10-14T06:07:57Z",
+      "id": "ros-navigation/navigation2#6660",
+      "issue_number": 6660,
+      "prediction_deadline_at": "2026-10-14T12:07:57Z",
+      "repository": "ros-navigation/navigation2",
+      "source": "inbox/FIRST_SEEN_20261014T060757Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "96a39eb99256db16fb0ec094181f35066762f50c0d50920daa71e022810530bd"
     }
   ]
 }

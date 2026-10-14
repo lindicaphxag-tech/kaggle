@@ -1,0 +1,13 @@
+{
+  "case_id": "ros2/rclcpp#3329",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-10-14T06:06:11Z",
+  "expiry_sha256": "64744d1779d3f8abadfdc6eae229e9646116ef83f8f90c15a77aaa0583cc8f4c",
+  "first_frozen_at": "2026-10-13T23:26:31Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-10-14T05:26:31Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "1c49480f1d30150a75f0aa2c0c222c8b41b9ba22a1cb5f6d0a8f1855df546d29"
+}
