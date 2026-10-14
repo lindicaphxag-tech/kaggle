@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """New named public source-locked acquisition BNCI2014_002 (14 people).
 
-Right-hand vs feet motor imagery; three predeclared *index-labelled* EEG
-channels EEG7/8/9 from the 15 available Laplacian montage channels.
+Right-hand vs feet motor imagery; three predeclared channel POSITIONS 7/8/9 in the native all-15-EEG
+MOABB output. Native MNE names are not EEG7/8/9 as anticipated,
+and no geographic equivalence to C3/Cz/C4 is claimed.
 They are NOT the C3/Cz/C4 anatomical electrodes used in other papers.
 Source IDs1--10. All 27-grid source criteria and simple baseline
 parameters frozen and SHA256-written before reading target IDs11--14.
@@ -21,7 +22,9 @@ from p1_alexmi_new_source_lock_two_held import held_score
 SOURCE=tuple(range(1,11))
 HELD=(11,12,13,14)
 EVENTS=("right_hand","feet")
-CHANNELS=("EEG7","EEG8","EEG9")
+CHANNELS=("pos7","pos8","pos9")
+ZERO_BASED_PICKS=(6,7,8)
+EXPECTED_FULL_EEG=15
 
 def save(path,obj):
     b=(json.dumps(obj,indent=2,sort_keys=True,allow_nan=False)+"\n").encode()
@@ -31,8 +34,12 @@ def save(path,obj):
 def read_one(paradigm,dataset,uid):
     x,l,_=paradigm.get_data(dataset=dataset,subjects=[uid])
     x=np.asarray(x,dtype=np.float64);l=np.asarray(l)
-    if x.ndim!=3 or x.shape[1]!=len(CHANNELS) or len(x)<25:
-        raise RuntimeError(f"BNCI2014_002 unexpected epoch geometry for {uid}: {x.shape}")
+    if x.ndim!=3 or x.shape[1]!=EXPECTED_FULL_EEG or len(x)<25:
+        raise RuntimeError(f"BNCI2014_002 unexpected full-channel EEG geometry for {uid}: {x.shape}")
+    # Source-precommitted index positions in the ordered all-EEG
+    # MOABB array. We explicitly avoid claiming that EEG7 is
+    # a valid MNE name or equivalent to C3.
+    x=x[:,list(ZERO_BASED_PICKS),:]
     if set(l.tolist())!=set(EVENTS) or not np.isfinite(x).all():
         raise ValueError(f"unknown BNCI2014_002 labels or non-finite data for {uid}")
     y=(l==EVENTS[0]).astype(int)
@@ -60,7 +67,7 @@ def execute(out):
     if len(grid)!=27 or len(set(grid))!=27:raise ValueError("wrong original grid")
     lda.GRID=grid
     ds=BNCI2014_002()
-    paradigm=MotorImagery(n_classes=2,events=list(EVENTS),channels=list(CHANNELS),
+    paradigm=MotorImagery(n_classes=2,events=list(EVENTS),channels=None,
                           fmin=8,fmax=30,resample=160,
                           baseline=None,reject_by_annotation=False)
     cs=[];ys=[];groups=[];receipts=[];sha=hashlib.sha256()
@@ -79,6 +86,9 @@ def execute(out):
        "original_27_grid":list(grid),
        "dataset":"BNCI2014_002","DOI":"10.1007/s00500-012-0895-4",
        "task":"two-class right_hand vs feet motor imagery",
+       "channel_positions_one_based_precommitted":[7,8,9],
+       "channel_select_zero_based":list(ZERO_BASED_PICKS),
+       "all_EEG_channel_count_required":EXPECTED_FULL_EEG,
        "channel_names_index_labelled_not_equivalent_to_C3CzC4":list(CHANNELS),
        "filter_fmin_fmax":[8,30],"resample_Hz":160,
        "source_feature_sha256":sha.hexdigest(),
