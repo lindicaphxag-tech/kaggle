@@ -1,0 +1,49 @@
+name: P4 real public EEG exact final-feature precision-bit budget curve
+on:
+  push:
+    branches: [publication/default-eeg-p4-rank-certificates-20261013]
+    paths:
+      - '.github/workflows/p4-real-eeg-final-feature-precision-budget.yml'
+      - 'research/defaultreg_bspc_v13/src/p4_real_eeg_final_feature_precision_budget_curve.py'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  exact_final_feature_quantization_bit_budget:
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    env:
+      MNE_DATA: /tmp/p4_real_final_feature_budget
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python3 -m pip install --disable-pip-version-check moabb==1.7.2 sympy==1.14.0
+      - name: Read real prior-exposed 2-electrode EEG; recompute all 7 exact rational bit budgets
+        run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_bspc_v13/src/p4_real_eeg_final_feature_precision_budget_curve.py --out p4_real_precision_budget_curve.json
+      - name: Require all grids, all sample pairs, exact input bound and positive end-to-end-scope disclaimer
+        run: |
+          python - <<'PY'
+          import json
+          z=json.load(open('p4_real_precision_budget_curve.json'))
+          assert z['status']=='EXACT_REAL_FINAL_FEATURE_QUANTIZATION_PRECISION_CURVE'
+          assert z['precision_bits_list']==[18,14,10,8,6,4,2]
+          assert len(z['precision_rows'])==7 and z['sample_pair_count']==12
+          assert z['precision_rows'][0]['counts']==dict(POS=8,NEG=4,UNKNOWN=0)
+          assert z['no_roundoff_bound_through_EEG_FILTERING_OR_TANGENT']
+          assert z['not_independent_new_acquisition']
+          assert all(sum(row['counts'].values())==12 and row['max_input_error_leq_eta']
+                     for row in z['precision_rows'])
+          print('P4_REALEEG_FINAL_FEATURE_BIT_BUDGET_SCOPE_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p4-real-eeg-final-feature-bit-budget-entire-lambda-proof-curve
+          path: p4_real_precision_budget_curve.json
+          if-no-files-found: warn
+          retention-days: 90
