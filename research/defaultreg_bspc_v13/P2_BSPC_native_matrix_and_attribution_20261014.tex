@@ -12,27 +12,6 @@
  \draw[black!12,very thin] (\i,0)--(\i,50);
  \draw[black!12,very thin] (0,\i)--(50,\i);
 }
-% Symmetric entry positions, x=(ID-1), y=(50-ID), full unit cells.
-\fill[red!78!black] (3,45) rectangle (4,46);
-\fill[red!78!black] (4,46) rectangle (5,47);
-\fill[orange!78!black] (46,1) rectangle (47,2);
-\fill[orange!78!black] (48,3) rectangle (49,4);
-\fill[cyan!64!black] (10,35) rectangle (11,36);
-\fill[cyan!64!black] (14,39) rectangle (15,40);
-% Correct mirrored coordinates for pairs (4,5), (47,49), (11,15).
-% Overlay exactly computed cells after the visual legend positions above.
-\fill[black!4] (0,0) rectangle (50,50);
-\draw[black!45,thin] (0,0) rectangle (50,50);
-\foreach \i in {10,20,30,40} {
- \draw[black!12,very thin] (\i,0)--(\i,50);
- \draw[black!12,very thin] (0,\i)--(50,\i);
-}
-\fill[red!78!black] (3,45) rectangle (4,46);
-\fill[red!78!black] (4,46) rectangle (5,47);
-\fill[orange!78!black] (46,1) rectangle (47,2);
-\fill[orange!78!black] (48,3) rectangle (49,4);
-\fill[cyan!64!black] (10,35) rectangle (11,36);
-\fill[cyan!64!black] (14,39) rectangle (15,40);
 % Exact symmetric coordinates:
 \fill[red!78!black] (3,45) rectangle (4,46);
 \fill[red!78!black] (4,46) rectangle (5,47);
