@@ -21,7 +21,7 @@ jobs:
       - name: Install publisher TeX and PDF QA packages
         run: |
           sudo apt-get update -qq
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended lmodern poppler-utils
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-publishers lmodern poppler-utils
       - name: Verify frozen arithmetic and nonidentifying evidence
         run: |
           python research/defaultreg_bspc_v13/src/p2_bspc_submission_numerical_gate_20261014.py
