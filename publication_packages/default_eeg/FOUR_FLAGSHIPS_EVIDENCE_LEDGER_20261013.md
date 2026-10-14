@@ -714,3 +714,27 @@ The four paper PRs remain **DRAFT** and not editorially submitted.
 This ledger separates achievements, executed evidence and
 scientific/ethical/submission hard gates without claiming all have
 been fulfilled.
+
+
+### Source-drift CI status correction (2026-10-14 10:55 UTC)
+The previously QUEUED P3 two-original-artifact forensic rerun is now
+**SUCCESS**:
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38552831272
+Artifact `11887098613`, original source runs
+`38548578442` and `38548578441`, with all eight per-person
+rounded shape and amplitude digests identical across runners while
+zero of eight exact float64 labelled-epoch digests agree.
+Cross-run mean covariance-trace max abs difference:
+1.4210854715202004e-14; logdet mean max:
+1.7763568394002505e-15. Quantised fingerprints are an
+approximate observation, **NOT** a rigorous perturbation
+certificate, nor byte-equal original source model replay.
+The new paper paragraph includes its completed reproducibility URL.
+
+Current P1 #143 and P2 #144 exact HEAD manuscripts show SUCCESS;
+P4 #146 exact HEAD shows SUCCESS. The P3 #145 latest
+HEAD (post-forensic-paragraph) PDF build was QUEUED at verification:
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38553132304.
+Do not call the newest P3 author-review PDF checked until it succeeds.
+All four paper PRs remain DRAFT. MOABB upstream acknowledgement is
+not a merged correction, scientific peer-review or acceptance.
