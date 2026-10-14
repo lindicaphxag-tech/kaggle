@@ -586,3 +586,41 @@ and are ready for immediate submission. In particular:
 - All four author manuscript PRs remain DRAFT. This ledger describes
   proven results and research gaps; it does not constitute accepted
   peer review, journal submission or clinical identification.
+
+
+## 2026-10-14 final verified second-data P4 result and PDFs
+
+- P4 second real public named EEG acquisition numerical test SUCCESS:
+  https://github.com/lindicaphxag-tech/kaggle/actions/runs/38544936551.
+  AlexMI eight persons, two electrodes, three final binary64 tangent
+  coordinates, eight fixed positive-negative pair comparisons per person
+  across four prespecified fractional-bit grids (18/10/6/4).
+  For EACH precision: 64 correlated sample pairs.
+  Whole-lambda conditional positive-or-negative certificates vs UNKNOWN:
+  18 bits 63/1 (48 POS,15 NEG), 10 bits 61/3 (47 POS,14 NEG),
+  6 bits 25/39 (23 POS,2 NEG), 4 bits 0/64.
+  These 256 pair-by-precision cases are NOT independent EEG acquisitions.
+  Distinct named public EEG data from prior BNCI2014_001 numerical input,
+  but AlexMI people previously examined by this project for P1.
+  Scope is exact rational quantisation of machine-produced FINAL features
+  and conditional covariance/resolvent score sign only; NOT end-to-end
+  MNE/tangent machine-error bound, prospective BCI safety or AUC gain.
+  Article subsection integrated in P4 current head
+  dc6c9dfe2baf04d761afa4407ea0ba6a6f5dfc31.
+- FINAL verified current manuscript PDF artifacts,
+  each copied from its GitHub exact-HEAD build and SHA-256 checked
+  against the contained receipt (0 overfull hboxes throughout):
+    P1 JNE: 28 pages, c591a32511e0cb29521d18044ba41a63446fb39b,
+      https://github.com/lindicaphxag-tech/kaggle/actions/runs/38540178044
+    P2 BSPC: 23 pages, 5ba20e21c52f41174cec2fd87a7c9506b2454027,
+      https://github.com/lindicaphxag-tech/kaggle/actions/runs/38544611226
+    P3 PLOS ONE: 12 pages, 06b2a33f4030ddb9c13121939700df28c254f4df,
+      https://github.com/lindicaphxag-tech/kaggle/actions/runs/38543145267
+    P4 Numerical Algorithms: 16 pages, dc6c9dfe2baf04d761afa4407ea0ba6a6f5dfc31,
+      https://github.com/lindicaphxag-tech/kaggle/actions/runs/38545449519
+- Local author-review evidence ZIP was made with all four exact SHA-checked
+  PDFs and the distinct P1/P2/P3/P4 machine-readable real-execution
+  artifacts. Actual human journal compliance, true independent
+  confirmatory validation, patient identity verification,
+  full float pipeline error proof, submission and acceptance
+  remain UNFINISHED, as do any external upstream PR merges.
