@@ -1,0 +1,63 @@
+name: P2 BSPC focused native PDF and science gates
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths:
+      - ".github/workflows/p2-bspc-focused-pdf-preflight.yml"
+      - "research/defaultreg_bspc_v13/main_p2_BSPC_FOCUSED_AUTHOR_REVIEW_20261014.tex"
+      - "research/defaultreg_bspc_v13/P2_BSPC_native_matrix_and_attribution_20261014.tex"
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  focused-journal-draft:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install publisher TeX and PDF QA packages
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended lmodern poppler-utils
+      - name: Build the focused evidence-locked manuscript
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          set -euo pipefail
+          main=main_p2_BSPC_FOCUSED_AUTHOR_REVIEW_20261014
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error "$main.tex"
+          test -s "$main.pdf"
+          if grep -Eiq 'Citation.*undefined|Reference.*undefined|Undefined control sequence|There were undefined references' "$main.log"; then
+            echo "Unresolved science/document references" >&2
+            exit 1
+          fi
+          pdfinfo "$main.pdf" | grep -E 'Pages:|Page size:'
+          mkdir -p "$GITHUB_WORKSPACE/p2-focused"
+          cp "$main.pdf" "$main.log" "$GITHUB_WORKSPACE/p2-focused/"
+          python - "$main" "$GITHUB_SHA" "$GITHUB_WORKSPACE/p2-focused" <<'PY'
+          import hashlib, json, re, subprocess, sys
+          from pathlib import Path
+          main, sha, output = sys.argv[1:]
+          folder=Path(output); pdf=folder/(main+'.pdf')
+          log=(folder/(main+'.log')).read_text(errors='replace')
+          info=subprocess.check_output(['pdfinfo',str(pdf)],text=True)
+          pages=int(re.search(r'^Pages:\s*(\d+)',info,re.M).group(1))
+          txt=subprocess.check_output(['pdftotext','-layout',str(pdf),'-'],text=True)
+          check={
+            'status':'DRAFT_SCIENTIFIC_AUTHOR_APPROVAL_HOLD',
+            'source_commit':sha,'main_tex':main+'.tex',
+            'pdf_pages':pages,'pdf_sha256':hashlib.sha256(pdf.read_bytes()).hexdigest(),
+            'overfull_hbox_count':len(re.findall(r'Overfull \\hbox',log)),
+            'contains_author_placeholder':'AUTHOR IDENTITIES AND AFFILIATIONS TO BE VERIFIED' in txt,
+            'contains_origin_limitation':'ancestry remains unresolved' in txt,
+            'contains_digital_census':'1,225' in txt,
+            'contains_factorial':'0.582551' in txt,
+            'final_original_acquisition_identity_confirmed':False,
+            'submission_authorized':False,
+          }
+          (folder/'P2_BSPC_FOCUSED_HEAD_RECEIPT.json').write_text(json.dumps(check,indent=2)+'\n')
+          print(json.dumps(check,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: P2-BSPC-FOCUSED-AUTHOR-REVIEW
+          path: p2-focused/
+          retention-days: 90
