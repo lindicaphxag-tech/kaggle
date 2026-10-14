@@ -1,0 +1,60 @@
+\subsection{A second public EEG feature family: precision reliability}
+\label{sec:p4-alexmi-second}
+We tested the \emph{conditional final-feature} sign
+certificate on eight previously project-examined
+AlexMI people. Each contributed 40 balanced
+right-hand versus feet imagery trials and
+three binary64 tangent-space coordinates
+derived from C3 and C4.
+Eight preselected positive--negative pairs
+per person were assessed under the same four
+binary fixed-point grids, with fractional bit
+counts 18, 10, 6, and 4. This creates 64
+paired comparisons per precision; each finite
+binary64 final feature was converted to an
+exact rational value before rounding, and the
+entrywise error was rigorously checked against
+$2^{-(b+1)}$. The previously derived
+covariance-coordinate resolvent test then
+either certifies a strict sign on all
+$\lambda\in[0,1]$ for the declared error
+box or returns UNKNOWN.
+
+\begin{table}[ht]\centering\small
+\caption{Exact conditional whole-interval
+score-sign certification on 64 paired
+final-feature comparisons in AlexMI.
+The 256 pair--precision combinations
+are not independent EEG acquisitions,
+and UNKNOWN is safe refusal rather
+than decoding failure.}
+\label{tab:p4-alexmi-second}
+\begin{tabular}{rrrr}
+\toprule
+Fractional bits & POS & NEG & UNKNOWN\\
+\midrule
+18 & 48 & 15 & 1\\
+10 & 47 & 14 & 3\\
+6 & 23 & 2 & 39\\
+4 & 0 & 0 & 64\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The success receipt is
+\href{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38544936551}
+{run 38544936551}.
+The progression from 63/64 certified
+at 18 bits to 0/64 at 4 bits confirms
+nontrivial abstention under increasing
+allowed final-feature quantisation error
+on a second real-data feature family.
+The eight participants belong to a
+single named study previously examined
+by this project. The uncertainty model
+\emph{begins after} EEG preprocessing
+and tangent feature extraction; it
+does not certify errors of filtering,
+matrix decomposition, or raw EEG
+acquisition, and no cross-subject AUC
+gain is assessed.
