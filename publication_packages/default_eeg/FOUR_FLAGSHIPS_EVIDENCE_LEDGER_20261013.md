@@ -652,3 +652,65 @@ https://github.com/lindicaphxag-tech/kaggle/actions/runs/38548682677
   reproduction.
 - New source-replay code and paper paragraph on P3 branch.
   Draft P3 still needs genuinely new acquisition-level validation.
+
+
+## 2026-10-14 independent-scope gate corrections
+
+**P1**: strict source-person outer CV on AlexMI (real previously exposed
+source IDs 1--6 and target 7,8) revealed that the old forecast construction
+was not a mathematically strict leave-one-source-person-out predictor:
+other folds could have trained on h while h was nominally out-of-fold.
+A corrected full NESTED inner CV and tangent reference fit removes each
+outer source person from ALL inner models; successful
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38539884099.
+Six truly out-of-source-person paired AUC margins:
++.0925,+.1850,-.0400,+.0200,-.0500,+.1500; mean +.0595833.
+Earlier leaky-crossfit mean +.0541667 must be separately labelled.
+The two already-exposed AlexMI targets yielded +.0050 and +.1875
+(27-grid). Trivial always-positive direction correct both: no new
+source-only decision forecast benefit. Article subsection updated.
+**P1 scientific blocker remains** robust independently held acquisition,
+nontrivial action utility, and strong venue comparisons.
+
+**P2 external scientific/software follow-up**: upstream MOABB issue
+https://github.com/NeuroTechX/moabb/issues/1248 received maintainer
+bruAristimunha response 2026-10-14
+"We're gonna fix this! Thank you for the report."
+This is external maintainer acknowledgement/intention; NOT a merged
+fix, independently approved provenance conclusion, or peer-reviewed
+paper. Public whole-EDF byte content still proves 29/29 EEG channel
+identity for published 4/5; 47/49 partial EDF storage overlap and
+MAT ancestry unresolved.
+
+**P3: cross-run source-SHA failure refined.** Two source-only diagnostic
+CI runs
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38548578442 and
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38548578441
+each read source DreyerB IDs61--68 TWICE. Within each runner 8/8
+subject epoch SHA fingerprints remain strictly identical, but between
+runners 0/8 bytewise per-subject digests agree. BOTH independently
+rounded shape (covariance divided by trace to 1e-9) and log10-trace
+(to 1e-8) fingerprints match for 8/8 persons across runners.
+Maximum cross-run source-person mean covariance trace discrepancy
+1.4211e-14; maximum logdet mean discrepancy 1.7764e-15.
+This is consistent with precision-level numerical variations,
+NOT an exact upper bound on entries or proof of root cause.
+A truly byte-identical ORIGINAL source model was not reproduced;
+the six-person follow-up remains old choices, newly refitted source.
+A new exact-vs-quantized independent-run audit and P3 LaTeX paragraph
+are implemented; CI rerun after fixing a GitHub Actions credential
+literal:
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38552831272
+STATUS WAS QUEUED on ledger update; DO NOT mark SUCCESS without
+a completed execution receipt.
+
+**P4**: previously completed rational certificate remains conditional
+on exact or bounded final-feature inputs; 12-pair previously exposed
+real EEG demonstrates only stored tangent value rounding,
+not preprocessing-level or IEEE754 source error certification.
+No new prospective verification or journal acceptance implied.
+
+The four paper PRs remain **DRAFT** and not editorially submitted.
+This ledger separates achievements, executed evidence and
+scientific/ethical/submission hard gates without claiming all have
+been fulfilled.
