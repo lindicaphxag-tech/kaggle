@@ -624,3 +624,31 @@ and are ready for immediate submission. In particular:
   confirmatory validation, patient identity verification,
   full float pipeline error proof, submission and acceptance
   remain UNFINISHED, as do any external upstream PR merges.
+
+
+## 2026-10-14 late evidence gate: DreyerB cross-run exact-source recovery
+
+Three independent clean GitHub Actions runners, each twice retrieving
+ONLY DreyerB source IDs 61--68, completed:
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38548682677
+
+- All three replicas' **exact source aggregate SHA-256** were equal
+  to the first originally frozen successful source recording:
+  \`7146797ee8d6caf71c57ee141604102b2d61217456cbfe3e00820b83e172b2a7\`.
+- All six within-run source re-reads matched. All 8 source people had
+  exact same ordered byte-level covariance-epoch digests and
+  label-aware unordered multiset digests across all 3 clean runners,
+  plus the diagnostic 9-decimal relative covariance and
+  8-decimal log-trace fingerprint equality.
+- The prior anomalous independent run's SHA
+  \`9f650460378e695189c3fa145bf0a29fe010b24cd92ba4aa1196e7439ada7f65\`
+  must NOT be erased. No evidence yet establishes whether it reflects
+  raw source file retrieval changes, processing state, a feature
+  array ordering change, or another transient numeric effect.
+- No target ID 69--76 was accessed during this diagnostic.
+  Original trained classifier parameter bytes were not archived,
+  so recovering the original source input DOES NOT retroactively make
+  the six-person re-fitted sensitivity an exact first-run classifier
+  reproduction.
+- New source-replay code and paper paragraph on P3 branch.
+  Draft P3 still needs genuinely new acquisition-level validation.
