@@ -7,6 +7,8 @@ on:
       - "research/defaultreg_bspc_v13/main_p2_BSPC_FOCUSED_AUTHOR_REVIEW_20261014.tex"
       - "research/defaultreg_bspc_v13/P2_BSPC_SUPPLEMENTARY_EVIDENCE_AUTHOR_REVIEW_20261014.tex"
       - "research/defaultreg_bspc_v13/P2_BSPC_native_matrix_and_attribution_20261014.tex"
+      - "research/defaultreg_bspc_v13/src/p2_bspc_submission_numerical_gate_20261014.py"
+      - "publication_packages/default_eeg/P2_BSPC_HIGHLIGHTS_AUTHOR_REVIEW.txt"
   workflow_dispatch:
 permissions: {contents: read}
 jobs:
@@ -19,6 +21,9 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended lmodern poppler-utils
+      - name: Verify frozen arithmetic and nonidentifying evidence
+        run: |
+          python research/defaultreg_bspc_v13/src/p2_bspc_submission_numerical_gate_20261014.py
       - name: Build the focused evidence-locked manuscript
         working-directory: research/defaultreg_bspc_v13
         run: |
@@ -39,7 +44,7 @@ jobs:
           fi
           pdfinfo "$main.pdf" | grep -E 'Pages:|Page size:'
           mkdir -p "$GITHUB_WORKSPACE/p2-focused"
-          cp "$main.pdf" "$main.log" "$supp.pdf" "$supp.log" "$GITHUB_WORKSPACE/p2-focused/"
+          cp "$main.pdf" "$main.log" "$supp.pdf" "$supp.log" "P2_BSPC_ARITHMETIC_RECEIPT_20261014.json" "$GITHUB_WORKSPACE/p2-focused/"
           python - "$main" "$GITHUB_SHA" "$GITHUB_WORKSPACE/p2-focused" <<'PY'
           import hashlib, json, re, subprocess, sys
           from pathlib import Path
