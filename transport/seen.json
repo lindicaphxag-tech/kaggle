@@ -1995,13 +1995,17 @@
     },
     {
       "created_at": "2026-10-14T08:30:18Z",
+      "expiry_recorded_at": "2026-10-14T18:51:45Z",
+      "expiry_sha256": "c6769deb24b5145be641dbdb570dc743aa29c869d3f995babe2a2a00dc728bef",
+      "expiry_source": "expirations/eProsima__Fast-DDS__6574.json",
       "first_frozen_at": "2026-10-14T11:44:44Z",
       "id": "eProsima/Fast-DDS#6574",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 6574,
       "prediction_deadline_at": "2026-10-14T17:44:44Z",
       "repository": "eProsima/Fast-DDS",
       "source": "inbox/FIRST_SEEN_20261014T114444Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "91f44d3396707e6ddd4275dab2b266ca0b94ad9a6beb1769eda5066f51086bf0"
     },
     {
@@ -2036,6 +2040,39 @@
       "source": "inbox/FIRST_SEEN_20261014T170750Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "e560a72707cf96d1b10e47dd2d498e26dc263ef5cfda096aaf4dba6e5818c6de"
+    },
+    {
+      "created_at": "2026-10-14T18:30:04Z",
+      "first_frozen_at": "2026-10-14T18:53:21Z",
+      "id": "NVlabs/alpasim#207",
+      "issue_number": 207,
+      "prediction_deadline_at": "2026-10-15T00:53:21Z",
+      "repository": "NVlabs/alpasim",
+      "source": "inbox/FIRST_SEEN_20261014T185321Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "e423e06b3b3332abf2f5600ae166992a16cb96c25637a633bd79f175e74e6143"
+    },
+    {
+      "created_at": "2026-10-14T18:31:11Z",
+      "first_frozen_at": "2026-10-14T18:53:21Z",
+      "id": "NVlabs/alpasim#208",
+      "issue_number": 208,
+      "prediction_deadline_at": "2026-10-15T00:53:21Z",
+      "repository": "NVlabs/alpasim",
+      "source": "inbox/FIRST_SEEN_20261014T185321Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "d96fb72d30ce9820380324c542c4478522cd2cdf7b17f2d5bb37feff8c1b0020"
+    },
+    {
+      "created_at": "2026-10-14T17:37:30Z",
+      "first_frozen_at": "2026-10-14T18:53:21Z",
+      "id": "huggingface/lerobot#4973",
+      "issue_number": 4973,
+      "prediction_deadline_at": "2026-10-15T00:53:21Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261014T185321Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "162cd10171c0031b5848c118acd691d95c91a44ba08128aca69792da21e200ca"
     }
   ]
 }

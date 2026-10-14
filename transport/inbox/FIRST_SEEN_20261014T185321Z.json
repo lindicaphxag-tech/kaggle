@@ -1,0 +1,59 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 3,
+  "new_candidates": [
+    {
+      "author_login": "sikai-sky-chen",
+      "body": "Hi, thanks for AlpaSim!\n\nWe run closed-loop evals on two machines and noticed that the same commit (affc2eab) gave us different environments. On the second machine, set up nine days after the first, `setup_local_env.sh` resolved about 25 packages to newer versions (for example sqlalchemy 2.0.54 -> 2.1.1, filelock 3.32.7 -> 4.0.3), with no error or warning.\n\nAs far as we can tell, three things add up:\n\n1. `uv.lock` is in `.gitignore` (lines 36-38), and a few git dependencies point at a branch rather than a commit (`src/driver/pyproject.toml` lines 51-54: alpamayo1_5, alpamayo_r1, vam, alpamayo2_super). So every `uv sync` resolves from scratch. We understand `exclude-newer = \"3 days\"` is there on purpose (ONBOARDING.md lines 109-112), but since the window moves with the date it doesn't pin anything. ONBOARDING.md line 58 also mentions \"a single lockfile (uv.lock)\", which might be worth updating.\n2. Even with a lock file, the Docker build wouldn't see it: `.dockerignore` is an allowlist without `!uv.lock`, so `uv sync` runs again inside the build (Dockerfile lines 53 and 60).\n3. The Dockerfile pulls `uv:latest` (line 17).\n\nCopying the first machine's uv.lock over and running `uv sync --frozen` made the two local environments match exactly (293 of 293 packages). For the driver image we just copied the built image over (docker save / docker load). We didn't try rebuilding it.\n\nWe haven't checked whether these version differences change any results. But in principle two people on the same commit could be loading the same checkpoint with different library versions (transformers, for example) without knowing it.\n\nAny one of these would help:\n- commit uv.lock (or attach one to each release), add `!uv.lock` to .dockerignore, and use `uv sync --frozen` in the Dockerfile\n- pin uv to a version (0.9.17 or later, which ONBOARDING needs for the relative exclude-newer) and pin the git dependencies to a rev\n- publish the built base image with each release\n\nOur setup: Docker Compose on a single machine, NuRec renderer, Alpamayo 1.5, base image alpasim-base:0.134.0. Machine 1: 2x RTX PRO 6000 Blackwell Max-Q, Ubuntu 22.04.5, driver 570.211.01, CUDA 12.8, Docker 29.7.2. Machine 2: RTX A6000.\n\nHappy to test a fix or send a PR.",
+      "created_at": "2026-10-14T18:30:04Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/207",
+      "id": "NVlabs/alpasim#207",
+      "issue_number": 207,
+      "labels": [
+        "bug"
+      ],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "e423e06b3b3332abf2f5600ae166992a16cb96c25637a633bd79f175e74e6143",
+      "title": "[BUG]Same commit, different package versions on two machines (uv.lock not committed, uv:latest in the Dockerfile)"
+    },
+    {
+      "author_login": "sikai-sky-chen",
+      "body": "Hi, thanks for AlpaSim!\n\nWe noticed some of our rollouts ran shorter than the n_sim_steps we asked for. In `src/runtime/alpasim_runtime/unbound_rollout.py` (affc2eab, lines 110-135) the step count is capped by what the recording can cover. Unless not a single step fits (lines 119-125), it logs \"Clipping n_sim_steps from X to Y\" at INFO level and carries on with the shorter rollout.\n\nThat makes sense, but it's easy to miss:\n\n1. `aggregate/results-summary.json` has neither the requested nor the actual number of steps, and `duration_frac_20s` is normalised to a fixed 20 s (`src/eval/src/eval/aggregation/processing.py` lines 55-65), so it can't show the clip either.\n2. The ASL header does record the actual count (`session_metadata.n_sim_steps`, lines 375-386), but under the same name as the config field, with nothing next to it for the requested count. We only caught it by counting poses in the ASL.\n\nTo reproduce: ask for more simulated time than the recording covers (for example many steps with a long control_timestep_us). The log shows the INFO line and the rollout ends normally.\n\nIt matters for anything that depends on duration (distance, progress, collision or off-road rate per rollout), and when comparing runs or scenes.\n\nAny of these would help:\n- log the clip as a WARNING\n- add n_sim_steps_requested next to n_sim_steps in the rollout metadata (or rename the existing one to n_sim_steps_actual), and put both in results-summary.json\n- an option to fail instead of clipping\n\nOur setup: Docker Compose on a single machine, NuRec renderer. We saw it with both VaVAM and Alpamayo 1.5, so it doesn't depend on the policy. 2x RTX PRO 6000 Blackwell Max-Q, Ubuntu 22.04.5, driver 570.211.01, CUDA 12.8, Docker 29.7.2, base image alpasim-base:0.134.0.\n\nHappy to test a fix or send a PR.",
+      "created_at": "2026-10-14T18:31:11Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/208",
+      "id": "NVlabs/alpasim#208",
+      "issue_number": 208,
+      "labels": [
+        "bug"
+      ],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "d96fb72d30ce9820380324c542c4478522cd2cdf7b17f2d5bb37feff8c1b0020",
+      "title": "[BUG]n_sim_steps gets clipped to the recording length, but the results summary doesn't show it"
+    },
+    {
+      "author_login": "David1726",
+      "body": "### Ticket Type\n\nBug report.\n\n### Environment & System Info\n\nWindows 11; Conda Python 3.12.15; Torch 2.11.0+cu128 / CUDA 12.8; NumPy 2.2.6; huggingface-hub 1.32.0; RTX 4070 Laptop GPU / NVIDIA driver 581.29; LeRobot 0.6.2 source at main commit 53feaef37b67e8f4c23b6953e880ff535e39d6fe (upstream rechecked 2026-10-15). Base/test dependencies exported from the lock, with official Windows CUDA Torch/Torchvision wheels; not all extras. Reproduced on both CPU and CUDA, with no training or robot run.\n\n### Description\n\nNormalizerProcessorStep adapts statistics to the input dtype. Its default epsilon, 1e-8, becomes zero in FP16. A constant coordinate equal to its mean or lower bound therefore produces NaN instead of the finite result already produced with float32 and bfloat16.\n\nThis was found while exercising the public processor API with synthetic robot-state statistics, not through a completed policy training or physical robot experiment. Constant state/action coordinates can arise when a demonstration dimension does not change.\n\n### Context & Reproduction\n\nIn a configured source environment, run:\n\n```python\n\"\"\"Compare normalization of a constant robot-state coordinate across dtypes.\"\"\"\nimport json\n\nimport torch\n\nfrom lerobot.configs.types import FeatureType, NormalizationMode, PolicyFeature\nfrom lerobot.processor import NormalizerProcessorStep, TransitionKey\n\nfor dtype in (torch.float32, torch.float16, torch.bfloat16):\n    for mode in (\n        NormalizationMode.MEAN_STD,\n        NormalizationMode.MIN_MAX,\n        NormalizationMode.QUANTILES,\n        NormalizationMode.QUANTILE10,\n    ):\n        normalizer = NormalizerProcessorStep(\n            features={\"observation.state\": PolicyFeature(type=FeatureType.STATE, shape=(2,))},\n            norm_map={FeatureType.STATE: mode},\n            stats={\n                \"observation.state\": {\n                    \"mean\": [1.0, 0.0], \"std\": [0.0, 1.0],\n                    \"min\": [1.0, 0.0], \"max\": [1.0, 1.0],\n                    \"q01\": [1.0, 0.0], \"q99\": [1.0, 1.0],\n                    \"q10\": [1.0, 0.0], \"q90\": [1.0, 1.0],\n                }\n            },\n        )\n        output = normalizer({TransitionKey.OBSERVATION: {\n            \"observation.state\": torch.tensor([1.0, 0.5], dtype=dtype)\n        }})[TransitionKey.OBSERVATION][\"observation.state\"]\n        print(json.dumps({\"dtype\": str(dtype), \"mode\": mode.value,\n                          \"finite\": bool(torch.isfinite(output).all()),\n                          \"output\": output.tolist()}))\n```\n\n### Relevant logs\n\nFor FP16, MEAN_STD returns [NaN, 0.5]; MIN_MAX, QUANTILES and QUANTILE10 return [NaN, 0.0]. The same inputs in float32 and bfloat16 are finite: [0.0, 0.5] or [-1.0, 0.0], respectively.\n\nNew regression cases exercise DeviceProcessorStep followed by normalization for states and actions. On unchanged production code, 8 FP16/default-eps cases fail and the other 40 combinations pass. The existing normalizer test file initially passed 64 tests with 1 hardware skip, so these conditions were not covered.\n\n### Checklist\n\n- [x] Searched existing issues and PRs; related items are identified below.\n- [x] Latest main SHA rechecked and tested on 2026-10-15; refresh again if publication is delayed.\n- [x] Reproduced on CPU (CUDA explicitly disabled) and CUDA in the same Conda environment. Linux/macOS have not been tested.\n\n### Additional Info / Proposed Fix\n\nRelated #3280 mentions zero-variance data, but does not isolate the FP16/default-eps failure. #4704 fixes variance estimation; this report concerns the processor even when supplied correct constant-feature statistics. #1880 introduced dtype adaptation and described half-precision support. I did not find an exact competing underflow fix in the searches performed; please redirect this report if it belongs in an existing thread.\n\nA small local patch uses max(configured epsilon, torch.finfo(input dtype).tiny) for floating-point transforms. This preserves the output dtype and configured epsilon while avoiding zero denominators. In FP16 the floor is about 6.1035e-5, so extremely small custom epsilons and MEAN_STD scaling near zero also change; that trade-off needs maintainer agreement. A representable larger epsilon is a workaround.\n\nI would like to contribute the fix if this approach is in scope. New regressions fail 8 / pass 40 on the original implementation on both CPU and CUDA. The patched normalizer/device files pass: CPU 141 passed / 18 skipped; CUDA 152 passed / 7 skipped. A broader processor run has 419 passed / 87 skipped / 1 failure in a Triton-dependent image compile test that also fails on pristine code. Linux, training and full-suite validation remain untested.\n\nCodex provided substantial assistance with investigation, patching, regression tests and this draft. Results refer to actual agent-executed local tests, not a claimed personal human or robot run.\n",
+      "created_at": "2026-10-14T17:37:30Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/4973",
+      "id": "huggingface/lerobot#4973",
+      "issue_number": 4973,
+      "labels": [
+        "bug",
+        "policies",
+        "tests",
+        "dependencies",
+        "processor",
+        "training"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "162cd10171c0031b5848c118acd691d95c91a44ba08128aca69792da21e200ca",
+      "title": "FP16 constant state/action normalization produces NaN with default epsilon"
+    }
+  ],
+  "post_activation_issue_identities_observed": 139,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-14T18:53:21Z",
+  "schema_version": 1
+}
