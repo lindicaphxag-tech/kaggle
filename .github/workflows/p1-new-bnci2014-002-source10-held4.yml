@@ -1,0 +1,56 @@
+name: P1 new BNCI2014-002 10-source 4-held matched 27-grid correct-NLL real EEG
+on:
+  push:
+    branches: [publication/default-eeg-p1-estimand-20261013]
+    paths:
+      - '.github/workflows/p1-new-bnci2014-002-source10-held4.yml'
+      - 'research/defaultreg_bspc_v13/src/p1_bnci2014_002_source10_reserved4_27_grid.py'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  ten_source_only_then_four_new_held:
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    env:
+      MNE_DATA: /tmp/p1-bnci2014-002-real-27-grid
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install independent public MOABB acquisition reader
+        run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Lock all ten source people to original 27-grid BEFORE requesting IDs11-14
+        run: |
+          set -euo pipefail
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_bspc_v13/src/p1_bnci2014_002_source10_reserved4_27_grid.py --out /tmp/p1-bnci002-results
+      - name: Reject wrong protocol or artificial independent acquisition inflation
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/p1-bnci002-results')
+          a=json.loads((p/'P1_BNCI002_FROZEN_SOURCE_TEN_BEFORE_TARGETS.json').read_text())
+          b=json.loads((p/'P1_BNCI002_NEW_FOUR_HELD_REAL_EEG_RESULTS.json').read_text())
+          assert a['source_ids']==list(range(1,11))
+          assert a['held_target_ids_UNREAD_at_this_stage']==[11,12,13,14]
+          assert len(a['original_27_grid'])==27
+          assert a['source_criteria_use_ONLY_source_groups']
+          assert b['held_ids']==[11,12,13,14] and len(b['results'])==4
+          assert b['original_27_grid_matched']
+          assert b['four_people_one_named_acquisition']
+          assert b['no_person_specific_forecast_value_established']
+          assert set(b['means'])=={'source_macro','proper_predictive_NLL','fixed_lambda_0p1','tangent_logistic_C1'}
+          print('P1_NEW_NAMED_BNCI002_REAL_SOURCE_LOCKED_FOUR_PERSON_TEST_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p1-bnci002-real-held-four-original-grid-and-trivial-control
+          path: /tmp/p1-bnci002-results/*.json
+          if-no-files-found: warn
+          retention-days: 90
