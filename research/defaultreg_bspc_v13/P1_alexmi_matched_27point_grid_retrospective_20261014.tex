@@ -1,0 +1,41 @@
+\paragraph{Protocol-matched 27-point source-only AlexMI sensitivity.}
+The AlexMI study in Table~\ref{tab:p1-alexmi}
+used a shorter eight-point shrinkage grid than
+the main experiment. We therefore replayed the
+\emph{same already exposed} source IDs 1--6 and
+held IDs 7--8 with the original 27-point grid
+\(\{0,.0005,.001,.002,.003,.005,.0075,.01,.015,
+.02,.03,.05,.075,.10,.15,.20,.30,.40,.50,
+.60,.70,.80,.90,.95,.98,.99,1\}\), without
+changing features, the independent LDA implementation,
+the fitted-mean predictive Gaussian score or source
+participant folds. The source-only criteria selected
+\(\lambda_{\rm macro}=1\) and
+\(\lambda_{\rm proper\ NLL}=.20\),
+with a source-fold forecast advantage of
+\( +.05417\) AUC. The two \emph{previously
+inspected} held people yielded:
+\[
+\begin{array}{c|rrr}
+ \mathrm{ID}&\mathrm{macro\ AUC}&
+ \mathrm{proper\ NLL\ AUC}&\Delta \mathrm{AUC}\\\hline
+ 7&1.0000&.9950&+.0050\\
+ 8&.9950&.8075&+.1875
+\end{array}
+\]
+Their descriptive mean margin is \(+.09625\) AUC,
+versus \(+.07750\) under the eight-point grid.
+The originally frozen source decision was committed
+\emph{before the re-read within this workflow},
+but the outcomes of both targets had been examined
+by the project in the eight-grid study, so this
+is a \emph{retrospective} common-grid sensitivity
+check, not new prospective or cross-acquisition
+evidence. The original and full-grid executable
+source and scalar outcome receipt are archived in
+\href{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38536408103}
+{GitHub Actions run 38536408103}.
+Macro predicted the positive advantage for both;
+a trivial always-positive forecast predicted it too.
+Neither predictive gain over that null nor
+a novel held-person decision policy is established.
