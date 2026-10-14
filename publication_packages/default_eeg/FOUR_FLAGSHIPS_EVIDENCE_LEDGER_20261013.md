@@ -523,3 +523,66 @@ and are ready for immediate submission. In particular:
   PDF SHA reverified against the contained JSON receipt and staged
   together in a reproducible author-review ZIP. Author sign-off,
   external preregistration and journal acceptance remain OPEN.
+
+
+## 2026-10-14 independent real-data receipts and MOABB upstream draft
+
+- P1: SUCCESS full nested source-person training and selection exclusion
+  https://github.com/lindicaphxag-tech/kaggle/actions/runs/38539884099.
+  Six AlexMI sources, inner grouped CV excludes outer source person
+  from ALL inner training and validation. Outer-person paired AUC
+  differences +.0925,+.185,-.04,+.02,-.05,+.15, mean +.05958333.
+  Old source forecast +.05416667 had improper indirect training re-entry;
+  it MUST NOT be represented as strict LOPO. Previously exposed target
+  IDs7/8 +.005 and +.1875; trivial always-positive remains 2/2.
+  Corrected mathematical/validation scope integrated in P1 manuscript.
+- P3: SUCCESS two new source-only reads, NO held people:
+  https://github.com/lindicaphxag-tech/kaggle/actions/runs/38542627607.
+  Dreyer2023B source IDs61..68 have identical individual ordered hashes,
+  sorted labelled-epoch hashes, features and whole-source SHA in two
+  same-environment reads. The new SHA 9f650460...9ada7f65 differs from
+  original 7146797e...3e172b2a7. Original source-model bit identity is
+  UNPROVEN; six-person target study is strictly prior-choice refit.
+  P3 latest TeX integrated receipt. Do not claim old exact source replay.
+- P2 external engineering: Official MOABB Issue #1248
+  https://github.com/NeuroTechX/moabb/issues/1248 has maintainer reply
+  "We're gonna fix this! Thank you for the report." This is an external
+  commitment to look at a data-loader issue, not independent patient
+  identity proof, not academic acceptance. Documentation-only DRAFT
+  upstream PR https://github.com/NeuroTechX/moabb/pull/1249 was opened;
+  no merge yet.
+- P2 full-release, erasure-tolerant real digital-content identity:
+  All-50 full-byte EDF SHA256 and 1225-pair real census SUCCESS
+  https://github.com/lindicaphxag-tech/kaggle/actions/runs/38388066957.
+  Separate independent six-EDF byte rehash and nonconstant-native-record
+  topology SUCCESS
+  https://github.com/lindicaphxag-tech/kaggle/actions/runs/38543795987.
+  All 9280 matching digital EEG channel blocks in 4/5 are nonconstant.
+  47/49 has 6957 exact nonconstant blocks, and 245 of 320 EDF storage
+  records have 28 of 29 matching named EEG channels; the longest
+  uninterrupted >=28-channel span covers zero-based records 128..306,
+  length 179. P4 channel does NOT have any exact matching native
+  time-varying block. 11/15 exact common P3 digital blocks 171,
+  never >1 EEG channel per native record.
+  Two immutable independent result artifacts were independently
+  reconciled SUCCESS in
+  https://github.com/lindicaphxag-tech/kaggle/actions/runs/38544354555.
+  On 1225 pairs: full EDF checksum linkage 0; full 29-channel
+  time-varying EEG linkage 1 (4/5); posthoc >=28 of29 nonconstant
+  EEG channels for >=100 consecutive native storage records linkage 2
+  (4/5 and 47/49); other 1223 pairs have no link under that rule.
+  The graph has 48 published DIGITAL-PRODUCT content components,
+  NOT 48 unique patients, recordings or original clinical acquisitions.
+  Thresholds were selected after the dataset was examined;
+  do not report prospective classifier specificity/FPR/generalization.
+  Formal definition, source-code and table integrated into P2 manuscript.
+- P4 distinct eight-person AlexMI (one already-project-examined public
+  data collection) conditional final binary64 feature-quantisation
+  numerical audit requested in
+  https://github.com/lindicaphxag-tech/kaggle/actions/runs/38544936551.
+  Read actual completed artifact before inserting ANY numerical result.
+  Input error bounds concern final tangent-feature quantisation only,
+  NOT end-to-end EEG preprocessing or acquisition/machine-error proof.
+- All four author manuscript PRs remain DRAFT. This ledger describes
+  proven results and research gaps; it does not constitute accepted
+  peer review, journal submission or clinical identification.
