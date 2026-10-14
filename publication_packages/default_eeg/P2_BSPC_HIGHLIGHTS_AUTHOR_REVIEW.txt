@@ -1,5 +1,5 @@
-• Released EEG participant IDs can share identical processed digital recordings.
-• Two more cross-ID pairs have near-perfect aligned waveform similarity.
-• An independent raw EDF digital reader confirms 32/33 equal ID4/5 channels.
-• Exact-content and high-similarity grouping are not equivalent.
-• Matched classifier refits localise most AUC changes to the aliased group.
+• 50 released EEG IDs contain 49 exact processed recording-content groups.
+• An exhaustive EDF census compared all 1,225 cross-identifier pairs.
+• Two other released ID pairs show partial aligned digital EEG overlap.
+• Most matched refit AUC change is concentrated in the aliased content group.
+• Reporting reweighting and model refitting are distinct retrospective contrasts.
