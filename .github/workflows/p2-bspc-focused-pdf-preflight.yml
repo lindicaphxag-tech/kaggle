@@ -9,6 +9,7 @@ on:
       - "research/defaultreg_bspc_v13/main_p2_BSPC_ELSEVIER_AUTHOR_REVIEW_20261014.tex"
       - "research/defaultreg_bspc_v13/P2_BSPC_public_digital_waveform_figure_20261015.tex"
       - "research/defaultreg_bspc_v13/P2_nemar_whole_EDF_manifest_scope_20261013.tex"
+      - "research/defaultreg_bspc_v13/P2_BSPC_concise_exhaustive_EDF_results_20261015.tex"
       - "research/defaultreg_bspc_v13/P2_BSPC_native_matrix_and_attribution_20261014.tex"
       - "research/defaultreg_bspc_v13/src/p2_bspc_submission_numerical_gate_20261014.py"
       - "publication_packages/default_eeg/P2_BSPC_HIGHLIGHTS_AUTHOR_REVIEW.txt"
@@ -109,6 +110,27 @@ jobs:
           }
           (folder/'P2_BSPC_FOCUSED_HEAD_RECEIPT.json').write_text(json.dumps(check,indent=2)+'\n')
           print(json.dumps(check,indent=2))
+          PY
+      - name: Check all rendered manuscript and SI pages remain within media bounds
+        run: |
+          python - <<'PY'
+          import fitz,json
+          from pathlib import Path
+          base=Path('research/defaultreg_bspc_v13')
+          names=['main_p2_BSPC_ELSEVIER_AUTHOR_REVIEW_20261014.pdf','P2_BSPC_SUPPLEMENTARY_EVIDENCE_AUTHOR_REVIEW_20261014.pdf']
+          result={}
+          for name in names:
+              d=fitz.open(base/name);bad=[]
+              for i,page in enumerate(d):
+                  r=page.rect
+                  for block in page.get_text('blocks'):
+                      if len(block)>4 and isinstance(block[4],str):
+                          x0,y0,x1,y1=block[:4]
+                          if x0<-0.75 or y0<-0.75 or x1>r.width+0.75 or y1>r.height+0.75:
+                              bad.append({'page':i+1,'x':round(x1,1),'width':round(r.width,1)})
+              result[name]={'pages':len(d),'out_of_media_text_blocks':bad}
+              if bad: raise RuntimeError(str(result[name]))
+          print('PASS_PDF_PAGE_BOUNDS',json.dumps(result))
           PY
       - name: Package exact-head, editor-flat TeX source and evidence receipts
         run: |
