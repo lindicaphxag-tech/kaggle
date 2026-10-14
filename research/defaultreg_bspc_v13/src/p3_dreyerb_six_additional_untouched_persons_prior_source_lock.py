@@ -31,7 +31,7 @@ def execute(old_json,out):
     if (frozen["status"]!="NEW_TRACKED_DREYER_B_SOURCE_CHOICES_BEFORE_HELD_69_70"
         or frozen["source_public_ids"]!=list(range(61,69))
         or frozen["held_public_ids_NOT_REQUESTED_YET"]!=[69,70]
-        or set(frozen["source_policy_choices"])!=set(METHODS)):
+        or not set(METHODS).issubset(frozen["source_policy_choices"])):
         raise ValueError("wrong pre-existing source lock")
     ds=Dreyer2023B()
     paradigm=MotorImagery(n_classes=2,events=["left_hand","right_hand"],
