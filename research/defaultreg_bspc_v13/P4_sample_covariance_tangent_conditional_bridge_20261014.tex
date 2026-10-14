@@ -1,0 +1,42 @@
+% Restricted analytic sensitivity bridge, not an EEG machine-error certificate.
+\subsection{Conditional sample-to-tangent perturbation bridge}
+The final-feature bounds above leave unresolved how sample-level uncertainty
+propagates through the covariance and tangent operators. We record a
+\emph{conditional} analytic bridge using established matrix perturbation
+inequalities; it is not a new numerical matrix-logarithm algorithm.
+For a stored, exactly represented $n\times p$ trial matrix $X$, define
+$P=I_n-\mathbf{1}\mathbf{1}^{\top}/n$ and
+$\widehat C=X^\top P X/(n-1)+rI$ for a \emph{fixed} $r\geq 0$.
+Assume an externally justified entrywise sample error
+$|X^\star_{ij}-X_{ij}|\leq\eta$ and set
+\[
+ e_X=\sqrt{np}\,\eta,\qquad
+ e_C=\frac{2\|PX\|_F e_X+e_X^2}{n-1}.
+\]
+Since $P$ is an orthogonal projector, expansion of the covariance product
+ensures $\|C^\star-\widehat C\|_F\leq e_C$.
+Let $G$ be an \emph{unchanged, exactly specified} SPD tangent
+reference and define the rational conservative quantities
+\[
+ a=\frac{1}{\|\widehat C^{-1}\|_\infty\|G\|_\infty},
+ \qquad b=\|G^{-1}\|_\infty e_C.
+\]
+If $\widehat C$ and $G$ are SPD and $a>b$, the perturbed whitened
+covariance remains SPD and the resolvent integral for the exact
+matrix logarithm yields
+\[
+ \big\|\mathrm{vec}_{s}\{\log(G^{-1/2}C^\star G^{-1/2})
+ -\log(G^{-1/2}\widehat C G^{-1/2})\}\big\|_2
+ \leq \frac{b}{a-b}.
+\]
+Here $\mathrm{vec}_{s}$ multiplies off-diagonal elements by $\sqrt{2}$,
+so its Euclidean norm equals the Frobenius norm of a symmetric matrix.
+A nonpositive $a-b$ leads to \textsc{unknown}, never a claimed safe
+tangent map. The proof bounds the \emph{exact mathematical operator};
+the rational implementation uses outward rational square-root bounds
+and rejects unbounded binary floating inputs. It neither establishes
+an error bound on the filtering process nor includes a changing tangent
+reference, data-dependent covariance shrinkage, floating eigensolvers,
+or finite-precision evaluation of $\log$. The source and regression
+cases are in \texttt{src/p4\_sample\_covariance\_tangent\_conditional\_bridge.py}.
+No decoding-performance or new method superiority is implied.
