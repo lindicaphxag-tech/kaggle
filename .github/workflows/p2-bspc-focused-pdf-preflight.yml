@@ -8,6 +8,7 @@ on:
       - "research/defaultreg_bspc_v13/P2_BSPC_SUPPLEMENTARY_EVIDENCE_AUTHOR_REVIEW_20261014.tex"
       - "research/defaultreg_bspc_v13/main_p2_BSPC_ELSEVIER_AUTHOR_REVIEW_20261014.tex"
       - "research/defaultreg_bspc_v13/P2_BSPC_public_digital_waveform_figure_20261015.tex"
+      - "research/defaultreg_bspc_v13/P2_nemar_whole_EDF_manifest_scope_20261013.tex"
       - "research/defaultreg_bspc_v13/P2_BSPC_native_matrix_and_attribution_20261014.tex"
       - "research/defaultreg_bspc_v13/src/p2_bspc_submission_numerical_gate_20261014.py"
       - "publication_packages/default_eeg/P2_BSPC_HIGHLIGHTS_AUTHOR_REVIEW.txt"
