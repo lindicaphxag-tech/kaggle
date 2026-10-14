@@ -6,6 +6,7 @@ on:
       - ".github/workflows/p2-bspc-focused-pdf-preflight.yml"
       - "research/defaultreg_bspc_v13/main_p2_BSPC_FOCUSED_AUTHOR_REVIEW_20261014.tex"
       - "research/defaultreg_bspc_v13/P2_BSPC_SUPPLEMENTARY_EVIDENCE_AUTHOR_REVIEW_20261014.tex"
+      - "research/defaultreg_bspc_v13/main_p2_BSPC_ELSEVIER_AUTHOR_REVIEW_20261014.tex"
       - "research/defaultreg_bspc_v13/P2_BSPC_native_matrix_and_attribution_20261014.tex"
       - "research/defaultreg_bspc_v13/src/p2_bspc_submission_numerical_gate_20261014.py"
       - "publication_packages/default_eeg/P2_BSPC_HIGHLIGHTS_AUTHOR_REVIEW.txt"
@@ -31,6 +32,9 @@ jobs:
           main=main_p2_BSPC_FOCUSED_AUTHOR_REVIEW_20261014
           latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error "$main.tex"
           test -s "$main.pdf"
+          elsevier=main_p2_BSPC_ELSEVIER_AUTHOR_REVIEW_20261014
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error "$elsevier.tex"
+          test -s "$elsevier.pdf"
           supp=P2_BSPC_SUPPLEMENTARY_EVIDENCE_AUTHOR_REVIEW_20261014
           latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error "$supp.tex"
           test -s "$supp.pdf"
@@ -44,7 +48,7 @@ jobs:
           fi
           pdfinfo "$main.pdf" | grep -E 'Pages:|Page size:'
           mkdir -p "$GITHUB_WORKSPACE/p2-focused"
-          cp "$main.pdf" "$main.log" "$supp.pdf" "$supp.log" "P2_BSPC_ARITHMETIC_RECEIPT_20261014.json" "$GITHUB_WORKSPACE/p2-focused/"
+          cp "$main.pdf" "$main.log" "$elsevier.pdf" "$elsevier.log" "$supp.pdf" "$supp.log" "P2_BSPC_ARITHMETIC_RECEIPT_20261014.json" "$GITHUB_WORKSPACE/p2-focused/"
           python - "$main" "$GITHUB_SHA" "$GITHUB_WORKSPACE/p2-focused" <<'PY'
           import hashlib, json, re, subprocess, sys
           from pathlib import Path
