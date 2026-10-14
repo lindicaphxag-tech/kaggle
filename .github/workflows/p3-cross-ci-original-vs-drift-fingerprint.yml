@@ -1,0 +1,51 @@
+name: P3 cross-run DreyerB exact vs quantized source-fingerprint drift
+on:
+  push:
+    branches: [publication/default-eeg-p3-transfer-negative-20261013]
+    paths:
+      - '.github/workflows/p3-cross-ci-original-vs-drift-fingerprint.yml'
+      - 'research/defaultreg_bspc_v13/src/p3_cross_run_source_quantized_vs_exact_certificate.py'
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+jobs:
+  independent_ci_source_only_signatures:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: p3-dreyerb-original-vs-new-source-by-person-digest-forensics
+          run-id: 38548578442
+          github-token: ${{ github.token }}
+          path: /tmp/p3original
+      - uses: actions/download-artifact@v4
+        with:
+          name: p3-dreyerb-no-target-two-source-reloads-drift-audit
+          run-id: 38548578441
+          github-token: __TOKEN__
+          path: /tmp/p3alternate
+      - name: Compare independent-run source-person signatures and fail on unexpected drift
+        run: |
+          set -euo pipefail
+          A=$(find /tmp/p3original -type f -name p3_dreyerb_source_hash_forensics.json -print -quit)
+          B=$(find /tmp/p3alternate -type f -name p3_source_only_two_read_forensic.json -print -quit)
+          test -n "$A" && test -n "$B"
+          python research/defaultreg_bspc_v13/src/p3_cross_run_source_quantized_vs_exact_certificate.py --original "$A" --alternate "$B" --out p3_original_vs_alternate_source_forensic.json
+      - name: Assert no misleading exact source/model identity claims
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('p3_original_vs_alternate_source_forensic.json'))
+          assert r['status']=='TWO_INDEPENDENT_CI_RUNS_SAME_QUANTIZED_SOURCE_NOT_BYTE_IDENTICAL'
+          assert r['cross_run_field_equal_counts']['bytewise_ordered_epoch_digest_equal']==0
+          assert r['cross_run_field_equal_counts']['quantized_1e9_covariance_shape_digest_equal']==8
+          assert r['cross_run_field_equal_counts']['quantized_1e8_log_trace_digest_equal']==8
+          assert r['not_proof_of_source_fitted_model_identity']
+          print('P3_FLOAT_LEVEL_DRIFT_VS_STABLE_ROUNDED_SOURCE_FINGERPRINT_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p3-original-vs-alternate-DreyerB-source-floating-precision-forensics
+          path: p3_original_vs_alternate_source_forensic.json
+          retention-days: 90
