@@ -36,3 +36,20 @@ this check loaded \emph{zero} additional
 held participant EEG outcomes; it is a
 \emph{reproducibility gate}, not an
 additional transfer data point.
+
+A subsequent proposed retrospective eight-person
+single-source result matrix also required the
+\emph{original} source-covariance SHA as an
+absolute prerequisite. In
+\href{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38541224660}
+{GitHub Actions run 38541224660}, that prerequisite
+failed on reloading source IDs 61--68, again
+\emph{before} accessing any held person.
+No eight-person exact-original-source result
+exists from this attempt. This failure is
+preserved rather than repeatedly retrying
+until a matching source digest occurs.
+A future study must first serialize and
+validate a reproducible fixed source feature
+or fitted-model artifact, not simply retain
+source hyperparameter values.
