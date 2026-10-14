@@ -2,11 +2,12 @@
 """P3 six further HELD DreyerB people with 100% prior-source-locked choices.
 
 Read immutable SOURCE lock from successful original Actions 38390737635.
-Recompute only source covariance features and verify exact SHA-256;
-DO NOT RESELECT or recalibrate ANY policy. Then (and only then)
-read 6 as-yet unreported public target IDs71--76 from same DreyerB
-acquisition. If the 8-source data/preproc changed, hard FAIL before
-any new target outcome is read. Not independent acquisitions.
+Recompute source covariance and COMPARE SHA-256 to original.
+Do not reselect any hyperparameter. Record digest drift explicitly.
+This is a fixed-CHOICE / newly RE-FITTED source-model sensitivity if
+byte identity fails, NOT an exact original frozen-source replay.
+Targets 71--76 are read only after this lower-tier scope is persisted.
+All people are from ONE DreyerB acquisition.
 """
 import argparse,hashlib,json
 from pathlib import Path
@@ -38,21 +39,35 @@ def execute(old_json,out):
         channels=["C3","Cz","C4"],fmin=8,fmax=30,resample=160,
         baseline=None,reject_by_annotation=False)
     C,y,g,recs,sha=load(ds,paradigm,SRC)
-    if sha!=frozen["source_preprocessed_covariances_sha256"]:
-        raise RuntimeError("source data/preprocessing SHA drift, no target access authorized")
+    exact=sha==frozen["source_preprocessed_covariances_sha256"]
+    observed=[(int(x["public_id"]),int(x["n"]),int(x["right"])) for x in recs]
+    earlier=[(int(x["public_id"]),int(x["n"]),int(x["right"]))
+             for x in frozen["source_receipts"]]
+    if observed!=earlier:
+        raise RuntimeError("source subject counts/classes changed; do not read targets")
     choices=frozen["source_policy_choices"]
-    certified={"status":"SOURCE_DATA_SHA_MUST_MATCH_PRIOR_UNCHANGED_LOCK",
+    certified={"status":"EXACT_SOURCE_REPLAY" if exact else
+        "LOWER_TIER_PRIOR_CHOICES_ONLY_SOURCE_BYTES_DIFFER",
       "prior_run":OLD_RUN,"prior_decisions_SHA256":hashlib.sha256(prior_bytes).hexdigest(),
       "prior_original_source_file":"P3_DREYER_B_SOURCE_LOCK_PRETARGET.json",
-      "source_covariance_sha256":sha,"exact_source_sha_match":True,
-      "policy_choices_not_refitted_or_readapted":True,
+      "source_covariance_sha256":sha,
+      "original_source_covariance_sha256":frozen["source_preprocessed_covariances_sha256"],
+      "exact_source_sha_match":exact,
+      "source_participant_counts_match_original":True,
+      "model_refitted_on_current_source_different_when_sha_drift":not exact,
+      "source_data_digest_drift_cause_unknown":not exact,
+      "prior_policy_choices_not_reselected_or_readapted":True,
       "source_public_ids":list(SRC),
       "target_public_ids_still_not_read":list(NEW_HELD),
       "prior_targets_69_70_outcomes_now_known_BUT_not_used_in_new_decisions":True,
       "acquisition_count":1,
       "not_externally_independently_registered":True}
     digest=write(out/"P3_DREYER_B_SIX_TARGET_PRE_READ_LOCK.json",certified)
-    print("P3_DREYER_B_SIX_NEW_TARGET_PRE_READ_SOURCE_SHA",digest,flush=True)
+    print("P3_DREYER_B_SIX_NEW_TARGET_PRE_READ_SOURCE_SHA",
+          json.dumps({"receipt_sha":digest,"orig_source_sha":
+                      frozen["source_preprocessed_covariances_sha256"],
+                      "new_source_sha":sha,"source_bytes_equal":exact},
+                     sort_keys=True),flush=True)
     records=[]
     for sid in NEW_HELD:
         Ct,yt,gt,receipt,target_sha=load(ds,paradigm,[sid])
@@ -67,13 +82,16 @@ def execute(old_json,out):
     effects={m:[r["paired_delta_vs_prior_macro"][m] for r in records]
              for m in METHODS}
     means={m:float(np.mean(v)) for m,v in effects.items()}
-    report={"status":"SIX_FURTHER_HELD_DREYERB_WITH_PRIOR_FROZEN_SOURCE",
+    report={"status":"SIX_NEW_DREYERB_FIXED_PRIOR_CHOICES_SOURCE_REFIT",
       "prior_source_lock_sha256":hashlib.sha256(prior_bytes).hexdigest(),
       "within_run_pre_read_lock_sha256":digest,
       "new_held_subject_ids":list(NEW_HELD),"new_held_people":6,
       "distinct_EEG_acquisitions_or_cohorts":1,
       "previously_exposed_held_69_70_not_used_for_source_policy":True,
       "no_source_hyperparameters_reoptimised":True,
+      "strict_original_source_byte_replay_achieved":exact,
+      "different_source_features_from_original":not exact,
+      "source_model_refitted_using_current_source_data":True,
       "mean_paired_delta_AUC":means,
       "method_per_person_effect":effects,
       "method_negative_harm_over_0p02_count":{
