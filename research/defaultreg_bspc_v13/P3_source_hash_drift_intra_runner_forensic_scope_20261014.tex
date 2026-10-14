@@ -23,8 +23,32 @@ The complete comparison is maintained as a
 machine-readable receipt in
 \href{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38548177214}
 {GitHub Actions run 38548177214}.
-A failed or incomplete receipt is not
-numerical evidence of stability.
+The completed, successful run independently reloaded
+all eight named source participants twice. Both
+aggregate exact SHA-256 values equalled
+\texttt{7146797e...3e172b2a7}, the checksum
+of the \emph{original} successful experiment
+38390737635, and the within-run equality
+held independently for all eight subjects'
+ordered labelled-epoch hashes and sorted
+labelled-epoch multiset hashes. Thus the
+original source product \emph{can} be regenerated
+byte-for-byte, at least in this runner.
+By contrast, another completed run had produced
+the different digest
+\texttt{9f650460...39ada7f65}.
+This contrast is evidence that the source mismatch
+is not an obligatory change in data releases nor
+inevitable stochastic inconsistency within a single
+runner. It is \emph{not} a causal diagnosis of the
+remaining between-run discrepancy.
+A separate three-independent-clean-runner
+test of exact, normalised covariance-shape and
+amplitude fingerprints is registered in the
+same repository. Results of that different
+test must be reported only from its completed
+run and may not be inferred from the successful
+within-run result.
 In all cases, the new six-person
 policy sensitivity retains its explicitly
 \emph{refitted-source, original-choices-only}
