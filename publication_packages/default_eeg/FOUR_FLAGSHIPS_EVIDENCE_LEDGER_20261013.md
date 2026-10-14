@@ -759,3 +759,98 @@ The four exact-head files have independently verified receipts:
 All four remain **author review**, **Draft PR**, **NOT journal-submitted**.
 They are not proof of external held-method superiority,
 MAT acquisition ancestry, IEEE floating numerical safety, or acceptance.
+
+
+## 2026-10-14 current completed reviewer source-lock experiments and verified PDF handoff
+
+**P1 JNE PR143 (HEAD \`a414b84f06fdf85c19300c83d727ab8512b2754a\`).**
+An additional separately named BNCI2014_002 right-hand/feet EEG source-locked real
+study used 10 fixed source people and previously unfetched held public IDs 11--14.
+The canonical 27-grid proper source-trained-mean Gaussian NLL comparator was
+contrasted with source-macro LDA, fixed 0.1 LDA and fixed C=1 logistic, using
+three source-predeclared native array EEG positions (not C3/Cz/C4).
+Successful actual held run https://github.com/lindicaphxag-tech/kaggle/actions/runs/38557289971,
+source lock SHA \`32001bacd48c2eb247a86f8655e75f2064c399d674e60528e68286c3d2fea2ee\`.
+Four-person macro/NLL deltas [+0.0109375,+0.0003125,+0.00578125,-0.01109375],
+mean only +0.001484375 AUC. Means: macro .549140625,
+proper .54765625, fixed .1 .55109375, fixed logistic .5506640625.
+This differs strongly from the TWO previously viewed AlexMI 27-grid subjects,
+mean +.09625 on a different feature montage. NO independently
+established person-forecast advantage or reliable cross-study gain.
+The first BNCI002 run failed before target access because
+the MNE channel labels were not 'EEG7'/'EEG8'/'EEG9'; fixed
+selection used predefined native array positions 7--9.
+A separate source-person strict nested AlexMI forecast
+re-analysis now prevents source-person training re-entry; run
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38539884099,
+strict source forecast +.0595833, but trivial always-positive sign
+direction remains as accurate on held IDs7 and 8.
+An unsupported 'TRUE PRE-DATA independently registered BNCI family'
+claim was explicitly removed from the Methods.
+Latest checked manuscript PDF: 29 pages, 0 overfull hboxes,
+GitHub https://github.com/lindicaphxag-tech/kaggle/actions/runs/38557762361.
+
+**P3 PLOS ONE PR145 (HEAD \`3dee0880e7683d5c55937843867756f9e2459ad8\`).**
+A NEW TWO-JOB workflow actually fit then serialized the five source
+decision states, alongside common tangent geometry and frozen source
+choices, BEFORE any held person 77--81 was opened. The
+source-feature SHA \`7146797e...3e172b2a7\` MATCHED the original
+successful source run 38390737635. A separate GitHub runner
+cryptographically verified the same-run saved fitted models
+(SHA \`6ba6ed29...09e9d6c4ffd3\`) and only then scored
+held public IDs77--81, 240 trials each (1,200 actual trials).
+Completed https://github.com/lindicaphxag-tech/kaggle/actions/runs/38556651631.
+Descriptive average paired deltas: continuous 0,
+SCE -0.007986111, anisotropic -0.003625,
+group-centred +0.000805556. SCE individual ID78 harm
+-0.030555556. This removes the current runner's source
+weight-refit ambiguity but does NOT establish a novel policy benefit.
+The original 2026-10-13 fitted model weights were not archived, so
+matching source feature SHA does NOT retroactively prove its
+weights match newly checkpointed model weights.
+Five held people still ONE acquisition study, not five
+independent external experiments.
+The prior six-person same study with source SHA mismatch
+remains a lower-tier hyperparameter-only refit sensitivity.
+Latest checked manuscript PDF: 14 pages, 0 overfull hboxes,
+GitHub https://github.com/lindicaphxag-tech/kaggle/actions/runs/38557792810.
+
+**P2 BSPC PR144 (HEAD \`5ba20e21c52f41174cec2fd87a7c9506b2454027\`).**
+All earlier 50 actual digital-EDF byte rehashes, all 1,225
+cross-released-ID pairs, partial 47/49 digital reuse,
+original Figshare v5 author code absence-of-complete
+MAT→EDF export gate remain in the manuscript. Upstream
+MOABB official issue https://github.com/NeuroTechX/moabb/issues/1248
+received a maintainer acknowledgment and intention to fix, which
+is real external feedback NOT a merged patch or provenance-confirmed
+original patient-identity conclusion. Latest verified manuscript PDF:
+23 pages, zero overfull; run
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38544611226.
+
+**P4 Numerical Algorithms PR146 (HEAD \`dc6c9dfe2baf04d761afa4407ea0ba6a6f5dfc31\`).**
+Joint spectral/score uncertainty, covariance eigenspace-invariant
+resolvent, final-feature rational grid quantitative budget and
+real BNCI/AlexMI last-feature sign certification are
+version controlled and test-passed. Remain conditional
+on externally valid feature-error bounds: NOT an
+IEEE754 end-to-end EEG-processing certificate, proven
+SOTA root solver or cross-person decoding gain. Latest
+verified manuscript PDF 16 pages, zero overfull;
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38545449519.
+
+Four exact-HEAD PDF ZIPs were downloaded and SHA256 of EVERY
+PDF matched the machine-generated EXACT_HEAD_PDF_RECEIPT.json,
+the page count and absence of out-of-page text bounding boxes.
+Consolidated independent review ZIP is created in conversation
+with no implied journal submission.
+
+**Hard status at completion of this audit:**
+All four still GitHub Draft / none journal-submitted / none accepted.
+P1 person-level action-value over trivial baselines not verified.
+P2 raw MAT→EDF conversion-operator chain and original
+clinical acquisition identity not verified.
+P3 practically meaningful and statistically reliable new source
+policy effect across independent acquisitions not verified.
+P4 mathematical uniqueness and whole-processing-pipeline
+validated floating error bounds not verified.
+The actual manuscript authors must approve and submit.
