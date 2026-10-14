@@ -1,0 +1,54 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=.92in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,booktabs,graphicx}
+\usepackage{lmodern,pgfplots,placeins}
+\pgfplotsset{compat=1.18}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xr}
+\externaldocument{main_p2_BSPC_FOCUSED_AUTHOR_REVIEW_20261014}
+\title{Supplementary evidence archive\\
+Released EEG identifiers can share numerical recording contents}
+\author{AUTHOR IDENTITIES AND AFFILIATIONS TO BE VERIFIED}
+\date{}
+\begin{document}
+\maketitle
+\noindent \textbf{Author-review only.} These source-controlled
+supplementary analyses include post-discovery screening and
+conditional sensitivity scenarios. They do not establish
+original clinical participant or acquisition identity.
+The original EEG releases are not redistributed here.
+
+\section{Supplementary Method S1: canonical trial identity, versioned releases and strict split boundaries}
+\input{P2_vector_identity_audit_workflow.tex}
+\input{P2_content_group_split_safety_scope.tex}
+\input{P2_signal_provenance_evidence_tiers_20261013.tex}
+\FloatBarrier
+
+\section{Supplementary Results S2: native digital EDF and candidate near-overlap evidence}
+\input{P2_real_whole_record_nearmatch_screen.tex}
+\input{P2_real_exact49_vs_assumed_near47_source_refit.tex}
+\input{P2_raw_digital_affine_fingerprint_real_results.tex}
+\input{P2_EDF_block_temporal_localisation_results_20261013.tex}
+\input{P2_nemar_whole_EDF_manifest_scope_20261013.tex}
+\input{P2_nemar_public_edf_bytes_replay_protocol_20261013.tex}
+\input{P2_exhaustive_nemar_50id_vector_audit_map_20261013.tex}
+\input{P2_channel_erasure_tolerant_digital_overlap_graph_20261014.tex}
+\FloatBarrier
+
+\section{Supplementary Results S3: source MAT-to-EDF products (unresolved ancestry)}
+\input{P2_public_source_MAT_first_pass_20261013.tex}
+\input{P2_source_mat_vs_preprocessed_edf_alignment_20261013.tex}
+\input{P2_mat_edf_heldout_temporal_screen_20261013.tex}
+\input{P2_figshare_v5_author_code_static_provenance_gap_20261014.tex}
+\FloatBarrier
+
+\section{Supplementary Results S4: additional controls and 49-record influence}
+\input{P2_known_transform_product_controls.tex}
+\input{P2_additional_BNCI2014_001_BNCI2015_001_controls_20261013.tex}
+\input{P2_figure_frozen49_group_paired_auc.tex}
+\FloatBarrier
+
+\bibliographystyle{unsrt}
+\bibliography{references_v10}
+\end{document}
