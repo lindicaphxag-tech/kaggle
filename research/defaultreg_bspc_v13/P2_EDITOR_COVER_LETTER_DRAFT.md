@@ -1,52 +1,21 @@
-# P2 — Editor cover letter (DRAFT; NOT TO SEND WITHOUT AUTHOR REVIEW)
-Dear Editor,
+# P2 BSPC — editorial cover letter, AUTHOR REVIEW ONLY — DO NOT SEND UNSIGNED
 
-We submit for consideration our original research manuscript,
-"When EEG Participant IDs Share Recording Contents: A Matched
-Audit of Validation Denominators, Model Refitting and Regularisation."
+Dear Editor-in-Chief,
 
-The work addresses a distinct signal-data reliability issue:
-released EEG participant identifiers need not guarantee independence
-of processed numerical recording contents. In the publicly
-distributed Liu2024 motor-imagery acquisition, an exactly
-predefined EEG preprocessing pipeline reveals complete
-cross-identifier overlap for one 40-trial record pair. We
-evaluate the consequences with fixed 49-content-group held
-targets and an explicit 2-by-2 analysis separating reporting
-denominator, model refitting and frozen shrinkage choice.
+Please consider our original research manuscript, **"Released EEG identifiers can share numerical recording contents: A full-dataset audit and matched evaluation of cross-subject decoding,"** for *Biomedical Signal Processing and Control*, subject to the authors' final approval.
 
-Additional real public-data checks have now reproduced the exact
-40-trial content alias under a second preprocessing configuration
-(6--35 Hz, 128 Hz). Two fixed classifier objectives, tangent logistic
-and ridge classification, each retained a pronounced refit-related AUC
-change for the aliased recording group while showing near-zero mean
-change over the other 48. These are retrospective analyses on the
-same acquisition, not new patients, independent cohorts or a causal
-population leakage estimate.
+This study identifies a technical failure mode in biomedical signal benchmarking: different public participant identifiers can index identical processed EEG signal contents even when conventional participant-wise evaluation is used. In the publicly released Liu2024 motor-imagery dataset, a pinned pipeline produced 2,000 labelled epoch instances but 1,960 unique exact contents. A separate, exhaustive census of all 50 published EDF files (1,225 unordered pairs) found 29/29 fully identical time-varying EEG digital streams for released IDs 4/5. Two further pairs, 47/49 and 11/15, shared 6,957/9,280 and 171/9,280 aligned native EEG blocks, respectively, without full-stream equality.
 
-An exploratory screening of all 1,225 trial-aligned released-ID recording pairs also detected two further, previously unrecognized, very high full-record similarities: 47/49 (0.99999999166) and 11/15 (0.99999998340). The latter two are candidate near-overlaps, NOT exact byte-matches or independently confirmed duplicate physical acquisitions. We do not extend the primary 49 exact-content-group AUC estimand to an asserted count of independent patients.
+We distinguish numerical release-layer signal identity from clinical patient identity or original acquisition provenance. Corresponding separately published source MAT arrays were not entirely identical, and the current Figshare code archive does not fully specify the MAT-to-EDF transformation. We do not infer that two clinical participants are the same patient.
 
-We report the full numerical observations without equating
-recording-content identity to clinical patient identity, nor
-claiming that arithmetic decomposition identifies a causal
-leakage effect. Two other public acquisitions were examined
-as negative controls under their pinned pipelines. The
-code and independently checked numerical receipts support
-reproduction of the exact estimands.
+In a matched 49-content-group retrospective analysis, mean ROC-AUC changed from 0.594000 across 50 nominal IDs to 0.588673 under content-group reporting weights and to 0.582551 with group-disjoint source refitting and source-only parameter choice. The descriptive total difference of -0.011449 must not be interpreted as an identified causal leakage penalty. The matched refit-related mean -0.006122 was concentrated in one overlap-affected held group (-0.2625); the other 48 averaged -0.000781. Fixed-classifier and preprocessing sensitivity tests on the same acquisition support localisation, not population generalisation.
 
-This study is separate from our work on EEG covariance
-prediction-score versus discrimination-validation estimands;
-the primary measurements, scientific question and
-conclusions of this submission are recording provenance
-and the validation unit rather than classifier improvements.
-Overlapping datasets and related manuscripts will be
-fully disclosed to the journal. A data-custodian clarification and author-approved
-independent raw-record verification are prerequisites to finalizing
-the description of the public clinical dataset.
+The manuscript contributes an independently traceable biomedical signal-content census, an explicit distinction between clinical, released-ID and digital-content evaluation units, and a matched fit-by-selection audit. We provide the original source products' provenance limitations and do not claim a superior EEG decoder or a new cryptographic method. Four other public EEG datasets were screened for exact processed cross-ID trial overlap under specified processing paths; negative screens are not proof of population-level absence of near-overlap.
 
-[Authors, affiliations, rights, originality, exclusive-submission
-declaration, funding, ethics approvals/exemptions, and
-corresponding author must be completed by actual authors.]
+The research is distinct in question and primary outcomes from our separate ongoing work on EEG regularisation scoring objectives. Any shared datasets, code or concurrent related manuscripts will be disclosed in the final submission.
+
+**Required before sending:** all authors' agreement on title and findings; authorship/order/affiliations; originality and exclusive submission; ethics and secondary-data terms; funding, CRediT and conflicts; AI-assisted preparation declaration; code/data repository public release; and documented data-custodian correspondence or a clear account of unresolved original provenance. None of these statements is represented as approved here.
 
 Sincerely,
-[CORRESPONDING AUTHOR TO BE VERIFIED]
+
+[CORRESPONDING AUTHOR — approval/signature required]
