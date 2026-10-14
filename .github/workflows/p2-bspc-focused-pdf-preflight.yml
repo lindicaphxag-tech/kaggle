@@ -73,6 +73,72 @@ jobs:
           (folder/'P2_BSPC_FOCUSED_HEAD_RECEIPT.json').write_text(json.dumps(check,indent=2)+'\n')
           print(json.dumps(check,indent=2))
           PY
+      - name: Package exact-head, editor-flat TeX source and evidence receipts
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile,ZIP_DEFLATED
+          import hashlib,json,re,os
+          base=Path("research/defaultreg_bspc_v13")
+          main=base/"main_p2_BSPC_ELSEVIER_AUTHOR_REVIEW_20261014.tex"
+          supp=base/"P2_BSPC_SUPPLEMENTARY_EVIDENCE_AUTHOR_REVIEW_20261014.tex"
+          mainarticle=base/"main_p2_BSPC_FOCUSED_AUTHOR_REVIEW_20261014.tex"
+          refs=base/"references_v10.bib"
+          seen=set()
+          def walk(f):
+              f=f.resolve()
+              if f in seen:return
+              if not f.is_file():raise FileNotFoundError(f)
+              seen.add(f)
+              s=f.read_text(encoding="utf-8")
+              for name in re.findall(r'\\input\{([^}]+)\}',s):
+                  child=f.parent/(name if name.endswith(".tex") else name+".tex")
+                  walk(child)
+          for root in (main,supp,mainarticle):walk(root)
+          seen.add(refs.resolve())
+          roots=[main,supp,mainarticle]
+          allfiles=sorted(seen,key=lambda x:x.name)
+          if len(set(x.name for x in allfiles))!=len(allfiles):
+              raise RuntimeError("flat source filename collision")
+          dist=Path("p2-submission-handoff");dist.mkdir(exist_ok=True)
+          with ZipFile(dist/"P2_BSPC_EDITORIAL_MANAGER_FLAT_TEX_SOURCES.zip","w",ZIP_DEFLATED) as zipf:
+              for f in allfiles:zipf.write(f,f.name)
+          def digest(f):return hashlib.sha256(f.read_bytes()).hexdigest()
+          PDFs=[base/(p+".pdf") for p in (
+              "main_p2_BSPC_ELSEVIER_AUTHOR_REVIEW_20261014",
+              "main_p2_BSPC_FOCUSED_AUTHOR_REVIEW_20261014",
+              "P2_BSPC_SUPPLEMENTARY_EVIDENCE_AUTHOR_REVIEW_20261014")]
+          for pdf in PDFs:
+              if not pdf.is_file():raise FileNotFoundError(pdf)
+          copyfiles=PDFs+[
+              Path("publication_packages/default_eeg/P2_BSPC_HIGHLIGHTS_AUTHOR_REVIEW.txt"),
+              base/"P2_EDITOR_COVER_LETTER_DRAFT.md",
+              base/"P2_BSPC_ARITHMETIC_RECEIPT_20261014.json",
+              base/"src/p2_bspc_submission_numerical_gate_20261014.py",
+              Path("publication_packages/default_eeg/P2_BSPC_20261014_SUBMISSION_DECISION_LOG.md"),
+          ]
+          receipt={"state":"AUTHOR_APPROVAL_REQUIRED_NOT_SUBMITTED",
+                   "exact_head":os.environ.get("GITHUB_SHA"),
+                   "source_files":len(allfiles),
+                   "editor_flat_source_zip_sha256":digest(dist/"P2_BSPC_EDITORIAL_MANAGER_FLAT_TEX_SOURCES.zip"),
+                   "pdf_sha256":{p.name:digest(p) for p in PDFs},
+                   "data_steward_review":"GMAIL_DRAFT_CREATED_NOT_SENT",
+                   "all_author_approval":False,
+                   "original_MAT_to_EDF_identity_confirmed":False,
+                   "journal_submission":False}
+          (dist/"PRE_SUBMISSION_MACHINE_RECEIPT.json").write_text(json.dumps(receipt,indent=2)+"\n")
+          with ZipFile(dist/"P2_BSPC_AUTHOR_REVIEW_COMPLETE_HANDOFF.zip","w",ZIP_DEFLATED) as z:
+              z.write(dist/"P2_BSPC_EDITORIAL_MANAGER_FLAT_TEX_SOURCES.zip","P2_BSPC_EDITORIAL_MANAGER_FLAT_TEX_SOURCES.zip")
+              z.write(dist/"PRE_SUBMISSION_MACHINE_RECEIPT.json","PRE_SUBMISSION_MACHINE_RECEIPT.json")
+              for f in copyfiles:z.write(f,f.name)
+          print(json.dumps(receipt,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: P2-BSPC-SUBMISSION-REVIEW-BUNDLE
+          path: p2-submission-handoff/
+          retention-days: 90
       - uses: actions/upload-artifact@v4
         with:
           name: P2-BSPC-FOCUSED-AUTHOR-REVIEW
