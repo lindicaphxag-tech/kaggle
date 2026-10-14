@@ -494,3 +494,32 @@ and are ready for immediate submission. In particular:
   competitor advantage unverified.
 - All four must pass coauthor signoff, declarations, references,
   venue-specific requirements and editorial submission.
+
+
+### 2026-10-14 postscript: P3 intermittent source digest and final current PDF
+- The *target-free* Dreyer2023B source-only twice-reload diagnostic
+  succeeded: https://github.com/lindicaphxag-tech/kaggle/actions/runs/38540426367.
+  Both reads of public IDs61--68 produced the identical original source
+  SHA \`7146797ee8d6caf71c57ee141604102b2d61217456cbfe3e00820b83e172b2a7\`;
+  all eight labelled participant ordered-trial and permutation-invariant
+  per-trial hashes matched between those reads. Earlier independent CI
+  reload had \`9f650460378e695189c3fa145bf0a29fe010b24cd92ba4aa1196e7439ada7f65\`.
+  Therefore source-feature byte instability is intermittent between
+  runs and has NO proven cause.
+- A new strict eight-person *retrospective* original-SHA gate failed
+  CLOSED again before ANY target was read:
+  https://github.com/lindicaphxag-tech/kaggle/actions/runs/38541224660.
+  Do not claim the eight people were successfully evaluated on identical
+  original source-feature bytes. Do not repeat selectively until one
+  run happens to pass.
+- Both results and technical research scope are included in P3
+  \`P3_dreyerb_source_only_two_reload_fingerprint_20261014.tex\`.
+  The latest complete, actually fetched P3 EXACT-HEAD PDF:
+  branch SHA \`09dd26f804bba87a99c86a3f22503f905d3adae5\`,
+  12 pages, 0 overfull, SHA256
+  \`e4f9051876e0decd9244521d1d4c4a43c42d354fc987c8691db0be51ac47e5e7\`,
+  run https://github.com/lindicaphxag-tech/kaggle/actions/runs/38541671186.
+  All four 2026-10-14 PDF exact-head CI ZIPs were downloaded,
+  PDF SHA reverified against the contained JSON receipt and staged
+  together in a reproducible author-review ZIP. Author sign-off,
+  external preregistration and journal acceptance remain OPEN.
