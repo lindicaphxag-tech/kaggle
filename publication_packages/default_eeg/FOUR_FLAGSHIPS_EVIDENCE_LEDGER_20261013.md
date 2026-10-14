@@ -382,3 +382,115 @@ has zero in its last completed build.
 submission-ready scientific design, journal template compliance,
 patient source identity, independent prospective validation,
 all-author signoff, or paper acceptance. All four remain DRAFT.**
+
+
+## 2026-10-14: publication-integrity audit and external maintainer engagement
+
+This section supersedes stale "pending" statements elsewhere in this
+append-only ledger. All four PRs are still DRAFT and NOT journal-submitted.
+
+### P1: source-person CV re-entry found and fixed
+- Primary \`choice()\` source-person forecast audit revealed that excluding
+  an outer source person's *validation score* still permitted that person's
+  data in models trained to generate OTHER source-person validation rows.
+  Calling that procedure strict outer-person crossfit was not justified.
+- Recomputed nested source-person outer folds: for each of AlexMI SOURCE
+  1--6, removed the held person from EVERY inner fit/geometry/λ selection,
+  trained two LDA models only on five remaining people, tested outer h.
+  Nested paired six-source-person ΔAUC:
+  +.0925,+.185,-.04,+.02,-.05,+.15 (mean +.0595833).
+  Previous weak source forecast +.0541667, separately labelled not strict.
+  Executed source exclusion workflow SUCCESS:
+  https://github.com/lindicaphxag-tech/kaggle/actions/runs/38539884099
+- The same ALREADY EXPOSED two AlexMI held people 7,8 under original
+  27-grid yield +.005 and +.1875 AUC macro minus proper NLL, mean +.09625.
+  Both strictly nested forecast and trivial always-positive predict
+  their *signs* equally; no novel targeting accuracy established.
+  Original 27-grid successful replay:
+  https://github.com/lindicaphxag-tech/kaggle/actions/runs/38536408103
+- Newly corrected methods paragraph in
+  P1_alexmi_strict_nested_source_forecast_correction_20261014.tex.
+  Latest P1 source c591a32511e0cb29521d18044ba41a63446fb39b:
+  28-page exact-head PDF SUCCESS
+  https://github.com/lindicaphxag-tech/kaggle/actions/runs/38540178044
+  0 overfull hboxes; the SHA256 of actual downloaded PDF matches CI JSON.
+
+### P2: author code ZIP searched; official MOABB acknowledgment
+- Original Figshare v5 original author \`code.zip\` read only, no script
+  execution, successful metadata/static code ZIP CI:
+  https://github.com/lindicaphxag-tech/kaggle/actions/runs/38535556189
+  21 MATLAB sources, two electrode location files, README.
+  Existing published code does not document a complete and validated
+  acquisition MAT -> manually preprocessed EDF export mapping.
+  This limits provenance rather than contradicts exact EDF content evidence.
+  New article subsection:
+  P2_figshare_v5_author_code_static_provenance_gap_20261014.tex.
+- Public MOABB upstream issue submitted, with all 50 file SHA and 1225
+  digital comparisons:
+  https://github.com/NeuroTechX/moabb/issues/1248
+  External maintainer bruAristimunha responded
+  "We're gonna fix this! Thank you for the report." on 2026-10-14.
+  A maintainer's acknowledgment/intent to fix is NOT independent
+  scientific verification of original acquisitions, merged patch,
+  publication, or proof of patient duplication.
+- Latest fetched P2 PDF source
+  3fb97c79212af4459311f9c9a06e77b9a08cbd06:
+  22 pages, 0 overfull, SHA256 matches the exact-head CI receipt.
+
+### P3: six new outcomes, source SHA drift explicitly preserved
+- Previously frozen policy-CHOICES (not byte-identical fitted models) from
+  https://github.com/lindicaphxag-tech/kaggle/actions/runs/38390737635
+  used on six further Dreyer2023B held IDs71--76, n=240 each.
+  Fixed choices, *refitted* source model, real public data run:
+  https://github.com/lindicaphxag-tech/kaggle/actions/runs/38537617142
+- Descriptive paired mean ROC-AUC vs source macro:
+  continuous 0, SCE -.006898148148, anisotropic -.003611111111,
+  group-centred -.0009375. No method establishes benefit.
+- Original full-source covariance SHA
+  7146797ee8d6caf71c57ee141604102b2d61217456cbfe3e00820b83e172b2a7,
+  newly read source SHA
+  9f650460378e695189c3fa145bf0a29fe010b24cd92ba4aa1196e7439ada7f65,
+  DIFFER. Strict byte-identical source replay therefore FAILED CLOSED
+  before any new target read. The lower-tier rerun uses same source
+  IDs, sample counts and previous fixed CHOICES, but refitted source model.
+  Do NOT pool old and new as same fitted model.
+- The manuscript directly documents both result and defect in
+  P3_dreyerb_six_new_locked_choices_source_drift_20261014.tex.
+  The 11-page PDF retrieved from successful exact-main build
+  af6f92c7dfe94ba42c87eab4d908bc5301852499 passes
+  0 overfull + SHA256 matching its receipt.
+  A target-free two-reload source-drift diagnostic was launched
+  on https://github.com/lindicaphxag-tech/kaggle/actions/runs/38540426367
+  but its completion was not confirmed when this line was authored.
+  Do NOT count that diagnostic as successful until the receipt is checked.
+
+### P4: still conditional despite strong arithmetic proofs
+- Existing source code and peer review draft remain: exact rational
+  interval certificates, admissible opposite-sign counterexamples,
+  covariance-coordinate resolvent bounds, bounded final feature
+  quantisation conditions and a small fixed-point real EEG demonstration.
+- No validated acquisition / preprocessing / floating IEEE-754
+  forward error bound and no independent algorithm advantage was
+  produced on 2026-10-14. Do NOT manufacture a stronger conclusion.
+- Most recent confirmed PDF source
+  ce67a7478750b177720b0ab4dec8afc1c7e34b8e:
+  15 pages, 0 overfull, SHA256 matching CI.
+
+### Publication readiness / not reached
+The current work materially improves *research integrity* and external
+triage. It does NOT yet meet the user's stricter condition that ALL FOUR
+are top-tier doctoral research, outperform accepted-paper controls,
+and are ready for immediate submission. In particular:
+- P1 still lacks useful source-only action prediction beyond always-macro
+  / always-positive; crossfit correction alone is not novelty.
+- P2 still lacks recorded source MAT->EDF conversion, external custody
+  confirmation of acquisition identities, independent discovery cohort,
+  and causal link between release overlaps and reported model accuracy.
+- P3 has heterogeneous negative and tiny positive examples across
+  non-independent acquisitions; there is no registered acquisition-level
+  meta-test and source SHA drift remains under diagnosis.
+- P4 theory guarantees are conditional on externally validated input
+  error bounds; end-to-end EEG and independent strong numerical
+  competitor advantage unverified.
+- All four must pass coauthor signoff, declarations, references,
+  venue-specific requirements and editorial submission.
