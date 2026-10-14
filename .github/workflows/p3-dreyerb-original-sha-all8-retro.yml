@@ -1,0 +1,61 @@
+name: P3 original exact-source-SHA replay of eight exposed DreyerB targets
+on:
+  push:
+    branches: [publication/default-eeg-p3-transfer-negative-20261013]
+    paths:
+      - '.github/workflows/p3-dreyerb-original-sha-all8-retro.yml'
+      - 'research/defaultreg_bspc_v13/src/p3_dreyerb_original_source_sha_eight_exposed_replay.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  exact_original_feature_source_all_eight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    env:
+      MNE_DATA: /tmp/p3_dreyer_b_same_source_retro
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python3 -m pip install --disable-pip-version-check moabb==1.7.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: p3-dreyer-B-first-repo-two-MI-targets-one-acquisition
+          run-id: 38390737635
+          github-token: ${{ github.token }}
+          path: /tmp/p3_authoritative_oct13_source
+      - name: Original source SHA hard gate BEFORE reading eight already-exposed targets
+        run: |
+          set -euo pipefail
+          mkdir -p "$MNE_DATA"
+          F=$(find /tmp/p3_authoritative_oct13_source -type f -name P3_DREYER_B_SOURCE_LOCK_PRETARGET.json -print -quit)
+          test -n "$F"
+          python research/defaultreg_bspc_v13/src/p3_dreyerb_original_source_sha_eight_exposed_replay.py --original-lock "$F" --out /tmp/p3_original_source_all8
+      - name: Require one source and fully disclosed retrospective target exposure
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('/tmp/p3_original_source_all8')
+          a=json.loads((root/'P3_DREYER_B_EIGHT_PERSON_SAME_SOURCE_PRE_READ.json').read_text())
+          b=json.loads((root/'P3_DREYERB_EIGHT_PEOPLE_ONE_EXACT_SOURCE_REPLAY.json').read_text())
+          assert a['source_matches_original_oct13_exactly']
+          assert a['target_outcomes_ALL_PREVIOUSLY_EXPOSED']
+          assert b['same_source_feature_bytes_for_all_eight_targets']
+          assert b['not_new_confirmatory_eeg_data']
+          assert b['previously_exposed_target_records']==list(range(69,77))
+          assert len(b['rows'])==8
+          print('P3_EIGHT_PREVIOUSLY_EXPOSED_HELD_ONE_EXACT_ORIGINAL_SOURCE_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p3-eight-exposed-DreyerB-held-one-verified-original-source-retro
+          path: /tmp/p3_original_source_all8/*.json
+          if-no-files-found: warn
+          retention-days: 90
