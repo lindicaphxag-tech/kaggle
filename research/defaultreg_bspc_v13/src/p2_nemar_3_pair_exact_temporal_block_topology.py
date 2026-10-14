@@ -36,6 +36,41 @@ def runs(vals,predicate):
             "n_native_records":len(vals)-start})
     return begins
 
+def eeg_block_nonconstant(blob,meta):
+    """Digital within-native-storage-record variation; never expose values."""
+    from p2_nemar_real_edf_full_file_and_digital_channel_audit import field,number
+    names=meta["channel_labels"]
+    records=meta["records"]
+    sizes=meta["samples_per_record"]
+    pos=number(field(blob,184,192))
+    out={name:[] for name in EEG_LABELS}
+    for _ in range(records):
+        for i,name in enumerate(names):
+            block=blob[pos:pos+2*sizes[i]]
+            pos+=2*sizes[i]
+            if name in out:
+                assert len(block)>=2 and len(block)%2==0
+                out[name].append(block != block[:2]*sizes[i])
+    assert pos==len(blob)
+    assert all(len(v)==records for v in out.values())
+    return out
+
+def channel_nonconstant_breakdown(a,b):
+    names=EEG_LABELS
+    rr=a["records"]
+    common_total={}
+    informative={}
+    for ch in names:
+        total=sum(a["eeg_block_digest"][ch][i]==b["eeg_block_digest"][ch][i]
+                  for i in range(rr))
+        meaningful=sum(
+          a["eeg_block_digest"][ch][i]==b["eeg_block_digest"][ch][i]
+          and a["eeg_block_nonconstant"][ch][i]
+          and b["eeg_block_nonconstant"][ch][i] for i in range(rr))
+        common_total[ch]=total
+        informative[ch]=meaningful
+    return common_total,informative
+
 def analyze(a,b):
     assert a["records"]==b["records"]
     R=a["records"]
@@ -47,6 +82,16 @@ def analyze(a,b):
             if matched_per_record.count(k)}
     assert sum(matched_per_record)==sum(k*val for k,val in
               ((int(k),v) for k,v in counts.items()))
+    total_by_ch,nonconstant_by_ch=channel_nonconstant_breakdown(a,b)
+    nonconstant_matching_per_record=[
+        sum(a["eeg_block_digest"][ch][i]==b["eeg_block_digest"][ch][i]
+             and a["eeg_block_nonconstant"][ch][i]
+             and b["eeg_block_nonconstant"][ch][i]
+            for ch in EEG_LABELS)
+        for i in range(R)]
+    assert sum(nonconstant_matching_per_record)==sum(nonconstant_by_ch.values())
+    assert sum(matched_per_record)==sum(total_by_ch.values())
+    assert all(x<=y for x,y in zip(nonconstant_matching_per_record,matched_per_record))
     positive=runs(matched_per_record,lambda z:z>0)
     full=runs(matched_per_record,lambda z:z==len(EEG_LABELS))
     near=runs(matched_per_record,lambda z:z>=25)
@@ -54,6 +99,21 @@ def analyze(a,b):
     return {"n_native_EDF_records":R,"n_named_EEG_channels":len(EEG_LABELS),
       "total_aligned_exact_EEG_storage_blocks":sum(matched_per_record),
       "per_record_matched_channel_histogram":counts,
+      "exact_native_blocks_with_genuine_within_block_time_variation":
+          sum(nonconstant_matching_per_record),
+      "exact_native_blocks_only_constant_within_record":
+          sum(matched_per_record)-sum(nonconstant_matching_per_record),
+      "matched_annotated_EEG_block_count_per_channel":total_by_ch,
+      "matched_nonconstant_EEG_block_count_per_channel":nonconstant_by_ch,
+      "nonconstant_exact_channel_count_per_native_record_histogram":
+          dict(sorted({str(k):nonconstant_matching_per_record.count(k)
+               for k in set(nonconstant_matching_per_record)}.items(),
+                    key=lambda kv:int(kv[0]))),
+      "longest_run_with_at_least_25_nonconstant_EEG_channel_blocks":
+          max([z["n_native_records"] for z in runs(
+               nonconstant_matching_per_record,lambda n:n>=25)],default=0),
+      "num_native_records_with_at_least_25_nonconstant_matches":
+          sum(n>=25 for n in nonconstant_matching_per_record),
       "num_records_with_any_matching_EEG_channel":
           sum(n>0 for n in matched_per_record),
       "num_records_with_all_29_EEG_channels_matched":
@@ -90,6 +150,7 @@ def live():
             raise RuntimeError("source distributor pinned full EDF SHA changed")
         p=parse_edf(blob)
         p["eeg_block_digest"]=digital_eeg_blocks(blob,p)
+        p["eeg_block_nonconstant"]=eeg_block_nonconstant(blob,p)
         prepared[i]=p
         print("P2_TOPOLOGY_REAL_EDF_VERIFIED",i,flush=True)
     out=[]
@@ -99,6 +160,10 @@ def live():
         print("P2_EXACT_EDF_TEMPORAL_OVERLAP_TOPOLOGY",
               json.dumps({"pair":[i,j],
                           "hist":x["per_record_matched_channel_histogram"],
+                          "nonconstant_exact_blocks":x[
+                             "exact_native_blocks_with_genuine_within_block_time_variation"],
+                          "matched_nonconstant_per_EEG_channel":x[
+                             "matched_nonconstant_EEG_block_count_per_channel"],
                           "full_runs":x["all_29_equal_contiguous_record_runs"],
                           "near_runs":x["at_least_25_equal_contiguous_record_runs"],
                           "any_runs":x["any_equal_contiguous_record_runs"]},
