@@ -1,0 +1,57 @@
+name: P2 erasure-tolerant digital identity graph two independent real EDF CI artifacts
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths:
+      - '.github/workflows/p2-two-receipt-erasure-tolerant-digital-graph.yml'
+      - 'research/defaultreg_bspc_v13/src/p2_cross_artifact_erasure_tolerant_digital_graph.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  reconcile_independent_full_census_and_temporal_topology:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: p2-nemar-fifty-edf-1225-physical-waveform-products-20261013
+          run-id: 38388066957
+          github-token: ${{ github.token }}
+          path: /tmp/p2_fifty_original
+      - uses: actions/download-artifact@v4
+        with:
+          name: p2-real-six-EDF-native-temporal-block-overlap-and-span-receipt
+          run-id: 38543795987
+          github-token: ${{ github.token }}
+          path: /tmp/p2_temporal_original
+      - name: Audit 1225 unique pairs against their independent six-real-EDF nonconstant-block source
+        run: |
+          set -euo pipefail
+          A=$(find /tmp/p2_fifty_original -type f -name p2_nemar_50_edf_1225_content_pairs.json -print -quit)
+          B=$(find /tmp/p2_temporal_original -type f -name p2_nemar_temporal_native_block_topology.json -print -quit)
+          test -n "$A" && test -n "$B"
+          python research/defaultreg_bspc_v13/src/p2_cross_artifact_erasure_tolerant_digital_graph.py --census "$A" --topology "$B" --out p2_erasure_tolerant_public_digital_content_graph.json
+      - name: Require 0 whole-file identities, 1 strict complete EEG edge, 2 erasure tolerant edges and NO patient inference
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('p2_erasure_tolerant_public_digital_content_graph.json'))
+          z=x['comparators']
+          assert x['n_checked_published_EDF_ids']==50 and x['n_complete_pairs']==1225
+          assert x['THIS_IS_NOT_A_PATIENT_COUNT']
+          assert x['no_source_MAT_conversion_or_clinical_identity_proof']
+          assert x['retrospective_erasure_tolerant_rule']['thresholds_selected_AFTER_seeing_exploratory_release']
+          assert z['whole_EDF_SHA_identity_edges']==0
+          assert z['all_29_full_EEG_channel_content_identity_edges']==1
+          assert z['one_channel_mismatch_tolerant_pairs']==[[4,5],[47,49]]
+          assert x['digital_content_graph_component_count']==48
+          print('P2_TWO_INDEPENDENT_REAL_EDF_RECEIPTS_ERASURE_TOLERANT_GRAPH_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p2-full50-pair-content-graph-from-two-immutable-CI-evidence-sources
+          path: p2_erasure_tolerant_public_digital_content_graph.json
+          retention-days: 90
