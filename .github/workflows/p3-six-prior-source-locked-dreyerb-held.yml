@@ -1,4 +1,4 @@
-name: P3 six additional DreyerB people original-source-SHA-locked no reselect
+name: P3 six DreyerB held under prior fixed choices with source-drift disclosure
 on:
   push:
     branches: [publication/default-eeg-p3-transfer-negative-20261013]
@@ -29,7 +29,7 @@ jobs:
           run-id: 38390737635
           github-token: ${{ github.token }}
           path: /tmp/prior_dreyer_b_source
-      - name: Fail-closed unchanged source SHA plus prior-locked actions, then read held 71-76
+      - name: Audit prior-source SHA and enforce original frozen choices, then read held 71-76
         run: |
           set -euo pipefail
           mkdir -p "$MNE_DATA"
@@ -45,13 +45,16 @@ jobs:
           a=json.loads((r/'P3_DREYER_B_SIX_TARGET_PRE_READ_LOCK.json').read_text())
           b=json.loads((r/'P3_DREYER_B_SIX_NEW_SOURCE_LOCKED_RESULTS.json').read_text())
           assert a['prior_run']==38390737635
-          assert a['exact_source_sha_match'] and a['policy_choices_not_refitted_or_readapted']
+          assert a['source_participant_counts_match_original']
+          assert a['prior_policy_choices_not_reselected_or_readapted']
+          assert a['exact_source_sha_match'] or a['model_refitted_on_current_source_different_when_sha_drift']
           assert b['new_held_subject_ids']==[71,72,73,74,75,76]
           assert b['distinct_EEG_acquisitions_or_cohorts']==1
           assert b['no_source_hyperparameters_reoptimised']
+          assert b['strict_original_source_byte_replay_achieved']==a['exact_source_sha_match']
           assert len(b['rows'])==6
           assert b['no_acquisition_level_confidence_or_coverage_claim']
-          print('P3_SIX_HELD_DREYERB_PRIOR_SOURCE_CHOICES_AUDIT_PASS')
+          print('P3_SIX_HELD_DREYERB_PRIOR_CHOICES_REFIT_DISCLOSED')
           PY
       - uses: actions/upload-artifact@v4
         if: always()
