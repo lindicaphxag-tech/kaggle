@@ -1,0 +1,32 @@
+name: P2 published 1225-pair scalar artifact independent arithmetic
+on:
+  push:
+    branches: [research/p2-1225-external-artifact-count-recheck-20261014]
+    paths:
+      - research/defaultreg_bspc_v13/src/p2_1225_pair_independent_scalar_audit.py
+      - .github/workflows/p2-1225-pair-independent-recount.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  immutable-artifact-recount:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download original approved whole-50 EDF scalar evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p _p2_1225
+          gh run download 38388066957 -R lindicaphxag-tech/kaggle -n p2-nemar-fifty-edf-1225-physical-waveform-products-20261013 -D _p2_1225
+          cd _p2_1225 && zip -q immutable_p2_original_pair_artifact.zip p2_nemar_50_edf_1225_content_pairs.json
+      - name: Independently recount 1225 original scalar records
+        run: python research/defaultreg_bspc_v13/src/p2_1225_pair_independent_scalar_audit.py _p2_1225/immutable_p2_original_pair_artifact.zip --out independent_p2_recount.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p2-count-recheck-not-independent-EEG-reprocessing
+          path: independent_p2_recount.json
