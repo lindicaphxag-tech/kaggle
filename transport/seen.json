@@ -1830,46 +1830,62 @@
     },
     {
       "created_at": "2026-10-14T04:54:46Z",
+      "expiry_recorded_at": "2026-10-14T13:59:57Z",
+      "expiry_sha256": "775cad231dbf7798452f0438d28efc82179a6785bbb7ff128f990988bec9a794",
+      "expiry_source": "expirations/Genesis-Embodied-AI__genesis-world__3536.json",
       "first_frozen_at": "2026-10-14T06:07:57Z",
       "id": "Genesis-Embodied-AI/genesis-world#3536",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3536,
       "prediction_deadline_at": "2026-10-14T12:07:57Z",
       "repository": "Genesis-Embodied-AI/genesis-world",
       "source": "inbox/FIRST_SEEN_20261014T060757Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "2d4d97758516c196b0adb5a2294a37a3d5392dff86b25d59c1a45bd367c86fa6"
     },
     {
       "created_at": "2026-10-14T05:41:26Z",
+      "expiry_recorded_at": "2026-10-14T13:59:57Z",
+      "expiry_sha256": "239d5ed47ff71e3cbc4bdec38e5b39e53720f78a7139f3e98ae680fbc6c0443b",
+      "expiry_source": "expirations/isaac-sim__IsaacSim__880.json",
       "first_frozen_at": "2026-10-14T06:07:57Z",
       "id": "isaac-sim/IsaacSim#880",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 880,
       "prediction_deadline_at": "2026-10-14T12:07:57Z",
       "repository": "isaac-sim/IsaacSim",
       "source": "inbox/FIRST_SEEN_20261014T060757Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "a1f283861536443429eb0431d3adc6766ca2d9ebfcd4bb26ed6c8d5e1aaa568a"
     },
     {
       "created_at": "2026-10-14T02:36:05Z",
+      "expiry_recorded_at": "2026-10-14T13:59:57Z",
+      "expiry_sha256": "1a314bff804876eaa050059ecce0ef8debf5c232c7460ff99865c8acebd261e3",
+      "expiry_source": "expirations/ros-controls__ros2_controllers__2702.json",
       "first_frozen_at": "2026-10-14T06:07:57Z",
       "id": "ros-controls/ros2_controllers#2702",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 2702,
       "prediction_deadline_at": "2026-10-14T12:07:57Z",
       "repository": "ros-controls/ros2_controllers",
       "source": "inbox/FIRST_SEEN_20261014T060757Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "7d29fcc6b723ac370e1fb3c1fce4fbaf04bb07761c4933a35f3dfbc82a3fb30b"
     },
     {
       "created_at": "2026-10-14T03:52:07Z",
+      "expiry_recorded_at": "2026-10-14T13:59:57Z",
+      "expiry_sha256": "d82a84eb84571bd75acd841f395c2ae4c563310f0d9f8e34b45ae14acae7b893",
+      "expiry_source": "expirations/ros-navigation__navigation2__6660.json",
       "first_frozen_at": "2026-10-14T06:07:57Z",
       "id": "ros-navigation/navigation2#6660",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 6660,
       "prediction_deadline_at": "2026-10-14T12:07:57Z",
       "repository": "ros-navigation/navigation2",
       "source": "inbox/FIRST_SEEN_20261014T060757Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "96a39eb99256db16fb0ec094181f35066762f50c0d50920daa71e022810530bd"
     },
     {
@@ -1959,6 +1975,28 @@
       "source": "inbox/FIRST_SEEN_20261014T114444Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "91f44d3396707e6ddd4275dab2b266ca0b94ad9a6beb1769eda5066f51086bf0"
+    },
+    {
+      "created_at": "2026-10-14T13:59:43Z",
+      "first_frozen_at": "2026-10-14T14:01:39Z",
+      "id": "RobotLocomotion/drake#25083",
+      "issue_number": 25083,
+      "prediction_deadline_at": "2026-10-14T20:01:39Z",
+      "repository": "RobotLocomotion/drake",
+      "source": "inbox/FIRST_SEEN_20261014T140139Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "74ebd802caceda70e94761b5c1f4a1555c8c9d7006d78a50dc98e43352055d58"
+    },
+    {
+      "created_at": "2026-10-14T11:49:07Z",
+      "first_frozen_at": "2026-10-14T14:01:39Z",
+      "id": "gazebosim/gz-sim#4078",
+      "issue_number": 4078,
+      "prediction_deadline_at": "2026-10-14T20:01:39Z",
+      "repository": "gazebosim/gz-sim",
+      "source": "inbox/FIRST_SEEN_20261014T140139Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "97d4707b6f5e650b363c1f89e1bee8ac744e682549a1e9035f9210d9d1ae0482"
     }
   ]
 }
