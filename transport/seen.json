@@ -2010,24 +2010,32 @@
     },
     {
       "created_at": "2026-10-14T13:59:43Z",
+      "expiry_recorded_at": "2026-10-14T20:37:35Z",
+      "expiry_sha256": "45a852abb030c9bbd6b1e5d6a797fac4070acf97cb2f43a7021d981d8e63d58a",
+      "expiry_source": "expirations/RobotLocomotion__drake__25083.json",
       "first_frozen_at": "2026-10-14T14:01:39Z",
       "id": "RobotLocomotion/drake#25083",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 25083,
       "prediction_deadline_at": "2026-10-14T20:01:39Z",
       "repository": "RobotLocomotion/drake",
       "source": "inbox/FIRST_SEEN_20261014T140139Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "74ebd802caceda70e94761b5c1f4a1555c8c9d7006d78a50dc98e43352055d58"
     },
     {
       "created_at": "2026-10-14T11:49:07Z",
+      "expiry_recorded_at": "2026-10-14T20:37:35Z",
+      "expiry_sha256": "dd4497a7f4fd554345d23deb1d1eb272ddbaf0262d4f1e5774b1163d386ac175",
+      "expiry_source": "expirations/gazebosim__gz-sim__4078.json",
       "first_frozen_at": "2026-10-14T14:01:39Z",
       "id": "gazebosim/gz-sim#4078",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 4078,
       "prediction_deadline_at": "2026-10-14T20:01:39Z",
       "repository": "gazebosim/gz-sim",
       "source": "inbox/FIRST_SEEN_20261014T140139Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "97d4707b6f5e650b363c1f89e1bee8ac744e682549a1e9035f9210d9d1ae0482"
     },
     {
@@ -2073,6 +2081,28 @@
       "source": "inbox/FIRST_SEEN_20261014T185321Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "162cd10171c0031b5848c118acd691d95c91a44ba08128aca69792da21e200ca"
+    },
+    {
+      "created_at": "2026-10-14T18:53:20Z",
+      "first_frozen_at": "2026-10-14T20:38:45Z",
+      "id": "eProsima/Fast-DDS#6577",
+      "issue_number": 6577,
+      "prediction_deadline_at": "2026-10-15T02:38:45Z",
+      "repository": "eProsima/Fast-DDS",
+      "source": "inbox/FIRST_SEEN_20261014T203845Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "996f485ca49a6cadc2f85386626fc20bcb82bbd440a3a3df6cde460b08db5592"
+    },
+    {
+      "created_at": "2026-10-14T19:58:30Z",
+      "first_frozen_at": "2026-10-14T20:38:45Z",
+      "id": "ros2/rclcpp#3342",
+      "issue_number": 3342,
+      "prediction_deadline_at": "2026-10-15T02:38:45Z",
+      "repository": "ros2/rclcpp",
+      "source": "inbox/FIRST_SEEN_20261014T203845Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "aa43a29f34af9f2c6084401fda3896bc6b7e6459ce2f83fcec70a3c89095727f"
     }
   ]
 }
