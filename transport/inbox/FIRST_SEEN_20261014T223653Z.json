@@ -1,0 +1,36 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "andrewkaufman",
+      "body": "### Summary\n\nFollow-up to #3457. Checked against `mujoco` 3.15.0 and `main`. `MjcPhysicsSceneAPI` can't represent these MJCF settings:\n\n| MJCF | Since | `mjcPhysics` USD schema |\n| --- | --- | --- |\n| `<option integrator=\"discrete\">` | 3.13 | `mjc:option:integrator` `allowedTokens` lacks `\"discrete\"` |\n| `<option><flag ipc=\"enable\"/></option>` | 3.14 | no `mjc:flag:ipc` |\n| `<option><flag diagexact=\"enable\"/></option>` | 3.9 | no `mjc:flag:diagexact` |\n\n### Why it matters\n\nThe USD decoder silently falls back to `euler` for unrecognized integrator tokens, so a model using the `discrete` integrator loses it on a USD round trip, and with it the `ipc` contact mode. MJCF-to-USD converters have no schema-defined place to record these settings.\n\n### Request\n\nAdd `\"discrete\"` to the `mjc:option:integrator` tokens, add `mjc:flag:ipc` and `mjc:flag:diagexact` to `MjcPhysicsSceneAPI`, and parse them in the USD decoder.\n\n### Reproduction\n\n```python\nimport mujoco\n\nfor xml in [\n    '<mujoco><option integrator=\"discrete\"/></mujoco>',\n    '<mujoco><option integrator=\"discrete\" solver=\"CG\"><flag ipc=\"enable\"/></option></mujoco>',\n    '<mujoco><option><flag diagexact=\"enable\"/></option></mujoco>',\n]:\n    mujoco.MjSpec.from_string(xml).compile()  # all compile\n```\n\n```bash\nschema=\"$(python -c 'import mujoco,os;print(os.path.dirname(mujoco.__file__))')/include/mujoco/experimental/usd/mjcPhysics\"\ngrep -n -A1 'Allowed Values\" | euler' \"$schema/sceneAPI.h\"  # euler, rk4, implicit, implicitfast\ngrep -rni 'ipc\\|diagexact' \"$schema\"  # (no output)\n```\n\n",
+      "created_at": "2026-10-14T21:07:40Z",
+      "html_url": "https://github.com/google-deepmind/mujoco/issues/3693",
+      "id": "google-deepmind/mujoco#3693",
+      "issue_number": 3693,
+      "labels": [],
+      "repository": "google-deepmind/mujoco",
+      "surface_sha256": "67a7330e107dca45681d3ac84a172eed800ef255db66f4d8497d06e12b451c8b",
+      "title": "mjcPhysics USD schema missing discrete integrator, ipc and diagexact flags"
+    },
+    {
+      "author_login": "andrewkaufman",
+      "body": "With `-DMUJOCO_WITH_USD=ON` on current `main` (`12720007e`), the USD tests can't be built or run from a plain build tree. There are two separate problems.\n\n**Setup:** Ubuntu 22.04 on x86_64, GCC 11.4, CMake 4.4 (Unix Makefiles), OpenUSD 25.11.\n\n### 1. `usd_decoder_test` uses internal include paths\n\n```\ntest/plugin/usd_decoder/usd_decoder_test.cc:25:10: fatal error: third_party/usd/v26/pxr/base/arch/fileSystem.h: No such file or directory\n```\n\n`test/plugin/usd_decoder/usd_decoder_test.cc` includes nine OpenUSD headers as `\"third_party/usd/v26/pxr/...\"`. Every other OpenUSD include in the repository (468 of them) uses `<pxr/...>`. A full `cmake --build build` fails the same way.\n\nThese lines came in with the Copybara merge of #3635 (`b70ab9c9c`). That PR's own commits used `<pxr/...>`, so the paths appear to be rewritten on import and not mapped back on export for this file. `80c1cc346` added the equivalent transform for `newton_tokens.h` in `plugin/usd_decoder/`, but nothing covers `test/plugin/usd_decoder/`. #3636 also edits this test file, so it may hit the same rewrite. The GitHub workflows configure with `-DMUJOCO_WITH_USD=OFF`, so CI can't catch either problem.\n\n### 2. `mjcPhysics/generatedSchema.usda` is staged only by `cmake --install`\n\nWhen `libmujoco` loads, it registers USD plugins from the `mujoco-usd-resources` directory next to it (`src/experimental/usd/utils.cc`). The test binaries load `build/lib/libmujoco.so`, so CTest always uses `build/lib/mujoco-usd-resources`, whether or not the build has been installed.\n\nThe build tree is set up for this. `plugInfo.json` for `usdMjcf`, `mjcPhysics` and `newton` is generated there, with library paths relative to the build tree, and `install_newton_usd_plugin` copies the Newton `generatedSchema.usda` there at configure time. The `mjcPhysics` schema, however, is listed only in `install(FILES mjcPhysics/generatedSchema.usda ...)`, so the build tree gets its `plugInfo.json` without the schema:\n\n```\nWarning: in _GetGeneratedSchema at line 804 of pxr/usd/usd/schemaRegistry.cpp -- Failed to open schema layer at path '<build>/lib/mujoco-usd-resources/mjcPhysics/generatedSchema.usda'. Any schemas defined in plugin library 'mjcPhysics' will not have valid prim definitions.\n```\n\nThe `mjc:` schema definitions are then missing, and the tests fail on wrong values rather than crashing. 84 of the 164 USD tests fail: 77 in `usd_decoder_test` and 7 in `MjcfSdfFileFormatPluginTest`. For example:\n\n```\nmju_user_error: Invalid size for o_solref attribute: 0 expected 2\nC++ exception with description \"Used null prim\" thrown in the test body.\n```\n\nCopying the schema into the build tree as well, the way the Newton plugin already does, would fix this:\n\n```cmake\nconfigure_file(\n  \"${CMAKE_CURRENT_SOURCE_DIR}/mjcPhysics/generatedSchema.usda\"\n  \"${CMAKE_BINARY_DIR}/${MJ_USD_INSTALL_DIR_LIB}/mjcPhysics/generatedSchema.usda\"\n  COPYONLY)\n```\n\n### Reproduction\n\n```sh\ncmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DMUJOCO_WITH_USD=ON -DMUJOCO_BUILD_TESTS=ON -Dpxr_DIR=<OpenUSD build or install>\ncmake --build build --target usd_decoder_test mjcf_file_format_test usdMjcf\nctest --test-dir build -R 'Usd|MjcfSdfFileFormatPluginTest'\n```\n\nThe build fails with problem 1. After changing the nine includes to `<pxr/...>`, it builds, and CTest shows problem 2. After also copying `src/experimental/usd/mjcPhysics/generatedSchema.usda` into `build/lib/mujoco-usd-resources/mjcPhysics/`, all 164 tests pass.\n",
+      "created_at": "2026-10-14T21:57:40Z",
+      "html_url": "https://github.com/google-deepmind/mujoco/issues/3695",
+      "id": "google-deepmind/mujoco#3695",
+      "issue_number": 3695,
+      "labels": [],
+      "repository": "google-deepmind/mujoco",
+      "surface_sha256": "48cf7583d44d1e71fa4fa666bbf5ef297fb4fa593c9999e84aa5aeee087c8dc3",
+      "title": "MUJOCO_WITH_USD=ON: usd_decoder_test fails to compile, and USD tests fail from the build tree"
+    }
+  ],
+  "post_activation_issue_identities_observed": 143,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-14T22:36:53Z",
+  "schema_version": 1
+}

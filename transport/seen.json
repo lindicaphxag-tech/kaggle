@@ -2103,6 +2103,28 @@
       "source": "inbox/FIRST_SEEN_20261014T203845Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "aa43a29f34af9f2c6084401fda3896bc6b7e6459ce2f83fcec70a3c89095727f"
+    },
+    {
+      "created_at": "2026-10-14T21:07:40Z",
+      "first_frozen_at": "2026-10-14T22:36:53Z",
+      "id": "google-deepmind/mujoco#3693",
+      "issue_number": 3693,
+      "prediction_deadline_at": "2026-10-15T04:36:53Z",
+      "repository": "google-deepmind/mujoco",
+      "source": "inbox/FIRST_SEEN_20261014T223653Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "67a7330e107dca45681d3ac84a172eed800ef255db66f4d8497d06e12b451c8b"
+    },
+    {
+      "created_at": "2026-10-14T21:57:40Z",
+      "first_frozen_at": "2026-10-14T22:36:53Z",
+      "id": "google-deepmind/mujoco#3695",
+      "issue_number": 3695,
+      "prediction_deadline_at": "2026-10-15T04:36:53Z",
+      "repository": "google-deepmind/mujoco",
+      "source": "inbox/FIRST_SEEN_20261014T223653Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "48cf7583d44d1e71fa4fa666bbf5ef297fb4fa593c9999e84aa5aeee087c8dc3"
     }
   ]
 }
