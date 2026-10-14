@@ -13,7 +13,11 @@ def census(original_zip):
     with ZipFile(original_zip) as z:
         if z.namelist()!=["p2_nemar_50_edf_1225_content_pairs.json"]:
             raise ValueError("Unexpected immutable artifact files")
-        d=json.loads(z.read(z.namelist()[0]))
+        original_bytes=z.read(z.namelist()[0])
+        expected_sha256="d9e14982dc61d56636b4962bc18d6c149737ddbefb5179c014980ffcdd33761d"
+        if hashlib.sha256(original_bytes).hexdigest()!=expected_sha256:
+            raise ValueError("Original frozen result artifact byte identity drift")
+        d=json.loads(original_bytes)
     rows=d["pairwise_scalar_records"]
     seen={}; histogram=Counter(); channel_histogram=Counter()
     if len(rows)!=1225 or d["n_unordered_comparisons"]!=1225 or d["n_public_ids_rehashed"]!=50:
