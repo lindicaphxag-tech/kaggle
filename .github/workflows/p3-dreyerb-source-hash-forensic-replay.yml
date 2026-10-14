@@ -1,0 +1,47 @@
+name: P3 DreyerB exact source byte drift, repeat retrieval forensic without targets
+on:
+  push:
+    branches: [publication/default-eeg-p3-transfer-negative-20261013]
+    paths:
+      - '.github/workflows/p3-dreyerb-source-hash-forensic-replay.yml'
+      - 'research/defaultreg_bspc_v13/src/p3_dreyerb_source_hash_drift_two_reloads_no_targets.py'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  twice_reload_source_only_no_targets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    env:
+      MNE_DATA: /tmp/p3-dreyerb-forensic-source-only
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Exact dependency family
+        run: python3 -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Reimport only source IDs 61-68 twice and compare byte/order-invariant EEG covariance hashes
+        run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_bspc_v13/src/p3_dreyerb_source_hash_drift_two_reloads_no_targets.py --out p3_source_only_two_read_forensic.json
+      - name: Require complete nonidentifying source-only audit, no target outcomes
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('p3_source_only_two_read_forensic.json'))
+          assert x['status']=='SOURCE_ONLY_THIRD_PARTY_RETRIEVAL_REPRO_FORENSIC'
+          assert x['source_ids']==list(range(61,69))
+          assert x['held_target_ids_NEVER_REQUESTED']==[69,70,71,72,73,74,75,76]
+          assert len(x['within_run_per_person_comparisons'])==8
+          assert x['cannot_assign_drift_cause_from_this_test_alone']
+          print('P3_NO_TARGET_SOURCE_DRIFT_DIAGNOSTIC_COMPLETED',x['within_run_same_aggregate'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p3-dreyerb-no-target-two-source-reloads-drift-audit
+          path: p3_source_only_two_read_forensic.json
+          if-no-files-found: warn
+          retention-days: 90
