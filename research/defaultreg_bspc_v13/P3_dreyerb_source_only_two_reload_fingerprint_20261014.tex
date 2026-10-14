@@ -1,0 +1,38 @@
+\paragraph{Source-only reproduction diagnosis without any held target access.}
+\label{sec:p3-dreyer-source-drift-retest}
+Because the exact source-covariance SHA-256 differed across
+earlier independent CI jobs, we ran a further \emph{target-free}
+forensic check. Using the same public Dreyer2023B
+source IDs 61--68 and the same three EEG channels,
+8--30 Hz/160 Hz preprocessing and covariance
+implementation, we loaded all eight source people
+\emph{twice} within one run, retaining both
+labelled-trial ordered SHA-256 fingerprints and
+order-invariant multisets of per-trial digests.
+Both aggregate source covariances exactly matched
+the \emph{original} source SHA
+\texttt{7146797e...3e172b2a7}; all eight
+individual subject digests agreed between the
+two consecutive source reloads, both in
+ordered and sorted form. The successful
+\href{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38540426367}
+{target-free reproducibility run 38540426367}
+contains the complete machine-readable diagnostic.
+
+By contrast, the separate earlier cross-run
+source reload used for the six-person
+fixed-choice model refit produced SHA
+\texttt{9f650460...39ada7f65}, despite matched
+subject/trial/class counts. The present
+within-run agreement shows the difference
+is \emph{not inevitable on every reload};
+it does not identify its cause. Possibilities
+such as host state, release retrieval,
+ordering, environment-dependent decoding
+and hidden numerical randomness require
+controlled isolation and cannot be named
+as established mechanisms. Importantly,
+this check loaded \emph{zero} additional
+held participant EEG outcomes; it is a
+\emph{reproducibility gate}, not an
+additional transfer data point.
