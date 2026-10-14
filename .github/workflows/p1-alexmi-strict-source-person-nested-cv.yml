@@ -1,0 +1,50 @@
+name: P1 AlexMI strict outer-person nested CV source forecast leakage audit
+on:
+  push:
+    branches: [publication/default-eeg-p1-estimand-20261013]
+    paths:
+      - '.github/workflows/p1-alexmi-strict-source-person-nested-cv.yml'
+      - 'research/defaultreg_bspc_v13/src/p1_alexmi_strict_outer_person_nested_forecast_audit.py'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  source_person_held_out_every_nested_fit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    env:
+      MNE_DATA: /tmp/p1-alexmi-strict-source-nested
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python3 -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Strict six-person outer source loop with inner CV model/geometry refits then already-exposed held re-read
+        run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_bspc_v13/src/p1_alexmi_strict_outer_person_nested_forecast_audit.py --out /tmp/p1_strict_nested_results
+      - name: Reject any outer person in a nested training or validation fold
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/p1_strict_nested_results')
+          a=json.loads((p/'P1_ALEXMI_STRICT_NESTED_SOURCE_ONLY_FORECAST_BEFORE_REREAD.json').read_text())
+          b=json.loads((p/'P1_ALEXMI_STRICT_NESTED_SOURCE_FORECAST_RETROSPECTIVE_RESULT.json').read_text())
+          assert len(a['27_grid'])==27 and len(a['nested_source_person_forecast'])==6
+          for row in a['nested_source_person_forecast']:
+              assert row['outer_held_source_person'] not in row['inner_subjects']
+              assert row['held_person_excluded_from_all_inner_model_training']
+          assert a['outer_subject_never_in_inner_cv_model_train_or_validation']
+          assert b['not_independent_experiment_or_new_target_outcome']
+          print('P1_STRICT_FULL_NESTED_SOURCE_PERSON_ALL_SIX_NO_ROW_MODEL_REENTRY_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p1-alexmi-strict-27grid-source-person-nested-cv-no-training-reentry
+          path: /tmp/p1_strict_nested_results/*.json
+          if-no-files-found: warn
+          retention-days: 90
