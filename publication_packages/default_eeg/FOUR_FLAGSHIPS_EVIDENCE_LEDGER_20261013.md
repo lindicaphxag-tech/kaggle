@@ -738,3 +738,24 @@ https://github.com/lindicaphxag-tech/kaggle/actions/runs/38553132304.
 Do not call the newest P3 author-review PDF checked until it succeeds.
 All four paper PRs remain DRAFT. MOABB upstream acknowledgement is
 not a merged correction, scientific peer-review or acceptance.
+
+
+### Exact current four-paper PDF gate resolved (2026-10-14)
+The latest P3 HEAD PDF is now **SUCCESS**, not queued:
+https://github.com/lindicaphxag-tech/kaggle/actions/runs/38553432071
+(HEAD `ee2ef159c0d72cf89eca986baab0fced61910ce0`;
+PDF SHA256 `89ccc701f3f94eeff042c494f8a2fe3e0d9e95d22f1c3ec90349e3a9bc944a09`,
+13 pages, 0 overfull hboxes, 1 underfull hbox).
+A GitHub artifact was downloaded and independently byte-SHA-verified
+against the CI manifest, then PDF page count and media-box bounds
+were inspected; the corrected source-drift section visibly fits
+the printed tenth page. The previous 8.16pt overrun from long
+source SHA text is fixed.
+The four exact-head files have independently verified receipts:
+- P1 HEAD c591a325, 28 pages, 0 overfull.
+- P2 HEAD 5ba20e21, 23 pages, 0 overfull.
+- P3 HEAD ee2ef159, 13 pages, 0 overfull.
+- P4 HEAD dc6c9dfe, 16 pages, 0 overfull.
+All four remain **author review**, **Draft PR**, **NOT journal-submitted**.
+They are not proof of external held-method superiority,
+MAT acquisition ancestry, IEEE floating numerical safety, or acceptance.
