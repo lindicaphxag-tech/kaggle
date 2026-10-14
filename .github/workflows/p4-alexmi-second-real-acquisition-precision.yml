@@ -1,0 +1,54 @@
+name: P4 second public AlexMI 8-person real final-feature quantization certificates
+on:
+  push:
+    branches: [publication/default-eeg-p4-rank-certificates-20261013]
+    paths:
+      - '.github/workflows/p4-alexmi-second-real-acquisition-precision.yml'
+      - 'research/defaultreg_bspc_v13/src/p4_second_public_alexmi_8_person_precision_scope.py'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  second_named_public_acquisition_eight_individuals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    env:
+      MNE_DATA: /tmp/p4-alexmi-second-data
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python3 -m pip install --disable-pip-version-check moabb==1.7.2 sympy==1.14.0
+      - name: Real AlexMI 8 participants and 256 fixed subject/pair/precision conditions
+        run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_bspc_v13/src/p4_second_public_alexmi_8_person_precision_scope.py --out p4_alexmi_second_real_public_feature_precision.json
+      - name: Confirm full exact-source conditional scope without claiming target success
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('p4_alexmi_second_real_public_feature_precision.json'))
+          assert x['status']=='SECOND_PUBLIC_EEG_ACQUISITION_REAL_FINAL_FEATURE_NUMERIC_SCOPE'
+          assert x['n_released_people']==8
+          assert x['total_pair_precision_conditions']==256
+          assert x['frozen_bit_grid']==[18,10,6,4]
+          assert x['no_preprocessing_MNE_covariance_or_tangent_machine_roundoff_guarantee']
+          assert x['all_roundoff_exact_rational_after_final_features']
+          assert x['all_in_same_AlexMI_public_acquisition']
+          assert len(x['person_and_precision_results'])==8
+          for p in x['person_and_precision_results']:
+              assert len(p['precision_checks'])==4
+              for a in p['precision_checks']:
+                  assert a['exact_final_binary64_entrywise_error_verified']
+                  assert sum(a['counts'].values())==8
+          print('P4_SECOND_PUBLIC_ALEXMI_EIGHT_PERSON_REAL_FINAL_FEATURE_SCOPE_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p4-second-public-AlexMI-eight-person-final-feature-whole-path-certificates
+          path: p4_alexmi_second_real_public_feature_precision.json
+          if-no-files-found: warn
+          retention-days: 90
