@@ -23,7 +23,7 @@ jobs:
         with:
           name: p3-dreyerb-no-target-two-source-reloads-drift-audit
           run-id: 38548578441
-          github-token: __TOKEN__
+          github-token: ${{ github.token }}
           path: /tmp/p3alternate
       - name: Compare independent-run source-person signatures and fail on unexpected drift
         run: |
