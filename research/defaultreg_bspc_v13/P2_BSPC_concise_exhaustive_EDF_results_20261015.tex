@@ -1,0 +1,27 @@
+\subsection{Exhaustive public-EDF digital overlap census}
+\label{sec:p2-main-census}
+We re-downloaded all 50 publicly released Liu2024 preprocessed
+EDF products and matched their full-file SHA-256 digests to a
+version-pinned independent NEMAR distribution manifest. The
+source-locked reader then compared all $\binom{50}{2}=1,225$
+unordered cross-ID pairs at the same named channel and native
+storage-record positions: 29 time-varying EEG channels by 320 EDF
+records, or 9,280 potential block positions per pair. A positive
+block match means equality of the as-stored integer digital
+sample payload, \emph{not} calibrated physiological amplitude,
+independent patient identity or an original acquisition session.
+
+Only released IDs 4/5 shared all 29 complete EEG channel
+streams and 9,280/9,280 aligned EEG blocks. IDs 47/49 shared
+6,957/9,280 aligned EEG blocks without any whole time-varying
+channel-stream identity; IDs 11/15 shared 171/9,280 blocks,
+also without a complete-channel match. The remaining 1,222
+ID pairs had zero matching blocks under this \emph{fixed and
+aligned} comparison rule. These zero outcomes are descriptive
+for the inspected release and cannot exclude transformed,
+reordered, time-shifted or partly overlapping acquisitions.
+The complete channel/block count table, source-file SHA
+verification, alternative reader checks and source MAT
+correspondence failures are retained in Supplementary Results
+S2--S3. All analyses are retrospective, and no clinical
+identity is inferred from digital sample equality.
