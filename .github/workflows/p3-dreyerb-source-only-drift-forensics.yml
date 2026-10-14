@@ -1,0 +1,46 @@
+name: P3 DreyerB source-only hash drift root-cause diagnostics
+on:
+  push:
+    branches: [publication/default-eeg-p3-transfer-negative-20261013]
+    paths:
+      - '.github/workflows/p3-dreyerb-source-only-drift-forensics.yml'
+      - 'research/defaultreg_bspc_v13/src/p3_dreyerb_source_hash_drift_two_reloads_no_targets.py'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  two_independent_source_reads_only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 95
+    env:
+      MNE_DATA: /tmp/p3-dreyer-source-only-forensics
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python3 -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Compare two fresh source-only preprocessed covariance reads without held IDs
+        run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_bspc_v13/src/p3_dreyerb_source_hash_drift_two_reloads_no_targets.py --out p3_dreyerb_source_hash_forensics.json
+      - name: Fail closed for any leaked held ID or source label mismatch
+        run: |
+          python - <<'PY'
+          import json
+          d=json.load(open('p3_dreyerb_source_hash_forensics.json'))
+          assert d['source_ids']==list(range(61,69))
+          assert d['held_target_ids_NEVER_REQUESTED']==[69,70,71,72,73,74,75,76]
+          assert len(d['within_run_per_person_comparisons'])==8
+          assert all(row['public_id'] in range(61,69) for row in d['within_run_per_person_comparisons'])
+          assert d['not_independent_held_subject_validation']
+          print('P3_DREYERB_SOURCE_ONLY_FINGERPRINT_FORENSIC_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p3-dreyerb-original-vs-new-source-by-person-digest-forensics
+          path: p3_dreyerb_source_hash_forensics.json
+          if-no-files-found: warn
+          retention-days: 90
