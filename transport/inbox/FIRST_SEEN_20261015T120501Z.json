@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "boris1828",
+      "body": "A sleeping rigid body is woken whenever an awake body's padded broadphase AABB overlaps its own, even when they never touch. While awake it drifts slightly, then falls asleep again at a different pose, so adding a body to a scene changes the motion of another body it never contacts.\n\nRepro (pybullet 3.2.7, useMaximalCoordinates=1, sleeping enabled): a 0.5 m cube rests on a plane and falls asleep. A 0.25 m sphere then rolls past one of its edges with a 12 cm gap. getContactPoints reports nothing, yet the cube is woken for 40 steps and ends up 6.5 \u00b5m from where it ends up without the sphere. The difference becomes exactly 0 with setCollisionFilterPair(cube, sphere, \u2026, 0) or with sleeping disabled. The reach follows the AABB padding: up to about 16 cm with the default contactBreakingThreshold of 0.02, and 35 cm with 0.1.\n",
+      "created_at": "2026-10-15T10:11:08Z",
+      "html_url": "https://github.com/bulletphysics/bullet3/issues/4815",
+      "id": "bulletphysics/bullet3#4815",
+      "issue_number": 4815,
+      "labels": [],
+      "repository": "bulletphysics/bullet3",
+      "surface_sha256": "579995577bc82dd9b41cad8d2c1612a5bc3f0ab107e1b09a6613fb7a06a7785c",
+      "title": "Sleeping body is woken and moved by a body that never comes within contact range"
+    }
+  ],
+  "post_activation_issue_identities_observed": 151,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-15T12:05:01Z",
+  "schema_version": 1
+}
