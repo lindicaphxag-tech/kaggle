@@ -1,0 +1,33 @@
+name: P2 V7 source-frozen tuned CAR comparator
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/p2-v7-source-tuned-car-benchmark.yml'
+      - 'research/defaultreg_bspc_v13/src/p2_v7_source_tuned_car_comparison.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_frozen_tuned_car:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      P2_OUTPUT: p2_v7_tuned_car
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install 'numpy<3' 'scipy<2'
+      - name: Development-only tuned CAR with source-held results
+        run: python research/defaultreg_bspc_v13/src/p2_v7_source_tuned_car_comparison.py
+      - name: Upload exact case-level predictions
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p2-v7-tuned-car-controlled-84-cases
+          path: p2_v7_tuned_car/
+          if-no-files-found: warn
