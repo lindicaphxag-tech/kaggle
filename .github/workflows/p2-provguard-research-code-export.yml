@@ -1,0 +1,32 @@
+name: P2 controlled EEG provenance reproducibility code export
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths: [".github/workflows/p2-provguard-research-code-export.yml"]
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  export-audited-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Copy version-locked source code with complete SHA manifest
+        run: |
+          mkdir -p provenance-code
+          cp research/defaultreg_bspc_v13/src/p2_external_chbmit_shared_clock.py provenance-code/
+          cp research/defaultreg_bspc_v13/src/p2_chbmit_six_subject_frozen_extension.py provenance-code/
+          cp .github/workflows/p2-external-chbmit-coherent-provenance.yml provenance-code/
+          cp .github/workflows/p2-external-chbmit-held4-confirmation.yml provenance-code/
+          cp .github/workflows/p2-provenance-consensus-physionet-heldtest.yml provenance-code/
+          cp research/defaultreg_bspc_v13/P2_PROVGUARD_COHERENCE_CRITICAL_BASELINE_20261015.md provenance-code/
+          cp research/defaultreg_bspc_v13/P2_SHARED_CLOCK_REAL_HELD_VALIDATION_20261015.md provenance-code/
+          cp research/defaultreg_bspc_v13/P2_SOURCE_CLOCK_REAL_PHYSIONET_AUTHOR_REVIEW_20261015.tex provenance-code/
+          (cd provenance-code && sha256sum * > SHA256_SOURCE_MANIFEST.txt)
+          printf '%s\n' "$GITHUB_SHA" > provenance-code/GITHUB_SOURCE_COMMIT.txt
+          ls -lh provenance-code/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: P2-coherent-EEG-external-source-and-run-workflows
+          path: provenance-code/
+          retention-days: 90
