@@ -1,0 +1,35 @@
+name: P2 V5 source-level null calibration on CHB-MIT
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/p2-provenance-v5-nineteen-record-calibration.yml'
+      - 'research/defaultreg_bspc_v13/src/p2_provguard_v5_continuous_search.py'
+      - 'research/defaultreg_bspc_v13/src/p2_provguard_v5_chbmit_nineteen_nulls.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  calibrated_chbmit_v5:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      P2_OUTPUT: p2_v5_source_null
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install numerical dependencies
+        run: python -m pip install 'numpy<3' 'scipy<2'
+      - name: Twenty CHB-MIT EDF public subject prefixes
+        run: python research/defaultreg_bspc_v13/src/p2_provguard_v5_chbmit_nineteen_nulls.py
+      - name: Upload raw output and null distribution
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p2-v5-nineteen-record-level-null-calibration
+          path: p2_v5_source_null/
+          if-no-files-found: warn
