@@ -1,0 +1,52 @@
+name: P1 AlexMI first-repo held acquisition correct NLL baseline lock
+on:
+  push:
+    branches: [publication/default-eeg-p1-estimand-20261013]
+    paths:
+      - '.github/workflows/p1-alexmi-new-held-real-eeg-gate.yml'
+      - 'research/defaultreg_bspc_v13/src/p1_alexmi_new_source_lock_two_held.py'
+      - 'research/defaultreg_bspc_v13/src/p1_second_model_shrinkage_lda_forecast.py'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  frozen-source-then-reserved-targets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    env:
+      MNE_DATA: /tmp/alexmi-new-p1-eeg
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python3 -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Source-only locked protocol; then reserve IDs 7 and 8
+        run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_bspc_v13/src/p1_alexmi_new_source_lock_two_held.py --out /tmp/p1_alexmi_out
+      - name: Assert target-late acquisition scope and no target-driven selectors
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/p1_alexmi_out')
+          a=json.loads((p/'P1_ALEXMI_SOURCE_FROZEN_BEFORE_RESERVED_IDS.json').read_text())
+          b=json.loads((p/'P1_ALEXMI_TWO_RESERVED_NEW_REAL_EEG_RESULTS.json').read_text())
+          assert a['held_public_ids_not_yet_read']==[7,8]
+          assert a['source_public_ids']==[1,2,3,4,5,6]
+          assert a['no_target_labels_or_features_used_for_selection']
+          assert b['no_TARGET_label_read_before_source_lock_within_workflow']
+          assert b['summary']['n_held_persons']==2
+          assert b['target_records_are_same_acquisition_dataset']
+          assert b['not_sufficient_for_independently_confirmed_method_or_clinical_gain']
+          print('P1_ALEXMI_SOURCE_LOCKED_NEW_PUBLIC_MI_ACQUISITION_NO_EXAGGERATED_CLAIM')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p1-alexmi-source-locked-new-public-eeg-vs-trivial-baselines
+          path: /tmp/p1_alexmi_out/*.json
+          if-no-files-found: warn
+          retention-days: 90

@@ -1,0 +1,30 @@
+name: P1 exact score-estimand algebra regression
+on:
+  push:
+    branches: [publication/default-eeg-p1-estimand-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/p1_estimand_exact_rational_check.py'
+      - '.github/workflows/p1-exact-score-estimand-algebra.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  exact-math:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python research/defaultreg_bspc_v13/src/p1_estimand_exact_rational_check.py > p1_algebra.json
+      - run: |
+          python - <<'PY'
+          import json
+          j=json.load(open("p1_algebra.json"))
+          assert j["identity_exact"] and not j["uses_real_EEG"]
+          print(j)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p1-exact-rational-math-no-new-eeg
+          path: p1_algebra.json
+          retention-days: 90

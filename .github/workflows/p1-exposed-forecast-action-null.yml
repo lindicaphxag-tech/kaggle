@@ -1,0 +1,36 @@
+name: P1 exposed EEG forecast action vs trivial policy null
+on:
+  push:
+    branches: [publication/default-eeg-p1-estimand-20261013]
+    paths:
+      - .github/workflows/p1-exposed-forecast-action-null.yml
+      - research/defaultreg_bspc_v13/src/p1_retrospective_forecast_action_null.py
+      - research/defaultreg_bspc_v13/results/P1_second_LDA_scorer_subject_forecast_20261013.json
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  frozen-nine-paired-decisions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Replay true exposed EEG outcome scalar artifact
+        run: |
+          python3 research/defaultreg_bspc_v13/src/p1_retrospective_forecast_action_null.py --input research/defaultreg_bspc_v13/results/P1_second_LDA_scorer_subject_forecast_20261013.json --out p1_exposed_action_decision_null.json
+      - name: Require hard zero-target and post-outcome scope
+        run: |
+          python3 - <<'PY'
+          import json
+          x=json.load(open('p1_exposed_action_decision_null.json'))
+          assert x['all_nine_forecasts_positive']
+          assert x['thresholds_chosen_after_target_outcomes']
+          assert x['actual_positive_subjects']==7
+          assert x['threshold_policies'][2]['macro_policy_selections']==5
+          assert float(x['threshold_policies'][2]['mean_realized_auc_delta_over_always_macro'])<0
+          print('P1_EXPOSED_DECISION_GAIN_NOT_ESTABLISHED')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p1-previously-exposed-nine-forecast-action-null
+          path: p1_exposed_action_decision_null.json
+          retention-days: 90

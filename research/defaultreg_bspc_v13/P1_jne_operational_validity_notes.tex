@@ -1,0 +1,39 @@
+\subsection{What an evaluator can change without claiming a new decoder}
+\label{sec:p1-recommendations}
+The corrected criterion was tested on
+already exposed held-person outcomes.
+On Shin2017A, source-macro AUC was $0.000307$
+lower than with proper predictive NLL selection.
+On BNCI2014\_002, it was $0.006819$ higher;
+an exploratory interval included zero.
+These examples have no independent
+positive sign certificate.
+An evaluator can nevertheless take
+specific, testable precautions:
+\begin{enumerate}
+\item Label the exact mean-estimation source
+in every likelihood score, separating
+held-validation-class-centred CovScore from
+source-trained-class-mean predictive NLL.
+\item Report participant-macro ROC-AUC,
+individual harmful effects, and source-selected
+parameters beside the density-fitting result;
+a change in one is not a substitute for
+a change in the others.
+\item Do not use held \emph{target}
+signals, labels, target-fitted geometry
+or performance to choose the source policy
+under a claimed zero-target setting.
+\item Keep original pre-target protocols
+and retrospective density-score diagnostic
+analyses in disjoint inferential families.
+\item Benchmark prospective selection benefits
+against genuine predictive selection and
+standard source-macro discrimination, not only
+against a historically misnamed covariance score.
+\end{enumerate}
+The exact decomposed invariant-density term is
+a measurement diagnostic for a fixed linear
+model, not an externally validated rule
+to improve new-person EEG classification
+or select a clinical BCI strategy.

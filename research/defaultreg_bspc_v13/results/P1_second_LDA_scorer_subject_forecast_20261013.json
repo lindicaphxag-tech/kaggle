@@ -1,0 +1,123 @@
+{
+  "all_subject_outcomes_previously_exposed_projectwide": true,
+  "held9_source_lock_before_signal_true_only_within_this_run": true,
+  "not_an_independent_confirmatory_model_or_acquisition": true,
+  "rows": [
+    {
+      "absolute_forecast_error_auc": 0.0053168402777777485,
+      "auc": {
+        "source_macro": 0.8474633487654322,
+        "source_predictive_nll": 0.8507426697530864
+      },
+      "direction_correct_excluding_ties": false,
+      "n_target_trials": 288,
+      "observed_macro_minus_predictive_auc": -0.003279320987654266,
+      "source_forecast_macro_minus_predictive_auc": 0.0020375192901234823,
+      "target_id": 1
+    },
+    {
+      "absolute_forecast_error_auc": 0.01219497492283951,
+      "auc": {
+        "source_macro": 0.478491512345679,
+        "source_predictive_nll": 0.4621913580246913
+      },
+      "direction_correct_excluding_ties": true,
+      "n_target_trials": 288,
+      "observed_macro_minus_predictive_auc": 0.016300154320987692,
+      "source_forecast_macro_minus_predictive_auc": 0.0041051793981481816,
+      "target_id": 2
+    },
+    {
+      "absolute_forecast_error_auc": 4.822530864198593e-05,
+      "auc": {
+        "source_macro": 0.9633005401234568,
+        "source_predictive_nll": 0.9613715277777778
+      },
+      "direction_correct_excluding_ties": true,
+      "n_target_trials": 288,
+      "observed_macro_minus_predictive_auc": 0.0019290123456789932,
+      "source_forecast_macro_minus_predictive_auc": 0.001977237654320979,
+      "target_id": 3
+    },
+    {
+      "absolute_forecast_error_auc": 0.0007595486111110494,
+      "auc": {
+        "source_macro": 0.7466724537037037,
+        "source_predictive_nll": 0.7393422067901234
+      },
+      "direction_correct_excluding_ties": true,
+      "n_target_trials": 288,
+      "observed_macro_minus_predictive_auc": 0.007330246913580307,
+      "source_forecast_macro_minus_predictive_auc": 0.008089795524691357,
+      "target_id": 4
+    },
+    {
+      "absolute_forecast_error_auc": 0.017945842978395014,
+      "auc": {
+        "source_macro": 0.5641396604938271,
+        "source_predictive_nll": 0.5407503858024691
+      },
+      "direction_correct_excluding_ties": true,
+      "n_target_trials": 288,
+      "observed_macro_minus_predictive_auc": 0.023389274691357986,
+      "source_forecast_macro_minus_predictive_auc": 0.005443431712962972,
+      "target_id": 5
+    },
+    {
+      "absolute_forecast_error_auc": 0.0046236014660492805,
+      "auc": {
+        "source_macro": 0.6990258487654321,
+        "source_predictive_nll": 0.6910686728395062
+      },
+      "direction_correct_excluding_ties": true,
+      "n_target_trials": 288,
+      "observed_macro_minus_predictive_auc": 0.007957175925925819,
+      "source_forecast_macro_minus_predictive_auc": 0.0033335744598765385,
+      "target_id": 6
+    },
+    {
+      "absolute_forecast_error_auc": 0.00516010802469119,
+      "auc": {
+        "source_macro": 0.7129147376543208,
+        "source_predictive_nll": 0.6998939043209876
+      },
+      "direction_correct_excluding_ties": true,
+      "n_target_trials": 288,
+      "observed_macro_minus_predictive_auc": 0.013020833333333148,
+      "source_forecast_macro_minus_predictive_auc": 0.007860725308641958,
+      "target_id": 7
+    },
+    {
+      "absolute_forecast_error_auc": 0.0328595196759259,
+      "auc": {
+        "source_macro": 0.9044656635802469,
+        "source_predictive_nll": 0.9240933641975309
+      },
+      "direction_correct_excluding_ties": false,
+      "n_target_trials": 288,
+      "observed_macro_minus_predictive_auc": -0.019627700617283916,
+      "source_forecast_macro_minus_predictive_auc": 0.013231819058641986,
+      "target_id": 8
+    },
+    {
+      "absolute_forecast_error_auc": 0.05951605902777771,
+      "auc": {
+        "source_macro": 0.7738715277777778,
+        "source_predictive_nll": 0.7074170524691359
+      },
+      "direction_correct_excluding_ties": true,
+      "n_target_trials": 288,
+      "observed_macro_minus_predictive_auc": 0.0664544753086419,
+      "source_forecast_macro_minus_predictive_auc": 0.006938416280864196,
+      "target_id": 9
+    }
+  ],
+  "source_lock_before_id9_sha256": "9da1778cf34b3dd979c5427a64a6ecf5737920ad2d8a6a263f847fb88d0d6d8a",
+  "status": "RETROSPECTIVE_SECOND_SCORER_EXPLORATORY_SOURCE_FORECAST",
+  "summary": {
+    "direction_correct": 7,
+    "direction_evaluable": 9,
+    "macro_minus_predictive_auc_mean": 0.012608239026063074,
+    "mean_absolute_forecast_error_auc": 0.015380524477023268
+  }
+}

@@ -1,0 +1,48 @@
+name: P1 external BNCI2014-001 estimand comparison and frozen held-ID protocol
+on:
+  push:
+    branches: [publication/default-eeg-p1-estimand-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/p1_external_bnci2014_001_estimand_held_subject.py'
+      - '.github/workflows/p1-bnci2014-001-external-estimand.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  empirical-external-source-protocol:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      MNE_DATA: /tmp/p1-external-public-EEG
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Load source 1-8, freeze proper-NLL / discriminative selectors before held ID9
+        run: |
+          mkdir -p "$MNE_DATA" /tmp/p1-external-estimand
+          python -m py_compile research/defaultreg_bspc_v13/src/p1_external_bnci2014_001_estimand_held_subject.py
+          python research/defaultreg_bspc_v13/src/p1_external_bnci2014_001_estimand_held_subject.py --out /tmp/p1-external-estimand
+          python - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          d=Path('/tmp/p1-external-estimand')
+          manifest=d/'BEFORE_SUBJECT9_SIGNAL_SOURCE_ONLY_CHOICES.json'
+          reports=list(d.glob('*RESULTS.json'))
+          assert manifest.exists() and len(reports)==1
+          report=json.loads(reports[0].read_text())
+          assert report['reserved_subject9_source_sha']==hashlib.sha256(manifest.read_bytes()).hexdigest()
+          assert report['one_held_subject_primary_not_a_confirmatory_cohort']['independent_targets_in_this_locked_experiment']==1
+          assert len(report['all9_held_people_EXPLORATORY_not_independent'])==9
+          print('P1_NEW_EXTERNAL_REAL_EEG_COMPARISON_RECORDED_NOT_CONFIRMATORY')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: P1-BNCI2014-001-source-locked-estimand-real-public-EEG
+          path: /tmp/p1-external-estimand/*.json
+          if-no-files-found: warn
+          retention-days: 90

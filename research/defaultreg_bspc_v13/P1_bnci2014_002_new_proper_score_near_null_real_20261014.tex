@@ -1,0 +1,96 @@
+\subsection{New named external BNCI2014\_002 correct-likelihood cohort: a near-null stress test}
+\label{sec:p1-bnci002-corrected-subset}
+We conducted a separate, internally source-locked test
+on the previously \emph{unused under this exact project
+protocol} public BNCI2014\_002 motor-imagery acquisition
+(right-hand versus feet imagery), independently
+documented as 14 public participants with
+15 native Laplacian EEG channels. Ten source
+participants (released IDs 1--10) were loaded first;
+the original paper's entire 27-point shrinkage grid
+was used to select source-macro AUC and
+source-training-mean \emph{proper predictive}
+Gaussian log-score parameters on grouped source folds.
+The two parameters, fixed $\lambda=0.1$ LDA,
+and tangent-logistic $C=1$ baselines were
+committed to an SHA-256 source-only receipt
+\texttt{32001bac\ldots c3d2fea2ee}
+\emph{before} the first read of any held
+participant 11--14. The experiment selected
+the central \emph{array positions} 7, 8 and 9
+(out of all 15 native EEG channels, with
+zero-based positions 6--8); these positional
+inputs must \emph{not} be described as
+C3, Cz and C4, or assumed equivalent
+to the older all-15-channel analysis.
+This deliberately different 3-channel
+representation makes it a
+representation/protocol \emph{sensitivity},
+not a direct new replication of the
+earlier all-15-channel CovScore family.
+The first source-only read failed
+before accessing \emph{any} target because
+a predeclared physical-name assumption
+(\texttt{EEG7} etc.) did not match the
+MOABB loader's actual native labels;
+the channel-position correction was
+made before the successful source lock
+and held outcomes. The completed
+source/target trace, including the failed
+first run, remains available in GitHub.
+The independent public dataset is not
+an independently \emph{registered} new
+trial and four held people in one study
+are not four independent acquisitions.
+
+\begin{table}[ht]\centering\small
+\caption{Original 27-grid, within-run
+source-only-frozen BNCI2014\_002
+three-positional-channel sensitivity
+(IDs 11--14, 160 trials/participant).
+All baseline models share the
+identical 10-person source pool;
+held labels only enter the final AUC.
+This table is \emph{not} the historical
+15-channel, leave-one-subject-out result
+against class-centred CovScore.}
+\label{tab:p1-bnci002-proper-source}
+\begin{tabular}{lrrrrr}
+\toprule
+Source choice & Held 11 & Held 12 & Held 13 & Held 14 & Mean\\
+\midrule
+Source-macro LDA & .61625 & .51766 & .58922 & .47344 & .54914\\
+Proper-NLL LDA & .60531 & .51734 & .58344 & .48453 & .54766\\
+Fixed $\lambda=.1$ LDA & .57266 & .51766 & .56578 & .54828 & .55109\\
+Tangent LR, $C=1$ & .56844 & .51297 & .56359 & .55766 & .55066\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The four individual paired
+Macro-minus-proper differences were
+$+.0109375$, $+.0003125$,
+$+.00578125$ and $-.01109375$ AUC:
+a descriptive average of only
+$+.001484375$.
+Macro selection was actually below
+both the fixed-$\lambda$ LDA and
+fixed tangent logistic \emph{in mean}
+on this group of four newly read
+participants, although with different
+per-person patterns. This new
+non-confirmatory study-level result
+weakens any claim that the AlexMI
+macro--proper difference predicts
+a large generic out-of-source EEG
+advantage, and strengthens the
+necessity of condition-specific
+and simple-baseline comparisons.
+The complete source-lock and real
+result are from the successful
+\href{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38557289971}
+{GitHub Actions run 38557289971}.
+No meaningful predictor or new
+personalised selection gain over a
+trivial always-macro action has
+been established by this contrast.

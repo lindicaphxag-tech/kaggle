@@ -1,0 +1,46 @@
+name: P1 BNCI2015-001 correct predictive NLL retrospective full refit
+on:
+  push:
+    branches: [publication/default-eeg-p1-estimand-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/p1_real_bnci2015_correct_predictive.py'
+      - '.github/workflows/p1-real-bnci2015-proper-nll.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  source-correct-predictive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    env:
+      MNE_DATA: /tmp/p1-public-bnci2015-cache
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Real 12-person proper-source-predictive vs historical centred vs macro AUROC
+        run: |
+          mkdir -p "$MNE_DATA" /tmp/p1-bnci2015-correct
+          python -m py_compile research/defaultreg_bspc_v13/src/p1_real_bnci2015_correct_predictive.py
+          python research/defaultreg_bspc_v13/src/p1_real_bnci2015_correct_predictive.py --out /tmp/p1-bnci2015-correct
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib
+          b=Path('/tmp/p1-bnci2015-correct')
+          z=json.loads((b/'P1_BNCI2015_001_PROPER_CORRECT_COMPARISON_REAL.json').read_text())
+          assert z['n_subjects']==len(z['per_subject'])==12
+          assert z['previously_exposed_target_dataset']
+          assert z['source_lock_sha']==hashlib.sha256((b/'BNCI2015_001_SOURCE_CHOICES_BEFORE_NEW_TARGET_AUC.json').read_bytes()).hexdigest()
+          assert not z['new_model_family_improvement_claimed']
+          print('P1_REAL_PROPER_NLL_RETROSPECTIVE_AUDITED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p1-BNCI2015-001-real-retro-correct-predictive-vs-centered
+          path: /tmp/p1-bnci2015-correct/*.json
+          if-no-files-found: warn
+          retention-days: 90

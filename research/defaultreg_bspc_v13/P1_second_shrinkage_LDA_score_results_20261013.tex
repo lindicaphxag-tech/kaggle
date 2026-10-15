@@ -1,0 +1,26 @@
+% Executed CI 38363352983, retrospective BNCI2014_001, different LDA score.
+\paragraph{Second scoring implementation and source-only forecast.}
+We implemented a pooled within-class covariance shrinkage LDA score
+independently of the main spectral score, retaining the common EEG
+covariance-to-tangent feature preprocessing. At each source fold,
+the predictive Gaussian NLL uses class means fitted on the source
+training participants; it does not re-centre the held person's class
+labels. A source-person cross-fit forecasts the AUC difference
+between source-macro and predictive-NLL selected shrinkage. The
+score was evaluated for the nine BNCI2014\_001 held participants.
+The executable process committed the eight-source selection for
+held participant 9 before opening that signal, but the acquisition
+and outcomes had previously been used in this research programme;
+this remains a retrospective robustness check.
+
+The source forecast identified the sign of the held AUC difference
+for 7 of 9 participants. Mean absolute forecast error was
+0.01538 AUC; the average observed source-macro minus correct
+predictive-NLL AUC was +0.01261. The forecast missed the sign for
+held participants 1 ($-0.00328$ observed versus +0.00204 forecast)
+and 8 ($-0.01963$ versus +0.01323), and substantially underestimated
+the positive difference for participant 9 (+0.06645 observed versus
++0.00694 forecast). These failures prevent claiming reliable
+individual risk prediction or a new-experiment rule. The model
+robustness test and nine scalar outcomes are in
+\href{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38363352983}{the successful CI run}.

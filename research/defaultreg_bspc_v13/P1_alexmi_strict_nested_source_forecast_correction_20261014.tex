@@ -1,0 +1,59 @@
+\paragraph{Strictly nested source-person cross-fit: correcting indirect re-entry.}
+\label{sec:p1-strict-nested-source-audit}
+An audit of the independent LDA source-only
+forecast implementation identified a leakage
+path \emph{within the source-person forecast}:
+the earlier leave-one-source-person-out prediction
+excluded the held person's \emph{validation score}
+when choosing each estimator, but validation rows
+from other source people could have been produced
+by cross-validation models trained using this
+held person's data. This violates the interpretation
+of the source forecast as a strictly outer-person
+out-of-fold prediction, though it does \emph{not}
+imply that AlexMI's reserved target participants
+7 and 8 entered either source fit.
+
+We corrected this with a full \emph{nested}
+six-person source experiment. For each outer
+source person $h\in\{1,\ldots,6\}$, we first
+remove all data from $h$, recompute source
+tangent reference, perform the inner
+five-participant source-person cross-validation
+on the unchanged 27-point shrinkage grid, choose
+the macro-AUC and proper predictive-NLL parameters,
+refit both classifiers on the five remaining
+people, and evaluate $h$ exactly once.
+Consequently, no model or geometry involved
+in the choice for $h$ has seen $h$.
+The six outer-person AUC differences
+(macro minus proper) were
+$\{+.0925,+.1850,-.0400,+.0200,-.0500,+.1500\}$,
+with mean $+.05958$ AUC; the earlier
+source-fold estimator reported $+.05417$
+but lacked this strict outer-person exclusion.
+
+The frozen choices fit on all six people
+remain $\lambda_{\rm macro}=1.0$ and
+$\lambda_{\rm proper}=.20$.
+When used as a single positive forecast for
+the \emph{previously inspected} AlexMI held
+people 7 and 8, the strict source-only
+forecast retains the correct positive
+directions, while their actual macro-minus-proper
+margins remain $+.0050$ and $+.1875$.
+The trivial always-positive forecast makes
+the same two directional predictions.
+No individual risk prediction advantage
+over that null, external preregistration or
+new target-subject generalisation is inferred.
+The source-person strict chronology, all
+inner folds and the complete numerical
+receipt were checked in the successful
+\href{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38539884099}
+{GitHub Actions run 38539884099}.
+This correction should precede any
+future source-forecast accuracy comparison;
+the earlier heuristic cross-fit numbers
+must not be described as independent
+outer-person predictions.

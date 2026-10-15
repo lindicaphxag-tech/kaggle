@@ -1,0 +1,35 @@
+name: P1 JNE estimand counterexample independent check
+on:
+  push:
+    branches: [publication/default-eeg-p1-estimand-20261013]
+    paths: ['.github/workflows/p1-exact-auc-identity-audit.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  p1-fixed-scorer-counterexample:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy
+      - name: Exact per-person ROC ranking invariance vs predictive logscore drift
+        run: |
+          python research/defaultreg_bspc_v13/src/p1_fixed_auc_predictive_penalty_counterexample.py > /tmp/p1_exact_auc_density_counterexample.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/p1_exact_auc_density_counterexample.json'))
+          assert d['all_examples_fixed_auc_identical']
+          r=d['results']
+          assert r['common_shift_orthogonal_to_score']['common_location']>30
+          assert r['baseline']['proper_minus_centered_quadratic_score']<1e-12
+          assert r['both_location_and_class_orthogonal']['score_aligned']<1e-12
+          assert r['both_location_and_class_orthogonal']['fixed_auc_invariant_fraction']>.999999999
+          print('P1_PROPER_MINUS_CLASS_CENTERED_NLL_THREEFACTOR_IDENTITY_AND_FIXED_AUC_INVARIANCE_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: defaultreg-P1-exact-finite-sample-model-selection-score-counterexample
+          path: /tmp/p1_exact_auc_density_counterexample.json
+          retention-days: 90

@@ -1,0 +1,65 @@
+\begin{abstract}
+\textbf{Objective.}
+In cross-person electroencephalography (EEG) decoding,
+a validation-class-centred covariance score can be
+mistaken for source-trained Gaussian predictive
+likelihood. We distinguish these estimands and test
+whether apparent superiority in source-only shrinkage
+selection survives correction of this comparator.
+
+\textbf{Approach.}
+We audit participant-grouped source-only tangent-space
+linear discriminant analysis using originally frozen
+EEG transfer comparisons, a fixed 27-point
+regularisation grid and explicit zero-target-information
+budgets. An exact finite-sample identity decomposes
+the difference between validation-class-centred and
+proper predictive Gaussian quadratic scores. New
+proper-predictive comparisons are designated
+\emph{retrospective}, not incorporated into earlier
+prospective inference families.
+
+\textbf{Main results.}
+In the prospectively frozen EEGMMIDB 20-person block,
+source-macro-AUC selection exceeded the historical
+class-centred CovScore selector by $0.0561$ AUC
+(Holm $p=0.00597$), but harmed five participants by
+more than $0.02$ AUC. Against the corrected
+source-trained predictive criterion, the
+\emph{post-outcome} paired AUC differences were
+$-0.000307$ (Shin2017A, $n=29$) and
+$+0.006819$ (BNCI2014\_002, $n=14$;
+exploratory interval includes zero).
+A separate retrospective BNCI2015\_001 12-person
+comparison yielded $+0.035989$ AUC against the
+corrected predictive comparator (paired exact
+$p=0.1572$) but harmed three participants.
+An additional retrospective BNCI2014\_001
+nine-person six-policy comparison yielded
+$+0.009265$ AUC for source-macro against
+proper NLL; the pre-held-read source lock
+was not independent preregistration. In a newly
+source-locked, original-27-grid BNCI2014\_002
+four-person emph{three-positional-channel}
+sensitivity, the Macro--proper-NLL mean difference
+was only $+0.00148$ AUC and fixed $\lambda=0.1$
+and logistic baselines both exceeded Macro.
+This contrasts with the $+0.09625$ two-person
+retrospective AlexMI margin, highlighting
+protocol and acquisition dependence. On three
+previously exposed source-validation acquisitions,
+$98.59\%$, $99.29\%$ and $99.77\%$ of the
+\emph{additional Gaussian mean-shift penalty} lay
+in components invariant to the fixed classifier's
+within-person AUC. The prespecified filter-bank
+interaction contradicted the original direction
+hypothesis ($-0.07781$ AUC).
+
+\textbf{Significance.}
+Covariance-fit, predictive-density and subject-level
+discrimination claims cannot be interchanged.
+Our findings yield a reproducible score-auditing
+protocol; they do not establish a consistently
+superior transfer decoder or an independently
+validated policy for unknown EEG participants.
+\end{abstract}

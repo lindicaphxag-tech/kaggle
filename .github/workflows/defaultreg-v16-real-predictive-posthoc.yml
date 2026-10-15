@@ -23,7 +23,6 @@ jobs:
       OMP_NUM_THREADS: '1'
       MKL_NUM_THREADS: '1'
       GH_TOKEN: ${{ github.token }}
-      MNE_DATA: ${{ runner.temp }}/mne_data
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -38,8 +37,10 @@ jobs:
       - name: Download immutable ORIGINAL frozen Shin score family
         run: |
           gh api repos/lindicaphxag-tech/kaggle/actions/artifacts/11674238395/zip > /tmp/defaultreg-Shin-original.zip
-          echo cda3210d24a8e9c7f3bf2d48490e51ad51f023beb652816a8679088cc3fb1842'  /tmp/defaultreg-Shin-original.zip' | sha256sum -c
+          printf '%s  %s\n' 'cda3210d24a8e9c7f3bf2d48490e51ad51f023beb652816a8679088cc3fb1842' '/tmp/defaultreg-Shin-original.zip' | sha256sum -c -
       - name: Execute actual source-only proper predictive NLL selection on public Shin2017A EEG
+        env:
+          MNE_DATA: ${{ runner.temp }}/mne_data
         run: |
           mkdir -p "$MNE_DATA"
           python research/defaultreg_proper_predictive/run_proper_predictive_posthoc.py \

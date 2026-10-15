@@ -1,0 +1,48 @@
+name: P1 AlexMI matched 27 point original-grid retrospective sensitivity
+on:
+  push:
+    branches: [publication/default-eeg-p1-estimand-20261013]
+    paths:
+      - '.github/workflows/p1-alexmi-27point-original-grid-sensitivity.yml'
+      - 'research/defaultreg_bspc_v13/src/p1_alexmi_original_27point_grid_matched_sensitivity.py'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  fixed_full_grid_retro_alexmi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    env:
+      MNE_DATA: /tmp/p1-alexmi-27grid
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python3 -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Load six source participants, freeze canonical 27-point grid, replay two already-exposed targets
+        run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_bspc_v13/src/p1_alexmi_original_27point_grid_matched_sensitivity.py --out /tmp/p1_alexmi_original_grid
+      - name: Check 27-grid protocol and no false prospectivity
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/p1_alexmi_original_grid')
+          a=json.loads((p/'P1_ALEXMI_27_GRID_SOURCE_REPLAY_LOCK.json').read_text())
+          b=json.loads((p/'P1_ALEXMI_CANONICAL_27GRID_REAL_RESULTS.json').read_text())
+          assert len(a['grid'])==27
+          assert b['n_held_people']==2 and b['distinct_acquisitions']==1
+          assert b['held_people_not_new_in_project']
+          assert not b['can_make_person_specific_forecast_gain_claim']
+          print('P1_27POINT_MATCHED_GRID_RETROSPECTIVE_ONLY_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p1-alexmi-27-grid-original-protocol-replay-with-exposed-targets
+          path: /tmp/p1_alexmi_original_grid/*.json
+          if-no-files-found: warn
+          retention-days: 90

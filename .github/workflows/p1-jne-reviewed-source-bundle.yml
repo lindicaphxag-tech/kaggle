@@ -1,0 +1,71 @@
+name: P1 independent author-review PDF and exact source ZIP
+on:
+  push:
+    branches: [publication/default-eeg-p1-estimand-20261013]
+    paths: ['.github/workflows/p1-jne-reviewed-source-bundle.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  journal-author-review-artifact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install reviewer PDF tooling
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended lmodern poppler-utils
+      - name: Build latest paper and fail on invalid references
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_p1_estimand_mismatch_EVIDENCE_GATED.tex
+          test -s main_p1_estimand_mismatch_EVIDENCE_GATED.pdf
+          ! grep -Eq 'Citation.*undefined|Reference.*undefined|Undefined control sequence' main_p1_estimand_mismatch_EVIDENCE_GATED.log
+          pdfinfo main_p1_estimand_mismatch_EVIDENCE_GATED.pdf | grep Pages
+      - name: Package EXACT referenced LaTeX source + PDF + author review gates
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile, ZIP_DEFLATED
+          import re, json, hashlib
+          base=Path("research/defaultreg_bspc_v13")
+          main=base / "main_p1_estimand_mismatch_EVIDENCE_GATED.tex"
+          visited=set()
+          def trace(f):
+              f=f.resolve()
+              if f in visited: return
+              if not f.is_file(): raise RuntimeError("MISSING required referenced source: "+str(f))
+              visited.add(f)
+              s=f.read_text(encoding="utf8")
+              for item in re.findall(r"\\input\{([^}]+)\}",s):
+                  trace(f.parent/(item if item.endswith(".tex") else item+".tex"))
+          trace(main)
+          assets=sorted(visited)
+          assets += [base/"references_v10.bib"]
+          extras=["publication_packages/default_eeg/P1_JNE_EDITOR_COVER_LETTER_DRAFT_20261013.md","publication_packages/default_eeg/P1_JNE_FINAL_AUTHOR_SIGNOFF_GATES_20261013.md"]
+          scripts=["src/p1_real_bnci2015_correct_predictive.py","src/p1_estimand_exact_rational_check.py"]
+          assets.extend(Path(x) for x in extras)
+          assets.extend(base/x for x in scripts)
+          pdf=base/"main_p1_estimand_mismatch_EVIDENCE_GATED.pdf"
+          if not pdf.is_file():raise RuntimeError("PDF compilation missing")
+          assets.append(pdf)
+          assets=list(dict.fromkeys(assets))
+          for f in assets:
+              if not f.is_file():raise RuntimeError("MISSING bundle file: "+str(f))
+          dist=Path("dist");dist.mkdir(exist_ok=True)
+          manifest={"paper":"P1", "prepared_for":"Journal of Neural Engineering",
+          "status":"AUTHOR_REVIEW_ONLY__NOT_JOURNAL_SUBMITTED",
+          "source_branch":"publication/default-eeg-p1-estimand-20261013",
+          "requires_authorship_ethics_funding_competing_interests_and_exclusivity_signoff":True,
+          "input_files":[{"path":str(x.relative_to(Path.cwd()) if x.is_absolute() else x),"sha256":hashlib.sha256(x.read_bytes()).hexdigest()} for x in assets]}
+          with ZipFile(dist/"P1-review-source-and-pdf.zip","w",ZIP_DEFLATED) as z:
+              for f in assets:z.write(f,str(f.relative_to(Path.cwd()) if f.is_absolute() else f))
+              z.writestr("AUTHOR_SIGNOFF_REQUIRED.json",json.dumps(manifest,indent=2))
+          print("AUTHOR_REVIEW_ONLY_PACKAGE_READY",str(dist/"P1-review-source-and-pdf.zip"),len(assets))
+          
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: P1-JOURNAL-CANDIDATE-AUTHOR-REVIEW-NOT-SUBMITTED
+          path: dist/P1-review-source-and-pdf.zip
+          retention-days: 90
