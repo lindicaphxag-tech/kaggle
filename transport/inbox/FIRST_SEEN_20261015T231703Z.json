@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "kevinwoodrobotics",
+      "body": "### Proposal\n\nCurrently the command builder does not include arguments for visualization and I think it will be useful to include it. \n\nThe command argument should include the last part \"--viz newton_gl\"\n\nuv run isaaclab play --rl_library rsl_rl \\\n  --task Isaac-Reorient-Cube-Shadow \\\n  physics=newton_mjwarp presets=asymmetric \\\n  --viz newton_gl\n\n### Motivation\n\nThis will make it easier for people to see the policy results after training for those that are unfamiliar with all the cmd arguments. \n\n### Alternatives\nN/A\n\n### Build Info\n- Isaac Lab Version 3.0\n\n### Additional context\nN/A \n\n### Checklist\n\n- [x] I have checked that there is no similar issue in the repo (**required**)\n\n### Acceptance Criteria\n\nAdd the criteria for which this task is considered **done**. If not known at issue creation time, you can add this once the issue is assigned.\n\n- [ ] When the command builder output include the argument \"--viz newton_gl\" \n",
+      "created_at": "2026-10-15T22:38:42Z",
+      "html_url": "https://github.com/isaac-sim/IsaacLab/issues/8626",
+      "id": "isaac-sim/IsaacLab#8626",
+      "issue_number": 8626,
+      "labels": [],
+      "repository": "isaac-sim/IsaacLab",
+      "surface_sha256": "b2e7f060bea5c187f7b7bf6339cd93b19227411cf6b3b5a88968ee5a4db7cddc",
+      "title": "[Proposal] Command Builder Should Include Argument for Simulation Visualization"
+    }
+  ],
+  "post_activation_issue_identities_observed": 165,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-15T23:17:03Z",
+  "schema_version": 1
+}
