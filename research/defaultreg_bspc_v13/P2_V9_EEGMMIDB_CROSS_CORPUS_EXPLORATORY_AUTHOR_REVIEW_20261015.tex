@@ -1,0 +1,55 @@
+% V9 real external acquisition, controlled transformations, author review only.
+\subsection{Cross-corpus, development-frozen EEGMMIDB controlled provenance}
+The original source-acquisition design from CHB--MIT differs from
+PhysioNet EEG Motor Movement/Imagery (EEGMMIDB).
+To examine transfer beyond the initial EDF cohort, we evaluated
+six digital EDF prefixes (S001--S006, R04). The EEG movement
+imagery classes were deliberately never read or classified:
+the endpoint is detection of numerical signal content reuse.
+Each source EDF generated eight known controlled reuse
+transforms and six designed unrelated or confounded targets.
+There are six source records, not 84 independent acquisitions.
+
+The tuned CAR comparator received the \emph{unchanged} thresholds
+0.93 (training) and 0.90 (verification), previously selected
+on the CHB--MIT development files chb01--02. The residual
+witness retained its pre-existing training and verification
+thresholds and did not refit on EEGMMIDB data.
+Both methods rejected all 36 constructed negatives, while
+the residual witness detected all 48/48 controlled
+positives and frozen CAR detected 39/48. The raw
+shared-clock matcher detected 48/48 positives but
+falsely accepted 6/36 strong common-artifact negatives.
+The between-method positive recall difference on the
+controlled variants is $9/48=18.75$ percentage points.
+
+All six EEGMMIDB source EDF files favored the residual
+witness; their respective missed-CAR cases numbered
+2, 1, 2, 1, 2 and 1. Treating each original EDF as
+the paired inferential unit (rather than the dependent
+transformed trials), the exploratory exact two-sided
+sign test for six wins and zero losses gives
+$p=2/2^6=0.03125$. Thus the test is nominally
+significant against the \emph{particular, development-frozen
+CAR comparator} under these controlled transfer conditions.
+This endpoint and transformation suite evolved during
+exploratory method development, so the nominal $p$ should
+not be interpreted as a registered familywise-confirmatory
+claim. The published algorithms for fingerprinting,
+multi-device synchronization and nonlinear time alignment
+have not been reproduced in this protocol.
+Full GitHub Actions run:
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38698819592};
+the machine-readable source-file hashes and per-case
+predictions are preserved in its uploaded artifact.
+
+Both independent acquisition collections contain true
+public EEG digital waveforms, but the putative reused
+targets and severe common-mode challenges were generated
+experimentally. Their labels do not establish naturally
+duplicated patient recordings or independently adjudicated
+clinical acquisition identity. Notably, the method's
+superiority over a frozen CAR comparator does not prove
+a universally lower false-match rate or a
+state-of-the-art gain against fully informed published
+synchronization and signal-fingerprint methods.
