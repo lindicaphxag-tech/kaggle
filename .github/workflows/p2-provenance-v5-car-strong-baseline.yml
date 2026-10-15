@@ -1,0 +1,31 @@
+name: P2 V5 CAR strong nuisance baseline
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/p2-provenance-v5-car-strong-baseline.yml'
+      - 'research/defaultreg_bspc_v13/src/p2_provguard_v5_car_strong_baseline.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  chbmit_car_comparator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      P2_OUTPUT: p2_v5_car_strong
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install 'numpy<3' 'scipy<2'
+      - run: python research/defaultreg_bspc_v13/src/p2_provguard_v5_car_strong_baseline.py
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p2-v5-car-strong-baseline-84-controlled-cases
+          path: p2_v5_car_strong/
+          if-no-files-found: warn
