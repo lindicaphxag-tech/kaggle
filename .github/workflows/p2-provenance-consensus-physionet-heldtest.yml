@@ -101,6 +101,18 @@ jobs:
                   rows,cols=linear_sum_assignment(-score)
                   if int(np.count_nonzero(score[rows,cols]>=TH))>=MIN:return True
               return False
+          def permutation_uncoordinated_lag(src,tgt):
+              # Strong informed baseline: every channel pair may independently pick its best lag.
+              # This does not enforce a single shared original recording clock.
+              ss=list(src);tt=list(tgt)
+              m=np.zeros((len(ss),len(tt)))
+              for i,k in enumerate(ss):
+                  for j,v in enumerate(tt):
+                      lag,score=cc_lags(tgt[v],src[k])
+                      m[i,j]=float(np.max(score)) if len(score) else 0.
+              m=np.where(m>=TH,m,0.)
+              row,col=linear_sum_assignment(-m)
+              return int(np.count_nonzero(m[row,col]>=TH))>=MIN
           def zero_label(src,tgt):
               return sum(k in tgt and atlag(v,tgt[k],0)>=TH for k,v in src.items())>=MIN
           def whole_equal(src,tgt):
@@ -116,6 +128,8 @@ jobs:
                   truth=int(ix<8);target=make(src,kind,16000+p*29+ix,other)
                   methods={"ProvGuard lag+assignment":int(screen(src,target)),
                            "label+lag Pearson":int(screen(src,target,False,True)),
+                           "permutation+independent lag Hungarian":int(permutation_uncoordinated_lag(src,target)),
+                           "permutation zero-lag Hungarian":int(screen(src,target,True,False)),
                            "label zero-lag Pearson":int(zero_label(src,target)),
                            "whole numeric bytes":int(whole_equal(src,target))}
                   rows.append(dict(subject=f"S{p:03d}",group="held" if p>=3 else "development",
