@@ -1,5 +1,11 @@
 name: P2 ProvGuard V3 six-EDF held-source benchmark
 on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/p2-provenance-v3-real-edf-20261015.yml'
+      - 'research/defaultreg_bspc_v13/src/p2_provguard_v3_frozen.py'
+      - 'research/defaultreg_bspc_v13/src/p2_provguard_v3_chbmit_benchmark.py'
   push:
     branches:
       - publication/default-eeg-p2-record-identity-20261013
