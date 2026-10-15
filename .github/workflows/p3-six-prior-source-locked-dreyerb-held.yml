@@ -1,0 +1,65 @@
+name: P3 six DreyerB held under prior fixed choices with source-drift disclosure
+on:
+  push:
+    branches: [publication/default-eeg-p3-transfer-negative-20261013]
+    paths:
+      - '.github/workflows/p3-six-prior-source-locked-dreyerb-held.yml'
+      - 'research/defaultreg_bspc_v13/src/p3_dreyerb_six_additional_untouched_persons_prior_source_lock.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  six_more_held_under_original_oct13_source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    env:
+      MNE_DATA: /tmp/p3_dreyerb_six_held
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python3 -m pip install --disable-pip-version-check moabb==1.7.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: p3-dreyer-B-first-repo-two-MI-targets-one-acquisition
+          run-id: 38390737635
+          github-token: ${{ github.token }}
+          path: /tmp/prior_dreyer_b_source
+      - name: Audit prior-source SHA and enforce original frozen choices, then read held 71-76
+        run: |
+          set -euo pipefail
+          mkdir -p "$MNE_DATA"
+          F=$(find /tmp/prior_dreyer_b_source -type f -name P3_DREYER_B_SOURCE_LOCK_PRETARGET.json -print -quit)
+          test -n "$F"
+          python research/defaultreg_bspc_v13/src/p3_dreyerb_six_additional_untouched_persons_prior_source_lock.py --prior-lock "$F" --out /tmp/p3_dreyerb_six_results
+      - name: Six real target people, fixed within-source choices, no statistical pseudoreplication
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=Path('/tmp/p3_dreyerb_six_results')
+          a=json.loads((r/'P3_DREYER_B_SIX_TARGET_PRE_READ_LOCK.json').read_text())
+          b=json.loads((r/'P3_DREYER_B_SIX_NEW_SOURCE_LOCKED_RESULTS.json').read_text())
+          assert a['prior_run']==38390737635
+          assert a['source_participant_counts_match_original']
+          assert a['prior_policy_choices_not_reselected_or_readapted']
+          assert a['exact_source_sha_match'] or a['model_refitted_on_current_source_different_when_sha_drift']
+          assert b['new_held_subject_ids']==[71,72,73,74,75,76]
+          assert b['distinct_EEG_acquisitions_or_cohorts']==1
+          assert b['no_source_hyperparameters_reoptimised']
+          assert b['strict_original_source_byte_replay_achieved']==a['exact_source_sha_match']
+          assert len(b['rows'])==6
+          assert b['no_acquisition_level_confidence_or_coverage_claim']
+          print('P3_SIX_HELD_DREYERB_PRIOR_CHOICES_REFIT_DISCLOSED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p3-six-public-dreyerb-unseen-held-original-source-SHA-lock
+          path: /tmp/p3_dreyerb_six_results/*.json
+          if-no-files-found: warn
+          retention-days: 90

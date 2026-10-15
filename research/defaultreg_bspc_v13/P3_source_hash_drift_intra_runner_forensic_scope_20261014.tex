@@ -1,0 +1,86 @@
+\paragraph{Source-feature fingerprint reproducibility gate.}
+The attempted exact byte-locked Dreyer2023B
+extension revealed unequal source-covariance SHA-256
+hashes across two GitHub Actions runs, even when
+source participant, trial and class counts agreed.
+A separate \emph{source-only} forensics workflow
+therefore reloads source participants 61--68
+\emph{twice in one fixed runner} and computes,
+for each participant, both the
+order-sensitive hash of its labelled covariance
+epochs and an order-insensitive hash of the
+same epoch-byte multiset.
+The experiment does \emph{not} open held IDs
+69--76 or evaluate any additional target label.
+This diagnostic can distinguish within-run
+nondeterminism of array ordering from
+within-run changes to the feature multiset.
+It cannot, without the original run's
+per-epoch hashes and independently archived
+unprocessed source bytes, establish the
+\emph{cause} of prior across-run SHA drift.
+The complete comparison is maintained as a
+machine-readable receipt in
+\href{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38548177214}
+{GitHub Actions run 38548177214}.
+The completed, successful run independently reloaded
+all eight named source participants twice. Both
+aggregate exact SHA-256 values equalled
+\texttt{7146797e...3e172b2a7}, the checksum
+of the \emph{original} successful experiment
+38390737635, and the within-run equality
+held independently for all eight subjects'
+ordered labelled-epoch hashes and sorted
+labelled-epoch multiset hashes. Thus the
+original source product \emph{can} be regenerated
+byte-for-byte, at least in this runner.
+By contrast, another completed run had produced
+the different digest
+\texttt{9f650460...39ada7f65}.
+This contrast is evidence that the source mismatch
+is not an obligatory change in data releases nor
+inevitable stochastic inconsistency within a single
+runner. It is \emph{not} a causal diagnosis of the
+remaining between-run discrepancy.
+A subsequently \emph{completed} three-clean-runner
+GitHub Actions replication
+(\href{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38548682677}
+{run 38548682677}) used independent fresh
+runners, each loading source IDs 61--68 twice.
+Every one of the six whole-source
+reads returned exactly the original full
+SHA-256 \texttt{7146797e...3e172b2a7}.
+For each of the eight source people, all
+three independent runners also agreed in
+ordered exact labelled covariance-epoch hashes,
+order-invariant epoch-multiset hashes,
+nine-decimal quantised normalised covariance
+shape hashes, and eight-decimal quantised
+log-amplitude hashes. The quantised hashes
+are \emph{diagnostic numerical fingerprints},
+not formal floating-error certificates.
+No held participant 69--76 was read.
+
+The earlier single anomalous
+\texttt{9f650460...39ada7f65} digest remains
+a genuine observed discordance in another
+completed run. The current evidence
+demonstrates that the initially successful
+source bytes are reproducible even
+\emph{across} clean runner instances;
+it does \emph{not} identify why the
+anomalous run differed or establish
+the binary identity of any earlier
+fitted classifier parameters, since no
+original classifier state was archived.
+The six newly observed held outcomes
+are therefore still transparently
+labelled as results under previously
+fixed hyperparameters and a re-fitted
+source model, not as a guaranteed
+bitwise replay of the first fitted model.
+In all cases, the new six-person
+policy sensitivity retains its explicitly
+\emph{refitted-source, original-choices-only}
+scope rather than being relabelled as
+exact reproduction of the original model.

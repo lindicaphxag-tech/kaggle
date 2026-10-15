@@ -1,0 +1,45 @@
+name: P3 four operators on common BNCI004 source
+on:
+  push:
+    branches: [publication/default-eeg-p3-transfer-negative-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/p3_bnci004_four_operator_same_source.py'
+      - '.github/workflows/p3-four-operator-common-source-bnci004.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  execute:
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    env:
+      MNE_DATA: /tmp/p3-four-operator-eeg
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - run: mkdir -p "$MNE_DATA" /tmp/p3-four-operator-results && python research/defaultreg_bspc_v13/src/p3_bnci004_four_operator_same_source.py --out /tmp/p3-four-operator-results
+      - name: Verify source-lock and result integrity
+        run: |
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          d=Path('/tmp/p3-four-operator-results')
+          a=d/'P3_FOUR_OPERATORS_SOURCE_LOCK.json'
+          b=json.loads((d/'P3_FOUR_OPERATORS_RESULTS.json').read_text())
+          assert b['source_lock_sha256']==hashlib.sha256(a.read_bytes()).hexdigest()
+          assert b['cannot_call_id9_independently_blinded']
+          assert set(b['target_auc'])=={'source_macro','continuous','SCE','anisotropic','group_centered'}
+          assert all(0<=v<=1 for v in b['target_auc'].values())
+          print('P3_FOUR_OPERATORS_COMMON_SOURCE_VERIFIED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p3-four-operator-common-source-results
+          path: /tmp/p3-four-operator-results/*.json
+          if-no-files-found: warn
+          retention-days: 90

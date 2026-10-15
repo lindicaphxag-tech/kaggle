@@ -1,0 +1,51 @@
+name: P3 Zhou2016 new acquisition source-lock four-operator prospective-in-run test
+on:
+  push:
+    branches: [publication/default-eeg-p3-transfer-negative-20261013]
+    paths:
+      - '.github/workflows/p3-zhou2016-unseen-in-repo-real-eeg.yml'
+      - 'research/defaultreg_bspc_v13/src/p3_zhou2016_new_source_locked_four_operators.py'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  frozen_three_source_then_unseen_id4:
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    env:
+      MNE_DATA: /tmp/zhou2016-p3-new-eeg
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python3 -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Lock all 5 source-policy choices before held Zhou public ID 4
+        run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_bspc_v13/src/p3_zhou2016_new_source_locked_four_operators.py --out /tmp/p3_zhou_new_out
+      - name: Audit frozen source data receipt and held outcome chronology
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=Path('/tmp/p3_zhou_new_out')
+          a=json.loads((d/'P3_ZHOU_FROZEN_BEFORE_PUBLIC_HELD4.json').read_text())
+          b=json.loads((d/'P3_ZHOU_FIRST_HELD_REAL_EEG_RESULTS.json').read_text())
+          assert a['source_ids']==[1,2,3] and a['held_id_UNREAD']==4
+          assert a['no_target_EEG_or_labels_for_source_decisions']
+          assert a['target_ID4_not_read_until_after_source_SHA']
+          assert len(b['methods_auc'])==5
+          assert set(b['methods_auc'])==set(a['algorithms'])
+          assert b['one_held_person_one_acquisition']
+          assert b['not_externally_preregistered']
+          print('P3_NEW_ZHOU_REAL_PUBLIC_HELD_SOURCE_LOCK_SCOPE_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p3-zhou2016-first-repo-held-source-policy-and-real-target
+          path: /tmp/p3_zhou_new_out/*.json
+          if-no-files-found: warn
+          retention-days: 90

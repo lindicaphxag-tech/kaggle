@@ -1,0 +1,87 @@
+\subsection{A separate fitted-model checkpoint gate across runner boundaries}
+\label{sec:p3-dreyerb-checkpointed-77-81}
+The earlier Dreyer2023B six-person source-refit sensitivity
+found a nonidentical source covariance SHA-256 in one
+run. To distinguish model adaptation from source data
+preparation, we conducted a further, more stringent
+\emph{two-job} evaluation of previously unread
+public Dreyer2023B participants 77--81.
+Job 1 requested \emph{only source} IDs 61--68,
+loaded the fixed policy choices from the original
+run 38390737635, and independently recomputed
+source feature byte digest
+\texttt{7146797e\ldots 3e172b2a7}. This digest
+\emph{exactly matches} the original successful
+source-feature release. Before fetching any
+new target, Job 1 fitted the source tangent
+reference, scalar spectral state, anisotropic
+state and group-centred LDA state and serialized
+all four components together with the five
+original policy choices into one signed-by-hash
+same-run artifact (SHA-256
+\texttt{6ba6ed29\ldots 09e9d6c4ffd3}).
+
+Job 2 ran on a \emph{separate runner}, checked
+the serialized artifact hash \emph{before}
+loading any target, and directly scored
+the five models on released IDs 77--81.
+No source covariance feature array was
+reloaded, no source training state was
+refitted and no policy hyperparameter was
+reselected in the target job. The end-to-end
+source-before-target chronology was independently
+asserted in successful
+\href{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38556651631}
+{GitHub Actions run 38556651631}.
+This tests \emph{one genuinely persisted fitted
+source checkpoint}, not merely frozen choices
+reapplied to numerically changing training data.
+The original historical fitted \emph{model weights}
+were not separately archived, so matching
+the earlier source-feature SHA-256 does not
+retroactively prove byte-identical classifier
+weights across October 13 and 14.
+
+\begin{table}[ht]
+\centering\small
+\caption{Five further previously uninspected Dreyer2023B
+public held people, 240 trials each, scored only by a
+source-fitted artifact persisted before the held
+run. Entries are paired ROC-AUC differences from
+the same artifact's Source macro comparator.
+Subjects are from \emph{one} released acquisition study,
+not five independent datasets.}
+\label{tab:p3-dreyerb-five-snapshot}
+\begin{tabular}{lrrrrrr}
+\toprule
+Policy & 77 & 78 & 79 & 80 & 81 & Mean\\
+\midrule
+Continuous & .00000 & .00000 & .00000 & .00000 & .00000 & .00000\\
+SCE & +.00125 & -.03056 & +.00021 & +.00674 & -.01757 & -.00799\\
+Anisotropic & +.00639 & -.01375 & -.00083 & +.00854 & -.01847 & -.00363\\
+Group-centred & +.00285 & +.00299 & -.00069 & -.00257 & +.00146 & +.00081\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The five newly read participants provided
+1,200 actual EEG trials. SCE lost more than
+.02 AUC in one person (ID 78) and produced
+a negative descriptive group mean of
+$-.007986$ AUC; anisotropic
+selection averaged $-.003625$.
+Group-centred selection averaged
+only $+.000806$ AUC, too small to establish
+a practical improvement and with mixed
+individual signs. Continuous equalled
+the original source macro. We do not pool
+this exact-current-checkpoint result with
+the six-person \emph{different-source-feature}
+refit as if their fitted numerical states
+were the same, nor interpret five correlated
+held people as five independent
+meta-acquisition calibration units.
+This removes an important engineering
+reproducibility ambiguity without rescuing
+a statistically or practically established
+new policy.

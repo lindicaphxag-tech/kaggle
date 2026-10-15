@@ -1,0 +1,44 @@
+\paragraph{Source-only fingerprint repeatability and historical SHA mismatch.}
+\label{sec:p3-dreyerb-source-hash-forensics}
+The previous Dreyer2023B extension reported an unequal
+source-feature SHA-256 when eight source people (61--68)
+were recomputed on a separate CI run, even though
+per-person trial and class totals matched the original
+frozen receipt. We independently reloaded and
+reprocessed ONLY these eight source people \emph{twice}
+on one new GitHub-hosted runner, without requesting
+targets 69--76 or changing any source-only policy.
+Both independent reads yielded the same complete
+source covariance-feature SHA-256,
+\texttt{9f650460...9ada7f65}; this differs from
+the original experiment's
+\texttt{7146797e...3e172b2a7}.
+For all eight source people the hashes of
+the \emph{ordered} labelled covariance-epoch
+sequences also matched across the two new reads,
+as did hashes of the corresponding sorted
+labelled-epoch multisets; source-feature
+mean-trace differences were exactly zero.
+The execution receipt is
+\href{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38542627607}
+{source-only forensic run 38542627607}.
+
+This result establishes \emph{same-run environment}
+read/preprocessing reproducibility in the new
+environment. It does \emph{not} explain the historical
+across-run change: earlier raw asset digests,
+ordered per-epoch feature outputs and an exact
+environment/BLAS image receipt were not retained
+at the originally frozen point. The drift
+must not be attributed to epoch permutation,
+software updates or raw asset changes without
+a controlled cross-run source comparison.
+Consequently the six-person study in
+Table~\ref{tab:p3-dreyerb-six} remains explicitly
+a \emph{prior-choice-only, source-refitted}
+sensitivity, not a second exact replay of
+the original fitted model. Future source-lock
+protocols should retain \emph{both} raw released
+binary digests and feature/intermediate hashes,
+library/BLAS versions and immutable numeric
+reference arrays, not merely hyperparameters.

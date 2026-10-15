@@ -1,0 +1,109 @@
+% Source-only six-policy Weibo2014 real public EEG: GitHub run 38326720457.
+\subsection{Second public acquisition with the identical six-policy matrix}
+\label{sec:p3-weibo-common-matrix}
+We applied the same six source-selection policies,
+with the same source-only information budget,
+to the public ten-person Weibo2014 motor-imagery
+collection. To match the first BNCI2014\_004
+matrix, we fixed three scalp channels C3, Cz and
+C4, left/right hand imagery, 8--30~Hz and
+160~Hz resampling. The six policies were
+source-macro AUC, proper source-class-mean
+predictive NLL, historical validation-class-centred
+CovScore, Ledoit--Wolf, OAS and fixed
+$\lambda=0.1$; all used the same grouped-source
+tangent-LDA implementation and feasible
+shrinkage grid.
+
+For the first chronological stage, the script read
+only released participants 1--9 to fit and
+select source parameters. The choices were
+recorded as SHA-256
+\texttt{555b3d5d96ea} (full SHA-256 in the archived manifest)
+before reading held participant 10's EEG.
+For participant 10's 160 trials, source-macro
+AUC was 0.668281, proper predictive NLL
+0.661562, and fixed $\lambda=0.1$ 0.655625.
+The run order supplies an auditable source--held
+separation; it is \emph{not} independent
+preregistration because Weibo2014 and
+source-only shrinkage behaviour had been
+examined before this analysis.
+
+We then retrospectively evaluated all ten
+person-held folds, refitting the remaining
+nine source participants in each fold.
+\begin{table}[tb]
+\centering\small
+\caption{Weibo2014 ten-person exploratory
+six-policy source-only comparison.
+Identical candidate definitions were used
+on BNCI2014\_004 (Table~\ref{tab:p3-shared-matrix})
+but participant folds within each dataset
+share heavily overlapping source training.}
+\label{tab:p3-weibo-common}
+\begin{tabular}{lrr}
+\toprule
+Selector & Weibo macro AUC & $\Delta$ vs source-macro\\
+\midrule
+Source-macro & 0.731405 & 0\\
+Proper Gaussian predictive NLL & 0.729358 & $-0.002047$\\
+Fixed $\lambda=0.1$ & 0.727029 & $-0.004376$\\
+Historical class-centred score & 0.725489 & $-0.005916$\\
+Ledoit--Wolf & 0.725509 & $-0.005896$\\
+OAS & 0.725509 & $-0.005896$\\
+\bottomrule
+\end{tabular}
+\end{table}
+The source-macro method had the highest
+mean AUC in this \emph{exploratory}
+matrix, but its average advantage over
+proper NLL was only 0.002047 AUC;
+no policy can be declared consistently
+superior on future independent cohorts.
+The complete source-lock and per-person
+numerical record were generated successfully at
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38326720457}.
+A separate reproducibility replay now serializes the
+per-person six-candidate, held-label oracle regret
+and the number of regrets exceeding 0.02 AUC,
+with output SHA-256 prefix \texttt{9d76fa0122d6e42a};
+the full digest is retained in the workflow artifact.
+The replay completed successfully at
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38337526277};
+it does not register a fresh acquisition or add the four
+original optimisation methods to the shared matrix.
+
+A retrospective oracle analysis over only these
+six source policy outputs gives the following
+\emph{in-sample decision regret} for selecting
+source-macro:
+\[
+R_i=\max_{m\in\mathcal M}\mathrm{AUC}_{im}
+-\mathrm{AUC}_{i,\mathrm{macro}}.
+\]
+Its mean was 0.000840 AUC on the nine
+BNCI2014\_004 held folds (six of nine
+had zero regret) and 0.001766 AUC
+on the ten Weibo2014 folds (eight
+of ten had zero regret). The respective
+worst observed regrets were 0.006335
+and 0.013125 AUC. These
+\emph{post-target oracle regrets} are
+descriptive upper-performance reference
+differences, not observable source-only
+model selection criteria or prospective
+performance bounds.
+
+The new experiment tests identical known
+policies on another public acquisition; it
+does \emph{not} add the original continuous
+optimisation, SCE, anisotropic shrinkage and GID
+candidates to this shared matrix. Moreover,
+the same Weibo2014 data appear in P1 and
+P4 as explicitly disclosed prior contextual
+evidence. These results are exclusive
+P3 source-policy comparison and cannot
+be represented as an entirely new independent
+dataset or additional original discovery
+under another paper.

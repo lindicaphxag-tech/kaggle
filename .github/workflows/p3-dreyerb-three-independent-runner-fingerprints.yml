@@ -1,0 +1,92 @@
+name: P3 DreyerB independent runner source bitwise vs quantized fingerprints
+on:
+  push:
+    branches: [publication/default-eeg-p3-transfer-negative-20261013]
+    paths:
+      - '.github/workflows/p3-dreyerb-three-independent-runner-fingerprints.yml'
+      - 'research/defaultreg_bspc_v13/src/p3_dreyerb_source_hash_drift_two_reloads_no_targets.py'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  three_independent_clean_workers:
+    strategy:
+      fail-fast: false
+      matrix:
+        replica: [1, 2, 3]
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    env:
+      MNE_DATA: /tmp/p3_dreyer_source_worker
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Record full package versions
+        run: |
+          python -m pip install --disable-pip-version-check moabb==1.7.2
+          python -m pip freeze > /tmp/p3_dreyer_worker_requirements.txt
+      - name: Independently retrieve source 61 through 68 TWICE; never touch held targets
+        run: |
+          mkdir -p "$MNE_DATA" "source-replica-${{ matrix.replica }}"
+          python research/defaultreg_bspc_v13/src/p3_dreyerb_source_hash_drift_two_reloads_no_targets.py --out "source-replica-${{ matrix.replica }}/source-forensic.json"
+          cp /tmp/p3_dreyer_worker_requirements.txt "source-replica-${{ matrix.replica }}/installed-requirements.txt"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p3-independent-source-replica-${{ matrix.replica }}
+          path: source-replica-${{ matrix.replica }}/
+          retention-days: 90
+  classify_cross_worker_fingerprints:
+    needs: three_independent_clean_workers
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: p3-independent-source-replica-*
+          path: workers
+      - name: Compare exact, rounded-shape, rounded-scale identity ACROSS clean workers
+        run: |
+          python - <<'PY'
+          import json,glob
+          paths=sorted(glob.glob('workers/**/source-forensic.json',recursive=True))
+          assert len(paths)==3,paths
+          z=[json.load(open(p)) for p in paths]
+          assert all(x['source_ids']==list(range(61,69)) for x in z)
+          assert all(x['held_target_ids_NEVER_REQUESTED']==[69,70,71,72,73,74,75,76] for x in z)
+          for x in z:
+            assert x['n_read_rounds']==2
+            assert len(x['new_rounds'][0]['per_subject'])==8
+          out={'status':'THREE_CLEAN_RUNNER_SOURCE_DRIFT_SCOPED',
+               'independent_clean_runner_count':3,
+               'no_held_person_or_outcome_read':True,
+               'cross_runner_exact_sha':[
+                  x['new_rounds'][0]['source_aggregate_sha256'] for x in z],
+               'each_run_intra_runner_stability':[
+                  x['within_run_same_aggregate'] for x in z],
+               'per_subject_replicas':[],
+               'cannot_assign_drift_cause_without_raw_file_hashes':True,
+               'not_a_target_utility_experiment':True}
+          for k in range(8):
+            entries=[x['new_rounds'][0]['per_subject'][k] for x in z]
+            assert all(r['public_id']==entries[0]['public_id'] for r in entries)
+            hashes={}
+            for field in ('ordered_epoch_digest','sorted_epoch_digest',
+                         'quantized_relative_covariance_9decimals_hash',
+                         'quantized_log10_trace_8decimals_hash'):
+              hashes[field]={'all_equal':len(set(r[field] for r in entries))==1,
+                             'distinct_count':len(set(r[field] for r in entries))}
+            out['per_subject_replicas'].append(
+              {'public_id':entries[0]['public_id'],
+               'hash_test':hashes,
+               'mean_trace_by_runner':[x['feature_mean_trace'] for x in entries]})
+          print('P3_CROSS_RUNNER_FINGERPRINT_AUDIT',json.dumps(out,sort_keys=True))
+          with open('p3_dreyerb_cross_runner_fingerprint_comparison.json','w') as f:
+            json.dump(out,f,indent=2,sort_keys=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p3-three-runner-bitwise-and-numeric-tolerance-source-forensic
+          path: p3_dreyerb_cross_runner_fingerprint_comparison.json
+          retention-days: 90

@@ -1,0 +1,49 @@
+\subsection{Locked-artifact common-policy null and oracle regret}
+\label{sec:p3-two-original-run-null}
+We independently re-read the \emph{original} real-EEG
+GitHub Actions receipts from the five-policy BNCI2014\_004
+held-ID-9 experiment (run 38341955398) and the
+five-policy Weibo2014 fixed-source IDs-9/10 experiment
+(run 38362787873). These contain three previously
+exposed held records belonging to \emph{two distinct
+acquisitions}, with different source models across
+acquisitions; they must not be interpreted as three
+independent acquisitions. Each comparison uses the
+\emph{same five choices within its own source pool}:
+source-macro scalar, continuous search, SCE,
+anisotropic source risk and within-group centring.
+The two original result artifacts and their original
+byte digests are the audit inputs, rather than
+manually transcribed three-decimal table entries.
+
+The descriptive mean AUC differences relative to
+source macro over the three held records are
+0 (continuous), $-0.01121849$ (SCE),
+$-0.00262667$ (anisotropic), and
+$-0.00423547$ (group-centred).
+The largest favourable \emph{per-record} change
+by any nonbaseline method is
+$+0.00040123$ AUC (anisotropic, BNCI ID 9);
+on the two Weibo IDs every alternative method
+either matches or underperforms source macro.
+SCE has a worst observed paired deterioration of
+$-0.021875$ AUC in Weibo ID 10.
+Even a post-outcome \emph{per-person oracle}
+that may select any of the five observed policies
+would improve the original source-macro policy
+by at most $0.00040123$ AUC on any one of
+these \emph{specific} records. The observed
+retrospective constant-policy mean is maximised
+by source macro or the identical continuous path.
+
+This is a weak \emph{negative control} on a small
+previously examined target selection, not an
+equivalence test, proof of no possible useful
+source-only rule, or a fair estimate of a new
+population-level effect. Acquisition-level $n=2$
+is inadequate for a confirmatory meta-inference.
+The exercise isolates the \emph{additional decision
+benefit} that a novel selector would need to
+demonstrate on new uninspected acquisitions,
+rather than mistaking nontrivial policy
+complexity for predictive utility.

@@ -1,0 +1,51 @@
+name: P3 Dreyer2023B previously untracked MI acquisition two target common policy
+on:
+  push:
+    branches: [publication/default-eeg-p3-transfer-negative-20261013]
+    paths:
+      - '.github/workflows/p3-dreyer-b-new-two-held-mi.yml'
+      - 'research/defaultreg_bspc_v13/src/p3_dreyer2023b_first_source_locked_two_targets.py'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  source_eight_then_two_new_held_people:
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    env:
+      MNE_DATA: /tmp/dreyer-b-public-eeg
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python3 -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Build eight-source model, freeze common-policy decisions, then read two reserved targets
+        run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_bspc_v13/src/p3_dreyer2023b_first_source_locked_two_targets.py --out /tmp/p3_new_dreyer_b
+      - name: Fail closed if source lock, policy matrix or acquisition scope are wrong
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=Path('/tmp/p3_new_dreyer_b')
+          a=json.loads((d/'P3_DREYER_B_SOURCE_LOCK_PRETARGET.json').read_text())
+          b=json.loads((d/'P3_DREYER_B_FIRST_TWO_HELD_REAL_RESULTS.json').read_text())
+          assert a['source_public_ids']==list(range(61,69))
+          assert a['held_public_ids_NOT_REQUESTED_YET']==[69,70]
+          assert a['source_lock_before_ANY_target_read']
+          assert len(b['rows'])==2 and b['acquisition_level_count']==1
+          assert b['no_target_adaptive_reselection']
+          assert all(set(x['auc'])==set(a['algorithm_families']) for x in b['rows'])
+          assert not a['external_preregistration']
+          print('P3_DREYER_B_MI_TWO_TARGETS_SOURCE_CHOICES_FROZEN_BEFORE_HELD')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p3-dreyer-B-first-repo-two-MI-targets-one-acquisition
+          path: /tmp/p3_new_dreyer_b/*.json
+          if-no-files-found: warn
+          retention-days: 90

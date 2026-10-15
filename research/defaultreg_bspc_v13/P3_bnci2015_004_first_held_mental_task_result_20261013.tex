@@ -1,0 +1,61 @@
+\subsection{Newly source-locked mental-task transfer control}
+\label{sec:p3-bnci2015-004}
+To test whether the retrospective motor-imagery null extends
+unchanged across task paradigms, we preregistered
+\emph{within the repository execution} a separate
+BNCI2015\_004 comparison of \emph{math versus letter}
+mental tasks. This is \emph{not} motor imagery, and no
+claim that it replicates a left/right motor imagery
+population is warranted. The five policies were evaluated
+on identical C3/Cz/C4 tangent covariance features,
+8--30 Hz, 160 Hz, using public participants 1--8
+as a single fixed source pool.
+The grouped source decisions, feature SHA-256 and
+algorithm family were saved before requesting held
+public participant 9. The source lock digest (abbreviated in print; full SHA-256 in the archived JSON) was
+\texttt{cb52c01b...e1f34ae454}.
+The original completed GitHub Actions run
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38390289317}
+retains the source and result JSON, and code search
+before execution found no prior tracked evaluation
+of this named acquisition. Neither constitutes
+external independent trial registration.
+
+\begin{table}[ht]\centering\small
+\caption{Within-run source-locked, \emph{newly read} one-person
+BNCI2015\_004 mental-task target. All five policy
+families share the same source participants and 160
+labelled held trials (80 letter / 80 math). Inference
+is descriptive at the level of one held person.}
+\label{tab:p3-bnci2015004}
+\begin{tabular}{lrr}
+\toprule
+Source policy & AUC & Paired $\Delta$AUC vs macro\\
+\midrule
+Source macro & .517969 & 0\\
+Continuous & .517969 & 0\\
+SCE & .527500 & +.009531\\
+Anisotropic & .517813 & -.000156\\
+Group-centred & .525469 & +.007500\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+This new held record shows a modest positive SCE
+effect and a smaller group-centred improvement,
+unlike the previously examined BNCI2014\_004 and
+Weibo2014 motor-imagery record comparisons.
+The effect is below $0.01$ AUC, and an 8-source,
+1-target protocol contains no independent target
+replication or powered evidence of generalisation.
+The previously published target EEG was first \emph{loaded}
+only after source-model choices were committed in this run,
+but the experiment was not externally blinded,
+and the task domain differs. Selection of this
+outcome for presentation cannot constitute a
+general cross-paradigm benefit claim or
+demonstrate a valid conformal meta-acquisition
+calibration. It is retained as a falsifiable
+new-data sensitivity and not merged with the
+retrospective motor-imagery family for a
+pooled $p$ value.

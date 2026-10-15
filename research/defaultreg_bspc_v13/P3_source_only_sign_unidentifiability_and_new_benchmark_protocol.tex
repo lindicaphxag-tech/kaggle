@@ -1,0 +1,98 @@
+\section{An identifiability obstruction without target information}
+\label{sec:p3-source-identifiability}
+The observed lack of repeatable source-only benefits should
+not be interpreted as a universal theorem that no EEG
+domain-generalisation method can succeed. A more precise
+mathematical obstruction explains why no \emph{unconditional}
+guarantee can be established from source observations
+alone.
+
+\paragraph{Proposition.}
+Let two fixed source-fitted binary linear policies
+have nonparallel normal vectors $w_a,w_b$.
+Without restrictions on the distribution of a
+previously unseen target domain, the sign of
+\[
+ \mathrm{AUC}_{T}(w_a)-\mathrm{AUC}_{T}(w_b)
+\]
+is not identifiable from their identical source-only
+training observations. Specifically, there exist
+two target joint distributions $T_+$ and $T_-$
+for which the source observations and both
+fitted policies are unchanged but the pairwise
+AUC preference reverses.
+
+\paragraph{Construction.}
+Since $w_a$ and $w_b$ are linearly independent
+up to scaling, there exists a direction $v$
+with $w_a^\top v>0$ and $w_b^\top v<0$.
+Take target world $T_+$ with positive examples
+at $v$ and negative examples at zero.
+For target world $T_-$, exchange their
+class labels. The linear ranking preference
+changes from
+$\mathrm{AUC}_{T_+}(w_a)=1$,
+$\mathrm{AUC}_{T_+}(w_b)=0$ to
+$\mathrm{AUC}_{T_-}(w_a)=0$,
+$\mathrm{AUC}_{T_-}(w_b)=1$.
+Arbitrarily small continuous perturbations
+preserve the strict inequalities.
+No source-only procedure observing the
+same source law in both target worlds
+can correctly predict both signs.
+This is an elementary construction and
+not a claim of a new no-free-lunch theorem.
+
+The construction is reproduced by a
+four-pair synthetic numerical regression.
+It is a falsification of a proposed
+\emph{distribution-free target sign
+certificate}, not an experimental EEG result
+or a clinical forecast.
+
+\paragraph{What can make forecasting meaningful?}
+Additional structural assumptions could include
+restricted shifts of nuisance locations,
+invariant conditional class contrast,
+a bounded divergence between source and target
+feature distributions, calibration EEG from the
+target, or a validated source-to-target relationship.
+Each assumption must be stated, measured and
+tested on genuinely new acquisitions.
+In particular, the group-centred discriminant
+operator's invariance under fixed-coordinate
+source-group translations does not imply
+invariance under a newly refitted Riemannian
+reference nor unchanged target label relations.
+The failed Lee2019 positive-benefit promotion
+is consistent with this limitation but
+is not a general impossibility proof.
+
+\section{How to turn the current negative case series into a falsifiable study}
+The current four source-only algorithms were not
+one predeclared candidate family tested
+on a common external data matrix.
+A suitable future primary endpoint would be
+the \emph{source-only selected regret},
+defined on truly new target groups $g$ by
+\[
+ R_g=\max_{m\in\mathcal M}
+        \mathrm{AUC}_g(m)-
+        \mathrm{AUC}_g(\widehat m_{\rm source}),
+\]
+where $\mathcal M$ and the source-only
+selection rule are frozen before any target
+EEG is read. This regret uses target labels
+\emph{only for final outcome analysis},
+not for source model selection.
+A second endpoint is the rate of
+$\mathrm{AUC}_g(\widehat m_{\rm source})-
+\mathrm{AUC}_g(m_0)<-0.02$ against an
+explicit original source-macro baseline.
+The same candidates, channel selections
+and source-locked participant units must
+be evaluated on all external datasets.
+Until this experiment exists, we report
+the four earlier case studies as negative
+research evidence rather than a replicated
+performance theorem.

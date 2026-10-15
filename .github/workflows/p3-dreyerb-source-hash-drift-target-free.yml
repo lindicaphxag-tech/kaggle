@@ -1,0 +1,46 @@
+name: P3 source SHA across-run drift two within-run reload forensic no targets
+on:
+  push:
+    branches: [publication/default-eeg-p3-transfer-negative-20261013]
+    paths:
+      - '.github/workflows/p3-dreyerb-source-hash-drift-target-free.yml'
+      - 'research/defaultreg_bspc_v13/src/p3_dreyerb_source_hash_drift_two_reloads_no_targets.py'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  verify_only_original_source_61_through_68:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    env:
+      MNE_DATA: /tmp/p3_dreyer_b_source_only_drift
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python3 -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Source only two repeats; diagnose ordered and sorted-label epoch SHA digests
+        run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_bspc_v13/src/p3_dreyerb_source_hash_drift_two_reloads_no_targets.py --out /tmp/p3_source_only_drift.json
+      - name: Enforce no held target access and honest unresolved cause
+        run: |
+          python - <<'PY'
+          import json
+          a=json.load(open('/tmp/p3_source_only_drift.json'))
+          assert a['source_ids']==list(range(61,69))
+          assert a['held_target_ids_NEVER_REQUESTED']==list(range(69,77))
+          assert a['n_read_rounds']==2
+          assert a['cannot_assign_drift_cause_from_this_test_alone']
+          assert len(a['within_run_per_person_comparisons'])==8
+          print('P3_DREYERB_SOURCE_ONLY_DRIFT_DIAGNOSTIC_COMPLETE')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p3-dreyerb-source-only-two-repeat-hash-and-epoch-permutation-diagnostics
+          path: /tmp/p3_source_only_drift.json
+          if-no-files-found: warn
+          retention-days: 90

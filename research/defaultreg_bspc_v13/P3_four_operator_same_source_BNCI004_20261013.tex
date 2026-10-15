@@ -1,0 +1,45 @@
+\subsection{Harmonised four-operator comparison on the same source cohort}
+\label{sec:p3-four-operator-matrix}
+We implemented the four original proposal families under a
+single BNCI2014\_004 source cohort (released IDs 1--8) and
+one held person (ID 9): the anchored continuous source-AUC
+search, source-contrast envelope (SCE, radius one),
+noise-debiased anisotropic operator (source-risk coefficient
+$0.25$, anisotropy choices $0,0.5,2$), and classical
+within-group centred LDA. The same source macro-AUC
+27-point scalar LDA is the comparator in every row.
+All use the identical 8--30 Hz, 160 Hz, C3/Cz/C4
+preprocessing and source-fitted tangent coordinates.
+The source choices were saved before opening ID 9 in this
+execution, under SHA-256 prefix
+\texttt{ce4dc7ab76d2} (full digest in the workflow artifact).
+However, ID 9 had already been evaluated in the previous
+six-policy study, so this is \emph{retrospective harmonisation},
+not an independently blinded test.
+
+\begin{table}[tb]\centering\small
+\caption{One exposed held person (720 labelled trials):
+matched-source ROC-AUC and difference from source macro.
+These are descriptive within-person comparisons, not
+population effect estimates.}
+\label{tab:p3-four-operator-one-person}
+\begin{tabular}{lrr}\toprule
+Policy & ROC-AUC & Difference\\\midrule
+Source macro-AUC scalar LDA & 0.836798 & 0\\
+Anchored continuous selector & 0.836798 & 0\\
+SCE selector & 0.836111 & $-0.000687$\\
+Anisotropic risk selector & 0.837199 & $+0.000401$\\
+Within-group centred operator & 0.833935 & $-0.002863$\\
+\bottomrule\end{tabular}
+\end{table}
+
+This repairs the previous \emph{different-candidate-matrix}
+comparison defect at the level of one shared source and
+held person. Continuous selected a score path with the
+same held AUC as the baseline; the largest observed
+positive difference is only $0.000401$ on this one
+already exposed person. One result cannot establish
+small population effects, equivalence, or a general
+failure law. The executable data schema, source-lock
+check and outcome artifact are attached to the successful
+workflow \url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38341955398}.

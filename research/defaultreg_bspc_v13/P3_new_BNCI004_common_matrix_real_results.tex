@@ -1,0 +1,86 @@
+% Distinct NEW data study; numerical outcomes executed in one verified run.
+\subsection{New shared-candidate experiment: BNCI2014\_004}
+\label{sec:p3-bnci004-first-run}
+To resolve the principal design weakness of our
+heterogeneous negative-case series, we ran a new
+\emph{same-candidate-matrix} experiment on the public
+BNCI2014\_004 two-class left/right motor-imagery
+dataset (nine released people; three scalp channels).
+The source-only policies were precisely the same
+source-macro 27-point LDA selector, proper
+source-class-mean Gaussian predictive-NLL selector,
+historical validation-class-centred covariance score
+(which must not be called predictive likelihood),
+Ledoit--Wolf and OAS shrinkage, and a non-tuned
+$\lambda=0.1$ control. All selectors used 8--30~Hz,
+160~Hz and train-group-fitted tangent geometry.
+Candidate parameters were selected from
+participant-grouped source folds without the
+corresponding held participant's EEG or outcome.
+The proper and class-centred criteria are
+known estimands, not methods newly invented
+in this companion research note.
+
+In a separately preserved chronological stage, only
+released IDs 1--8 were processed initially.
+The eight-source candidate choices and processing
+receipt were saved with SHA-256
+\texttt{2eeeaa143c61} (full SHA-256 in the published workflow artifact)
+\emph{before opening participant 9's EEG}.
+On 720 held participant-9 labelled trials,
+source-macro yielded $0.836798$ ROC-AUC,
+proper predictive NLL $0.837454$,
+historical class-centred score $0.836111$,
+Ledoit--Wolf $0.836150$, OAS
+$0.836165$ and a fixed $\lambda=0.1$
+$0.837160$. Thus the proper-NLL selector
+was $+0.000656$ AUC above source-macro
+on \emph{one} held person, which
+is far too little information to claim
+a typical benefit or non-benefit.
+
+After the reserved first-run result was opened,
+we evaluated all nine participant-held folds
+using each of the same six selectors and eight
+other source participants per fold. We explicitly
+label these nine cross-validation folds as
+\emph{exploratory}: they overlap in training sources,
+include already exposed recording data and
+are neither independent new acquisitions nor
+separately pre-registered replications.
+\begin{table}[tb]\centering\small
+\caption{New BNCI2014\_004 same-person-fold
+descriptive comparison (nine exploratory
+held participants). The final column is
+the within-held-person macro AUC difference
+relative to the source-macro selector.}
+\label{tab:p3-shared-matrix}
+\begin{tabular}{lrr}
+\toprule
+Source-only selector & Macro ROC-AUC & $\Delta$ AUC\\
+\midrule
+Source-macro (reference) & 0.778002 & 0\\
+Proper Gaussian predictive NLL & 0.776581 & $-0.001421$\\
+Fixed $\lambda=0.1$ & 0.774814 & $-0.003188$\\
+Historical class-centred score & 0.770549 & $-0.007453$\\
+Ledoit--Wolf & 0.770628 & $-0.007374$\\
+OAS & 0.770640 & $-0.007362$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+This unified matrix is scientifically more
+interpretable than comparing different methods
+on disjoint exposed datasets. It does not
+establish any population-level ordering,
+since the number of participants is small,
+their source training sets are shared and
+the original 8--30~Hz montage is intentionally
+low dimensional ($p=6$ tangent features).
+It neither confirms the earlier four different
+proposals' null hypotheses nor qualifies as
+two new independent external datasets.
+Executable source lock, individual held-group
+outcomes and fully auditable code are attached
+to successful GitHub Actions
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38321155451}.

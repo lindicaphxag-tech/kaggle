@@ -1,0 +1,41 @@
+name: P3 two original real EEG common-operator artifacts, hard null replay
+on:
+  push:
+    branches: [publication/default-eeg-p3-transfer-negative-20261013]
+    paths:
+      - .github/workflows/p3-two-original-real-eeg-policy-replay.yml
+      - research/defaultreg_bspc_v13/src/p3_two_acquisitions_original_artifact_common_policy_audit.py
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  two-acquisition-three-exposed-records:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: p3-four-operator-common-source-results
+          run-id: 38341955398
+          github-token: ${{ github.token }}
+          path: /tmp/p3_bnci_original
+      - uses: actions/download-artifact@v4
+        with:
+          name: p3-weibo-four-operators-common-source
+          run-id: 38362787873
+          github-token: ${{ github.token }}
+          path: /tmp/p3_weibo_original
+      - name: Replay original EEG scalars with a common-method matrix
+        run: |
+          set -euo pipefail
+          B=$(find /tmp/p3_bnci_original -type f -name P3_FOUR_OPERATORS_RESULTS.json -print -quit)
+          W=$(find /tmp/p3_weibo_original -type f -name P3_WEIBO_FOUR_OPERATORS_TWO_TARGET_RESULTS.json -print -quit)
+          test -n "$B" && test -n "$W"
+          python research/defaultreg_bspc_v13/src/p3_two_acquisitions_original_artifact_common_policy_audit.py --bnci "$B" --weibo "$W" --out /tmp/p3_two_original_acquisition_common_policy_replay.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p3-two-exposed-real-acquisitions-fixed-policy-null
+          path: /tmp/p3_two_original_acquisition_common_policy_replay.json
+          retention-days: 90

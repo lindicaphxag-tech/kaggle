@@ -1,0 +1,35 @@
+\subsection{Acquisition-level abstention: proved scope and synthetic counterexample}
+For a single candidate policy selected \emph{before} calibration and a
+source-only predictor $\widehat m$ held fixed, let $Y_k$
+be its subsequently measured AUC margin on independent historical
+acquisitions $k=1,\ldots,n$. Define calibration residuals
+$R_k=\widehat m-Y_k$. Set
+$k_\alpha=\lceil(n+1)(1-\alpha)\rceil$ and let
+$q_\alpha$ be the $k_\alpha$th smallest residual.
+If $k_\alpha>n$, report a negative-infinity lower bound and
+do not authorize switching. Otherwise the lower prediction bound is
+$L=\widehat m-q_\alpha$; switch only when $L>\delta_{\min}$.
+Assuming the calibration and new-acquisition residuals are
+exchangeable and $\widehat m$ and the candidate have not been fit or
+selected using the calibration outcomes, the rank argument for
+split-conformal prediction yields
+$\Pr[Y_{\rm new}\ge L]\ge 1-\alpha$ marginally.
+This is not a conditional, distribution-shift or clinical guarantee.
+For multiple candidate policies or outcome-driven model selection,
+additional calibration or multiplicity control is required.
+With identical strict-Z0 source inputs, the new-target decision is
+the \emph{same across targets}: no target-specific choice is inferred.
+
+We implemented the rank rule with a fail-closed small-calibration
+test. In an explicitly \emph{synthetic} example with 79 independent
+calibration meta-acquisitions, $\alpha=0.1$, frozen
+$\widehat m=.08$ AUC and threshold $\delta_{\min}=.02$,
+the bound was approximately $0.0347$ and permitted a switch.
+It covered 90.64\% of 2,500 independently simulated draws from
+the same meta-law; after shifting the new-law margin mean,
+coverage dropped to 3.0\% (2,500 draws).
+This is a validation of assumptions and failure behavior only.
+The real research repository does not contain 79 eligible
+independent labelled meta-acquisitions for this use.
+Consequently no acquisition-calibrated real EEG selection,
+prospective benefit, or formal safety coverage is claimed.

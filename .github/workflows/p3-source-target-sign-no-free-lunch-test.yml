@@ -1,0 +1,30 @@
+name: P3 conditional source-to-unseen-target sign identifiability counterexample
+on:
+  push:
+    branches: [publication/default-eeg-p3-transfer-negative-20261013]
+    paths: ['.github/workflows/p3-source-target-sign-no-free-lunch-test.yml','research/defaultreg_bspc_v13/src/p3_no_source_only_target_sign_certificate_toy.py']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  toy-example-verified:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install numpy
+      - run: |
+          python research/defaultreg_bspc_v13/src/p3_no_source_only_target_sign_certificate_toy.py > /tmp/P3_conditional_no_source_target_certificate.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/P3_conditional_no_source_target_certificate.json'))
+          assert r['same_sources'] and r['unseen_target_reversal']
+          assert r['target_conditions']=={
+             'worldA_policy0':1.,'worldA_policy1':0.,
+             'worldB_policy0':0.,'worldB_policy1':1.}
+          print('P3_SAME_SOURCE_OPPOSITE_TARGET_POLICY_SIGN_EXACT_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p3-conditional-identifiability-counterexample-not-real-eeg
+          path: /tmp/P3_conditional_no_source_target_certificate.json

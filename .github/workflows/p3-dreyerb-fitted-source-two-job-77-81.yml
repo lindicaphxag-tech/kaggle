@@ -1,0 +1,94 @@
+name: P3 persisted fitted source models vs never-reselected held DreyerB 77-81
+on:
+  push:
+    branches: [publication/default-eeg-p3-transfer-negative-20261013]
+    paths:
+      - '.github/workflows/p3-dreyerb-fitted-source-two-job-77-81.yml'
+      - 'research/defaultreg_bspc_v13/src/p3_dreyerb_persist_fitted_source_then_held_77_81.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  source_only_checkpoint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 105
+    env:
+      MNE_DATA: /tmp/p3-dreyerb-77-81-source
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python3 -m pip install --disable-pip-version-check moabb==1.7.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: p3-dreyer-B-first-repo-two-MI-targets-one-acquisition
+          run-id: 38390737635
+          github-token: ${{ github.token }}
+          path: /tmp/p3-original-freeze
+      - name: Read source ONLY and persist fitted model/ref/choice states
+        run: |
+          set -euo pipefail
+          mkdir -p "$MNE_DATA"
+          SRC=$(find /tmp/p3-original-freeze -type f -name P3_DREYER_B_SOURCE_LOCK_PRETARGET.json -print -quit)
+          test -n "$SRC"
+          python research/defaultreg_bspc_v13/src/p3_dreyerb_persist_fitted_source_then_held_77_81.py --stage source --prior-lock "$SRC" --out /tmp/p3_fitted_source_bundle
+          test -s /tmp/p3_fitted_source_bundle/SOURCE_ONLY_FITTED_FIVE_POLICY_CHECKPOINT.pkl
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p3-same-run-fitted-source-only-checkpoint-five-policies
+          path: /tmp/p3_fitted_source_bundle/*
+          if-no-files-found: error
+          retention-days: 30
+  holdout_77_to_81_without_source_refit:
+    needs: source_only_checkpoint
+    runs-on: ubuntu-latest
+    timeout-minutes: 105
+    env:
+      MNE_DATA: /tmp/p3-dreyerb-77-81-target
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python3 -m pip install --disable-pip-version-check moabb==1.7.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: p3-same-run-fitted-source-only-checkpoint-five-policies
+          path: /tmp/p3_exact_fitted_source_bundle
+      - name: SHA-verify exact SOURCE fitted states before any held target is loaded
+        run: |
+          set -euo pipefail
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_bspc_v13/src/p3_dreyerb_persist_fitted_source_then_held_77_81.py --stage held --artifact /tmp/p3_exact_fitted_source_bundle --out /tmp/p3_five_target_results
+      - name: Reject target re-fit or cross-acquisition overclaims
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/p3_five_target_results')
+          a=json.loads((p/'P3_PERSISTED_CHECKPOINT_VERIFIED_BEFORE_HELD.json').read_text())
+          b=json.loads((p/'P3_DREYERB_FIVE_HELD_PERSISTED_SOURCE_MODEL_RESULTS.json').read_text())
+          assert a['no_model_refit_on_held_job']
+          assert a['held_subjects_not_yet_read']==[77,78,79,80,81]
+          assert b['target_ids']==[77,78,79,80,81] and len(b['results'])==5
+          assert b['no_model_refit_or_hyperparameter_reselection_on_held_job']
+          assert b['acquisition_dataset_count']==1
+          assert not b['prior_eight_held_people_known_at_hyperparam_selection_freeze']
+          assert set(b['mean_delta_auc_vs_source_macro'])==set(['source_macro','continuous','SCE','anisotropic','group_centered'])
+          print('P3_CHECKPOINTED_FITTED_SOURCE_MODEL_AND_FIVE_HELD_REAL_TEST_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p3-five-DreyerB-held-results-source-model-fitted-before-second-runner
+          path: /tmp/p3_five_target_results/*.json
+          if-no-files-found: warn
+          retention-days: 90

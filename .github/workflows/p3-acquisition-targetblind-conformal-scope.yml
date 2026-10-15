@@ -1,0 +1,24 @@
+name: P3 acquisition-level conformal target-blind synthetic falsification
+on:
+  push:
+    branches: [publication/default-eeg-p3-transfer-negative-20261013]
+    paths:
+      - '.github/workflows/p3-acquisition-targetblind-conformal-scope.yml'
+      - 'research/defaultreg_bspc_v13/src/p3_acquisition_conformal_targetblind_scope.py'
+      - 'research/defaultreg_bspc_v13/P3_acquisition_level_conformal_scope_20261013.tex'
+      - 'research/defaultreg_bspc_v13/main_p3_source_only_optimisation_NEGATIVE_UNREADY.tex'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  independent-meta-synthetic-proof-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          python3 research/defaultreg_bspc_v13/src/p3_acquisition_conformal_targetblind_scope.py --out p3_conformal_scope.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p3-synthetic-assumption-falsification
+          path: p3_conformal_scope.json

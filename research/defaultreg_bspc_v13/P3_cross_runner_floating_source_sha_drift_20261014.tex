@@ -1,0 +1,63 @@
+\paragraph{Independent-run source-feature precision forensics.}
+\label{sec:p3-dreyerb-float-fingerprints}
+The complete 256-bit hashes are stored in the archived machine-readable receipts. The earlier Dreyer2023B source covariances
+failed a strict bytewise replay from their
+original source SHA-256,
+\texttt{7146797e\ldots}, into
+\texttt{9f650460\ldots}.
+To distinguish a systematic changed source
+pipeline from trial reordering or within-run
+nondeterminism, we obtained two independently
+executed, \emph{source-only} GitHub Actions
+fingerprint archives. Each of their original
+runs requested only IDs 61--68 twice and
+never requested IDs 69--76; the repeated
+source reads were \emph{exactly byte-equal
+within each runner}.
+In contrast, between the runners, the
+per-participant raw float64 covariance SHA
+and the order-insensitive labelled-epoch
+digest differ for all eight persons, while
+the exact \emph{quantised} fingerprints
+agree for all eight: normalised covariance
+shape rounded at $10^{-9}$ precision and
+per-epoch $\log_{10}$ covariance trace
+rounded at $10^{-8}$ precision both give
+eight matching per-person hashes.
+The maximum difference in per-person
+\emph{mean} covariance trace is
+$1.43\times10^{-14}$; the maximum difference
+in mean log-determinant is
+$1.78\times10^{-15}$.
+These are measurements of \emph{summary
+statistics}, not bounds on the largest
+elementwise covariance or score difference.
+The executable, two-original-receipt comparison
+is pinned to original source-only runs
+\texttt{38548578442} and \texttt{38548578441}.
+The independent two-artifact replication completed
+successfully in
+\href{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38552831272}
+{GitHub Actions run 38552831272},
+which checked the original input SHA-256 values,
+all 8 per-person exact and quantised fingerprints,
+and the non-disclosure of held target EEG.
+
+Taken together, these observations are
+consistent with floating-point roundoff
+rather than gross source-record replacement;
+they do \emph{not} establish identical raw
+acquisition file bytes, identical fitted
+model parameters, or an IEEE-754 perturbation
+guarantee. Quantisation can hide a true
+difference below its resolution and does
+not make an exact lock pass. Accordingly,
+the six-person fixed-choice source-\emph{refit}
+reported in Table~\ref{tab:p3-dreyerb-six}
+remains a lower-tier sensitivity test, not
+a resurrection of the failed exact-source
+replay. A future strict replay must persist
+and reuse the exact source feature arrays
+and model weights rather than reproducing
+floating-point hashes from new recomputation
+and assuming equality.
