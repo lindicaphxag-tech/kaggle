@@ -1,0 +1,37 @@
+name: P4 numerical multidimensional Bernstein-vs-Taylor source certificate
+on:
+  push:
+    branches: [publication/default-eeg-p4-rank-certificates-20261013]
+    paths: ['.github/workflows/p4-multidimensional-spectral-certificate-stress.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  p4-independent-multidimensional-synthetic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy
+      - name: Recompute 15 symmetric positive-definite p2-p12 fixtures, 201 sampled AUC points each
+        run: |
+          python research/defaultreg_bspc_v13/src/p4_multidimensional_source_certificate_stress.py /tmp/p4-independent-dimension-profile.json
+          python - <<'PY'
+          import json
+          z=json.load(open('/tmp/p4-independent-dimension-profile.json'))
+          assert z['n_synthetic_cases']==15 and z['dense_grid_checked_for_each_case']==201
+          assert all(x['dense_201_lambdas_passed'] for x in z['cases'])
+          assert set(z['dimension_summary'])=={'2','3','6','9','12'}
+          assert z['not_real_eeg_or_independent_replicated_dataset']
+          assert z['not_a_formally_rounding_verified_interval_certificate']
+          print('P4_SYNTHETIC_15_CASE_SPD_ENCLOSURE_CHECKS_PASS_NO_TARGET_CLAIM')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: defaultreg-P4-p2to12-Bernstein-vs-Taylor-numerical-rank-certificates
+          path: /tmp/p4-independent-dimension-profile.json
+          retention-days: 90

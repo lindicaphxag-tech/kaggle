@@ -1,0 +1,86 @@
+\subsection{Finite rank cells on the continuous spectral shrinkage path}
+\label{sec:v25-bernstein-rank-cells}
+The V23 interval method bounded source-trial score signs by
+enclosing the individual rational terms. In low-dimensional
+EEG, a complementary approach acts on their \emph{common
+numerator}, exploiting cancellations otherwise lost in
+termwise bounds.
+
+For fixed source-trained eigensystem
+$S=U\,\mathrm{diag}(s_1,\ldots,s_p)U^\top$, class contrast
+$d_s$, fixed held-\emph{source} positive--negative feature
+difference $v_{pn}$, let
+\[
+q_i(\lambda)=(1-\lambda)s_i+\lambda\nu,\qquad
+a_{i,pn}=(u_i^\top v_{pn})(u_i^\top d_s).
+\]
+On a feasible interval $I$ where $q_i(\lambda)>0$ for all
+$i,\lambda$, the sign of the score difference is the sign
+of the single polynomial
+\begin{equation}
+ N_{pn}(\lambda)
+ =\sum_{i=1}^{p}a_{i,pn}\prod_{j\ne i}q_j(\lambda),
+ \qquad\deg N_{pn}\le p-1 .
+ \label{eq:v25-spectral-numerator}
+\end{equation}
+Indeed $z_{pn}=N_{pn}/\prod_iq_i$ and the denominator is
+strictly positive. Unless $N_{pn}$ vanishes identically
+(and the pair remains tied throughout), a positive--negative
+pair can change its strict ordering only at the at most
+$p-1$ distinct real roots of $N_{pn}$. Hence the finite
+source-validation macro-AUC is piecewise constant on
+the complement of the finite union of all such rank-cell
+boundaries. Values \emph{at} a root are evaluated separately
+because ties count for one-half AUC credit; it would be
+incorrect to assume the supremum is attained only at
+open-cell midpoints. The root-count argument is an
+elementary consequence of rational functions, not a
+claim of priority for new polynomial algebra.
+
+For each subinterval $[\ell,r]$, map $\lambda$ to
+$t\in[0,1]$ and express the degree-$p-1$ numerator
+as a Bernstein polynomial
+\[
+ N_{pn}(\ell+(r-\ell)t)
+ =\sum_{k=0}^{p-1} b_{k,pn}B_k^{p-1}(t).
+\]
+As Bernstein basis functions are nonnegative and sum to
+one, $\min_k b_{k,pn}\le N_{pn}(\lambda)\le
+\max_k b_{k,pn}$. Strict positivity (or negativity)
+of \emph{all} coefficients proves that the pair's rank
+is unchanged on the entire subinterval. A source pair
+is declared rank-stable over $I$ only if \emph{every}
+subinterval proves the same strict sign. A failure to
+certify is retained as uncertainty, not counted as a
+real crossing. The inference is exact in real arithmetic;
+our floating-point implementation applies a conservative
+cancellation margin but does not use formally verified
+directed rounding, and therefore we do not claim a
+machine-checked mathematical certificate.
+
+The new implementation uses a positive product-of-denominators
+scaling and is explicitly restricted to $p\le12$ to
+control numerical conditioning. With three EEG channels,
+a tangent-space covariance model has only six unique
+coordinates, yielding a numerator of degree at most
+five per positive--negative sample pair. AUC credit of
+all certified source pairs remains unchanged over the
+entire candidate path. Adding one-sided worst-case
+credit changes for the uncertified pairs provides a
+deterministic interval-wide finite-\emph{source}-AUC
+envelope analogous to the established source macro-AUC bounding construction.
+
+\paragraph{Research scope and falsification.}
+The practical hypothesis is that whole-numerator
+Bernstein bounds reduce unnecessary uncertainty relative
+to the V23 termwise/Taylor interval method on
+\emph{identical frozen} held-source model folds and
+lambda intervals. We test this on a previously exposed
+three-channel Weibo2014 acquisition as a retrospective
+mechanistic comparison, not as a fresh target-validation
+sample. Either method may be tighter; gains in certified
+\emph{source} rank coverage are not gains in unknown-person
+AUC, and no claim of cross-subject error prevention
+is implied. Boundary roots, exact ties, denser intervals,
+numerical cancellation, and subject-specific harms remain
+necessary negative controls.

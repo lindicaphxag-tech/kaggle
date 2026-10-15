@@ -1,0 +1,53 @@
+\subsection{Real three-channel EEG source rank cells: a small numerical improvement}
+\label{sec:v25-real-bernstein}
+An executable retrospective source-only audit was completed on
+Weibo2014 using the same original C3/Cz/C4 sensorimotor montage,
+fixed six-dimensional tangent-LDA pipeline, and first outer
+held-subject fold as the V24 first-run study. The other nine
+participants each entered the original held-source validation
+procedure, with source-fitted tangent references and shrinkage
+spectra unchanged. Because Weibo2014 target outcomes had already
+been exposed in V24, this audit is a \emph{post-outcome
+mechanistic analysis}; it is not a new, independently untouched
+external test or a prospective predictor of target harm.
+
+\begin{table}[tb]
+\centering\small
+\caption{V25 3-channel Weibo2014 source-domain certificate
+comparison, nine held-\emph{source} people, 12 fixed lambda
+subintervals per range. Percentages count only pair rankings
+conservatively proved invariant along an entire continuous
+shrinkage interval. Failure to certify is \emph{not} an
+observed rank crossing. There are no new target AUC effects
+in this table.}
+\label{tab:v25-source-bernstein}
+\begin{tabular}{lrrr}
+\toprule
+Source interval & V23 Taylor & V25 Bernstein & Gain (pp)\\
+\midrule
+Complete $[0,1]$ & 94.121\% & 94.267\% & +0.146\\
+Between source selectors & 96.274\% & 96.338\% & +0.064\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+V25 gave a slightly higher certifiable pair fraction for
+all nine validation source people on both prescribed
+intervals, and reproduced the same endpoint AUC values
+as V23 to the frozen numerical tolerance. These
+increases are \emph{small}; no genuine future-person
+generalisation effect, clinical value, computational
+advantage or superior transfer selector has been
+established. Neither method guarantees formal verified
+floating-point arithmetic. The original completed
+GitHub Actions proof-of-execution is
+\texttt{38283087191}, with frozen JSON SHA-256
+\texttt{c0c9e038376c899d}\ldots.
+The full digest and source-person results remain in
+the public immutable experiment artifact
+\texttt{11762626131}.
+
+The retrospective result motivates further mathematical
+study of spectral rank boundaries, but does not justify
+promoting the whole-numerator certificate into the
+primary manuscript's EEG decoding performance claims.

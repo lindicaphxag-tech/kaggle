@@ -1,0 +1,38 @@
+% P4 executed GitHub Action 38315929126; synthetic source only.
+\subsection{Does simply adding more shrinkage intervals close the gap?}
+\label{sec:p4-refinement}
+To test whether the observed benefit of the
+whole-numerator Bernstein formulation is merely
+an artefact of using insufficiently many intervals,
+we reran the same fifteen deterministic synthetic
+source spectra with $12$, $24$ and $48$
+equal-length subintervals. The original
+$12$-subinterval run already used source
+pair features held fixed across comparisons.
+The measured mean improvement of Bernstein
+$48$ segments over its own $12$-segment
+coverage was just \emph{$+0.0412$ percentage
+points} over these fifteen cases, with a
+strict increase in only $2/15$.
+No case gave a decrease beyond the
+stated numerical tolerance in this test.
+
+The result supports a narrow, mechanistic
+reading of the earlier synthetic comparisons:
+the much larger differences between V23
+termwise/Taylor and V25 whole-numerator
+Bernstein at identical $12$-segment budgets
+cannot be attributed exclusively to
+insufficient segmentation of the latter
+bound. Exploiting polynomial cancellations
+is a different enclosure choice from
+simply refining the grid. This does not
+prove optimality of Bernstein bounds,
+because neither enclosure includes exact
+root isolation and each is conditional
+on floating-point eigensystems.
+The $12$-, $24$- and $48$-segment runs also
+do not establish better runtime efficiency;
+denser subdivision has a computational cost.
+All cases are \emph{synthetic}, not
+additional real EEG recordings.

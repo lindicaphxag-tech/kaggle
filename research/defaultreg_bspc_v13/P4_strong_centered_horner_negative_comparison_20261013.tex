@@ -1,0 +1,77 @@
+% Verified real executed rational synthetic benchmark: 38326786180.
+\subsection{Stronger centered-Horner baseline falsifies an exclusive Bernstein gain}
+\label{sec:p4-strong-centered-control}
+The initial 960-interval exact-rational benchmark
+found 924 strict-sign certifications for Bernstein
+and only 912 for \emph{unshifted} power-basis
+interval Horner. We tested whether those
+twelve additional certificates survive the
+stronger classical baseline of
+midpoint-translated interval Horner
+(Section~\ref{sec:p4-selective-hybrid-proof}).
+All methods used the \emph{same}
+$p=2,3,6,9,12$ rational spectra,
+12 deterministic patterns per dimension
+and 16 fixed subintervals per pattern.
+Root-touching, identically tied and
+negative-case synthetic tests were
+included; an outcome was accepted only
+when an exact inclusion enclosure
+established a strict sign.
+
+\begin{table}[tb]
+\centering\small
+\caption{Second, stronger exact-rational matched
+960-interval benchmark. Parenthesised times
+are in-run Python internal evaluation totals;
+they are machine-dependent and not asymptotic
+runtime guarantees. The test contains no
+original real EEG floating input certification.}
+\label{tab:p4-centered-horner}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrr}
+\toprule
+Exact rational interval method & Certified / 960 & Seconds\\
+\midrule
+Original interval Horner & 912 & 0.0742\\
+\textbf{Midpoint-centered interval Horner} & \textbf{924} & 0.2623\\
+Bernstein enclosure & 924 & 0.4057\\
+Centered Horner then Bernstein & 924 & 0.2753\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The midpoint-centered evaluator recovered all
+12 signs missed by the original Horner baseline,
+while Bernstein certified \emph{no additional}
+interval beyond centered Horner on these
+fixtures. The selective method triggered
+Bernstein fallback on only 36/960 intervals,
+but none of those fallbacks produced an
+additional strict-sign certificate.
+Its measured inner-run time was slightly
+greater than centered Horner alone
+($0.2753$ versus $0.2623$~s),
+although less than calling Bernstein on
+all 960 intervals. The centered method
+was also slower than the weakest,
+unshifted original Horner baseline.
+
+These results \emph{falsify} a claim of
+exclusive Bernstein superiority over an
+appropriately transformed classical
+interval enclosure on this dataset.
+They do not disprove all possible
+Bernstein advantages on other polynomial
+families, intervals or computing budgets.
+A further method contribution requires
+benchmarking against
+midpoint-translated Horner,
+root isolation, arithmetic-error-bounded
+interval methods and numerically stable
+coefficient transformations.
+The exact executed output and source
+version are archived at
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38326786180}.
+No real EEG classifier or unseen-person AUC
+was improved by this synthetic experiment.

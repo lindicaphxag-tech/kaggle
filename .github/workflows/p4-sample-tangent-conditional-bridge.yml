@@ -1,0 +1,43 @@
+name: P4 exact sample-to-tangent conditional sensitivity proof audit
+on:
+  push:
+    paths:
+      - 'research/defaultreg_bspc_v13/src/p4_sample_covariance_tangent_conditional_bridge.py'
+      - '.github/workflows/p4-sample-tangent-conditional-bridge.yml'
+  pull_request:
+    paths:
+      - 'research/defaultreg_bspc_v13/src/p4_sample_covariance_tangent_conditional_bridge.py'
+      - '.github/workflows/p4-sample-tangent-conditional-bridge.yml'
+permissions:
+  contents: read
+jobs:
+  rational-operator-sensitivity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install minimal matrix-regression dependencies
+        run: python -m pip install --disable-pip-version-check sympy numpy scipy
+      - name: Exact rational conditional certificate and numerical diagnostic
+        run: |
+          python research/defaultreg_bspc_v13/src/p4_sample_covariance_tangent_conditional_bridge.py --out /tmp/p4-tangent-bridge-result.json
+          python - <<'PY'
+          import json
+          with open('/tmp/p4-tangent-bridge-result.json') as f:
+              d=json.load(f)
+          assert d['status']=='PASS'
+          assert d['nontrivial_bound_cases']>=20
+          assert d['large_uncertainty_returns_UNKNOWN']
+          assert d['no_MNE_IEEE754_full_pipeline_certificate']
+          print('PASS_SCOPE_LOCKED_CONDITIONAL_SAMPLE_TO_TANGENT')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p4-conditional-rational-sample-to-tangent-NOT-full-float
+          path: /tmp/p4-tangent-bridge-result.json
+          if-no-files-found: warn
+          retention-days: 90

@@ -1,0 +1,40 @@
+% Exact rational arithmetic audit: computational proof scope, not new EEG evidence.
+\subsection{Exact-arithmetic confirmation of the certificate implication}
+\label{sec:p4-exact-rational}
+To separate a mathematically valid enclosure from the numerical
+implementation used for the retrospective EEG experiment, we
+implemented an additional independent rational-input verifier.
+For rational $s_i>0$, $\nu>0$ and $a_i$, it forms
+$N(\lambda)=\sum_i a_i\prod_{j\ne i}
+(s_j+(\nu-s_j)\lambda)$ with exact rational coefficients.
+On a rational interval $[l,r]\subseteq[0,1]$, it performs
+an exact affine substitution followed by the power-to-Bernstein
+basis conversion
+\[
+ b_k=\sum_{j=0}^{k}c_j
+ {\binom{k}{j}\over\binom{n}{j}},\qquad
+ N(l+(r-l)t)=\sum_{j=0}^{n}c_jt^j.
+\]
+A strictly positive (negative) set of \emph{all} rational
+Bernstein coefficients implies the same strict sign at
+\emph{every} point on the entire closed interval because
+$B_k^n(t)\ge0$ and $\sum_kB_k^n(t)=1$.
+The all-zero polynomial is a separate identically tied case;
+mixed signs are \emph{unresolved}, not automatically an actual
+rank reversal. This sufficiency statement needs neither a
+dense grid nor random interpolation points.
+
+The executable independent check exercises rational spectra in
+dimensions $p=2,3,6,9,12$, with cancellation patterns,
+boundary roots and exact ties. Its purpose is to test the
+logical and arithmetic implementation of this narrow certificate,
+NOT to revise real-EEG pair-coverage estimates. In particular,
+the original eigenvalues and score projections come from
+floating-point preprocessing and are not exact rational
+measurements of the underlying physical signal. Exact
+calculations on rationalized inputs alone would not certify
+that preprocessing, eigendecomposition or source feature
+estimation were numerically error-free. A fully verified
+real-EEG guarantee still requires input uncertainty bounds
+and directed rounding or an independently checked interval
+arithmetic implementation.

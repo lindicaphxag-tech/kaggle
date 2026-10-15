@@ -1,0 +1,48 @@
+\FloatBarrier
+\subsection{Corrected multi-family exact-rational stress test}
+\label{sec:p4-multifamily}
+We further varied the spectral fixture on a fixed interval grid: three deterministic strictly
+positive spectral families (linear, quadratic, and alternating),
+five dimensions $p=2,3,6,9,12$, the same twelve distinct-up-to-scale rational
+contrast patterns per spectrum, and both eight and sixteen equal
+rational subintervals. This produces 4,320 matched interval cases. An initial
+contrast generator made its twelve nominal patterns scalar multiples;
+we detected this defect and replaced it before this corrected run.
+This correction was made after examining the first sweep, so this
+expanded comparison is exploratory rather than an independently
+preregistered test.
+The numerator construction, coefficients, interval endpoints and
+both methods use exact rational arithmetic. These are synthetic
+classifier spectra, not an end-to-end certificate of the numerical
+EEG preprocessing pipeline.
+
+\begin{table}[ht]\centering\small
+\caption{Exact rational whole-interval strict-sign certifications
+on the corrected 4,320-case exploratory sweep. Opposite-sign rational
+point witnesses invalidate a whole-interval constant strict sign for
+88 unresolved cases. The extra Bernstein signs include thirteen
+quadratic-spectrum dimension-twelve cases; other gains are spread
+across the remaining tested spectra and dimensions.}
+\label{tab:p4-multifamily}
+\begin{tabular}{lr}\toprule
+Method or diagnostic & Interval count\\\midrule
+Midpoint-centered Horner certified & 4,212\\
+Bernstein certified & 4,232\\
+Bernstein only versus centered Horner & 20\\
+Centered Horner only versus Bernstein & 0\\
+Both unresolved with opposite-sign rational witnesses & 88\\
+Both unresolved without such a witness & 0\\
+\bottomrule\end{tabular}
+\end{table}
+
+The Bernstein fallback raises the
+strict-sign count from 4,212 to 4,232 on this corrected
+synthetic suite, a 0.463-percentage-point change in
+coverage (20/4,320). It does not repair the 88 genuinely
+sign-changing intervals and does not prove an asymptotic
+speed advantage. In the earlier quadratic-spectrum 960-case
+fixture, the advantage remains zero. This result narrows the
+claim to a small reproducible advantage on selected synthetic
+intervals under these corrected patterns; tests of rounding-safe floating implementations,
+root isolation, runtime and more diverse polynomials remain
+necessary before a numerical-algorithm journal submission.

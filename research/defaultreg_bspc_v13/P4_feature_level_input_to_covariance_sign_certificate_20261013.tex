@@ -1,0 +1,90 @@
+\subsection{From certified final-feature input errors to covariance-score signs}
+\label{sec:p4-final-feature-chain}
+The covariance-coordinate theorem previously assumed
+an externally supplied matrix-level error radius.
+We now derive that radius \emph{deterministically}
+from a more elementary, equally conditional assumption:
+the \emph{final stored feature matrix} $\widehat X\in
+\mathbb Q^{n\times p}$ is related to the hypothetical
+unrounded feature matrix $X$ by entrywise
+$|X_{ij}-\widehat X_{ij}|\leq\eta$.
+Here $\eta$ is an \emph{externally justified bound
+on the final features}, \emph{not} a property we
+infer from an EDF's raw 16-bit conversion.
+No non-linear EEG preprocessing, tangent transform
+or numerical matrix decomposition is covered by
+this assumption without an additional verified
+forward-error analysis.
+
+For two classes, let $H$ be the symmetric
+block-diagonal within-class centring projection,
+$R=HX$, $\widehat R=H\widehat X$ and
+$\rho I$ a fixed identical positive ridge.
+Then the pooled within-class covariances are
+\[
+S=\frac{R^\top R}{n-2}+\rho I,\qquad
+\widehat S=\frac{\widehat R^\top\widehat R}{n-2}+\rho I.
+\]
+Writing $E=X-\widehat X$ gives
+$\|HE\|_2\leq\|E\|_F\leq\eta\sqrt{np}$.
+By expanding the Gram product,
+\[
+\|S-\widehat S\|_2\leq
+\frac{2\|\widehat R\|_F\eta\sqrt{np}
+       +np\eta^2}{n-2}
+\equiv\epsilon_S.
+\]
+For the difference $d$ of two empirical class
+means and any positive-minus-negative example
+difference $v$, the same entrywise assumption
+implies
+\[
+\|d-\widehat d\|_2\leq 2\eta\sqrt{p}
+\equiv\epsilon_d,\qquad
+\|v-\widehat v\|_2\leq 2\eta\sqrt{p}
+\equiv\epsilon_v.
+\]
+Replacing all square roots with \emph{upward exact-rational}
+approximations gives a machine-checkable rational
+outer bound, which is submitted to the
+covariance-coordinate resolvent criterion in
+Section~\ref{sec:p4-cov-resolvent}.
+If it returns a strict sign, that sign holds for
+\emph{every} exact feature matrix in the specified
+entrywise input box and every $\lambda\in[0,1]$.
+No independence assumptions on feature errors,
+no fixed eigenvectors and no sampled noise law
+are required for this conditional conclusion.
+
+The included synthetic exact-rational test uses
+64 seeded two-class, 24-record final-feature matrices
+with a common positive ridge. Of these deliberately
+well-separated fixtures, 48 have proved positive
+score signs and 16 proved negative signs over the
+entire continuous $\lambda$ interval and every
+admissible entrywise feature perturbation; no
+candidate was inconclusive in this \emph{easy}
+synthetic subset. Independently reconstructed
+admissible feature perturbations produced 576 exact
+rational score checks without a contradiction.
+A separate, deliberately adversarial \emph{exact
+counterexample} perturbs one positive and one
+negative record, each by $\eta=0.1$: the nominal
+score is positive and an admissible score is
+negative across tested shrinkage values; the
+algorithm correctly returns \texttt{UNKNOWN}.
+This demonstrates that the apparatus can
+refuse certification when input uncertainty
+permits a genuine decision reversal.
+The program recomputes all class means,
+within-class residuals, covariance and pair
+differences rather than merely injecting
+a matrix-level error. The successful code,
+exact samples and fail-closed counterexample
+are archived in
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38389194383}.
+These are conditional operator regressions,
+not real EEG classification, a patient-level
+risk model, or proof that any unverified
+preprocessing/tangent pipeline satisfies
+the assumed final-feature $\eta$ bound.

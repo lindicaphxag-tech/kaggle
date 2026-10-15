@@ -1,0 +1,71 @@
+\subsection{Exact event-map update after root isolation}
+\label{sec:p4-incremental-events}
+A separate prototype now constructs the complete rational-input
+AUC event map. It uses SymPy's existing exact real-root routine
+for every pair numerator; the new computational step groups equal
+algebraic events and updates the two-class pair credit only for
+pairs participating at that event. Odd-multiplicity roots reverse
+the strict-order credit, even-multiplicity roots retain it, and
+each vanishing pair contributes exactly one-half at the event.
+Globally tied pairs and roots at the parameter endpoints remain
+separate cases. This is an event-aggregation procedure, not a
+new polynomial root isolator.
+
+The exact output (all event points, event AUC values, and open-cell
+AUC values) agrees with the original implementation that recomputes
+every pair's sign in every cell. The local tests include coincident events, double roots, full-path ties, endpoint equality,
+closely spaced rational roots and algebraic irrational roots.
+\paragraph{Correctness and operation count.}
+Assume each source-fitted spectral denominator is strictly positive
+throughout the feasible parameter interval and every nonzero rational
+pair numerator has had all its roots isolated exactly. Between
+consecutive distinct roots, each pair sign is constant. At a root,
+its ROC-AUC credit is $1/2$; across the root, the sign changes if
+and only if its multiplicity is odd. Thus initializing pair credits
+in the first open cell and updating only the incident pairs at each
+root gives, by induction over ordered roots, exactly the same AUC
+at every event and open cell as evaluating all pair numerators
+anew. Zero-polynomial pairs contribute $1/2$ everywhere and
+endpoint values are evaluated separately. For $P$ pairs, $E$
+interior roots counted with pair incidence, and $R$ distinct event
+locations, the combinatorial work after root isolation is $O(P)$
+initialization plus $O(E\log E)$ algebraic comparisons for sorting
+and $O(E+R)$ pair-credit/output operations. Re-evaluating all
+$P$ pairs on each of $R+1$ cells uses $O(P(R+1))$ sign evaluations.
+These counts exclude algebraic number bit complexity and root
+isolation, which may dominate total time.
+
+A deterministic rational SPD synthetic benchmark used dimensions
+$p=3,6$, pair counts 4--32, and 8--64 interior events. At $p=6$
+we used a full degree-five numerator; the two in-range roots per
+pair were constructed, with the remaining roots outside $[0,1]$.
+
+\begin{table}[ht]\centering\small
+\caption{Exploratory local Python timings for identical exact event maps.
+Each value is the median of six timed executions after an untimed
+warmup, with alternating method order, in seconds. Both
+algorithms call the same SymPy exact root routine. The last two
+rows have no in-range root and delimit the gain.}
+\label{tab:p4-incremental-events}
+\begin{tabular}{rrrrr}\toprule
+$p$ & Pairs & Events & Full re-evaluation & Incremental\\\midrule
+3 & 16 & 32 & 0.107 & 0.017\\
+3 & 32 & 64 & 0.422 & 0.034\\
+6 & 8 & 16 & 0.101 & 0.023\\
+6 & 16 & 32 & 0.367 & 0.045\\
+3 & 32 & 0 & 0.433 & 0.448\\
+6 & 16 & 0 & 3.249 & 3.169\\
+\bottomrule\end{tabular}
+\end{table}
+
+The measured speedup concerns aggregation of an event-rich, exactly
+solvable constructed family, and does not establish superiority to
+Sturm/Descartes root-isolation implementations, floating-point
+interval methods, or realistic EEG polynomial distributions.
+For no-event cases the observed differences are small and reverse
+direction across dimensions and repeated runs; no stable benefit is
+established while exact root isolation itself dominates. Real-source pair scale,
+shared-pole construction costs, precision/rounding envelopes and
+memory use remain untested. Executable parity and full timing
+receipts are available in the public workflow
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38355016384}.

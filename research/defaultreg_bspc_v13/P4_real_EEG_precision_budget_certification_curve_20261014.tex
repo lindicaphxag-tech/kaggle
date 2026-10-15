@@ -1,0 +1,74 @@
+\subsection{Observed certificate precision budget on real final EEG features}
+\label{sec:p4-real-feature-precision-curve}
+The preceding real-final-feature test fixes the grid at
+$2^{-18}$. To quantify whether certification is trivial
+across \emph{all} floating-to-fixed point precisions,
+we ran a source-code-identical, previously exposed
+BNCI2014\_001 subject 1 sensitivity over
+fractional-bit counts
+$b\in\{2,4,6,8,10,14,18\}$.
+The stored \emph{finite binary64 output} of the
+two-electrode MNE/tangent feature pipeline
+(64 balanced source epochs, three feature
+coordinates) is represented as an exact rational
+and independently rounded to the step $2^{-b}$.
+An entrywise worst-case radius
+$\eta_b=2^{-(b+1)}$ is checked by
+an \emph{exact rational difference} for every
+one of the 64$\times$3 features.
+The unchanged 12 positive--negative sample pairs
+were fixed in the earlier experiment, not
+chosen to maximise this curve.
+
+The same pooled-covariance and class-contrast
+bounds of Section~\ref{sec:p4-final-feature-chain}
+and the same eigenspace-invariant
+resolvent certificate of
+Section~\ref{sec:p4-cov-resolvent}
+were applied at each precision.
+\begin{table}[ht]\centering\small
+\caption{Conditional whole-$\lambda\in[0,1]$
+strict score-sign certificates on 12 fixed
+within-record EEG sample pairs after exact-rational
+quantisation of already computed final tangent features.
+\texttt{UNKNOWN} means \emph{insufficient conservative
+bound}; it is not a demonstrated score sign reversal,
+EEG classification failure or population error.}
+\label{tab:p4-feature-bits}
+\begin{tabular}{rrrr}
+\toprule
+Fractional bits $b$ & Positive & Negative & Unknown\\
+\midrule
+2 & 0 & 0 & 12\\
+4 & 0 & 0 & 12\\
+6 & 3 & 2 & 7\\
+8 & 8 & 4 & 0\\
+10 & 8 & 4 & 0\\
+14 & 8 & 4 & 0\\
+18 & 8 & 4 & 0\\
+\bottomrule
+\end{tabular}
+\end{table}
+All 84 resulting evaluations and their exact
+input-error bounds were independently replayed
+in successful
+\href{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38537814266}
+{GitHub Actions run 38537814266}.
+The threshold is \emph{empirical and input-specific}:
+eight fractional bits suffice for all 12
+\emph{these} comparisons; the theorem does not
+identify eight bits as a general numerical
+precision requirement. Because re-quantisation
+changes the centre matrix as well as $\eta_b$,
+the algorithm's count is not claimed to
+be monotone for arbitrary inputs or
+all possible precision budgets.
+The original real EEG acquisition and all
+prior preprocessing/eigendecomposition error
+remain entirely \emph{outside} the proved
+final-feature box. Thus this experiment
+contributes a falsifiable stability-versus-
+representational-resolution application,
+not a stronger physical or patient-level
+EEG correctness theorem, performance
+improvement or independent source validation.

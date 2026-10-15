@@ -1,0 +1,84 @@
+name: P4 exact-rational rank-event prototype selftest
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - publication/default-eeg-p4-rank-certificates-20261013
+    paths:
+      - research/defaultreg_bspc_v13/src/p4_exact_rank_event_sweep_prototype.py
+      - research/defaultreg_bspc_v13/src/p4_joint_spectral_coefficient_box_certificate.py
+      - research/defaultreg_bspc_v13/src/p4_joint_box_adaptive_refinement_and_falsification.py
+      - research/defaultreg_bspc_v13/src/p4_covariance_coordinate_resolvent_bound.py
+      - research/defaultreg_bspc_v13/src/p4_final_feature_entrywise_error_to_covariance_certificate.py
+      - .github/workflows/p4-exact-rank-event-prototype.yml
+
+jobs:
+  test-toy-exact-rank-events:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install exact symbolic dependency
+        run: python -m pip install sympy==1.13.3
+      - name: Exact rational two-event and tie tests
+        run: python research/defaultreg_bspc_v13/src/p4_exact_rank_event_sweep_prototype.py
+      - name: Joint spectral and coefficient interval-box soundness regression
+        run: |
+          python research/defaultreg_bspc_v13/src/p4_joint_spectral_coefficient_box_certificate.py --out p4_joint_spectral_box_results.json
+      - name: Feature-matrix entrywise rounding box to pooled covariance and ranking proof
+        run: |
+          python research/defaultreg_bspc_v13/src/p4_final_feature_entrywise_error_to_covariance_certificate.py --out p4_final_feature_perturbation_certificate.json
+          python - <<'PY'
+          import json
+          z=json.load(open('p4_final_feature_perturbation_certificate.json'))
+          assert z['status']=='PASS'
+          assert z['synthetic_feature_matrices']==64
+          assert z['entrywise_error_bound_assumed_externally']
+          assert z['no_bound_through_EEG_preprocessing_or_tangent_transform']
+          print('P4_FINAL_FEATURE_TO_POOLED_COVARIANCE_CERTIFICATE_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p4-final-feature-quantization-to-covariance-conditional-certificate
+          path: p4_final_feature_perturbation_certificate.json
+          retention-days: 90
+      - name: Eigenspace-invariant covariance-space perturbation theorem regression
+        run: |
+          python research/defaultreg_bspc_v13/src/p4_covariance_coordinate_resolvent_bound.py --out p4_covariance_resolvent_oracle.json
+          python - <<'PY'
+          import json
+          z=json.load(open('p4_covariance_resolvent_oracle.json'))
+          assert z['status']=='PASS'
+          assert z['decisions']==dict(POS=46,NEG=65,UNKNOWN=9)
+          assert z['exact_covariance_perturbation_oracle_checks']==2220
+          print('P4_COVARIANCE_COORDINATE_CERTIFICATE_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p4-rational-covariance-perturbation-oracle
+          path: p4_covariance_resolvent_oracle.json
+          retention-days: 90
+      - name: Full synthetic box proof-or-exact-witness replay
+        run: |
+          python research/defaultreg_bspc_v13/src/p4_joint_box_adaptive_refinement_and_falsification.py --out p4_proof_or_counterexample.json
+          python - <<'PY'
+          import json
+          x=json.load(open('p4_proof_or_counterexample.json'))
+          assert x['status']=='PASS'
+          assert x['final']==dict(ROBUST_POS=95,ROBUST_NEG=91,FALSIFIED=36,UNKNOWN=0)
+          assert len(x['falsifications'])==36
+          print('P4_RATIONAL_CERTIFICATION_OR_FALSIFICATION_FIXTURES_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p4-exact-rational-proofs-and-falsifying-witnesses
+          path: p4_proof_or_counterexample.json
+          retention-days: 90
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p4-joint-spectral-coefficient-box-results
+          path: p4_joint_spectral_box_results.json
+          retention-days: 90

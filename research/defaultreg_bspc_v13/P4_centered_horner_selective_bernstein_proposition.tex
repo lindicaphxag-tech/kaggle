@@ -1,0 +1,77 @@
+\subsection{Centered-Horner enclosure and selective Bernstein refinement}
+\label{sec:p4-selective-hybrid-proof}
+To obtain a meaningful competitor for the original
+Bernstein-only enclosure, we add a midpoint-centered,
+exact-rational interval Horner evaluator and a selective
+two-stage certificate. Let the exact rational score-numerator
+polynomial be $P(\lambda)=\sum_{j=0}^d a_j\lambda^j$
+on $I=[\ell,r]\subseteq[0,1]$, with
+$c=(\ell+r)/2$ and $h=(r-\ell)/2$. The translated
+polynomial in $u=\lambda-c\in[-h,h]$ is
+\[
+P(c+u)=\sum_{k=0}^d b_k u^k,\qquad
+b_k=\sum_{j=k}^d \binom{j}{k}a_jc^{j-k}.
+\]
+An interval Horner evaluation of these $b_k$
+over $[-h,h]$ encloses every $P(\lambda)$ on $I$
+by interval-arithmetic inclusion. Since the input
+coefficients and endpoints are rational, our exact
+\texttt{Fraction} arithmetic introduces no numerical
+rounding at this step. Neither this fact nor
+the power-basis coefficient identity certifies
+the unverified floating EEG feature extractor.
+
+\paragraph{Selective refinement algorithm.}
+Evaluate centered Horner first. If its lower bound is
+strictly positive or its upper bound strictly negative,
+retain that sign without computing Bernstein
+coefficients. If centered Horner is unresolved,
+transform to the Bernstein basis on the \emph{same}
+interval and accept a strict sign only if all its
+coefficients share that strict sign. Otherwise
+return unresolved. A polynomial whose coefficients
+all vanish is a separately recorded exact tie.
+Inclusion is mandatory at \emph{both}
+stages; finite point samples cannot substitute
+for either interval proof.
+
+\paragraph{Certificate-union proposition.}
+Suppose both the centered-Horner and Bernstein
+procedures return a strict sign only when their exact
+enclosures exclude zero. Then the selective method
+is sound and certifies precisely the union of
+the intervals certified by either procedure.
+Indeed, a strict centered-Horner sign gives the
+desired inclusion proof immediately. Otherwise the
+algorithm invokes the Bernstein procedure, which
+gives an independent inclusion proof if it succeeds.
+If both procedures could certify opposite strict
+signs on the same interval, the two sound
+enclosures would force $P$ to be simultaneously
+strictly positive and strictly negative on a
+nonempty interval, which is impossible. No
+unknown-sign interval is promoted to a certificate.
+Consequently, for a fixed test collection $\mathcal I$,
+\[
+C_{\rm selective}(\mathcal I)
+= C_{\rm centered}(\mathcal I)
+\cup C_{\rm Bernstein}(\mathcal I),\qquad
+|C_{\rm selective}|\geq
+\max\{|C_{\rm centered}|,|C_{\rm Bernstein}|\}.
+\]
+This is a correctness property, \emph{not}
+a theorem of runtime improvement. The hybrid
+pays the centered-Horner cost for every interval
+and the Bernstein cost on unresolved ones;
+when centered Horner rarely resolves or
+Bernstein is costly, this policy can be slower
+than either stand-alone method.
+
+The method and signed-root/tie tests are archived
+in the public experiment source accompanying
+workflow \texttt{38326786180}.
+The strict mathematical scope is rational-input
+polynomial sign determination. Certifying the
+floating-point-generated EEG spectrum, tangent
+features and original SPD eigensystem would
+require further upstream error bounds.

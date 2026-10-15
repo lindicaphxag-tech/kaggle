@@ -1,0 +1,46 @@
+% Exact rational coefficient-only uncertainty; independently executed fixed-seed test.
+\subsection{Bounding coefficient uncertainty without assuming a floating EEG certificate}
+\label{sec:p4-coeff-uncertain}
+For fixed \emph{exact} positive spectrum $s_i>0$, let
+$q_i(\lambda)=(1-\lambda)s_i+\lambda\nu$ with
+$\nu=p^{-1}\sum_i s_i$. Suppose the pair numerator
+coefficients are not exactly $a_i$ but $a_i+\delta_i$ with
+\emph{externally justified} independent bounds
+$|\delta_i|\leq\varepsilon_i$. Write
+\[
+B_i(\lambda)=\prod_{j\neq i}q_j(\lambda),\quad
+N(\lambda)=\sum_i a_iB_i(\lambda),\quad
+E(\lambda)=\sum_i\varepsilon_iB_i(\lambda).
+\]
+All $q_i$ and $B_i$ are positive for $\lambda\in[0,1]$.
+For every admissible perturbation and every parameter,
+\[
+N(\lambda)-E(\lambda)\ \leq\
+\sum_i(a_i+\delta_i)B_i(\lambda)\
+\leq N(\lambda)+E(\lambda).
+\]
+A strict positive Bernstein coefficient vector for
+$N-E$ on a specified closed interval proves a robust
+positive score difference there; a strict positive
+Bernstein vector for $-(N+E)$ proves a robust negative
+difference. Otherwise the algorithm returns
+\texttt{UNKNOWN}, and must not assert an ordering.
+This follows from the convex-hull property of the
+Bernstein representation, without relying on sampling.
+The rule is sufficient, not complete: \texttt{UNKNOWN}
+may contain either a truly stable or an unstable sign.
+
+A self-contained exact-rational implementation checks invalid
+spectra, negative error bounds and accidental binary-float
+inputs fail closed. In a fixed-seed set of 96 \emph{synthetic}
+dimension-2--5 instances it classified 31 positive,
+39 negative and 26 unknown, and tested 3,120
+independent box-corner/parameter combinations without
+contradicting a classified sign. This sampling is a
+regression check, not a proof of coverage or tightness.
+The uncertainty model covers only pair-score coefficients,
+with fixed exact spectral poles. No bound is yet established
+for EEG filtering, input digitisation, covariance estimation,
+eigenvalues/eigenvectors, or IEEE-754 rounding. Accordingly
+the experiment does not license an end-to-end
+machine-certified EEG provenance or transfer claim.

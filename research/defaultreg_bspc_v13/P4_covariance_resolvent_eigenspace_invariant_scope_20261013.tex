@@ -1,0 +1,84 @@
+\subsection{Covariance-coordinate sign robustness under eigenspace rotation}
+\label{sec:p4-cov-resolvent}
+The spectral box method above requires \emph{externally justified}
+bounds on coefficients expressed in a fixed eigenspace.
+A complementary sufficient condition works directly in original
+covariance coordinates, including arbitrary rotations of eigenvectors.
+Let $S=S^\top\succ0$, $d$ be the fitted class contrast,
+$v$ a held-source positive-minus-negative feature difference,
+and $\nu=\operatorname{tr}(S)/p$. For any
+$\lambda\in[L,R]\subseteq[0,1]$, write
+$A_\lambda=(1-\lambda)S+\lambda\nu I$ and
+$f_\lambda=v^\top A_\lambda^{-1}d$.
+Consider arbitrary symmetric covariance perturbations
+$\|\Delta S\|_2\le\epsilon_S$ and feature perturbations
+$\|\Delta v\|_2\le\epsilon_v$,
+$\|\Delta d\|_2\le\epsilon_d$, all jointly admissible,
+and set $\nu'=\operatorname{tr}(S+\Delta S)/p$.
+Because
+\[
+\|A'_\lambda-A_\lambda\|_2
+\le(1-\lambda)\|\Delta S\|_2+
+\lambda|\operatorname{tr}(\Delta S)|/p
+\le\epsilon_S,
+\]
+the perturbation of the isotropic shrinkage target
+is included automatically.
+
+An exact lower bound $\mu_S\le\lambda_{\min}(S)$
+is available from the rational inverse row-sum norm:
+$\mu_S=1/\|S^{-1}\|_\infty$;
+symmetry ensures $\|S^{-1}\|_2\le\|S^{-1}\|_\infty$.
+Set $\mu=\min(\mu_S,\nu)$ and assume
+$0\le\epsilon_S<\mu$.
+Then all feasible shrunk matrices remain positive definite,
+and the resolvent identity gives the uniform guarantee
+\[
+|f'_\lambda-f_\lambda|\le
+\frac{\epsilon_S\|v\|_2\|d\|_2}
+     {\mu(\mu-\epsilon_S)}
++\frac{\|v\|_2\epsilon_d+
+       \epsilon_v\|d\|_2+\epsilon_v\epsilon_d}
+      {\mu-\epsilon_S}
+\equiv B.
+\]
+The code replaces both vector 2-norms by their
+computable rational 1-norm upper bounds, never by
+favourable approximations.
+
+For rational input $S,v,d$, the determinant identity
+\[
+f_\lambda =
+\frac{v^\top\operatorname{adj}(A_\lambda)d}
+     {\det A_\lambda} =
+\frac{N(\lambda)}{D(\lambda)},\qquad D(\lambda)>0
+\]
+allows rational polynomial Bernstein controls on $[L,R]$.
+If every numerator Bernstein coefficient is positive,
+$\inf f_\lambda\ge
+\min_k b^N_k/\max_k b^D_k$;
+the analogous negative bound uses
+$-\max_k b^N_k/\max_k b^D_k$.
+A strict score margin greater than $B$ proves the
+sign for \emph{all} admissible covariance, contrast and
+pair-feature perturbations and all parameters in $[L,R]$.
+Otherwise the procedure returns \texttt{UNKNOWN}.
+This argument does not assume eigenvector alignment,
+simple eigenvalues or a fixed eigenbasis; it is a
+conservative sufficient condition, not a sharp theorem
+about unknown EEG acquisition noise.
+
+In a seeded constructed suite of 120 exact-rational
+symmetric-positive-definite matrices of dimensions
+2--4, 46 positive and 65 negative cases were certified;
+9 returned unknown. Independently reconstructed
+2,220 admissible rational covariance/vector perturbation
+and parameter probes contradicted none of these signs.
+These point probes check implementation rather than
+prove the spectral-norm theorem. Crucially, no validated
+mapping from digitised EEG, covariance-estimation error,
+or floating-point operations to the externally assumed
+$(\epsilon_S,\epsilon_d,\epsilon_v)$ is presently available.
+Neither the synthetic outcomes nor this classical
+resolvent bound proves a new EEG classification
+improvement or unqualified state-of-the-art originality.

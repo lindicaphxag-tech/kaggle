@@ -1,0 +1,43 @@
+\subsection{Certificate-first exact AUC event execution: research extension}
+For a rational shrinkage-LDA pair margin, the common denominator
+is strictly positive on the shrinkage interval. Before isolating
+roots of its numerator polynomial $N_{ij}(\lambda)$, exact power
+coefficient, quadratic extremum and Bernstein-sign tests can prove
+the absence of interior zeros. No real-root solver is then called
+for that pair. The other pairs use the \emph{identical exact
+SymPy real-root backend} as the unpruned source-only incremental
+event-sweep comparator. At each algebraic event, only incident
+pair credits change; odd root multiplicity reverses the rank,
+even multiplicity preserves the neighboring ranks, and the
+event itself awards one-half for a tie. Endpoint and permanently
+tied cases remain explicit. Under rational inputs, a strictly
+positive definite covariance family and provably ordered
+algebraic roots, this reproduces the full exact empirical
+ROC--AUC path. Bernstein positivity and event sweeping are
+classical; no new root-isolation theorem is asserted.
+
+We fixed four rational source-path regimes with 12 seeds each
+and 16 positive--negative score-polynomial pairs per seed.
+All test polynomials are exactly representable by the
+$d=3$ diagonal shrinkage-LDA family
+$S=\operatorname{diag}(1,2,4)$, $\tau=7/3$ and
+$d=(1,1,1)$ through inversion of the rational numerator
+basis; they are not arbitrary unphysical sign functions.
+The same incumbent incremental sweep and identical SymPy
+root backend were used in both arms. The proposed
+algorithm matched every exact AUC cell, isolated event
+tie and domain endpoint in all 48 inputs.
+
+Median runtime speed ratios were $9.72\times$ (stable ranks),
+$3.87\times$ (sparse rank events), $2.08\times$ (mixed) and
+$0.98\times$ (event dense). For the first three groups,
+all 12/12 paired fixtures were faster; dense ranks gave
+6/12 faster. Holm-adjusted one-sided paired Wilcoxon
+$p=0.00098$ for each of the first three and
+$p=0.455$ for dense events. These are small constructed
+rational CPU timing comparisons, not real EEG
+generalization, published root-isolator SOTA, or a
+new numerical-theory priority claim. Performance on
+external solvers, higher-dimensional EEG geometry,
+full floating preprocessing uncertainty and unseen
+acquisitions remains unestablished.
