@@ -10,6 +10,9 @@ on:
       - "research/defaultreg_bspc_v13/P2_BSPC_public_digital_waveform_figure_20261015.tex"
       - "research/defaultreg_bspc_v13/P2_nemar_whole_EDF_manifest_scope_20261013.tex"
       - "research/defaultreg_bspc_v13/P2_BSPC_concise_exhaustive_EDF_results_20261015.tex"
+      - "research/defaultreg_bspc_v13/main_p2_BSPC_POSITIVE_METHOD_AUTHOR_REVIEW_20261015.tex"
+      - "research/defaultreg_bspc_v13/P2_SOURCE_CLOCK_CHBMIT_EXTERNAL_AUTHOR_REVIEW_20261015.tex"
+      - "research/defaultreg_bspc_v13/P2_SOURCE_CLOCK_REAL_PHYSIONET_AUTHOR_REVIEW_20261015.tex"
       - "research/defaultreg_bspc_v13/P2_BSPC_native_matrix_and_attribution_20261014.tex"
       - "research/defaultreg_bspc_v13/src/p2_bspc_submission_numerical_gate_20261014.py"
       - "publication_packages/default_eeg/P2_BSPC_HIGHLIGHTS_AUTHOR_REVIEW.txt"
@@ -73,6 +76,9 @@ jobs:
           elsevier=main_p2_BSPC_ELSEVIER_AUTHOR_REVIEW_20261014
           latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error "$elsevier.tex"
           test -s "$elsevier.pdf"
+          positive=main_p2_BSPC_POSITIVE_METHOD_AUTHOR_REVIEW_20261015
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error "$positive.tex"
+          test -s "$positive.pdf"
           supp=P2_BSPC_SUPPLEMENTARY_EVIDENCE_AUTHOR_REVIEW_20261014
           latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error "$supp.tex"
           test -s "$supp.pdf"
@@ -86,7 +92,7 @@ jobs:
           fi
           pdfinfo "$main.pdf" | grep -E 'Pages:|Page size:'
           mkdir -p "$GITHUB_WORKSPACE/p2-focused"
-          cp "$main.pdf" "$main.log" "$elsevier.pdf" "$elsevier.log" "$supp.pdf" "$supp.log" "P2_BSPC_ARITHMETIC_RECEIPT_20261014.json" "$GITHUB_WORKSPACE/p2-focused/"
+          cp "$main.pdf" "$main.log" "$elsevier.pdf" "$elsevier.log" "$positive.pdf" "$positive.log" "$supp.pdf" "$supp.log" "P2_BSPC_ARITHMETIC_RECEIPT_20261014.json" "$GITHUB_WORKSPACE/p2-focused/"
           python - "$main" "$GITHUB_SHA" "$GITHUB_WORKSPACE/p2-focused" <<'PY'
           import hashlib, json, re, subprocess, sys
           from pathlib import Path
@@ -117,7 +123,7 @@ jobs:
           import fitz,json
           from pathlib import Path
           base=Path('research/defaultreg_bspc_v13')
-          names=['main_p2_BSPC_ELSEVIER_AUTHOR_REVIEW_20261014.pdf','P2_BSPC_SUPPLEMENTARY_EVIDENCE_AUTHOR_REVIEW_20261014.pdf']
+          names=['main_p2_BSPC_ELSEVIER_AUTHOR_REVIEW_20261014.pdf','main_p2_BSPC_POSITIVE_METHOD_AUTHOR_REVIEW_20261015.pdf','P2_BSPC_SUPPLEMENTARY_EVIDENCE_AUTHOR_REVIEW_20261014.pdf']
           result={}
           for name in names:
               d=fitz.open(base/name);bad=[]
@@ -140,7 +146,7 @@ jobs:
           from zipfile import ZipFile,ZIP_DEFLATED
           import hashlib,json,re,os
           base=Path("research/defaultreg_bspc_v13")
-          main=base/"main_p2_BSPC_ELSEVIER_AUTHOR_REVIEW_20261014.tex"
+          main=base/"main_p2_BSPC_POSITIVE_METHOD_AUTHOR_REVIEW_20261015.tex"
           supp=base/"P2_BSPC_SUPPLEMENTARY_EVIDENCE_AUTHOR_REVIEW_20261014.tex"
           mainarticle=base/"main_p2_BSPC_FOCUSED_AUTHOR_REVIEW_20261014.tex"
           refs=base/"references_v10.bib"
@@ -168,6 +174,7 @@ jobs:
           def digest(f):return hashlib.sha256(f.read_bytes()).hexdigest()
           PDFs=[base/(p+".pdf") for p in (
               "main_p2_BSPC_ELSEVIER_AUTHOR_REVIEW_20261014",
+              "main_p2_BSPC_POSITIVE_METHOD_AUTHOR_REVIEW_20261015",
               "main_p2_BSPC_FOCUSED_AUTHOR_REVIEW_20261014",
               "P2_BSPC_SUPPLEMENTARY_EVIDENCE_AUTHOR_REVIEW_20261014")]
           for pdf in PDFs:
