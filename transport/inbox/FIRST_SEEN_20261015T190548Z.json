@@ -1,0 +1,26 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "AlexandreAmice",
+      "body": "### What happened?\n\nSince Drake 1.58 the python wheel uses nanobind bindings, while the binary distribution uses pybind bindings. That causes these two programs to behave different:\n```\n\"\"\"Compare None payloads with an ordinary Python-object payload.\"\"\"\n\nfrom pydrake.common.value import AbstractValue\nfrom pydrake.systems.framework import LeafSystem\n\n\nclass OptionalCommand(LeafSystem):\n    def __init__(self):\n        super().__init__()\n        # Start with a non-None model to test runtime assignment separately.\n        self.DeclareAbstractOutputPort(\n            \"command\", lambda: AbstractValue.Make({\"command\": 1}), self.calc\n        )\n\n    def calc(self, context, output):\n        output.set_value(None)  # No command available this tick.\n\n\ndef set_none():\n    value = AbstractValue.Make({\"command\": 1})\n    value.set_value(None)\n    return value.get_value()\n\n\ndef port_none():\n    system = OptionalCommand()\n    return system.get_output_port().Eval(system.CreateDefaultContext())\n\n\nprint(\"Binding metaclass:\", type(AbstractValue).__name__)\nfor label, probe in [\n    (\"Make(dict), control\", lambda: AbstractValue.Make({\"command\": 1}).get_value()),\n    (\"Make(None)\", lambda: AbstractValue.Make(None).get_value()),\n    (\"set_value(None)\", set_none),\n    (\"output port emits None\", port_none),\n]:\n    try:\n        print(f\"  {label}: OK -> {probe()!r}\")\n    except Exception as error:\n        print(f\"  {label}: {type(error).__name__}: {str(error).splitlines()[0]}\")\n```\nOutputs are:\n```\nDrake 1.58.0: public nanobind wheel\nBinding metaclass: nb_type\n  Make(dict), control: OK -> {'command': 1}\n  Make(None): TypeError: object() takes no arguments\n  set_value(None): TypeError: set_value(): incompatible function arguments. The following argument types are supported:\n  output port emits None: TypeError: set_value(): incompatible function arguments. The following argument types are supported:\n\nDrake 1.58.0: official pybind binary archive\nBinding metaclass: pybind11_type\n  Make(dict), control: OK -> {'command': 1}\n  Make(None): OK -> None\n  set_value(None): OK -> None\n```\n\nAdditionally, does it make sense that the binary archive still uses pybind instead of nanobind or is this also a bug?\n\n### Version\n\n_No response_\n\n### What operating system are you using?\n\n_No response_\n\n### What installation option are you using?\n\n_No response_\n\n### Relevant log output\n\n```shell\n\n```",
+      "created_at": "2026-10-15T18:09:59Z",
+      "html_url": "https://github.com/RobotLocomotion/drake/issues/25089",
+      "id": "RobotLocomotion/drake#25089",
+      "issue_number": 25089,
+      "labels": [
+        "type: bug"
+      ],
+      "repository": "RobotLocomotion/drake",
+      "surface_sha256": "4164a940a129d666fc36a38f63b8e1eb1f045b1409de98ecad8a9b4dd92ac79a",
+      "title": "Nanobind and Pybind do not treat AbstractValue.Make(None) the same"
+    }
+  ],
+  "post_activation_issue_identities_observed": 163,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-15T19:05:48Z",
+  "schema_version": 1
+}
