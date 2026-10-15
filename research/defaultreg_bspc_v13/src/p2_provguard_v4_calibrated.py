@@ -138,3 +138,63 @@ def familywise_accept(scores,null_scores,alpha=.05):
     scores=list(scores)
     if not scores or not 0<alpha<1:raise ValueError('family')
     return [bool(v>0 and null_pvalue(v,null_scores)<=alpha/len(scores)) for v in scores]
+
+# Distinct endpoint for content-safe splitting: ONE digitally reused channel is enough.
+# A cross-channel asynchronous splice is NEGATIVE for coherent-clock identity but
+# POSITIVE for ANY-CHANNEL content reuse. Never mix their labels or confusion matrices.
+def any_content_witness(source,target,p=Policy()):
+    if p.min_channels<2:raise ValueError('policy')
+    s={k:arr(v) for k,v in source.items()};t={k:arr(v) for k,v in target.items()}
+    ss=sorted(s);tt=sorted(t)
+    failed=dict(status='ABSTAIN',endpoint='ANY_CHANNEL_CONTENT',policy=asdict(p))
+    if not ss or not tt:return failed
+    uniform=(len({len(x) for x in s.values()})==1 and len({len(x) for x in t.values()})==1)
+    if uniform:
+        X=np.vstack([s[k] for k in ss]);Y=np.vstack([t[k] for k in tt])
+    best=None
+    for lag in range(-p.max_lag,p.max_lag+1):
+        if uniform:
+            a=max(0,-lag);b=max(0,lag);n=min(X.shape[1]-a,Y.shape[1]-b)
+            if n<p.min_overlap:continue
+            v=int(n*(1-p.verify_fraction));e=v-p.guard_samples
+            if e<64 or n-v<64:continue
+            m=_corr_matrix(X[:,a:a+e],Y[:,b:b+e])
+            i,j=np.unravel_index(int(np.argmax(m)),m.shape)
+            score=float(m[i,j])
+            if score<p.train_threshold:continue
+            z=(score,-abs(lag),lag,int(i),int(j))
+        else:
+            z=None
+            for i,sc in enumerate(ss):
+                for j,tc in enumerate(tt):
+                    row=blocks(s[sc],t[tc],lag,p)
+                    if row is None or row[5]<p.train_threshold:continue
+                    v=(row[5],-abs(lag),lag,i,j)
+                    if z is None or v>z:z=v
+        if z is not None and (best is None or z>best):best=z
+    if best is None:return failed
+    _,_,lag,i,j=best
+    a,b,n,e,v,fit,hold=blocks(s[ss[i]],t[tt[j]],lag,p)
+    if hold<p.verify_threshold:return failed
+    return dict(status='NUMERIC_WITNESS',endpoint='ANY_CHANNEL_CONTENT',
+        policy=asdict(p),lag=lag,source_channel=ss[i],target_channel=tt[j],
+        source_span=[a,a+n],target_span=[b,b+n],train_relative=[0,e],
+        verify_relative=[v,n],train_abs_corr=round(fit,10),
+        verify_abs_corr=round(hold,10),
+        source_sha256_f64=digest(s[ss[i]]),target_sha256_f64=digest(t[tt[j]]))
+
+def verify_any_content(source,target,w,p=Policy()):
+    try:
+        if w['status']!='NUMERIC_WITNESS' or w['endpoint']!='ANY_CHANNEL_CONTENT' or w['policy']!=asdict(p):return False
+        lag=w['lag']
+        if type(lag)!=int or abs(lag)>p.max_lag:return False
+        x=arr(source[w['source_channel']]);y=arr(target[w['target_channel']])
+        result=blocks(x,y,lag,p)
+        if result is None:return False
+        a,b,n,e,v,fit,hold=result
+        return bool(fit>=p.train_threshold and hold>=p.verify_threshold and
+            w['source_span']==[a,a+n] and w['target_span']==[b,b+n] and
+            w['train_relative']==[0,e] and w['verify_relative']==[v,n] and
+            abs(w['train_abs_corr']-fit)<1e-8 and abs(w['verify_abs_corr']-hold)<1e-8 and
+            w['source_sha256_f64']==digest(x) and w['target_sha256_f64']==digest(y))
+    except (KeyError,ValueError,TypeError,IndexError,AttributeError):return False
