@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "MohammadHijjawi97",
+      "body": "### Bug Description\n\n`MPMEntity.get_free()` cannot be called: it always fails with a bare `AssertionError` from `ParticleEntity._sanitize_particles_tensor`. `get_free` allocates its output with the default `batched=True`, which requires `envs_idx`, but it never passes one. The free flag is per particle and shared by all environments, which is how `set_free` already handles it.\n\n### Steps to Reproduce\n\n```python\nimport genesis as gs\n\ngs.init(backend=gs.cpu)\nscene = gs.Scene(show_viewer=False)\ncube = scene.add_entity(\n    morph=gs.morphs.Box(pos=(0.0, 0.0, 0.5), size=(0.1, 0.1, 0.1)),\n    material=gs.materials.MPM.Elastic(),\n)\nscene.build()\ncube.set_free(cube.init_particles[:, 2] > 0.5)\nprint(cube.get_free())\n```\n\n### Expected Behavior\n\n`get_free()` returns a boolean tensor of shape `(n_particles,)` matching what was passed to `set_free`.\n\n### Relevant log output\n\n```\n  File \"genesis/engine/entities/mpm_entity.py\", line 593, in get_free\n    free = self._sanitize_particles_tensor(None, gs.tc_bool)\n  File \"genesis/engine/entities/particle_entity.py\", line 135, in _sanitize_particles_tensor\n    assert envs_idx is not None\nAssertionError\n```\n\n### Environment\n\nWindows 11, CPU backend, Python 3.13.14, torch 2.14.1+cpu, quadrants 1.3.3.\n\n### Release version or Commit ID\n\nmain 105898fc0a5f068f22dffbbfa39f5ea89be42a1e\n",
+      "created_at": "2026-10-15T19:11:25Z",
+      "html_url": "https://github.com/Genesis-Embodied-AI/genesis-world/issues/3547",
+      "id": "Genesis-Embodied-AI/genesis-world#3547",
+      "issue_number": 3547,
+      "labels": [],
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "surface_sha256": "427f74b05bd34d9693f55612b436d40ff8a7aeaec6dfb67be3e77b11109492fb",
+      "title": "[Bug]: `MPMEntity.get_free()` always raises `AssertionError`"
+    }
+  ],
+  "post_activation_issue_identities_observed": 164,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-15T20:32:25Z",
+  "schema_version": 1
+}
