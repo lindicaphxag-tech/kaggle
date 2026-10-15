@@ -1,0 +1,72 @@
+\subsection{Cross-acquisition validation of a shared-recording clock}
+\label{sec:p2-physionet-external-clock}
+To determine whether the channel--clock mechanism is specific to one
+motor-imagery acquisition, we reproduced the same frozen detector on
+a distinct public EEG acquisition family: CHB--MIT scalp seizure EEG
+(PhysioNet v1.0.0, dataset DOI 10.13026/C2K01R). The downloaded
+digital EDF prefixes were directly decoded, using eight bipolar EEG
+channels and 768 consecutive samples per source. The test sampled
+public digital waveforms, \emph{not} independent clinically confirmed
+duplicate episodes, and did not use seizure or clinical identity labels.
+
+The source--target matcher required at least four distinct channels
+with absolute Pearson correlation $\ge0.985$, a common temporal lag
+within 100 samples and at least 230 overlapping samples; these numeric
+settings were frozen in the previous EEGMMIDB experiment. Each
+source generated eight known-reuse digital transformations (including
+channel relabelling/permutation, common temporal shift, cropping,
+channel omission, amplitude rescaling and low-amplitude noise) and
+five controlled negative transformations. Among the negatives, an
+\emph{asynchronous same-source} composite contained all eight source
+channel contents but with eight individually chosen clock delays:
+it was negative \emph{only} for the endpoint of a coherent
+synchronised multichannel recording, and would be positive under
+the different endpoint of any reused electrode samples.
+
+\begin{table}[tb]
+\centering\small
+\caption{Source-frozen CHB--MIT test on real publicly released
+digital EDF samples under \emph{experimentally imposed}
+known-reuse transformations. The first two records were tested
+before the subsequently untouched CHB03--CHB06 test group.
+Multiple manipulations of one EDF do not constitute independent
+clinical subjects. False matches are specific to the
+coherent-multichannel-clock endpoint, not any-channel reuse.}
+\label{tab:p2-chbmit-external-clock}
+\begin{tabular}{lrrrr}
+\toprule
+&\multicolumn{2}{c}{CHB01--02 (2 sources)}
+&\multicolumn{2}{c}{CHB03--06 (new 4 sources)}\\
+Method & TP/16 & FP/10 & TP/32 & FP/20\\
+\midrule
+Common clock + channel assignment &16&0&32&0\\
+Independent best-lag channel Hungarian &16&2&32&4\\
+Same-label zero-lag correlation &8&0&16&0\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The complete six-source outcome was 48/48 controlled positives and
+zero of 30 constructed negative matches for the common-clock method,
+compared with the same 48/48 positive detections but six of 30
+negative matches for the unconstrained independent-lag Hungarian
+comparator. Every discordance was an intentionally asynchronous
+same-source example. This confirms the narrow practical value of
+the \emph{global recording clock} constraint on another EEG task, not
+new clinical classification accuracy, population-level false-positive
+rates or algorithmic novelty over established multichannel
+synchronisation systems. Source-level subgroup counts, original
+HTTP byte-range status 206, prefix SHA-256 and independently
+stored outcome records are available in
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38666039518}
+and
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38666330505}.
+The full native EDF sources are distributed by PhysioNet and
+are \emph{not} redistributed with this study.
+
+Limitations include only six real digital source records from
+one external acquisition family, author-constructed transformations,
+heterogeneous semantics between channel reuse and common-clock
+recording reuse, and a lack of baseline comparisons against
+published multi-device synchronization, time-warping and
+multichannel fingerprinting implementations.
