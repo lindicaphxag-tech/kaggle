@@ -56,55 +56,59 @@ def car(d):
 pos=['exact','relabel_permute','global_lag','crop','gain','drop','noise','combined']
 neg=['different_subject','same_file_different_time','one_shared_channel',
      'async_same_source','repeated_constant_artifact','shared_global_artifact']
-records={}
-for r in RELS:
-    records[r]=read_edf(r)
-    print('EEGMMIDB_SOURCE_LOADED',r,flush=True)
-frozen_car=base.Policy(train_threshold=.93,verify_threshold=.90)
-rows=[]
-for i,rel in enumerate(RELS):
-    src,nonoverlap,meta=records[rel]
-    different=records[RELS[(i+1)%len(RELS)]][0]
-    for j,kind in enumerate(pos+neg):
-        if kind=='shared_global_artifact':
-            q=np.arange(768);wave=np.sin(q*.051)+np.sin(q*.113)
-            amplitude=100*max(np.std(np.stack(list(src.values()))),np.std(np.stack(list(different.values()))))
-            a={k:v+amplitude*wave for k,v in src.items()}
-            b={k:v+amplitude*wave for k,v in different.items()}
-        else:
-            a=src
-            b=common.transform(src,nonoverlap if kind=='same_file_different_time' else different,
-                               kind,common.SEED+31*i+j)
-        row={'source':rel,'kind':kind,'positive':kind in pos,
-         'raw':int(base.match(a,b)['status']=='NUMERIC_WITNESS'),
-         'frozen_tuned_car':int(base.match(car(a),car(b),frozen_car)['status']=='NUMERIC_WITNESS'),
-         'residual':int(proposed.match(a,b)['status']=='DUAL_WITNESS')}
-        rows.append(row)
-    print('V9_SOURCE_EVALUATED',rel,flush=True)
-summary={}
-for method in ('raw','frozen_tuned_car','residual'):
-    pp=[r for r in rows if r['positive']];nn=[r for r in rows if not r['positive']]
-    summary[method]={'TP':sum(r[method] for r in pp),'positive_total':len(pp),
-                     'FP':sum(r[method] for r in nn),'negative_total':len(nn)}
-source_stats=[]
-for rel in RELS:
-    a=[r for r in rows if r['source']==rel]
-    source_stats.append({'source':rel,'car_TP':sum(r['frozen_tuned_car'] for r in a if r['positive']),
-       'residual_TP':sum(r['residual'] for r in a if r['positive']),
-       'car_FP':sum(r['frozen_tuned_car'] for r in a if not r['positive']),
-       'residual_FP':sum(r['residual'] for r in a if not r['positive'])})
-doc={'status':'EXECUTED_REAL_EXTERNAL_EEG_WAVEFORMS_CONTROLLED_VARIANTS',
- 'corpus':'PhysioNet eegmmidb/1.0.0; S001..S006 R04; unmodified digital EDF prefixes',
- 'contrasts':'CHB-MIT dev-frozen CAR vs raw shared clock vs residual verification',
- 'n_original_records':len(RELS),'n_controlled_cases':len(rows),
- 'frozen_thresholds':{'CAR_train':.93,'CAR_verify':.90,'residual_v5_train':.985,'residual_v5_verify':.97},
- 'source_manifest':{r:records[r][2] for r in RELS},
- 'summary':summary,'per_record':source_stats,'cases':rows,
- 'limitations':['R04 EEGMMIDB task labels never read or evaluated',
-   'data collection different from CHB-MIT but digital variants are synthetic',
-   'source IDs project-wide prior exposure unknown, not prospectively untouched',
-   '6 source EDFs not 84 independent observations',
-   'not a patient or clinical acquisition identity classifier',
-   'no direct published SOTA fingerprint or DTW benchmark in this experiment']}
-(OUT/'P2_V9_EEGMMIDB_CROSS_CORPUS_84.json').write_text(json.dumps(doc,indent=2)+'\n')
-print('P2_V9_EEGMMIDB_SUMMARY',json.dumps(summary,sort_keys=True),flush=True)
+def main():
+    records={}
+    for r in RELS:
+        records[r]=read_edf(r)
+        print('EEGMMIDB_SOURCE_LOADED',r,flush=True)
+    frozen_car=base.Policy(train_threshold=.93,verify_threshold=.90)
+    rows=[]
+    for i,rel in enumerate(RELS):
+        src,nonoverlap,meta=records[rel]
+        different=records[RELS[(i+1)%len(RELS)]][0]
+        for j,kind in enumerate(pos+neg):
+            if kind=='shared_global_artifact':
+                q=np.arange(768);wave=np.sin(q*.051)+np.sin(q*.113)
+                amplitude=100*max(np.std(np.stack(list(src.values()))),np.std(np.stack(list(different.values()))))
+                a={k:v+amplitude*wave for k,v in src.items()}
+                b={k:v+amplitude*wave for k,v in different.items()}
+            else:
+                a=src
+                b=common.transform(src,nonoverlap if kind=='same_file_different_time' else different,
+                                   kind,common.SEED+31*i+j)
+            row={'source':rel,'kind':kind,'positive':kind in pos,
+             'raw':int(base.match(a,b)['status']=='NUMERIC_WITNESS'),
+             'frozen_tuned_car':int(base.match(car(a),car(b),frozen_car)['status']=='NUMERIC_WITNESS'),
+             'residual':int(proposed.match(a,b)['status']=='DUAL_WITNESS')}
+            rows.append(row)
+        print('V9_SOURCE_EVALUATED',rel,flush=True)
+    summary={}
+    for method in ('raw','frozen_tuned_car','residual'):
+        pp=[r for r in rows if r['positive']];nn=[r for r in rows if not r['positive']]
+        summary[method]={'TP':sum(r[method] for r in pp),'positive_total':len(pp),
+                         'FP':sum(r[method] for r in nn),'negative_total':len(nn)}
+    source_stats=[]
+    for rel in RELS:
+        a=[r for r in rows if r['source']==rel]
+        source_stats.append({'source':rel,'car_TP':sum(r['frozen_tuned_car'] for r in a if r['positive']),
+           'residual_TP':sum(r['residual'] for r in a if r['positive']),
+           'car_FP':sum(r['frozen_tuned_car'] for r in a if not r['positive']),
+           'residual_FP':sum(r['residual'] for r in a if not r['positive'])})
+    doc={'status':'EXECUTED_REAL_EXTERNAL_EEG_WAVEFORMS_CONTROLLED_VARIANTS',
+     'corpus':'PhysioNet eegmmidb/1.0.0; S001..S006 R04; unmodified digital EDF prefixes',
+     'contrasts':'CHB-MIT dev-frozen CAR vs raw shared clock vs residual verification',
+     'n_original_records':len(RELS),'n_controlled_cases':len(rows),
+     'frozen_thresholds':{'CAR_train':.93,'CAR_verify':.90,'residual_v5_train':.985,'residual_v5_verify':.97},
+     'source_manifest':{r:records[r][2] for r in RELS},
+     'summary':summary,'per_record':source_stats,'cases':rows,
+     'limitations':['R04 EEGMMIDB task labels never read or evaluated',
+       'data collection different from CHB-MIT but digital variants are synthetic',
+       'source IDs project-wide prior exposure unknown, not prospectively untouched',
+       '6 source EDFs not 84 independent observations',
+       'not a patient or clinical acquisition identity classifier',
+       'no direct published SOTA fingerprint or DTW benchmark in this experiment']}
+    (OUT/'P2_V9_EEGMMIDB_CROSS_CORPUS_84.json').write_text(json.dumps(doc,indent=2)+'\n')
+    print('P2_V9_EEGMMIDB_SUMMARY',json.dumps(summary,sort_keys=True),flush=True)
+
+if __name__ == '__main__':
+    main()
