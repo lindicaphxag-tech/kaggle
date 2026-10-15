@@ -2190,13 +2190,17 @@
     },
     {
       "created_at": "2026-10-15T05:17:01Z",
+      "expiry_recorded_at": "2026-10-15T14:54:22Z",
+      "expiry_sha256": "747e7f1ee62643b8885dcbbebf35c4b2e323a4a69e24631bacd8287f97b2ef85",
+      "expiry_source": "expirations/tesseract-robotics__tesseract__1384.json",
       "first_frozen_at": "2026-10-15T06:24:48Z",
       "id": "tesseract-robotics/tesseract#1384",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 1384,
       "prediction_deadline_at": "2026-10-15T12:24:48Z",
       "repository": "tesseract-robotics/tesseract",
       "source": "inbox/FIRST_SEEN_20261015T062448Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "19380cbf6caf26dda63beaf291bded26c27c638f987ce594696c43c1f737bb40"
     },
     {
@@ -2253,6 +2257,83 @@
       "source": "inbox/FIRST_SEEN_20261015T120501Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "579995577bc82dd9b41cad8d2c1612a5bc3f0ab107e1b09a6613fb7a06a7785c"
+    },
+    {
+      "created_at": "2026-10-15T13:49:57Z",
+      "first_frozen_at": "2026-10-15T14:55:58Z",
+      "id": "Genesis-Embodied-AI/genesis-world#3544",
+      "issue_number": 3544,
+      "prediction_deadline_at": "2026-10-15T20:55:58Z",
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "source": "inbox/FIRST_SEEN_20261015T145558Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "3ed4be741b140be358d709ddc10bce1b6f442cc658cc277a1424b6f4f3430092"
+    },
+    {
+      "created_at": "2026-10-15T14:04:30Z",
+      "first_frozen_at": "2026-10-15T14:55:58Z",
+      "id": "huggingface/lerobot#4982",
+      "issue_number": 4982,
+      "prediction_deadline_at": "2026-10-15T20:55:58Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261015T145558Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "0faa4522cbb58ddabd3981110d4cf0fd1a0f2d32fef78b55d9d0a7205484821f"
+    },
+    {
+      "created_at": "2026-10-15T14:48:47Z",
+      "first_frozen_at": "2026-10-15T14:55:58Z",
+      "id": "huggingface/lerobot#4983",
+      "issue_number": 4983,
+      "prediction_deadline_at": "2026-10-15T20:55:58Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261015T145558Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "39b4a6a4b7432eab8c881542f8f963b826cd49123ab76623923127546ee35548"
+    },
+    {
+      "created_at": "2026-10-15T12:05:44Z",
+      "first_frozen_at": "2026-10-15T14:55:58Z",
+      "id": "ros-controls/ros2_control#3697",
+      "issue_number": 3697,
+      "prediction_deadline_at": "2026-10-15T20:55:58Z",
+      "repository": "ros-controls/ros2_control",
+      "source": "inbox/FIRST_SEEN_20261015T145558Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "2f10d2664d2b1f22f6f4991ab4938f6abba7bdd9016fdc3b8244497b25c9f4ea"
+    },
+    {
+      "created_at": "2026-10-15T13:54:46Z",
+      "first_frozen_at": "2026-10-15T14:55:58Z",
+      "id": "ros-controls/ros2_control#3698",
+      "issue_number": 3698,
+      "prediction_deadline_at": "2026-10-15T20:55:58Z",
+      "repository": "ros-controls/ros2_control",
+      "source": "inbox/FIRST_SEEN_20261015T145558Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "faf2a35002c4189f7ff99d64be286ce24c7b76655da9fbb3868e794b49be64e4"
+    },
+    {
+      "created_at": "2026-10-15T12:18:51Z",
+      "first_frozen_at": "2026-10-15T14:55:58Z",
+      "id": "ros2/rosbag2#2530",
+      "issue_number": 2530,
+      "prediction_deadline_at": "2026-10-15T20:55:58Z",
+      "repository": "ros2/rosbag2",
+      "source": "inbox/FIRST_SEEN_20261015T145558Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "5d9429f02a33c315be13cbdad13aa2fe8971ed4b4ccb20af714a1d29a6e2dd34"
+    },
+    {
+      "created_at": "2026-10-15T12:25:25Z",
+      "first_frozen_at": "2026-10-15T14:55:58Z",
+      "id": "ros2/rosbag2#2531",
+      "issue_number": 2531,
+      "prediction_deadline_at": "2026-10-15T20:55:58Z",
+      "repository": "ros2/rosbag2",
+      "source": "inbox/FIRST_SEEN_20261015T145558Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "7ed7179ffbb1f3878a123dac879799c9d452f38491731e7f02975c16b8bf95be"
     }
   ]
 }
