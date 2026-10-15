@@ -1,0 +1,5 @@
+A 50-ID EEG release audit covers all 1,225 cross-identifier pairs.
+Shared-clock matching tests coherent multichannel content ancestry.
+Four new CHB-MIT EDFs yielded 32/32 controlled reuse detections.
+The matcher rejected 20/20 constructed negatives versus 16/20 for a baseline.
+Digital content identity is distinguished from clinical patient identity.
