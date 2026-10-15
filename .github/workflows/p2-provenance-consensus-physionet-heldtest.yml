@@ -56,6 +56,13 @@ jobs:
               if kind=="single_channel":
                   t={k:v.copy() for k,v in negative.items()}
                   first=next(iter(s));t[first]=s[first].copy();return t
+              if kind=="asynchronous_same_source":
+                  # Adversarial NON-COHERENT multichannel product:
+                  # each sensor independently comes from this source, but with a different delay;
+                  # no 4 sensors share one original acquisition clock.
+                  offsets=[7,23,39,55,71,87,13,29]
+                  return {f"Q{i}":np.r_[rng.normal(0,np.std(v),offsets[i]),v[:-offsets[i]]]
+                          for i,v in enumerate(s.values())}
               if kind=="shared_artifact":
                   t={k:v.copy() for k,v in negative.items()}
                   w=rng.normal(0,1,768)
@@ -124,7 +131,7 @@ jobs:
           rows=[]
           for p in [1,2,3,4]:
               src=sources[p,1];other=sources[p,2]
-              for ix,kind in enumerate(["exact","permutation","lag","crop","gain","drop","noise","combined","independent","single_channel","shared_artifact"]):
+              for ix,kind in enumerate(["exact","permutation","lag","crop","gain","drop","noise","combined","independent","single_channel","asynchronous_same_source","shared_artifact"]):
                   truth=int(ix<8);target=make(src,kind,16000+p*29+ix,other)
                   methods={"ProvGuard lag+assignment":int(screen(src,target)),
                            "label+lag Pearson":int(screen(src,target,False,True)),
@@ -148,6 +155,8 @@ jobs:
              "prespecified":{"abs_pearson":TH,"min_distinct_channels":MIN,"min_overlap_samples":MINLEN,"max_abs_lag":MAXLAG},
              "partition":"S001-S002 dev, S003-S004 held; same public acquisition family",
              "clinical_duplicate_identity_test":False,"natural_population_false_positive_rate_claim":False,
+             "label_definition":"coherent multichannel shared recording clock; asynchronous per-channel copies are deliberately negative for this specific estimand",
+             "strong_baseline":"permutation+independent lag Hungarian (channelwise match without shared clock)",
              "input_file_sha256":digests,"summary":summary,"rows":rows}
           (OUT/"REAL_PHYSIONET_HELDTEST_RECEIPT.json").write_text(json.dumps(o,indent=2)+"\n")
           print("REAL_EEG_CONTROLLED_TRANSFORM_RECEIPT",json.dumps(summary))
