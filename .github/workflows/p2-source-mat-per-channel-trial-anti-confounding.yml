@@ -1,0 +1,46 @@
+name: P2 public original source MAT per-channel and per-trial anti-confounding analysis
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/p2_source_mat_channel_trial_decomposition.py'
+      - '.github/workflows/p2-source-mat-per-channel-trial-anti-confounding.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  mat-trial-channel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy scipy h5py
+      - name: Falsify naïve global correlation with high-energy single-channel synthetic controls
+        run: |
+          python -m py_compile research/defaultreg_bspc_v13/src/p2_source_mat_channel_trial_decomposition.py
+          python research/defaultreg_bspc_v13/src/p2_source_mat_channel_trial_decomposition.py --self-test
+      - name: Analyze three affected released pairs in six original public MAT files without publishing signals
+        run: |
+          python research/defaultreg_bspc_v13/src/p2_source_mat_channel_trial_decomposition.py --out /tmp/p2-mat-public-original-channel-trial-aggregates.json
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/p2-mat-public-original-channel-trial-aggregates.json'))
+          assert [r['released_public_ids'] for r in x['pair_comparisons']]==[[4,5],[47,49],[11,15]]
+          assert all(r['source_mat_candidate_shape']==[40,33,4000] for r in x['pair_comparisons'])
+          assert all(r['no_EDF_mat_channel_map_claim'] for r in x['pair_comparisons'])
+          assert x['full_archive_not_downloaded'] and x['no_EEG_data_or_patient_metadata_in_artifacts']
+          assert x['total_http_range_body_bytes']<x['full_original_release_source_zip_bytes']
+          print('P2_MAT_CHANNELWISE_SOURCE_COMPARISON_DONE_WITHOUT_EXPORTED_WAVEFORMS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: P2-SIX-MAT-SOURCE-CHANNEL-TRIAL-CORRELATION-SCALARS-ONLY
+          path: /tmp/p2-mat-public-original-channel-trial-aggregates.json
+          if-no-files-found: warn
+          retention-days: 90

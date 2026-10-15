@@ -1,0 +1,169 @@
+name: P2 ProvGuard real PhysioNet held-subject transform evaluation
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths: [".github/workflows/p2-provenance-consensus-physionet-heldtest.yml"]
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  physionet-real-signal-evaluation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 38
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - name: Install MNE, SciPy and NumPy
+        run: python -m pip install --disable-pip-version-check "numpy<3" scipy mne
+      - name: Public PhysioNet EDF held-subject test, fixed thresholds and four comparators
+        run: |
+          mkdir -p p2_physioreal
+          cat > p2_physioreal/real_run.py <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          from urllib.request import urlretrieve
+          from scipy.signal import correlate,correlation_lags
+          from scipy.optimize import linear_sum_assignment
+          import numpy as np
+          import mne
+          OUT=Path("p2_physioreal");DATA=Path("/tmp/public_eegmmidb")
+          TH=.985; MIN=4; MINLEN=230; MAXLAG=100
+          def get(pid,run):
+              fn=f"S{pid:03d}R{run:02d}.edf"
+              f=DATA/fn;DATA.mkdir(exist_ok=True)
+              if not f.exists():
+                  url=f"https://physionet.org/files/eegmmidb/1.0.0/S{pid:03d}/{fn}"
+                  urlretrieve(url,f)
+              if f.stat().st_size<250000:raise RuntimeError("invalid EDF download")
+              raw=mne.io.read_raw_edf(f,preload=False,verbose="ERROR")
+              picks=[k for k in raw.ch_names if raw.get_channel_types(picks=[k])[0]=="eeg"][:8]
+              z=raw.get_data(picks=picks,start=200,stop=968)
+              assert z.shape==(8,768)
+              return {k:z[i].copy() for i,k in enumerate(picks)},hashlib.sha256(f.read_bytes()).hexdigest()
+          def make(src,kind,seed,negative=None):
+              rng=np.random.default_rng(seed);s={k:v.copy() for k,v in src.items()}
+              if kind=="exact":return s
+              if kind=="permutation":return {f"X{i}":v for i,v in enumerate(reversed(list(s.values())))}
+              if kind=="lag":return {k:np.r_[rng.normal(0,np.std(v),32),v[:-32]] for k,v in s.items()}
+              if kind=="crop":return {k:v[63:700].copy() for k,v in s.items()}
+              if kind=="gain":return {k:v*(0.8+i*.04)+np.mean(v)*.1 for i,(k,v) in enumerate(s.items())}
+              if kind=="drop":return dict(list(s.items())[:5])
+              if kind=="noise":return {k:v+rng.normal(0,np.std(v)*.015,len(v)) for k,v in s.items()}
+              if kind=="combined":
+                  return {f"X{i}":v[43:700]*(.7+.03*i)+rng.normal(0,np.std(v)*.005,657)
+                          for i,(k,v) in enumerate(reversed(list(s.items())[:6]))}
+              if kind=="independent":return {k:v.copy() for k,v in negative.items()}
+              if kind=="single_channel":
+                  t={k:v.copy() for k,v in negative.items()}
+                  first=next(iter(s));t[first]=s[first].copy();return t
+              if kind=="asynchronous_same_source":
+                  # Adversarial NON-COHERENT multichannel product:
+                  # each sensor independently comes from this source, but with a different delay;
+                  # no 4 sensors share one original acquisition clock.
+                  offsets=[7,23,39,55,71,87,13,29]
+                  return {f"Q{i}":np.r_[rng.normal(0,np.std(v),offsets[i]),v[:-offsets[i]]]
+                          for i,v in enumerate(s.values())}
+              if kind=="shared_artifact":
+                  t={k:v.copy() for k,v in negative.items()}
+                  w=rng.normal(0,1,768)
+                  return {k:v+w*np.std(v)*.17 for k,v in t.items()}
+              raise KeyError(kind)
+          def cc_lags(t,s):
+              ns=len(s);nt=len(t);lag=correlation_lags(nt,ns,"full")
+              a=np.maximum(0,-lag);b=np.maximum(0,lag)
+              n=np.minimum(ns-a,nt-b)
+              x=np.r_[0,np.cumsum(s)];x2=np.r_[0,np.cumsum(s*s)]
+              y=np.r_[0,np.cumsum(t)];y2=np.r_[0,np.cumsum(t*t)]
+              sumx=x[a+n]-x[a];sumy=y[b+n]-y[b]
+              vx=np.maximum(x2[a+n]-x2[a]-sumx*sumx/n,0)
+              vy=np.maximum(y2[b+n]-y2[b]-sumy*sumy/n,0)
+              dot=correlate(t,s,mode="full",method="fft")-sumx*sumy/n
+              den=np.sqrt(vx*vy)
+              r=np.divide(dot,den,out=np.zeros_like(dot),where=(den>1e-20)&(n>=MINLEN))
+              valid=(abs(lag)<=MAXLAG)&(n>=MINLEN)
+              return lag[valid],np.abs(r[valid])
+          def atlag(a,b,l):
+              si=max(0,-l);tj=max(0,l);n=min(len(a)-si,len(b)-tj)
+              if n<MINLEN:return 0
+              x=a[si:si+n];y=b[tj:tj+n]
+              std=np.std(x)*np.std(y)
+              return 0 if std<1e-18 else abs(float(np.mean((x-x.mean())*(y-y.mean()))/std))
+          def screen(src,tgt,permutation=True,shift=True):
+              # All candidate lags are checked, without post-outcome top-lag pruning.
+              # Single FFT-normalized channel cross-correlation per pair; precompute once.
+              ss=list(src);tt=list(tgt)
+              grid=np.zeros((2*MAXLAG+1,len(ss),len(tt)),dtype=np.float32)
+              for i,k in enumerate(ss):
+                  for j,v in enumerate(tt):
+                      if not permutation and k!=v:continue
+                      lag,val=cc_lags(tgt[v],src[k])
+                      take=np.abs(lag)<=MAXLAG
+                      grid[lag[take]+MAXLAG,i,j]=val[take]
+              which=[MAXLAG] if not shift else range(2*MAXLAG+1)
+              for u in which:
+                  m=np.where(grid[u]>=TH,grid[u],0)
+                  if int(np.sum(m.max(axis=1)>=TH))<MIN:continue
+                  row,col=linear_sum_assignment(-m)
+                  if int(np.sum(m[row,col]>=TH))>=MIN:return True
+              return False
+          def permutation_uncoordinated_lag(src,tgt):
+              # Strong informed baseline: every channel pair may independently pick its best lag.
+              # This does not enforce a single shared original recording clock.
+              ss=list(src);tt=list(tgt)
+              m=np.zeros((len(ss),len(tt)))
+              for i,k in enumerate(ss):
+                  for j,v in enumerate(tt):
+                      lag,score=cc_lags(tgt[v],src[k])
+                      m[i,j]=float(np.max(score)) if len(score) else 0.
+              m=np.where(m>=TH,m,0.)
+              row,col=linear_sum_assignment(-m)
+              return int(np.count_nonzero(m[row,col]>=TH))>=MIN
+          def zero_label(src,tgt):
+              return sum(k in tgt and atlag(v,tgt[k],0)>=TH for k,v in src.items())>=MIN
+          def whole_equal(src,tgt):
+              return set(src)==set(tgt) and all(np.array_equal(src[k],tgt[k]) for k in src)
+          sources={};digests={}
+          for p in [1,2,5,6]:
+              for run in (1,2):
+                  s,h=get(p,run);sources[p,run]=s;digests[f"S{p:03d}R{run:02d}"]=h
+          rows=[]
+          for p in [1,2,5,6]:
+              src=sources[p,1];other=sources[p,2]
+              for ix,kind in enumerate(["exact","permutation","lag","crop","gain","drop","noise","combined","independent","single_channel","asynchronous_same_source","shared_artifact"]):
+                  truth=int(ix<8);target=make(src,kind,16000+p*29+ix,other)
+                  methods={"ProvGuard lag+assignment":int(screen(src,target)),
+                           "label+lag Pearson":int(screen(src,target,False,True)),
+                           "permutation+independent lag Hungarian":int(permutation_uncoordinated_lag(src,target)),
+                           "permutation zero-lag Hungarian":int(screen(src,target,True,False)),
+                           "label zero-lag Pearson":int(zero_label(src,target)),
+                           "whole numeric bytes":int(whole_equal(src,target))}
+                  rows.append(dict(subject=f"S{p:03d}",group="held" if p>=3 else "development",
+                                   test=kind,controlled_reuse=truth,methods=methods))
+          summary={}
+          for g in ("development","held"):
+              r=[z for z in rows if z["group"]==g];summary[g]={}
+              for name in rows[0]["methods"]:
+                  summary[g][name]=dict(
+                      true_positive=sum(q["controlled_reuse"]==1 and q["methods"][name] for q in r),
+                      positive_n=sum(q["controlled_reuse"]==1 for q in r),
+                      false_positive=sum(q["controlled_reuse"]==0 and q["methods"][name] for q in r),
+                      negative_n=sum(q["controlled_reuse"]==0 for q in r))
+          o={"experiment":"real PhysioNet EDF substrate; controlled digital transformations",
+             "source":"10.13026/C28G6P; EDF v1.0.0; original files not redistributed",
+             "prespecified":{"abs_pearson":TH,"min_distinct_channels":MIN,"min_overlap_samples":MINLEN,"max_abs_lag":MAXLAG},
+             "partition":"S001-S002 dev, NEW S005-S006 held (neither inspected in previous S003/S004 method comparison); same dataset family",
+             "clinical_duplicate_identity_test":False,"natural_population_false_positive_rate_claim":False,
+             "label_definition":"coherent multichannel shared recording clock; asynchronous per-channel copies are deliberately negative for this specific estimand",
+             "strong_baseline":"permutation+independent lag Hungarian (channelwise match without shared clock)",
+             "input_file_sha256":digests,"summary":summary,"rows":rows}
+          (OUT/"REAL_PHYSIONET_HELDTEST_RECEIPT.json").write_text(json.dumps(o,indent=2)+"\n")
+          print("REAL_EEG_CONTROLLED_TRANSFORM_RECEIPT",json.dumps(summary))
+          PY
+          python p2_physioreal/real_run.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: P2-PhysioNet-real-signal-controlled-provenance-benchmark
+          path: p2_physioreal/
+          if-no-files-found: warn
+          retention-days: 90

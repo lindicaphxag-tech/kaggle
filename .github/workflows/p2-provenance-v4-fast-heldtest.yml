@@ -1,0 +1,38 @@
+name: P2 ProvGuard V4 fast six-EDF benchmark
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/p2-provenance-v4-fast-heldtest.yml'
+      - 'research/defaultreg_bspc_v13/src/p2_provguard_v4_calibrated.py'
+      - 'research/defaultreg_bspc_v13/src/p2_provguard_v4_chbmit_benchmark.py'
+      - 'research/defaultreg_bspc_v13/src/p2_provguard_v4_two_endpoint_chbmit.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  p2_v4_real_edf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      P2_OUTPUT: p2_v4_chbmit_results
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: python -m pip install 'numpy<3' 'scipy<2'
+      - name: Execute fixed 78-case CHB-MIT EDF benchmark
+        run: python research/defaultreg_bspc_v13/src/p2_provguard_v4_chbmit_benchmark.py
+      - name: Evaluate both distinct endpoints under frozen rules
+        run: python research/defaultreg_bspc_v13/src/p2_provguard_v4_two_endpoint_chbmit.py
+      - name: Upload complete case-level receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: provguard-v4-six-EDF-78-cases
+          path: p2_v4_chbmit_results/
+          if-no-files-found: error

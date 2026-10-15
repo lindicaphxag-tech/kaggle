@@ -1,0 +1,108 @@
+\subsection{Channel-erasure-tolerant digital-product graph}
+\label{sec:p2-erasure-tolerant-graph}
+A whole-EDF cryptographic digest cannot detect
+\emph{partial} digital reuse: all 50 independently
+retrieved published files have distinct full-file
+SHA-256 values, even where many channels are
+byte-identical. We therefore analyse the
+preprocessed EDF files as channel-by-native-record
+digital product arrays. For released ID $i$,
+named EEG channel $c$ and aligned native EDF
+storage record $r$, let $H_{icr}$ be SHA-256 of
+the exact stored digital sample bytes and
+$V_{icr}$ the predicate that samples are
+\emph{nonconstant within that native record}.
+Define
+\[
+M_{ij}(r)=
+\sum_{c\in\mathcal C}
+\mathbf{1}\{H_{icr}=H_{jcr},
+V_{icr}=V_{jcr}=1\},\qquad |\mathcal C|=29.
+\]
+Same-position comparisons require named channel,
+sample count and record geometry agreement.
+The longest compatible contiguous span is
+\[
+R_{ij}(k)=\max\{\ell:
+\exists r,\ \forall t=r,\ldots,r+\ell-1,\
+M_{ij}(t)\ge k\}.
+\]
+This is an exact-digital-channel erasure-tolerant
+content fingerprint, \emph{not} a declaration of
+shared original acquisition or person.
+Cryptographic digests provide practical,
+not mathematically collision-free, equality evidence.
+
+The full independent real-byte rehash and
+1,225-pair census and a separately implemented
+six-file, three-pair temporal topology audit
+used a common version-pinned NEMAR EDF release
+with no downloaded patient labels or redistributed
+waveforms. For ID 4/5, $M_{45}(r)=29$ for all
+320 native records. For 47/49,
+$M_{47,49}(r)=28$ on 245 records, including
+a contiguous 179-record run (zero-based
+indices 128--306); the P4 channel has
+no exact matching native time-varying block,
+which demonstrates why whole-file equality
+does not detect this case. For 11/15, only
+the P3 channel has 171 identical nonconstant
+native records; no individual record has
+two or more equal EEG channels. The remaining
+1,222 pairs have no exact same-channel,
+same-record EEG block match in this release.
+
+As a \emph{retrospective}, explicitly
+post-outcome example, consider the rule
+$R_{ij}(28)\ge 100$: at least 28 of 29
+named EEG channels equal in 100 consecutive
+native storage records. This gives exactly
+two release-content edges, 4/5 and 47/49,
+versus zero whole-file SHA-256 identity
+edges and one whole-29-channel equality
+edge (4/5). The other 1,223 pairs
+remain unlinked under the inspected rule.
+This is \emph{not} a calibrated prospective
+false-positive rate. The 28- and 100-unit
+thresholds were set after examining the
+named released products.
+
+\begin{table}[ht]\centering\small
+\caption{Digital-product content graph
+connections on all 1,225 different released
+ID pairs. EDF blocks are not independent
+clinical trials; graph groups are not
+clinical participant identities.}
+\label{tab:p2-erasure-content-graph}
+\begin{tabular}{p{.57\linewidth}rl}
+\toprule
+Same-release product-link criterion & Edges & Public ID pairs\\
+\midrule
+Whole EDF SHA-256 identity & 0 & None\\
+All 29 entire time-varying EEG channels
+identical & 1 & 4/5\\
+At least 28 nonconstant EEG channels matched
+for 100 consecutive native EDF records
+& 2 & 4/5, 47/49\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The resulting 48 connected components
+are \emph{digital-product fingerprint groups};
+they must \emph{not} be reported as
+48 distinct original patients.
+Neither raw MAT-to-EDF export lineage
+nor underlying patient identity follows
+from these edges. An externally validated
+decision rule and measurement of how the
+actual train/test split conclusions change
+are still required before claiming a
+new generalisable provenance algorithm.
+The real-byte evidence is in
+\href{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38388066957}
+{the full 50-file independent checksum census},
+\href{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38543795987}
+{the nonconstant digital block topology audit}
+and their machine-readable cross-artifact
+comparison.

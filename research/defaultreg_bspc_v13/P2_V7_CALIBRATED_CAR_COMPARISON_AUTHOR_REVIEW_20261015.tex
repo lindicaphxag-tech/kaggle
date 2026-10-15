@@ -1,0 +1,104 @@
+% P2 BSPC V7 evidence-locked comparison; 2026-10-15 author-review ONLY.
+\subsection{Informed common-average-reference comparator and source-level null ranks}
+To exclude a trivial gain from comparing artifact-sensitive raw waveforms
+against an artifact-filtering method, we added a strong fully informed
+comparison that subtracts the common average reference (CAR) across
+the eight source and target channels prior to applying the unchanged
+shared-clock assignment algorithm. The same six original CHB--MIT
+EDF digital source prefixes each produced eight controlled reuse
+positives and six constructed negatives; these are 84 \emph{correlated}
+case variants from six source records, not 84 independent clinical
+observations.
+
+On this \emph{controlled} set, raw shared-clock matching detected
+48/48 positives with 6/36 false matches; CAR preprocessing followed
+by the original shared-clock matcher detected 39/48 with 0/36 false
+matches, and the matched-channel residual verification found 48/48
+with 0/36 false matches. All six raw false matches occurred in
+the deliberately injected strong common-artifact condition.
+This result demonstrates a preservation-of-detections advantage
+relative to \emph{this specified CAR baseline and its frozen original
+thresholds}, but it does not establish advantage over source-calibrated
+CAR thresholds, robust rereferencing, component decomposition,
+multichannel device synchronization or time-series fingerprints.
+The author-review evidence is the inspectable success receipt
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38675387956};
+A threshold-tuned CAR comparator was also completed. Fifteen
+training/verification threshold pairs were selected using chb01--02
+only; the selected fit threshold was 0.93 and holdout threshold 0.90.
+On these two development originals both CAR and residual verification
+found 16/16 controlled positives and 0/12 constructed negatives.
+On four additional original EDF sources (chb03--06), CAR detected
+31/32 positives with 0/24 false matches, while the residual method
+detected 32/32 positives with 0/24 false matches; raw shared-clock
+detected 32/32 but incorrectly matched 4/24 negatives.
+The successful original receipt is
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38677222169}.
+Because these four originals were already used in other project
+experiments, this is \emph{not} a fresh prospective independent test.
+The only CAR/residual disagreement is one constructed positive:
+an exploratory exact two-sided paired test gives $p=1$.
+Source-level clustering cannot increase such weak evidence;
+the controlled experiment thus establishes no statistically
+persuasive advantage over source-tuned CAR.
+
+We also evaluated a continuous score obtained by selecting the
+common-lag or one-channel correspondence using a fit-only time
+block, followed by verification-block correlation. Rather than
+treating individual lags, electrodes or overlapping windows as
+independent null trials, an empirical rank test was applied
+to \emph{the maximum over the complete permitted source search}
+for 19 distinct published CHB--MIT case identifiers. A
+controlled positive gave score 0.999968 (common-clock endpoint)
+versus maximum null 0.184460; the one-channel endpoint scored
+1.000000 versus maximum null 0.424179. Both had the minimum
+achievable one-query rank $p=(1+0)/(19+1)=0.05$; the
+successful source-level check is
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38675387852}.
+The two endpoints are not independent prespecified discoveries;
+familywise claims require multiplicity adjustment and suitable
+exchangeability of genuinely independent source recordings.
+The database is a single corpus and the positives remain engineered
+variants, so no population-wide clinical false-match guarantee is
+inferred.
+
+\paragraph{Matched-subset common-mode cancellation.}
+Let $k\geq 2$ correctly paired channels be aligned into
+$X=U+\mathbf{1}u^\top$ and $Y=PU+\mathbf{1}v^\top$,
+where $P$ is a channel permutation, $U$ is the true
+channel-specific signal and $u,v$ are arbitrary distinct
+additive common-mode disturbances. For the matched-set
+reference projector $H_k=I_k-\mathbf{1}\mathbf{1}^\top/k$,
+\begin{equation}
+H_kX=H_kU,\qquad H_kY=PH_kU .
+\end{equation}
+This follows directly from $H_k\mathbf{1}=0$ and
+$H_kP=PH_k$. Nonconstant matched residual channels are
+therefore invariant to this class of additive nuisance.
+If all true channels are spatially identical, their residual
+variance vanishes and the verifier must abstain.
+Pre-match CAR generally uses different entire sensor sets
+in the two records; changing unmatched channels can then
+change the reference signal of every matched sensor.
+Matched-subset projection eliminates this set dependency,
+but its algebra is classical, not a new theorem priority claim.
+
+\paragraph{Multiplicity and evidence scope.}
+The two endpoint null-rank scores each gave a nominal
+minimum possible single-test $p=1/20=0.05$ with 19
+source-level negatives. If both endpoints are in one
+confirmatory family, Holm-adjusted $p=0.10$ for both.
+Consequently neither provides a corrected significance
+claim. Controlled transformations from each EDF original
+must be treated as clustered observations.
+
+\paragraph{Reproducibility and honest scope.}
+Before external release, the full numerical witness must be
+independently recomputed, the original EDF prefix digests retained
+without redistributing patient waveforms, all source-group
+identities checked against the distributor manifests, and
+threshold selection performed without inspection of final
+evaluation recordings. Additional sources and naturally observed
+digital reuse, as well as a systematic cost/abstention comparison,
+remain required before promoting this component to a generally
+superior biomedical signal provenance algorithm.

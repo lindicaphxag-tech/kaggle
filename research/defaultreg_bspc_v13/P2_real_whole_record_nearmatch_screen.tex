@@ -1,0 +1,71 @@
+\subsection{Exploratory screening for highly similar but non-identical recordings}
+\label{sec:p2-whole-record-near-overlap}
+The exact-identity audit establishes 49 groups of
+\emph{byte-equivalent processed recording contents}
+for the primary analysis; it cannot identify
+near-duplicates produced by scaling, quantisation,
+partial corruption or changes in physical calibration.
+We therefore performed a separate retrospective
+screen of all $\binom{50}{2}=1,225$ released-ID pairs.
+Using the same pinned 8--30~Hz/160~Hz processed
+40-trial arrays, each complete trial-aligned
+record was vectorised, mean-centred and normalised
+to unit norm. Its full-record Pearson/cosine
+similarity was compared to precommitted
+diagnostic cutoffs 0.95 and 0.9999.
+Event-label sequence agreement was checked
+separately. This screen was developed after
+the known ID4/5 finding and is \emph{exploratory}.
+It is not invariant to trial reordering, time
+shifts, altered events or channel permutations.
+
+Precisely three of the 1,225 pairs exceeded
+both the 0.95 and 0.9999 thresholds.
+The complete processed contents of ID4/5
+were exactly identical as established earlier,
+and their normalised similarity was 1.0.
+Two \emph{additional} pairs exhibited
+near-unity whole-record similarity:
+ID47/49 had $0.99999999166$, and ID11/15
+had $0.99999998340$. All three pairs
+had identical aligned 40-trial label sequences.
+The remaining 1,222 pairs fell below 0.95
+under this particular aligned-record measure.
+These new pairwise comparisons were
+executed on the same public release using
+the frozen screen and saved at
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38321951859}.
+
+Importantly, the original released ID47/49
+pair was previously used as a
+\emph{negative control for exact identity}:
+a separate original EDF digital-payload audit
+confirmed byte-for-byte equality in only one of
+33 raw channels. It is \emph{not} a sound
+negative control for waveform near-overlap.
+A lack of raw digital byte identity can coexist
+with nearly identical processed numerical
+waveforms. We therefore retain the primary
+49 \emph{exact-content} groups but
+\emph{do not} infer there are 49 fully
+independent electrophysiological recordings
+under any tolerance- or acquisition-based
+notion of identity. Likewise, we do not
+prematurely merge 47/49 or 11/15 into
+single people or claim an effective 47-patient
+sample. Such interpretation requires inspecting
+the original acquisition/release mechanism
+and comparing calibrated raw/processed signals
+under matched temporal/channel alignment.
+Whole-record correlation is only a trigger
+for this technical forensic inquiry.
+
+The related high-similarity result does not
+alter the original 49 exact-group
+$2\times2$ numerical factor analysis,
+whose estimand is conditional on \emph{exact}
+processed-content identity. It narrows the
+interpretation of that analysis: exact
+deduplication alone is not sufficient
+evidence of physiologically independent
+recordings in this public release.

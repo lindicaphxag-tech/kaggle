@@ -1,0 +1,50 @@
+\subsection{Audit of the author's original Figshare processing-code archive}
+\label{sec:p2-original-code-gate}
+To distinguish a data-product fingerprint from a reproducible
+source-to-product mapping, we performed a separate,
+non-executing, version-pinned audit of the author-published
+\texttt{code.zip} in Figshare article 21679035, version 5
+(\href{https://doi.org/10.6084/m9.figshare.21679035.v5}
+{original public release}). The Figshare API metadata listed
+14 published files, including \texttt{sourcedata.zip}
+(1,874,824,439 bytes), \texttt{edffile.zip}
+(462,843,633 bytes) and a 20,811-byte
+\texttt{code.zip} (file ID 42305226).
+The code archive was separately fetched and checksum-verified
+(SHA-256 beginning \texttt{7c48ff5304f9}; the full immutable
+digest appears in the machine-readable CI provenance artifact).
+The archive contains exactly 21 MATLAB \texttt{.m} files,
+two electrode-location files and one \texttt{README.md}.
+The archived MATLAB code was \emph{not executed}; no
+raw MAT files, EDF data files or patient metadata
+were downloaded for this distinct code audit.
+
+The static inventory shows functions for notch/bandpass filtering,
+CSP/FBCSP extraction, LDA/SVM, tangent-space classification,
+time--frequency visualisation, and evaluation scripts
+(\texttt{PlotAccuracy.m} and \texttt{PlotFigure.m}) that iterate
+over \texttt{sourcedata} MAT files. The text inventory
+contains no program which unambiguously exports the
+original per-subject MAT arrays to the published
+preprocessed EDF files, with a documented 33-channel map,
+manual artefact decisions, event alignment and version history.
+Thus the \emph{published analysis code alone} is insufficient
+to reproduce the full MAT-to-EDF lineage.
+This is an \emph{absence-of-disclosed-conversion-detail}
+finding, not proof that no conversion code exists elsewhere,
+that the author did not perform the documented manual
+preprocessing, or that any patient identity was altered.
+
+The reproducible manifest, per-file cryptographic hashes,
+and line-numbered matching-code excerpts were preserved
+in the successful, strictly bounded, read-only audit
+\href{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38535556189}
+{GitHub Actions run 38535556189}.
+The next necessary provenance test requires the actual
+conversion or manual-processing record, and where possible
+the original curators' clarification; neither an
+approximate MAT--EDF waveform correlation nor a
+directory name can replace it. Our positive findings
+about \emph{published EDF digital products} in
+Section~\ref{sec:p2-exhaustive-nemar} remain valid
+regardless of this mapping gap.

@@ -1,0 +1,29 @@
+name: P2 primary Figshare v5 code archive provenance static audit
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths:
+      - '.github/workflows/p2-figshare-v5-author-code-inspection.yml'
+      - 'research/defaultreg_bspc_v13/src/p2_figshare_v5_publisher_processing_code_static_audit.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  download_only_published_code:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Inspect Figshare v5 authoritative metadata and static CODE archive only
+        run: |
+          python research/defaultreg_bspc_v13/src/p2_figshare_v5_publisher_processing_code_static_audit.py --out p2_figshare_published_code_static_inventory.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p2-figshare-v5-published-processing-source-code-static-inventory
+          path: p2_figshare_published_code_static_inventory.json
+          if-no-files-found: warn
+          retention-days: 90

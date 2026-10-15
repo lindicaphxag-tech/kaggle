@@ -1,0 +1,47 @@
+name: P2 public MAT EDF held-out temporal lineage screen
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths:
+      - research/defaultreg_bspc_v13/src/p2_mat_edf_heldout_window_lineage.py
+      - .github/workflows/p2-mat-edf-heldout-window-lineage.yml
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  public-release-screen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    env:
+      MNE_DATA: /tmp/p2-public-mat-edf-window-eeg
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Synthetic permuted-affine and unrelated controls
+        run: python research/defaultreg_bspc_v13/src/p2_mat_edf_heldout_window_lineage.py --self-test
+      - name: Public release six-by-six held-out screen
+        run: |
+          mkdir -p "$MNE_DATA" /tmp/p2-heldout-window
+          python research/defaultreg_bspc_v13/src/p2_mat_edf_heldout_window_lineage.py --out /tmp/p2-heldout-window/P2_MAT_EDF_HELDOUT_TEMPORAL_SCREEN.json
+      - name: Check aggregate schema
+        run: |
+          python - <<'PY'
+          import json
+          z=json.load(open('/tmp/p2-heldout-window/P2_MAT_EDF_HELDOUT_TEMPORAL_SCREEN.json'))
+          assert len(z['rows'])==36
+          assert len({(r['source_mat_public_id'],r['processed_edf_public_id']) for r in z['rows']})==36
+          assert all(0<=r['heldout_last_2000_median_abs_r']<=1 for r in z['rows'])
+          assert z['cannot_establish_raw_acquisition_or_clinical_patient_identity']
+          print('P2_SIX_BY_SIX_HELDOUT_RELEASE_LAYER_SCREEN_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p2-public-mat-edf-heldout-temporal-screen
+          path: /tmp/p2-heldout-window/*.json
+          if-no-files-found: warn
+          retention-days: 90

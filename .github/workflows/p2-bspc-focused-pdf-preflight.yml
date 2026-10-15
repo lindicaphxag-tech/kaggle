@@ -1,0 +1,224 @@
+name: P2 BSPC focused native PDF and science gates
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - ".github/workflows/p2-bspc-focused-pdf-preflight.yml"
+      - "research/defaultreg_bspc_v13/main_p2_BSPC_POSITIVE_METHOD_AUTHOR_REVIEW_20261015.tex"
+      - "research/defaultreg_bspc_v13/P2_V7_CALIBRATED_CAR_COMPARISON_AUTHOR_REVIEW_20261015.tex"
+      - "research/defaultreg_bspc_v13/P2_V9_ORIGINAL_RECORD_SIGN_TEST_AUTHOR_REVIEW_20261015.tex"
+      - "research/defaultreg_bspc_v13/P2_V9_EEGMMIDB_CROSS_CORPUS_EXPLORATORY_AUTHOR_REVIEW_20261015.tex"
+      - "research/defaultreg_bspc_v13/P2_V5_COMMON_MODE_CONTROLLED_REAL_EDF_AUTHOR_REVIEW_20261015.tex"
+      - "research/defaultreg_bspc_v13/P2_V7_CALIBRATED_CAR_COMPARISON_AUTHOR_REVIEW_20261015.tex"
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths:
+      - ".github/workflows/p2-bspc-focused-pdf-preflight.yml"
+      - "research/defaultreg_bspc_v13/main_p2_BSPC_FOCUSED_AUTHOR_REVIEW_20261014.tex"
+      - "research/defaultreg_bspc_v13/P2_BSPC_SUPPLEMENTARY_EVIDENCE_AUTHOR_REVIEW_20261014.tex"
+      - "research/defaultreg_bspc_v13/main_p2_BSPC_ELSEVIER_AUTHOR_REVIEW_20261014.tex"
+      - "research/defaultreg_bspc_v13/P2_BSPC_public_digital_waveform_figure_20261015.tex"
+      - "research/defaultreg_bspc_v13/P2_nemar_whole_EDF_manifest_scope_20261013.tex"
+      - "research/defaultreg_bspc_v13/P2_BSPC_concise_exhaustive_EDF_results_20261015.tex"
+      - "research/defaultreg_bspc_v13/main_p2_BSPC_POSITIVE_METHOD_AUTHOR_REVIEW_20261015.tex"
+      - "research/defaultreg_bspc_v13/P2_SOURCE_CLOCK_CHBMIT_EXTERNAL_AUTHOR_REVIEW_20261015.tex"
+      - "research/defaultreg_bspc_v13/P2_SOURCE_CLOCK_REAL_PHYSIONET_AUTHOR_REVIEW_20261015.tex"
+      - "research/defaultreg_bspc_v13/P2_BSPC_native_matrix_and_attribution_20261014.tex"
+      - "research/defaultreg_bspc_v13/src/p2_bspc_submission_numerical_gate_20261014.py"
+      - "publication_packages/default_eeg/P2_BSPC_HIGHLIGHTS_AUTHOR_REVIEW.txt"
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+jobs:
+  focused-journal-draft:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install publisher TeX and PDF QA packages
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-publishers lmodern poppler-utils
+      - name: Download independently verified real public EDF waveform evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: P2-real-EDF-native-waveform-panels-SHA-gated
+          run-id: 38600178102
+          github-token: ${{ github.token }}
+          path: p2-waveform-source
+      - name: Reflow the native PDF vectors into 2-by-3 panels
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check pymupdf
+          python - <<'PY'
+          from pathlib import Path
+          import json,fitz
+          root=Path('p2-waveform-source')
+          manifest=json.loads((root/'provenance.json').read_text())
+          assert manifest['status']=='REAL_PUBLIC_EDF_WAVEFORMS_SHA_VERIFIED'
+          assert manifest['patient_identity_not_assessed'] and manifest['not_original_raw_MAT']
+          src=fitz.open(root/'P2_real_native_EDF_waveform_array.pdf')
+          assert len(src)==1
+          w,h=src[0].rect.width,src[0].rect.height
+          panelw=w/3; panelh=h/2
+          out=fitz.open()
+          page=out.new_page(width=2*panelw+20,height=3*panelh+20)
+          for i in range(6):
+              source_col,source_row=i%3,i//3
+              col,row=i%2,i//2
+              clip=fitz.Rect(source_col*panelw,source_row*panelh,(source_col+1)*panelw,(source_row+1)*panelh)
+              target=fitz.Rect(10+col*panelw,10+row*panelh,10+(col+1)*panelw,10+(row+1)*panelh)
+              page.show_pdf_page(target,src,0,clip=clip,keep_proportion=False)
+          target=Path('research/defaultreg_bspc_v13/P2_real_native_EDF_waveform_array_2by3.pdf')
+          out.save(target,garbage=4,deflate=True)
+          assert target.stat().st_size>10000
+          print('PASS_NATIVE_DIGITAL_WAVEFORM_VECTORS',str(target),target.stat().st_size)
+          PY
+      - name: Verify frozen arithmetic and nonidentifying evidence
+        run: |
+          python research/defaultreg_bspc_v13/src/p2_bspc_submission_numerical_gate_20261014.py
+      - name: Build the focused evidence-locked manuscript
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          set -euo pipefail
+          main=main_p2_BSPC_FOCUSED_AUTHOR_REVIEW_20261014
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error "$main.tex"
+          test -s "$main.pdf"
+          elsevier=main_p2_BSPC_ELSEVIER_AUTHOR_REVIEW_20261014
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error "$elsevier.tex"
+          test -s "$elsevier.pdf"
+          positive=main_p2_BSPC_POSITIVE_METHOD_AUTHOR_REVIEW_20261015
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error "$positive.tex"
+          test -s "$positive.pdf"
+          supp=P2_BSPC_SUPPLEMENTARY_EVIDENCE_AUTHOR_REVIEW_20261014
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error "$supp.tex"
+          test -s "$supp.pdf"
+          if grep -Eiq 'Citation.*undefined|Reference.*undefined|Undefined control sequence|There were undefined references' "$supp.log"; then
+            echo "Unresolved supplementary reference" >&2
+            exit 1
+          fi
+          if grep -Eiq 'Citation.*undefined|Reference.*undefined|Undefined control sequence|There were undefined references' "$main.log"; then
+            echo "Unresolved science/document references" >&2
+            exit 1
+          fi
+          pdfinfo "$main.pdf" | grep -E 'Pages:|Page size:'
+          mkdir -p "$GITHUB_WORKSPACE/p2-focused"
+          cp "$main.pdf" "$main.log" "$elsevier.pdf" "$elsevier.log" "$positive.pdf" "$positive.log" "$supp.pdf" "$supp.log" "P2_BSPC_ARITHMETIC_RECEIPT_20261014.json" "$GITHUB_WORKSPACE/p2-focused/"
+          python - "$main" "$GITHUB_SHA" "$GITHUB_WORKSPACE/p2-focused" <<'PY'
+          import hashlib, json, re, subprocess, sys
+          from pathlib import Path
+          main, sha, output = sys.argv[1:]
+          folder=Path(output); pdf=folder/(main+'.pdf')
+          log=(folder/(main+'.log')).read_text(errors='replace')
+          info=subprocess.check_output(['pdfinfo',str(pdf)],text=True)
+          pages=int(re.search(r'^Pages:\s*(\d+)',info,re.M).group(1))
+          txt=subprocess.check_output(['pdftotext','-layout',str(pdf),'-'],text=True)
+          check={
+            'status':'DRAFT_SCIENTIFIC_AUTHOR_APPROVAL_HOLD',
+            'source_commit':sha,'main_tex':main+'.tex',
+            'pdf_pages':pages,'pdf_sha256':hashlib.sha256(pdf.read_bytes()).hexdigest(),
+            'overfull_hbox_count':len(re.findall(r'Overfull \\hbox',log)),
+            'contains_author_placeholder':'AUTHOR IDENTITIES AND AFFILIATIONS TO BE VERIFIED' in txt,
+            'contains_origin_limitation':'ancestry remains unresolved' in txt,
+            'contains_digital_census':'1,225' in txt,
+            'contains_factorial':'0.582551' in txt,
+            'final_original_acquisition_identity_confirmed':False,
+            'submission_authorized':False,
+          }
+          (folder/'P2_BSPC_FOCUSED_HEAD_RECEIPT.json').write_text(json.dumps(check,indent=2)+'\n')
+          print(json.dumps(check,indent=2))
+          PY
+      - name: Check all rendered manuscript and SI pages remain within media bounds
+        run: |
+          python - <<'PY'
+          import fitz,json
+          from pathlib import Path
+          base=Path('research/defaultreg_bspc_v13')
+          names=['main_p2_BSPC_ELSEVIER_AUTHOR_REVIEW_20261014.pdf','main_p2_BSPC_POSITIVE_METHOD_AUTHOR_REVIEW_20261015.pdf','P2_BSPC_SUPPLEMENTARY_EVIDENCE_AUTHOR_REVIEW_20261014.pdf']
+          result={}
+          for name in names:
+              d=fitz.open(base/name);bad=[]
+              for i,page in enumerate(d):
+                  r=page.rect
+                  for block in page.get_text('blocks'):
+                      if len(block)>4 and isinstance(block[4],str):
+                          x0,y0,x1,y1=block[:4]
+                          if x0<-0.75 or y0<-0.75 or x1>r.width+0.75 or y1>r.height+0.75:
+                              bad.append({'page':i+1,'x':round(x1,1),'width':round(r.width,1)})
+              result[name]={'pages':len(d),'out_of_media_text_blocks':bad}
+              if bad: raise RuntimeError(str(result[name]))
+          print('PASS_PDF_PAGE_BOUNDS',json.dumps(result))
+          PY
+      - name: Package exact-head, editor-flat TeX source and evidence receipts
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile,ZIP_DEFLATED
+          import hashlib,json,re,os
+          base=Path("research/defaultreg_bspc_v13")
+          main=base/"main_p2_BSPC_POSITIVE_METHOD_AUTHOR_REVIEW_20261015.tex"
+          supp=base/"P2_BSPC_SUPPLEMENTARY_EVIDENCE_AUTHOR_REVIEW_20261014.tex"
+          mainarticle=base/"main_p2_BSPC_FOCUSED_AUTHOR_REVIEW_20261014.tex"
+          refs=base/"references_v10.bib"
+          seen=set()
+          def walk(f):
+              f=f.resolve()
+              if f in seen:return
+              if not f.is_file():raise FileNotFoundError(f)
+              seen.add(f)
+              s=f.read_text(encoding="utf-8")
+              for name in re.findall(r'\\input\{([^}]+)\}',s):
+                  child=f.parent/(name if name.endswith(".tex") else name+".tex")
+                  walk(child)
+          for root in (main,supp,mainarticle):walk(root)
+          seen.add(refs.resolve())
+          wave=base/'P2_real_native_EDF_waveform_array_2by3.pdf'
+          seen.add(wave.resolve())
+          roots=[main,supp,mainarticle]
+          allfiles=sorted(seen,key=lambda x:x.name)
+          if len(set(x.name for x in allfiles))!=len(allfiles):
+              raise RuntimeError("flat source filename collision")
+          dist=Path("p2-submission-handoff");dist.mkdir(exist_ok=True)
+          with ZipFile(dist/"P2_BSPC_EDITORIAL_MANAGER_FLAT_TEX_SOURCES.zip","w",ZIP_DEFLATED) as zipf:
+              for f in allfiles:zipf.write(f,f.name)
+          def digest(f):return hashlib.sha256(f.read_bytes()).hexdigest()
+          PDFs=[base/(p+".pdf") for p in (
+              "main_p2_BSPC_ELSEVIER_AUTHOR_REVIEW_20261014",
+              "main_p2_BSPC_POSITIVE_METHOD_AUTHOR_REVIEW_20261015",
+              "main_p2_BSPC_FOCUSED_AUTHOR_REVIEW_20261014",
+              "P2_BSPC_SUPPLEMENTARY_EVIDENCE_AUTHOR_REVIEW_20261014")]
+          for pdf in PDFs:
+              if not pdf.is_file():raise FileNotFoundError(pdf)
+          copyfiles=PDFs+[wave,
+              Path("publication_packages/default_eeg/P2_BSPC_HIGHLIGHTS_AUTHOR_REVIEW.txt"),
+              base/"P2_EDITOR_COVER_LETTER_DRAFT.md",
+              base/"P2_BSPC_ARITHMETIC_RECEIPT_20261014.json",
+              base/"src/p2_bspc_submission_numerical_gate_20261014.py",
+              Path("publication_packages/default_eeg/P2_BSPC_20261014_SUBMISSION_DECISION_LOG.md"),
+          ]
+          receipt={"state":"AUTHOR_APPROVAL_REQUIRED_NOT_SUBMITTED",
+                   "exact_head":os.environ.get("GITHUB_SHA"),
+                   "source_files":len(allfiles),
+                   "editor_flat_source_zip_sha256":digest(dist/"P2_BSPC_EDITORIAL_MANAGER_FLAT_TEX_SOURCES.zip"),
+                   "pdf_sha256":{p.name:digest(p) for p in PDFs},
+                   "data_steward_review":"GMAIL_DRAFT_CREATED_NOT_SENT",
+                   "all_author_approval":False,
+                   "original_MAT_to_EDF_identity_confirmed":False,
+                   "journal_submission":False}
+          (dist/"PRE_SUBMISSION_MACHINE_RECEIPT.json").write_text(json.dumps(receipt,indent=2)+"\n")
+          with ZipFile(dist/"P2_BSPC_AUTHOR_REVIEW_COMPLETE_HANDOFF.zip","w",ZIP_DEFLATED) as z:
+              z.write(dist/"P2_BSPC_EDITORIAL_MANAGER_FLAT_TEX_SOURCES.zip","P2_BSPC_EDITORIAL_MANAGER_FLAT_TEX_SOURCES.zip")
+              z.write(dist/"PRE_SUBMISSION_MACHINE_RECEIPT.json","PRE_SUBMISSION_MACHINE_RECEIPT.json")
+              for f in copyfiles:z.write(f,f.name)
+          print(json.dumps(receipt,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: P2-BSPC-SUBMISSION-REVIEW-BUNDLE
+          path: p2-submission-handoff/
+          retention-days: 90
+      - uses: actions/upload-artifact@v4
+        with:
+          name: P2-BSPC-FOCUSED-AUTHOR-REVIEW
+          path: p2-focused/
+          retention-days: 90

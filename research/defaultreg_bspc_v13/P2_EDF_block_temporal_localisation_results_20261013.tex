@@ -1,0 +1,73 @@
+% Executed independently audited aggregated results: Actions 38332413760
+% Public L iu2024 publisher-preprocessed EDFs, not acquisition original source MAT.
+\subsection{Time-localized exact digital overlap within the released EDF layer}
+\label{sec:p2-time-localised-block-overlap}
+The initial comparison of whole EDF channels did not capture
+\emph{partial temporal identity}. We therefore read the
+publisher-supplied EDF digital \texttt{int16} payload in
+native record order, retaining only the 29 explicitly named EEG
+channels and only nonconstant corresponding channel blocks.
+Each aligned channel--record pair was evaluated for exact
+byte equality and, separately, for high sample correlation.
+This analysis occurs \emph{before our additional MOABB
+8--30~Hz filtering} but \emph{after the publisher's
+upstream signal preprocessing}; it is not an original
+acquisition MAT comparison.
+
+\begin{table}[tb]
+\centering\small
+\caption{Exploratory released-EDF digital signal comparison.
+The denominator 9,280 comprises 29 named EEG channels across
+320 EDF record indices, \emph{not} independent subjects or
+motor-imagery trials. The final column is the longest run
+of consecutive EDF record indices in which at least
+90\% of the 29 named EEG channel blocks are byte-identical.
+The comparisons were selected after prior waveform inspection.}
+\label{tab:p2-temporal-exact-edf}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrr}
+\toprule
+Released IDs & Exact EEG blocks & $\geq90\%$ identical & Longest run\\
+\midrule
+4/5    & 9,280/9,280 & 320/320 & 320\\
+47/49  & 6,957/9,280 & 245/320 & 179\\
+11/15  & 171/9,280   & 0/320   & 0\\
+2/3    & 0/9,280     & 0/320   & 0\\
+6/7    & 0/9,280     & 0/320   & 0\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The 47/49 pair had \emph{74.97\%} exactly equal
+named-EEG channel--record blocks, despite the absence
+of full-length equality across nearly all original
+EDF channels. In 245 out of 320 native EDF record
+indices, at least 90\% of the channel blocks
+matched; the longest uninterrupted such run
+spanned 179 successive EDF records.
+By contrast, the 11/15 pair had only 171/9,280
+(1.84\%) exactly equal channel--record blocks,
+despite high processed waveform correlations.
+The numerical contrast indicates distinct types
+of release-layer signal relatedness: extensive
+piecewise \emph{exact} identity in one pair versus
+predominantly \emph{nonexact} high similarity
+in another. It does not establish how the
+release-layer relationship arose.
+
+Identical stored digital EDF record blocks are
+not evidence of a shared human identity, do not
+determine whether an acquisition was repeated or
+transformed, and do not by themselves count
+independent physiological observations.
+The experiment is retrospective and the within-file
+block comparisons are strongly dependent. No
+binomial significance level or prevalence estimate
+is computed from these thousands of blocks.
+The self-tested code and scalar-only output are
+available at
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38332413760}.
+The separately published source MAT archive is an
+independent \emph{data product} that has not yet
+been shown to reproduce these numerical
+relationships in the acquisition-source layer.

@@ -1,0 +1,162 @@
+% P2 methods upgrade: independent publication claim and no patient identity claim.
+\subsection{Validation units, overlap graph and three evaluation estimands}
+\label{sec:p2-units}
+A cross-person EEG result can involve four non-equivalent units:
+a clinical individual, a released digital participant ID,
+a continuous raw recording, and processed labelled EEG
+epochs. Only digital recording contents can be compared
+without further information from the clinical data stewards.
+It follows that exact cross-ID numerical identity does
+\emph{not} establish identity of two patients.
+
+Under fixed preprocessing let $h(x,y)$ denote an exact
+fingerprint of a trial's numeric array and event label.
+Released identifiers $g$ and $g'$ are joined if their
+processed trial sets share a fingerprint. The connected
+components define \emph{recording-content groups}.
+If $g$ is held out by its released ID but $g'$ in the
+training set shares all of $g$'s processed labelled EEG
+trials, a nominal participant-independent evaluation
+is not independent at the level of digital signal
+contents. An \emph{exact-fingerprint component-disjoint}
+split instead removes every member of the held
+exact-content component from training. This
+criterion does not guarantee disjointness under
+partial EDF record-block reuse, unequal-length
+window overlaps or transformed near-duplicates;
+those are separate provenance questions. The graph construction is deterministic and
+standard; its scientific value is in making the
+claimed independence unit inspectable.
+
+We distinguish three reporting estimands:
+\[
+\begin{split}
+ M_{50}&=\frac{1}{50}\sum_{g\in\mathrm{released IDs}}A_g,
+ \\
+ M_{49,A}&=\frac{1}{49}\sum_{G\in\mathrm{content groups}}
+                  A_G(F_A,\lambda_A),\\
+ M_{49,B}&=\frac{1}{49}\sum_{G\in\mathrm{content groups}}
+                  A_G(F_B,\lambda_B).
+\end{split}
+\]
+$M_{50}$ uses nominal ID weights, whereas $M_{49,A}$
+uses the original trained models and original source
+choices on 49 unique evaluated contents. Thus
+$M_{49,A}-M_{50}$ is an evaluation \emph{weighting}
+contrast. $M_{49,B}-M_{49,A}$ is a matched-target
+\emph{software pipeline} contrast with changes to
+source fitting and parameter selection.
+Their sum is arithmetic, not an identified
+causal patient-level leakage effect.
+
+\subsection{Distinguishing our question from previous leakage research}
+\label{sec:p2-related-novelty}
+Brookshire et al.\ \cite{brookshire2024leakage}
+showed that segment-wise rather than participant-wise
+validation can dramatically overestimate unseen-person
+EEG classification. Gil and Hern\'andez-Sabat\'e
+\cite{gil2026subjectvalidation} compared multiple
+levels of EEG validation across six classifiers.
+Del Pup et al.\ \cite{delpup2025partition} compared five EEG
+validation strategies, three classification problems and
+four deep architectures in a much broader study of
+partition choices. These studies demonstrate that
+validation-unit errors are not merely an issue of one EEG algorithm; however, they did not test exact cross-ID signal-content aliasing as the unit definition itself.
+MOABB \cite{jayaram2018moabb} promotes a transparent
+and repeatable public-EEG evaluation interface.
+Our study asks the narrower additional question of
+whether the released \emph{participant identifier}
+itself correctly keys independent digital EEG contents
+before such a split is constructed.
+Neither the cryptographic fingerprint, graph component
+procedure nor the factorial subtraction is claimed as
+a previously unknown mathematical invention.
+
+\subsection{Negative controls, preprocessing dependence and raw signal check}
+\label{sec:p2-controls}
+An exact fingerprint depends on signal sampling,
+event alignment, filtering, channel order, data dtype,
+and the specified MOABB processing path.
+Here those choices are pinned, and the total number
+of analysed trials is reported explicitly.
+We additionally compared as-stored digital samples in the
+\emph{publisher-supplied, preprocessed EDF files}:
+32 of 33 reader-interpreted channel arrays were equal
+over the corresponding record pair, whereas one
+channel reported an empty name and different values.
+This is independent supporting \emph{digital signal}
+evidence but not proof of clinical identity or an
+explanation of how these files were created.
+An additional published-EDF numerical check used an
+independent byte-level parser of each EDF record's 16-bit
+\emph{digital} channel payload, without calling the MNE or
+pyEDFlib signal readers. This comparison does not assume
+valid EDF physical amplitude calibration, which is
+important because pyEDFlib's strict parser rejected the
+released file header with a Physical Maximum format error.
+All raw digital channel records were compared pairwise
+as literal bytes. Corresponding digital channel equality
+is a reproducible file-content fact, not proof of EEG
+physical-amplitude equivalence under every reader or of
+clinical participant identity. The original-acquisition MAT files were not examined by
+this EDF-only analysis; it is not an independent
+verification of upstream acquisition records.
+Clarification from the data custodians remains pending.
+
+Weibo2014 and BNCI2014\_002 were retained as
+two previously exposed control acquisitions.
+No cross-ID exact processed epoch matches were
+found within the indicated pre-processing pipelines.
+Zero exact overlaps cannot rule out near duplicates,
+window overlaps, or other release errors.
+An additional \emph{exact-byte nonidentity} check
+compared released Liu2024 IDs 47 and 49, whose historical
+target AUC vectors happened to coincide. Their raw EDF
+sample streams were not exactly identical, establishing
+only that coincident decoder outcomes are not an identity
+fingerprint. A subsequently executed aligned-waveform
+screen found this \emph{same pair} to be exceptionally
+similar after preprocessing, with substantial raw digital
+channelwise correlation. It therefore \emph{cannot}
+serve as a negative control for near-duplicate signal
+content or independent physiological acquisition.
+The separate pairs 2/3 and 6/7 are low-correlation
+\emph{post-discovery diagnostic comparisons}, not
+prospectively sampled negative controls or a
+false-positive-rate estimate.
+
+\subsection{Matched model-by-selection design and dependence}
+\label{sec:p2-analysis-units}
+All 49 \emph{same} held digital recording contents
+were evaluated under
+$(F_A,\lambda_A)$, $(F_A,\lambda_B)$,
+$(F_B,\lambda_A)$ and $(F_B,\lambda_B)$.
+We repeat the same comparison for source-macro
+discriminative selection, proper source-trained-mean
+predictive Gaussian selection and a historical
+class-centred covariance score. Each policy's source
+parameters were frozen before the crossed held-target
+responses were computed. For group $g$ and policy $m$,
+\[
+ I_{gm}=Y_{BB,gm}-Y_{BA,gm}-Y_{AB,gm}+Y_{AA,gm}.
+\]
+The fitted source model includes the training-derived
+Riemannian tangent geometry; this can change under
+content purging even when $\lambda$ does not change.
+The full result was recomputed from the original
+49-row immutable archive and checked against its
+independently frozen paired model scores with
+$10^{-10}$ tolerance. Its content SHA-256 was
+\texttt{0e7bfdb73970\allowbreak fcff9231a519\allowbreak 54bd2d548f47\allowbreak 2cb296624967\allowbreak afc80d9d241c\allowbreak e2be}.
+
+The 49 held content groups are valid reporting
+\emph{units}, not 49 independent trained classifiers:
+their source pools overlap almost completely.
+No ordinary paired population test on the 49 fitted
+AUC differences is therefore claimed here.
+Instead we report conditional distributions of
+paired changes, source-choice changes and
+delete-one-content-group sensitivity.
+All original held outcomes had already been
+exposed when these descriptive checks were designed;
+there is no independent prospective replication.

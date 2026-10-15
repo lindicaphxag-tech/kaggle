@@ -1,0 +1,40 @@
+name: P2 original MAT sourcedata ZIP range-only directory index
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/p2_figshare_sourcedata_remote_zip_index.py'
+      - '.github/workflows/p2-original-mat-archive-range-zip-index.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  zipped-sourcedata-directory-metadata-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Synthetic central-directory byte-range test (no network)
+        run: |
+          python -m py_compile research/defaultreg_bspc_v13/src/p2_figshare_sourcedata_remote_zip_index.py
+          python research/defaultreg_bspc_v13/src/p2_figshare_sourcedata_remote_zip_index.py --self-test
+      - name: Read official Figshare v5 sourcedata.zip central directory by HTTP partial ranges only
+        run: |
+          python research/defaultreg_bspc_v13/src/p2_figshare_sourcedata_remote_zip_index.py --out /tmp/p2-remote-sourcedata-index.json
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/p2-remote-sourcedata-index.json'))
+          assert x['remote_zip_size_bytes']>1000000000
+          assert x['http_range_206_required_and_observed']
+          assert x['full_source_archive_not_downloaded']
+          assert x['source_zip_index_only_not_original_mat_signal_comparison']
+          print('P2_ORIGINAL_SOURCE_MAT_ZIP_RANGE_INDEX_COMPLETE_NO_MEDICAL_SIGNAL_READ')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: P2-FIGSHARE-SOURCEDATA-ZIP-RANGE-ONLY-DIRECTORY-NO-EEG-DOWNLOADED
+          path: /tmp/p2-remote-sourcedata-index.json
+          if-no-files-found: warn
+          retention-days: 90

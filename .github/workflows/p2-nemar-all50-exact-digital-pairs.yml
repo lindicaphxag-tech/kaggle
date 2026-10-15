@@ -1,0 +1,49 @@
+name: P2 complete NEMAR fifty EDF all-pairs real digital audit
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths:
+      - '.github/workflows/p2-nemar-all50-exact-digital-pairs.yml'
+      - 'research/defaultreg_bspc_v13/src/p2_nemar_complete_fifty_pairwise_digital_scan.py'
+      - 'research/defaultreg_bspc_v13/src/p2_nemar_real_edf_full_file_and_digital_channel_audit.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  whole_public_cohort:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Offline EDF schema and exhaustive 50-choose-2 synthetic controls
+        run: |
+          python3 research/defaultreg_bspc_v13/src/p2_nemar_complete_fifty_pairwise_digital_scan.py --self-test
+      - name: Check fifty FULL public EDF SHA-256 digests then 1225 exact EEG waveform and block pairs
+        run: |
+          python3 research/defaultreg_bspc_v13/src/p2_nemar_complete_fifty_pairwise_digital_scan.py --out p2_nemar_50_edf_1225_content_pairs.json
+      - name: Require a complete non-identifying real-audit receipt
+        run: |
+          python3 - <<'PY'
+          import json
+          x=json.load(open('p2_nemar_50_edf_1225_content_pairs.json'))
+          assert x['status']=='PUBLIC_NEMAR_FIFTY_EDF_WHOLE_COHORT_SCALAR_AUDIT'
+          assert x['n_public_ids_rehashed']==50 and x['n_unordered_comparisons']==1225
+          assert x['all_full_file_sha256_match_versioned_external_manifest']
+          assert x['full_EDF_sha256_unique_ids']==50
+          assert x['CPz_constant_reference_excluded_from_overlap_count']
+          assert x['MAT_to_EDF_transform_and_clinical_acquisition_identity_unknown']
+          assert len(x['pairwise_scalar_records'])==1225
+          assert len(x['per_public_file_nonidentifying_counts'])==50
+          assert all(row['comparable'] for row in x['pairwise_scalar_records'])
+          print('P2_REAL_ALL_50_EDF_SHA_AND_1225_EXACT_PAIR_SCANS_COMPLETE')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p2-nemar-fifty-edf-1225-physical-waveform-products-20261013
+          path: p2_nemar_50_edf_1225_content_pairs.json
+          if-no-files-found: warn
+          retention-days: 90

@@ -1,0 +1,41 @@
+name: P2 independent alternative EEG preprocessing overlap robustness
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/p2_alternative_processing_record_overlap.py'
+      - '.github/workflows/p2-alternative-processing-identity.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  alternative-release-processing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    env:
+      MNE_DATA: /tmp/p2-alt-public-eeg-cache
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_bspc_v13/src/p2_alternative_processing_record_overlap.py --out /tmp/p2-alternate-epoch-audit.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/p2-alternate-epoch-audit.json'))
+          assert d['is_not_second_software_reader']
+          assert d['not_independent_external_dataset']
+          assert d['reanalysis']['shape_trials_channels_samples'][:2]==[40,29]
+          assert 1<=d['reanalysis']['unique_processed_record_count']<=50
+          print("P2_ALTERNATIVE_PROCESSING_COMPLETED_WITHOUT_PREIMPOSING_DUPLICATE_RESULT")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p2-real-public-eeg-alternative-preprocessing-exact-id-sensitivity
+          path: /tmp/p2-alternate-epoch-audit.json
+          if-no-files-found: warn
+          retention-days: 90

@@ -1,0 +1,55 @@
+% Epistemic provenance boundary confirmed against the publisher's public
+% Figshare v5 description and MOABB Liu2024 loader metadata, 2026-10-13.
+\subsection{Release-layer versus original-acquisition provenance}
+\label{sec:p2-public-provenance-tier}
+The public Liu2024 description distinguishes original
+acquisition data and processed signal products
+\cite{liu2024stroke}. In the MOABB loader used here,
+\texttt{data\_path} resolves to a
+publisher-supplied \texttt{edffile} path; the
+public dataset metadata classifies these EDF
+signals as \emph{preprocessed} (including
+baseline removal and 0.5--40~Hz filtering).
+Our subsequent 8--30~Hz and resampling
+pipeline is a \emph{further} transformation.
+These layers must not be conflated.
+
+The currently inspected \emph{release-content}
+layers are (i) additionally MOABB-transformed
+labelled epochs; (ii) publisher-supplied EDF
+16-bit digital payloads \emph{before} our
+further filtering; and (iii) separately published
+source MAT numerical arrays. The source MAT
+archive was acquired by verified public HTTP
+byte-range extraction without distributing any
+waveform data. A preliminary same-shape
+whole-array comparison is reported separately
+in Section~\ref{sec:p2-source-MAT}.
+
+Using two EDF libraries reduces reader-specific
+software error, but it does not establish
+original acquisition provenance. Likewise,
+the distributed MAT source product is an
+earlier \emph{release artifact}, not
+a clinical acquisition log. MAT-to-EDF
+channel mapping, trial provenance and source
+conversion operations remain unverified.
+Even further agreement between published
+MAT and EDF would establish numerical
+signal ancestry, not that two released
+IDs identify the same person or recording
+session. Contextual, nonidentifying
+clarification from the custodians remains
+outstanding. No clinical identities or
+source-session explanations have been
+inferred from the released files.
+
+Consequently, our labels \emph{exact EDF
+content overlap}, \emph{highly similar
+EDF content} and \emph{unknown clinical
+recording origin} designate different
+scientific claims. In particular, a
+conservative 47-group grouping exercise
+is a source-exclusion sensitivity
+scenario, not a count of 47 verified
+independent physiological recordings.

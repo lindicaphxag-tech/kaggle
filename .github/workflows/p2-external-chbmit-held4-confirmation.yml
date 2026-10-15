@@ -1,0 +1,48 @@
+name: P2 CHB-MIT new four-person held confirmation
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths:
+      - "research/defaultreg_bspc_v13/src/p2_chbmit_six_subject_frozen_extension.py"
+      - ".github/workflows/p2-external-chbmit-held4-confirmation.yml"
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  external-corpus-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - name: Install limited deps for byte-level digital EDF verification
+        run: python -m pip install --disable-pip-version-check "numpy<3" scipy
+      - name: Independently download CHB-MIT EDF prefixes and evaluate frozen rules
+        env:
+          P2_OUTPUT: p2_chbmit_external
+        run: |
+          python research/defaultreg_bspc_v13/src/p2_chbmit_six_subject_frozen_extension.py
+          python - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          p=Path("p2_chbmit_external/CHBMIT_EXTERNAL_COHERENCE_20261015.json")
+          j=json.loads(p.read_text())
+          assert j["status"]=="REAL_PUBLISHED_CHBMIT_DIGITAL_PREFIX_CONTROLLED_TRANSFORMS"
+          assert len(j["cases"])==78 and len(j["EDF_prefix_provenance"])==6
+          assert j["group_summary"]["held-new"]["common_clock"]["positive_total"]==32
+          assert j["group_summary"]["held-new"]["common_clock"]["negative_total"]==20
+          assert j["pre_frozen"]["threshold_abs_correlation"]==.985
+          assert j["pre_frozen"]["minimum_channels"]==4
+          for rel,v in j["EDF_prefix_provenance"].items():
+              assert v["prefix_bytes"]>=200000 and len(v["sha256_prefix"])==64
+              assert len(v["chosen_eeg_labels"])==8
+          print("FROZEN_EXTERNAL_EEG_CASE_QA",j["summary"])
+          print("JSON_SHA256",hashlib.sha256(p.read_bytes()).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: P2-CHBMIT-frozen-4-new-subject-heldtest
+          path: p2_chbmit_external/
+          if-no-files-found: warn
+          retention-days: 90

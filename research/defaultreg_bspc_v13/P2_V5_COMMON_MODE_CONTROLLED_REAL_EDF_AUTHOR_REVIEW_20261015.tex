@@ -1,0 +1,48 @@
+% Verified artifact-control results; authors must inspect logs and approve. NOT natural clinical duplicate claims.
+\subsection{A controlled common-mode confounding challenge}
+We evaluated whether high numerical correlation and a shared time
+offset necessarily imply common channel-specific digital recording
+content. Six distinct public CHB--MIT EDF digital source prefixes
+each supplied eight known controlled source transformations and six
+negative controls. The additional negative control combines
+channel-specific signals from two different published EDF records
+with the \emph{same deliberately injected high-amplitude additive
+sinusoidal nuisance} at all eight channels. Thus these are known
+numerical counterexamples rather than naturally recorded artifacts;
+their signal-level labels do not establish physical acquisition or
+clinical participant identity. We retain six independent source
+units rather than treating the resulting 84 variants as
+84 independent observed EEG recordings.
+
+A match-first, verify-second numerical witness required at least
+four distinct channels and one shared lag. To reject a common-mode-only
+match, we subtracted each time point's mean across the selected
+\emph{matched channels} separately from the source and target held-out
+verification blocks, then required every channel-specific residual
+correlation to exceed the frozen threshold. Selection of the common lag
+and assignment used only the original training part and was
+\emph{not re-optimised} using the residual verification part.
+
+On these controlled cases, both the raw shared-clock baseline
+and the channel-residual witness detected all 48/48 transformed
+positives. The uncorrected shared-clock matcher accepted six
+of 36 constructed negative cases, all six from the purposely
+common-artifact case. The residual witness accepted none of 36.
+The public GitHub experiment ran successfully twice, with inspectable
+case-level receipts at
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38673797844}
+and
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38674323102}.
+This establishes the expected behavior of the proposed
+\emph{conditional numerical evidence} under one severe constructed
+confound, not naturally observed clinical noise immunity.
+
+In particular, subtracting a common channel reference is a classical
+EEG preprocessing operation. A fully informed comparator that performs
+common average referencing (CAR) before existing shared-clock matching
+could remove the same nuisance. Such a comparator, as well as published
+multichannel device synchronisation, signal fingerprints and nonlinear
+temporal alignment, is required before claiming novel algorithmic
+superiority. These controls are not replaced by the positive results
+above. At this author-review stage, the residual variant is retained as
+a testable research extension, not declared a superior final method.

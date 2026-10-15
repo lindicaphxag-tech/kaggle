@@ -1,0 +1,79 @@
+\subsection{Externally hosted public EDF digital-payload replication gate}
+\label{sec:p2-nemar-real-gate}
+A further replication gate has been implemented using
+NEMAR \texttt{nm000158} version \texttt{v1.0.3}, which is an
+independent \emph{distribution channel} for the same
+underlying Liu2024 data, not an independently acquired
+patient cohort. The public provenance manifest at
+\href{https://github.com/nemarDatasets/nm000158/blob/11e3eeb4b439d5f8ee1b5e3b8e6032824bc2de83/sourcedata/sourcedata_provenance.json}{pinned NEMAR public provenance manifest}
+records a per-file SHA-256 checksum for its MOABB-1.5.0 EDF
+derivatives. The CI protocol fetches six public EDF
+products (IDs 04, 05, 11, 15, 47, 49), recomputes their
+\emph{complete binary file} checksums, and refuses to
+compare signal content if any one differs from the pinned
+distributor manifest. A second, standard-library EDF
+reader then extracts as-stored little-endian digital sample
+payloads record-by-record without accepting the source
+files' physiological-amplitude header calibration.
+SHA-256 is computed per complete channel stream and
+compared both at equal channel positions and across
+permuted channel multisets. Channel comparisons require
+matching record and per-record sample counts.
+Only scalar checks and hashes are retained; this
+workflow publishes no EEG waveform arrays.
+
+The parser includes independently constructed two-channel
+two-record fixtures that exercise exact channel equality,
+permutation invariance and rejection of truncated payloads.
+A parser self-test is not a public-byte replication.
+The real public-byte replication completed successfully
+in frozen GitHub Actions run \texttt{38384783079}
+(\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38384783079}),
+with independently recalculated SHA-256 matching the
+published NEMAR manifest for all six EDF binary files.
+Each is 10,568,704 bytes with 33 digital channels
+and 320 EDF records. Exactly 32 of 33 channel streams
+are identical at the same digital positions between
+released IDs 4 and 5; the exact permutation-invariant
+count is also 32. For ID pairs 11/15 and 47/49,
+the exact channel-stream counts are both 1 of 33,
+under either positional or permutation-invariant
+comparison. The whole-file SHA-256 values remain
+different for all three pairs. A non-identifying
+machine-readable scalar receipt is preserved
+as artifact \texttt{11804714208} in the run.
+This check is an independent \emph{implementation
+and hosted-release byte retrieval}, not an
+independent original EEG recording cohort.
+A follow-up, independently rerun location audit
+(\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38386864421})
+re-read the EDF channel labels and tested whether
+each exact channel stream had any sample variation.
+For released IDs 4/5, 31 of the 32 identical channels
+were \emph{time-varying} digital streams; the
+remaining identical channel is CPz, reference-channel
+index 17, whose digital samples were constant.
+The only different channel was index 32
+(unnamed in the earlier MNE reader audit).
+In contrast, for each of 11/15 and 47/49,
+the \emph{sole} identical stream was the
+\emph{constant CPz reference} at index 17.
+Therefore these two one-channel exact matches
+have \emph{no evidentiary force} as a positive
+fingerprint of a repeated physiological waveform.
+The near-pair correspondence remains a separate,
+non-identifying \emph{approximate similarity}
+screen requiring transformation and source logs.
+The strong 4/5 digital reuse conclusion rests
+on the 31 \emph{variable} matching streams
+and cannot be dismissed as a shared reference
+constant. These are statements about integer EDF
+payloads, not about the identity of patients or
+a provenance-proven conversion of raw MAT signals.
+
+Successful byte reproduction, if observed, can establish
+that an anomaly is visible in a second distribution channel
+but cannot distinguish reuse at a shared upstream EDF
+source from genuine raw acquisition or same-patient
+identity. The data stewards' MAT-to-EDF conversion
+metadata remain outstanding.

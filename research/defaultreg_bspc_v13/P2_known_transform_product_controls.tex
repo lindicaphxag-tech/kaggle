@@ -1,0 +1,39 @@
+% Purely synthetic, post-discovery method stress test, not clinical ancestry.
+\subsection{Known-transform signal-product controls (synthetic stress test)}
+An additional disjoint-seed numerical control asks which transform families
+can be detected \emph{without} interpreting equality as patient identity.
+For channel-by-time matrices $X,Y$ at a common time grid,
+let $Q_X,Q_Y$ be orthonormal bases for their demeaned temporal
+row spaces. The directed containment residual
+\[
+\rho(Y\mid X)=\|(I-Q_XQ_X^\top)Q_Y\|_F/
+\sqrt{\operatorname{rank}(Y)}
+\]
+is zero (in exact arithmetic) whenever $Y=MX+b{\bf1}^\top$
+for any fixed cross-channel matrix $M$ and channel offsets $b$,
+provided $Y$ has nonzero temporal rank. This includes permutations,
+channel gain/sign changes, common-average rereference and
+noninvertible re-referencing. The statement follows from
+$\operatorname{row}(Y-\bar Y)\subseteq
+\operatorname{row}(X-\bar X)$; it is a classical
+linear-algebra property rather than evidence of a previously unknown
+clinical transformation.
+
+We calibrated a similarity threshold on 120 independently
+generated \emph{synthetic} source--non-source pairs and tested
+120 new random records with six explicitly known transformations,
+using independently seeded records. Unrelated negative controls
+produced two false links for each of directed subspace containment
+and a flattened Pearson comparator (2/120, with wide uncertainty);
+thus this is not a calibrated zero-error detector. Every one
+of the 120 channel-permutation/gain cases passed the subspace test,
+compared with nine passing flattened Pearson (9/120). The
+containment test also accepted all tested common-reference and
+full-channel-mix cases, whereas shifted time samples were not
+guaranteed; nine of 120 shifted cases did not pass.
+This simulation is an operator test on EEG-like signals, \emph{not}
+an independent published acquisition, a clinical false-positive rate,
+a reconstruction of the public MAT--EDF transform, or a new EEG
+classifier. Rejection means \emph{unresolved}, not independent people.
+The synthetic threshold was chosen after synthetic calibration
+and is not transferred to the Liu2024 source-attribution table.

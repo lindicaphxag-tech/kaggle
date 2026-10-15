@@ -1,0 +1,87 @@
+\subsection{Complete 50-record digital-product control distribution}
+\label{sec:p2-exhaustive-nemar}
+To remove the selection bias of displaying only nominated
+high-similarity pairs, we performed a separate \emph{complete}
+record-content census on the version-pinned NEMAR
+\texttt{nm000158} v1.0.3 Liu2024 \emph{EDF} derivatives.
+The implementation downloaded all 50 public files afresh,
+recomputed their entire-file SHA-256 digests, required agreement
+with the NEMAR manifest (MOABB 1.5.0 retrieval of 11 August 2026),
+and compared every unordered cross-ID pair
+($\binom{50}{2}=1{,}225$).
+The exact program, source revision and a machine-readable
+scalar result artifact are documented in successful
+GitHub Actions run
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38388066957}.
+No raw waveforms or patient-level clinical features are
+redistributed. Every pair has the same 29 named EEG-channel
+geometry and 320 native EDF storage records. We compared
+two predeclared \emph{descriptive} scales:
+complete time-varying digital EEG channel streams,
+and same-channel, same-storage-record exact EEG payload
+blocks (29$\times$320=9,280 aligned block positions per pair).
+CPz, a constant reference signal, is deliberately excluded;
+the two EOG channels and the additional unmatched auxiliary
+channel are not counted in this 29-EEG analysis.
+An exact match is SHA-256 identity of the as-stored
+little-endian digital sample bytes, not a physical-voltage
+agreement under unverified EDF scaling. The count of
+storage blocks is a \emph{within-file structural
+measurement}, not the number of independent trials or
+participants.
+
+\begin{table}[ht]
+\centering\small
+\caption{Exhaustive pairwise public-EDF digital-content census
+(all 1,225 released-ID pairs). Full-stream counts refer only to
+29 named \emph{time-varying EEG} channel streams. Storage blocks
+are aligned digital EDF records, \emph{not independent trials}.
+The zero-other-pair row is conditional on exactly this
+release, temporal alignment and comparison rule.}
+\label{tab:p2-nemar-full50}
+\begin{tabular}{lrrr}
+\toprule
+ID pair category & No. pairs & Matching full EEG &
+ Matching EEG blocks\\
+\midrule
+4/5     & 1 & 29/29 & 9,280/9,280\\
+47/49   & 1 & 0/29 & 6,957/9,280\\
+11/15   & 1 & 0/29 & 171/9,280\\
+All other pairs & 1,222 & 0/29 & 0/9,280\\
+\midrule
+Total & 1,225 & & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All 50 full-file SHA-256 checks matched the independent
+host's versioned manifest. Across all 1,225 pairs,
+\emph{exactly one} pair had any fully identical
+time-varying EEG channel stream: released IDs 4/5
+shared all 29 of 29. The aligned native-EEG-block
+distribution had exactly four distinct outcomes:
+1,222 pairs with zero exact corresponding blocks,
+11/15 with 171/9,280 (1.84\%), 47/49 with
+6,957/9,280 (74.97\%), and 4/5 with 9,280/9,280
+(100\%). This reproduces the previously reported
+47/49 \emph{partial} digital overlap without
+misclassifying it as a complete recording duplicate.
+The 11/15 and 47/49 pairs share no \emph{whole}
+time-varying EEG channel stream, but their exact block
+matches must not be dismissed as the trivial
+constant-CPz reference phenomenon.
+
+The 1,222-pair null outcome documents the \emph{within-release
+empirical specificity of exact, aligned digital comparisons}.
+It is \emph{not} an independently calibrated population
+false-positive rate or a proof that those original
+patients/recordings were distinct: overlapping
+source material may be transformed, channel-reordered,
+temporally shifted or resampled. Since the dataset
+and its candidate anomalies were studied before this
+all-pair rerun, these are retrospective full-cohort
+descriptive results, not a pre-blinded discovery test.
+These findings support a recommendation to document
+digital-content groups and investigate partial overlaps,
+while reserving acquisition-level identity
+attribution for release-operator records or custodians.

@@ -1,0 +1,34 @@
+name: P2 cross-release six-by-six directional rank audit
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths:
+      - '.github/workflows/p2-cross-release-direction-rank-audit.yml'
+      - 'research/defaultreg_bspc_v13/src/p2_cross_release_rank_audit.py'
+      - 'research/defaultreg_bspc_v13/src/p2_nemar_release_manifest_audit.py'
+      - 'research/defaultreg_bspc_v13/results/P2_mat_edf_heldout_temporal_scalar_summary_20261013.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  replay-frozen-scalar-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run fail-closed synthetic input-validation tests
+        run: python3 research/defaultreg_bspc_v13/src/p2_cross_release_rank_audit.py --self-test
+      - name: Replay post-hoc six-source ordering; no raw EEG required
+        run: |
+          python3 research/defaultreg_bspc_v13/src/p2_cross_release_rank_audit.py \
+            --input research/defaultreg_bspc_v13/results/P2_mat_edf_heldout_temporal_scalar_summary_20261013.json \
+            --output p2_posthoc_six_source_rank_audit.json
+      - name: Independent-host NEMAR pinned metadata digest audit
+        run: |
+          python3 research/defaultreg_bspc_v13/src/p2_nemar_release_manifest_audit.py --out p2_nemar_pinned_manifest_audit.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p2-posthoc-six-source-ranking-json
+          path: |
+            p2_posthoc_six_source_rank_audit.json
+            p2_nemar_pinned_manifest_audit.json

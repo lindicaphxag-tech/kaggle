@@ -1,0 +1,51 @@
+name: P2 native EDF digital block overlap and relocation provenance audit
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/p2_native_edf_block_provenance_audit.py'
+      - '.github/workflows/p2-native-edf-block-provenance-audit.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  synthetic-and-public-native-blocks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      MNE_DATA: /tmp/p2-public-EDF-block-cache
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check moabb==1.7.2
+      - name: Synthetic independent same/affine/reordered/different EDF block tests
+        run: |
+          python -m py_compile research/defaultreg_bspc_v13/src/p2_native_edf_block_provenance_audit.py
+          python research/defaultreg_bspc_v13/src/p2_native_edf_block_provenance_audit.py --self-test
+      - name: Execute five public Liu2024 pair-specific native digital block analyses
+        run: |
+          mkdir -p "$MNE_DATA"
+          python research/defaultreg_bspc_v13/src/p2_native_edf_block_provenance_audit.py --out /tmp/p2-native-edf-block-report.json
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/p2-native-edf-block-report.json'))
+          assert [p['released_public_ids'] for p in x['pairs']]==[[4,5],[47,49],[11,15],[2,3],[6,7]]
+          for p in x['pairs']:
+              total=p['aligned_nonconstant_channel_blocks']
+              assert 0<=p['aligned_raw_nonconstant_corr_ge_0p9999']<=total
+              assert 0<=p['aligned_exact_nonconstant_blocks']<=p['any_position_exact_nonconstant_blocks']
+              assert p['no_patient_EDF_header'] if 'no_patient_EDF_header' in p else True
+          assert x['no_waveforms_or_patient_EDF_header_in_output']
+          assert x['native_blocks_are_not_epoch_or_patient_counts']
+          print('P2_REAL_PUBLIC_EDF_NATIVE_BLOCK_REPORT_COMPLETE_NON_IDENTIFYING')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: P2-RAW-NATIVE-EDF-BLOCK-OVERLAP-RELOCATION-AGGREGATES-ONLY
+          path: /tmp/p2-native-edf-block-report.json
+          if-no-files-found: warn
+          retention-days: 90

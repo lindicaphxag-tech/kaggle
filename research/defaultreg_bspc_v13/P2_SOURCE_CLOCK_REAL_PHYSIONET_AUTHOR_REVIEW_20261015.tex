@@ -1,0 +1,77 @@
+% Author-review candidate research subsection only.
+% Not included in the canonical journal manuscript, because replication
+% beyond one public acquisition family and known synchronisation baselines
+% has not established a separate original algorithm contribution.
+\subsection{Controlled real-signal test of coherent multi-sensor release provenance}
+\label{sec:p2-source-clock-positive}
+We distinguish \emph{any individually reused channel samples} from
+\emph{one coherently time-synchronised multichannel recording segment}.
+The latter is the explicitly narrower target of this positive mechanism
+experiment. It requires at least four distinct sensor correspondences
+to support a single source--target time offset. Candidate correlations
+are screened at absolute Pearson correlation $\geq0.985$ with at least
+230 overlapping samples and permitted offsets within $\pm100$ samples.
+One-to-one channel correspondences are resolved by maximum-weight
+assignment. These settings were held fixed before examining the new
+S005--S006 test IDs.
+
+Public PhysioNet EEGMMIDB EDF v1.0.0 signals were used as the source
+waveforms. Only the first eight EEG sensors and 768 samples were used
+per ID/record. IDs S001--S002 were development sources. S003--S004
+were tested previously as a held proof-of-concept; a later revision
+therefore used previously uninspected S005--S006 as the additional held
+ID pair. Every source yielded eight \emph{experimentally controlled}
+same-waveform positive variants (including channel renaming, cropping,
+fixed lag, scaling, channel omission, and low-amplitude noise) and
+four constructed negative conditions. This is not naturally observed
+clinical duplication ground truth.
+
+\begin{table}[tb]
+\centering
+\small
+\caption{Observed results on the new S005--S006 controlled-transform
+held set (two public source IDs). All numbers are case counts, not
+independent clinical subject counts. The last negative deliberately
+reuses all source channels at different delays and is negative
+\emph{only for common-clock multichannel ancestry}.}
+\label{tab:p2-source-clock-physionet-new-held}
+\begin{tabular}{lrr}
+\toprule
+Method & Detected positives / 16 & False matches / 8\\
+\midrule
+Shared-clock, one-to-one channels & 16 & 0\\
+Independent-best-lag channel Hungarian & 16 & 2\\
+Zero-lag channel Hungarian & 10 & 0\\
+Named-channel shifted Pearson & 12 & 0\\
+Named-channel zero-lag Pearson & 8 & 0\\
+Full labelled numerical equality & 2 & 0\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For the independent-best-lag Hungarian baseline, the two false matches
+were the constructed \texttt{asynchronous\_same\_source} scenarios:
+each matched sensor was digitally copied from the same source, but
+distinct per-channel delays prevented any four sensor traces from
+sharing a single clock. The coherent matcher rejected both without
+losing any of the 16 constructed held positives. This controlled
+contrast corroborates the \emph{operational utility of a shared-time
+constraint}, not novelty over established EEG synchronization methods,
+nor a general improvement in any-channel digital content reuse
+detection. The earlier S003--S004 controlled test showed the same
+16/16 positives and 0/8 versus 2/8 false-match pattern. The source
+EDFs and all post-transform outcomes remain publicly traceable in
+independent GitHub Actions receipts
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38662768329}
+and
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38663141073}.
+
+The experiment uses one open EEG acquisition family, very few distinct
+held people, intentionally constructed negatives, and a contrast
+whose preferred label depends on the intended meaning of provenance.
+Consequently it does \emph{not} establish sensitivity or specificity
+for clinical reuse, clinical participant identity, original MAT--EDF
+ancestry, or domain-independent release auditing. Additional independent
+EEG datasets and comparisons with contemporary multichannel
+synchronization, approximate fingerprinting and time-warping methods
+are required before an original-algorithm superiority claim.

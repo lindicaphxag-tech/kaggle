@@ -1,0 +1,177 @@
+% Real public Figshare v5 original SOURCE MAT files.
+% First bulk-array run 38333234894; channel/trial falsification 38333754177.
+% No source-MAT/EDF clinical channel map or identity claim.
+\subsection{Source MAT correlations: a falsifying channel-wise control}
+\label{sec:p2-source-MAT}
+We independently obtained six designated
+MAT members of Figshare v5 \texttt{sourcedata.zip}
+using strict HTTP byte ranges. The ZIP
+CRC values verified, and no waveform
+arrays or patient metadata were included
+in the public numerical receipts.
+Each selected public MAT contained one
+large numerical array of shape
+$40\times33\times4000$.
+This is a separately published source
+artifact, \emph{not} verified access to
+a clinical acquisition-session log.
+
+Naively flattening all 5,280,000
+numbers in each corresponding
+pair produced apparent
+$r\simeq0.99995$. Critically, that
+quantity is \emph{not} a
+channel-wise EEG similarity estimate.
+We therefore recomputed correlations
+separately for each corresponding
+MAT array channel index and counted
+exactly equal numeric trial--channel
+blocks on the original
+$40\times33\times4000$ grids.
+\begin{table}[tb]
+\centering\small
+\caption{Falsification of naive pooled-source
+MAT correlations. The median is
+taken over nonconstant source-array
+channel indices (one of the 33 is
+constant). The final count is
+aligned exact equality of
+$40\times33=1,320$ available
+trial--channel positions, of which
+40 constant-channel positions were
+excluded, leaving 1,280 eligible
+blocks; these are not
+independent clinical trials or people.
+No complete MAT channel pair reached
+$r\geq0.9999$.}
+\label{tab:p2-source-mat-initial}
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{lrrr}
+\toprule
+IDs & Pooled $r$ & Median channel $r$ & Exact / 1,280\\
+\midrule
+4/5   & 0.999965 & 0.625329 & 15\\
+47/49 & 0.999958 & 0.818365 & 14\\
+11/15 & 0.999954 & 0.763512 & 10\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The same MAT channel index 17
+contains a full-length constant
+high-magnitude value, with root
+mean square amplitude about 187,500
+in the inspected files; its
+within-channel Pearson correlation
+is undefined. Pooling channels of
+unequal offsets/variances can therefore
+give spuriously reassuring
+cross-file agreement. In fact,
+no corresponding nonconstant
+MAT array channel had full-length
+Pearson $r\geq0.9999$, and there
+were only 15, 14 and 10
+exact trial--channel blocks
+respectively out of 1,280 eligible blocks.
+Thus the first-pass pooled MAT correlations are
+\emph{not evidence that almost all original-source
+EEG waveforms were equal}.
+
+\paragraph{Exact covariance decomposition of the misleading pooled statistic.}
+Let $X_{j,t}$ and $Y_{j,t}$ denote paired numerical
+MAT values at source-array channel index $j$ and
+within-channel location $t$; all channels here
+contain the same number of sampled values.
+Denote the channel-specific means by
+$\mu_{X,j},\mu_{Y,j}$ and global means
+by $\mu_X,\mu_Y$. By the law of
+total covariance,
+\[
+\operatorname{Cov}(X,Y)
+=\underbrace{\frac1J\sum_j
+ \operatorname{Cov}_{t}(X_{j,t},Y_{j,t})}
+ _{\text{within-channel covariance}}
++\underbrace{\operatorname{Cov}_{j}
+ (\mu_{X,j},\mu_{Y,j})}
+ _{\text{between-channel mean covariance}}.
+\]
+The analogous law decomposes
+$\operatorname{Var}(X)$ and
+$\operatorname{Var}(Y)$ into within- and
+between-channel parts. Consequently,
+a near-unit Pearson coefficient computed after
+flattening all channels may be dominated
+by aligned channel offsets, even when the
+time-varying EEG within each channel differs.
+We re-executed this decomposition on all
+six separately published source MAT arrays,
+not on example or invented signals.
+
+\begin{table}[tb]
+\centering\small
+\caption{Executed source MAT Pearson comparisons
+before and after subtracting each MAT channel's
+own mean. Between-channel fraction is
+$\operatorname{Var}_j(\mu_{X,j})/
+\operatorname{Var}(X)$ for the first file
+in each pair. All array indices are
+unlabelled source-MAT indices; MAT-to-EDF
+channel identity remains unverified.}
+\label{tab:p2-source-mat-covariance}
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{lrrr}
+\toprule
+IDs & Flattened $r$ & Within-channel $r$
+ & Between/total var.\\
+\midrule
+4/5   & 0.999965 & 0.728604 & 99.9926\%\\
+47/49 & 0.999958 & 0.849534 & 99.9798\%\\
+11/15 & 0.999954 & 0.932343 & 99.9435\%\\
+\bottomrule
+\end{tabular}
+\end{table}
+The second file in each pair likewise had
+between-channel fractions of
+99.9861\%, 99.9720\%, and 99.9349\%.
+This quantitatively explains why
+flattened $r\simeq0.99995$ was misleading:
+nearly all pooled MAT variance lies
+\emph{between} channel means rather than
+in each channel's changing signal.
+The within-channel pooled coefficient
+remains a variance-weighted aggregate,
+not a majority-channel agreement
+guarantee; the channelwise medians and
+exact trial--channel block counts in
+Table~\ref{tab:p2-source-mat-initial}
+must be considered separately.
+The decomposition was executed with a
+successful independent workflow run
+\texttt{38334394283} and
+the JSON artifact contains the component
+covariances for reproduction.
+
+
+These source-MAT findings do
+\emph{not} invalidate the separate,
+directly verified preprocessed-EDF
+digital block identities in
+Table~\ref{tab:p2-temporal-exact-edf}.
+Instead they make source-MAT to
+EDF signal/channel mapping,
+processing and export lineage
+an even more important unresolved
+question. No direct source-MAT
+to EDF channel correspondence,
+clinical person identity or
+shared acquisition session
+has been established.
+
+The verified exploratory results and scalar-only
+receipts are available as
+\href{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38333234894}{workflow 38333234894}
+and
+\href{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38333754177}{workflow 38333754177}.
+They are analyses of previously
+examined public recordings, not
+prospectively uninspected cohorts.

@@ -1,0 +1,25 @@
+name: P2 independent-seed synthetic transform false-link control
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths:
+      - '.github/workflows/p2-known-transform-product-control.yml'
+      - 'research/defaultreg_bspc_v13/src/p2_known_transform_subspace_negative_controls.py'
+      - 'research/defaultreg_bspc_v13/P2_known_transform_product_controls.tex'
+      - 'research/defaultreg_bspc_v13/main_p2_eeg_record_provenance_EVIDENCE_GATED.tex'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  synthetic-operator-controls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 -m pip install --disable-pip-version-check numpy scipy
+      - run: |
+          python3 research/defaultreg_bspc_v13/src/p2_known_transform_subspace_negative_controls.py --out p2_known_transform_control.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p2-known-transform-disjoint-synthetic-results
+          path: p2_known_transform_control.json

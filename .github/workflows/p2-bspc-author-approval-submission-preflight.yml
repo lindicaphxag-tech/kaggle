@@ -1,0 +1,53 @@
+name: P2 BSPC author-approval submission candidate (LaTeX + references)
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/p2-bspc-author-approval-submission-preflight.yml'
+      - 'research/defaultreg_bspc_v13/main_p2_BSPC_SUBMISSION_AUTHOR_APPROVAL_20261015.tex'
+      - 'research/defaultreg_bspc_v13/P2_BSPC_native_matrix_AUTHOR_APPROVAL_20261015.tex'
+      - 'research/defaultreg_bspc_v13/P2_49_record_localisation_AUTHOR_APPROVAL_20261015.tex'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_and_pdf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 32
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install publisher TeX + BibTeX + PDF QA
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-publishers lmodern poppler-utils
+      - name: Build and check Elsevier article
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          set -euo pipefail
+          name=main_p2_BSPC_SUBMISSION_AUTHOR_APPROVAL_20261015
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error "$name.tex"
+          test -s "$name.pdf"
+          if grep -Eiq 'Citation.*undefined|Reference.*undefined|Undefined control sequence|There were undefined references|Overfull .hbox' "$name.log"; then
+            echo "Undefined source or PDF overfull text: NOT AUTHOR APPROVED"
+            exit 1
+          fi
+          pdfinfo "$name.pdf" | grep -E 'Pages:|Page size:'
+          mkdir -p "$GITHUB_WORKSPACE/p2-bspc-author"
+          cp "$name.pdf" "$name.log" "$name.tex" references_v10.bib "$GITHUB_WORKSPACE/p2-bspc-author/"
+          python - <<'PY'
+          import json,hashlib,pathlib
+          p=pathlib.Path('main_p2_BSPC_SUBMISSION_AUTHOR_APPROVAL_20261015.pdf')
+          q=pathlib.Path.home()
+          info={'submission_status':'NOT_SUBMITTED','author_approval_required':True,
+                'pdf_sha256':hashlib.sha256(p.read_bytes()).hexdigest(),
+                'pdf_bytes':p.stat().st_size,'manuscript_version':'20261015'}
+          f=pathlib.Path('p2-manifest.json');f.write_text(json.dumps(info,indent=2)+'\n')
+          print('P2_AUTHOR_APPROVAL_PDF_VERIFIED',json.dumps(info))
+          PY
+          cp p2-manifest.json "$GITHUB_WORKSPACE/p2-bspc-author/"
+      - name: Preserve candidate PDF and source
+        uses: actions/upload-artifact@v4
+        with:
+          name: P2-BSPC-AUTHOR-APPROVAL-ONLY-NOT-SUBMITTED
+          path: p2-bspc-author/
+          if-no-files-found: error

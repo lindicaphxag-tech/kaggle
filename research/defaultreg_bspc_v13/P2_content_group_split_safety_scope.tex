@@ -1,0 +1,54 @@
+% P2 supplementary method: decision and numerical validity boundaries.
+\subsection{A conservative, content-level safety rule and its limits}
+\label{sec:p2-safe-grouping-rule}
+Content grouping is performed \emph{before} creating
+train/validation/test folds. For reproducibility, a candidate
+epoch match is keyed by numeric dtype and byte order, array
+shape and channel order, event label, time-index convention
+and full numeric sample content. A cryptographic digest
+accelerates the search; the matching raw canonical byte
+payload is compared directly before claiming exact identity.
+Two released IDs with any matching labelled epochs form
+a cross-ID graph edge; connected components define a
+conservative unit for \emph{content-disjoint} splitting.
+This graph is a \emph{split hygiene constraint}, not a
+claim that a component necessarily corresponds to a
+single person, a single recording session, or a
+single clinical recruitment identity. A partial
+one-epoch collision need not establish identity
+of full recordings.
+
+We distinguish a complete epoch-set alias, as found
+between the specified released IDs 4 and 5, from
+isolated epoch overlap. The latter requires separate
+investigation of stimulus alignment, repeated
+calibration sequences, resampling and deterministic
+synthetic trial insertion. Hash equality without
+a full canonical-byte comparison, equality of
+target AUC values, or similarity after arbitrary
+rounding is \emph{not} our identity criterion.
+
+\paragraph{Robustness of the reported aggregate effect.}
+The matched 49-group experiment isolates a
+\emph{pipeline} contrast, not a causal intervention.
+For source-macro AUC, one affected group contributed
+$-0.2625$ whereas the remaining 48 groups averaged
+$-0.00078125$; thus the arithmetic overall
+$-0.00612245$ is dominated by a single component.
+Removing that group's contribution from the
+reported average is an influence diagnostic,
+not a new independent 48-group refit.
+A new clean acquisition would be necessary to
+estimate population-wide consequences of
+record aliasing, and a clarification from
+the public-data custodians is required
+before making any attribution about the
+original acquisition process.
+
+A standalone synthetic split-safety regression
+test checks exact-byte confirmation, label
+sensitivity, full-trial aliasing and the
+published factorial \emph{arithmetic}.
+It does not read private patient identifiers,
+reproduce the public EDF files, re-estimate
+the published AUCs or establish new validation.

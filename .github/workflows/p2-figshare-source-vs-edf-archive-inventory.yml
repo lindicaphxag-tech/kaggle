@@ -1,0 +1,38 @@
+name: P2 publisher Figshare original MAT versus processed EDF public archive inventory
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths:
+      - 'research/defaultreg_bspc_v13/src/p2_figshare_source_archive_manifest.py'
+      - '.github/workflows/p2-figshare-source-vs-edf-archive-inventory.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  figshare-public-manifest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Query publisher file metadata without downloading EEG waveforms
+        run: |
+          python -m py_compile research/defaultreg_bspc_v13/src/p2_figshare_source_archive_manifest.py
+          python research/defaultreg_bspc_v13/src/p2_figshare_source_archive_manifest.py --out /tmp/p2-figshare-public-original-vs-edf-manifest.json
+          python - <<'PY'
+          import json
+          p='/tmp/p2-figshare-public-original-vs-edf-manifest.json'
+          x=json.load(open(p))
+          assert x['figshare_article_id']==21679035
+          assert x['public_metadata_only'] is True
+          assert x['no_signals_downloaded_or_patient_identity_checked'] is True
+          assert x['no_claim_MAT_correspondence_verified'] is True
+          print('P2_FIGSHARE_PUBLISHER_MANIFEST_CHECKED_NO_EEG_SAMPLES_READ')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: P2-PUBLISHER-FIGSHARE-V5-ORIGINAL-MAT-PROCESSED-EDF-MANIFEST-ONLY
+          path: /tmp/p2-figshare-public-original-vs-edf-manifest.json
+          if-no-files-found: warn
+          retention-days: 90

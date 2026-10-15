@@ -1,0 +1,5 @@
+• 50 released EEG IDs contain 49 exact processed recording-content groups.
+• An exhaustive EDF census compared all 1,225 cross-identifier pairs.
+• Two other released ID pairs show partial aligned digital EEG overlap.
+• Most matched refit AUC change is concentrated in the aliased content group.
+• Reporting reweighting and model refitting are distinct retrospective contrasts.

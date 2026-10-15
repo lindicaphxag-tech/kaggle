@@ -1,0 +1,45 @@
+name: Default EEG Paper 2 separate manuscript PDF proof
+on:
+  push:
+    branches: [publication/default-eeg-p2-record-identity-20261013]
+    paths:
+      - '.github/workflows/defaultreg-paper-2-proof.yml'
+      - 'research/defaultreg_bspc_v13/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pdf-evidence-gated:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install LaTeX and PDF tooling
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended lmodern poppler-utils
+      - name: Compile independent Paper 2 research manuscript
+        working-directory: research/defaultreg_bspc_v13
+        run: |
+          latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error main_p2_eeg_record_provenance_EVIDENCE_GATED.tex
+          test -s main_p2_eeg_record_provenance_EVIDENCE_GATED.pdf
+          pdftotext -layout main_p2_eeg_record_provenance_EVIDENCE_GATED.pdf /tmp/paper-2-text.txt
+          grep -q '1,960' /tmp/paper-2-text.txt
+          grep -q '0.582551' /tmp/paper-2-text.txt
+          grep -q '0.588673' /tmp/paper-2-text.txt
+          ! grep -Eq 'Citation.*undefined|Reference.*undefined|Undefined control sequence' main_p2_eeg_record_provenance_EVIDENCE_GATED.log
+          pdfinfo main_p2_eeg_record_provenance_EVIDENCE_GATED.pdf | grep Pages
+          mkdir -p /tmp/defaultreg-paper-2-firstpage
+          pdftoppm -f 1 -l 1 -png -r 120 main_p2_eeg_record_provenance_EVIDENCE_GATED.pdf /tmp/defaultreg-paper-2-firstpage/p1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: defaultreg-P2-SEPARATE-RESEARCH-DRAFT-NOT-SUBMITTED
+          path: |
+            research/defaultreg_bspc_v13/main_p2_eeg_record_provenance_EVIDENCE_GATED.tex
+            research/defaultreg_bspc_v13/main_p2_eeg_record_provenance_EVIDENCE_GATED.pdf
+            research/defaultreg_bspc_v13/main_p2_eeg_record_provenance_EVIDENCE_GATED.log
+            research/defaultreg_bspc_v13/P2_*.md
+            /tmp/defaultreg-paper-2-firstpage/**
+          if-no-files-found: warn
+          retention-days: 90

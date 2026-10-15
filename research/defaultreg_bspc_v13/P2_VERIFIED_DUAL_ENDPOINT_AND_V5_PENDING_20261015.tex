@@ -1,0 +1,58 @@
+% Author review insertion: V4 true executed results; V5 is candidate only.
+\subsection{Endpoint-specific multichannel reuse and content reuse}
+Two logically distinct endpoints are required. The coherent recording
+endpoint, $E_{\mathrm{clock}}$, requires at least four distinct
+channel pairs to admit a single global time lag. The content
+endpoint, $E_{\mathrm{any}}$, accepts verified reuse of at least one
+individual channel even when different channels have incompatible
+time offsets. Accordingly, an asynchronous multi-sensor composite
+is a designed negative for $E_{\mathrm{clock}}$ but a positive for
+$E_{\mathrm{any}}$. A split claimed to avoid \emph{identified numerical
+reuse} must group connected records using confirmed
+$E_{\mathrm{any}}$ edges, not solely the coherent-recording edges.
+
+The same frozen CHB--MIT digital EDF controlled-transformation
+experiment was evaluated under both pre-specified endpoint labels.
+For six original public EDF recordings, $E_{\mathrm{clock}}$
+detected 48/48 transformed positive cases with 0/30 constructed
+negative matches; $E_{\mathrm{any}}$ detected 60/60 constructed
+positive cases with 0/18 constructed negatives. The additional
+12 $E_{\mathrm{any}}$ positives are six single-channel reuse and
+six asynchronous same-source reuse cases. Every accepted numerical
+correspondence was independently verified under the trusted
+algorithm policy. Complete case-level results and source hashes
+are emitted by the GitHub Action run
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38671905017}
+(status SUCCESS, inspected 15 October 2026).
+
+These are \emph{controlled modifications of six independent
+public EEG digital source records}, not 78 statistically independent
+recordings and not clinical duplicate ground truth. Under the
+narrow $E_{\mathrm{clock}}$ endpoint, the pre-existing
+shared-clock algorithm and the updated verified matcher
+were tied at 48/48 positive matches and 0/30 negatives;
+the unconstrained independent-lag Hungarian comparator
+matched 48/48 positives but falsely accepted six
+asynchronous composites. No published DTW synchronizer
+superiority or population false-positive guarantee follows.
+
+\subsection{Numerical witness scope and prospective research extensions}
+For an accepted numerical witness, an external checker recomputes
+the per-channel lagged training and blocked verification
+correlations, validates the one-to-one channel correspondence,
+the common lag, all reported overlapping sample intervals,
+and standardized floating-array digests. Verification certifies
+the stated numerical predicates on the supplied arrays. It does
+\emph{not} prove physical acquisition origin, patient identity,
+global optimality or a probabilistic false-match rate.
+
+A subsequent V5 research prototype explores continuous
+whole-search scores evaluated on an untouched temporal block,
+record-level null calibration, and matched-channel common-mode
+residual evidence against shared nuisance artifacts.
+Neither an improvement in natural EEG provenance recovery nor
+a strong published-baseline advantage has yet been established
+for V5. These extensions are therefore \emph{not included} in
+the V4 empirical result claims and must pass separate
+frozen independent-source experiments before promotion to the
+primary method.

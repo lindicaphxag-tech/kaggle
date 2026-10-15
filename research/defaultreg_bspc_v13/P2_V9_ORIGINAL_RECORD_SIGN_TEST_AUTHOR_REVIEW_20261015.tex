@@ -1,0 +1,44 @@
+% Evidence locked source-unit audit. This is not a SOTA claim.
+\subsection{A 12-record source-level audit of the tuned comparator}
+We reused the frozen CAR training and verification thresholds
+(0.93 and 0.90, respectively) selected on chb01--02,
+and evaluated twelve additional CHB--MIT source EDF prefixes
+(chb09--20), each under the same eight known controlled
+positive transformations and six constructed negatives.
+These additional source IDs were previously encountered
+during corpus-level development, so they are \emph{not}
+prospectively untouched clinical records.
+
+Across the resulting 96 controlled positive cases,
+the matched-subset residual verifier detected 96,
+whereas tuned CAR followed by shared-clock matching
+detected 91; both rejected all 72 constructed negatives.
+The uncorrected raw matcher detected 96/96 but falsely
+accepted 12/72 negative cases. The primary GitHub Actions
+receipt was successful and preserves per-original
+predictions at
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38679288891}.
+
+The five additional controlled detections attributed to
+the residual verifier arise from only \emph{four} original
+EDF sources: chb10 contributed two, and chb11, chb17
+and chb19 contributed one each. The remaining eight
+sources showed identical positives. Therefore an exact
+paired sign test using \emph{original EDF files as the
+units} has four positive and zero negative source-level
+differences among four non-ties, yielding a
+two-sided $p=2/2^4=0.125$ (preference-directed
+one-sided $p=1/2^4=0.0625$). There is no familywise
+significant or peer-validated state-of-the-art superiority
+claim. Treating all 96 transformed positives as independent
+would be statistical pseudoreplication.
+
+A cross-corpus test on PhysioNet EEGMMIDB digital EDF
+prefixes has been registered using the original frozen
+CHB--MIT threshold without target retuning at
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/workflows/p2-v9-eegmmidb-crosscorpus.yml}.
+Its outcome must not be reported until the complete source
+hashes, per-original case rows, and finalized workflow
+receipt are verified. The method's legitimate endpoint is
+\emph{numerical recording-content overlap}, not patient
+identity or neural decoding accuracy.

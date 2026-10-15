@@ -1,0 +1,62 @@
+% Public release, descriptive post-discovery screen. CI 38359640970 and 38360228555.
+\paragraph{Disjoint-time validation of exploratory release-layer matching.}
+To test whether the previously reported post hoc trial assignment
+merely fitted the same numeric samples that were subsequently scored,
+we fitted a separate 40-by-40 one-to-one trial permutation for each
+stored channel index using only the first 2,000 samples per 4,000-sample
+trial. We then scored the fixed assignments on the last 2,000 samples,
+which were not used to choose the permutation. Both halves belong to
+the same trial and are \emph{not} independent acquisitions. Six
+CRC-verified public source MAT members and their six publisher-preprocessed
+EDF counterparts give all 36 ordered MAT-to-EDF public-ID comparisons;
+the table displays the three previously flagged pairs in both directions.
+The 36 comparisons and hypotheses were selected after the EDF overlap
+discovery and are descriptive, not a calibrated provenance classifier.
+
+\begin{table}[h!]\centering\small
+\caption{Held-out last-half median absolute correlation after a trial
+assignment fitted on the first half, at the same stored channel index.
+Each cell pools 1,280 nonconstant channel--trial comparisons. The
+four cells for each pair include both MAT-to-EDF directions and the
+same-public-ID controls. The release transformation and electrode
+map remain unknown.}
+\label{tab:p2-heldout-temporal}
+\begin{tabular}{lrrrr}
+\toprule
+Released IDs $A/B$ & MAT $A$/EDF $A$ & MAT $A$/EDF $B$ &
+MAT $B$/EDF $A$ & MAT $B$/EDF $B$\\
+\midrule
+4/5   & .8024 & .7960 & .0472 & .0514\\
+11/15 & .3744 & .3642 & .0215 & .0225\\
+47/49 & .7261 & .7186 & .0196 & .0205\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The directionality of this fixed-assignment temporal test is consistent
+with the earlier full-trial exploratory analysis: in each selected pair,
+source MAT $A$ has greater numeric correspondence to both released EDF
+products than source MAT $B$ has. Performance varies strongly across
+the three pairs; the test does not establish that the MAT files are
+biological source records for the EDF, that the same electrode was
+compared, or that either ID denotes a different patient. In all six
+same-public-ID controls, the 40 matched trial correlations at absolute
+$r\geq0.9999$ are concentrated entirely in stored channel index 32
+(zero based). The publisher EDF label for this index is blank in all
+six checked files; its physiological or auxiliary role cannot be
+established from that header. In the twelve cells for the
+three flagged pairs, excluding this single index leaves \emph{zero}
+matched trials at that threshold. Thus those 40 near-perfect items
+cannot be cited as 40 independent EEG channels or people.
+
+A sensitivity statistic computed as the median of the 31 remaining
+\emph{channel-level} held-out medians still retains the directional
+difference: MAT 4 to EDF 4/5, .8018/.8018 versus MAT 5 to EDF 4/5,
+.0527/.0527; MAT 11 to EDF 11/15, .3647/.3650 versus MAT 15 to
+EDF 11/15, .0188/.0191; MAT 47 to EDF 47/49, .7081/.7081 versus
+MAT 49 to EDF 47/49, .0174/.0174. These are channel-median
+summaries, not a pooled trial-correlation median or externally
+validated identity thresholds. The complete scalar receipts,
+including first-half, held-out and channel-level statistics, are in
+the successful \href{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38359640970}{initial workflow}
+and \href{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38360228555}{channel-level sensitivity workflow}.

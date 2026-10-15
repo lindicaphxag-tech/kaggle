@@ -1,0 +1,78 @@
+% New executed retrospective public EEG checks.
+\subsection{Alternative preprocessing and fixed-classifier sensitivity}
+\label{sec:p2-real-extra-robustness}
+We evaluated two retrospective robustness questions after the
+primary content-overlap finding. Neither is a new clinical
+cohort, independently registered replication or causal
+estimate. First, exact whole-record identity grouping
+of the same 50 publicly released Liu2024 IDs was
+repeated using a different processing configuration
+(6--35 Hz filtering and 128 Hz resampling rather
+than 8--30 Hz/160 Hz), without reading classifier
+outcomes. Released IDs 4 and 5 again contributed
+identical complete processed 40-trial and event-label
+arrays. The cohort again contained 49 whole-record
+content groups, with an array shape of
+$40\times29\times512$ per released ID.
+This is one preprocessing sensitivity analysis,
+not an independent raw EDF reader.
+The executed record is archived at
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38319497449}.
+
+Second, we refitted two fixed-hyperparameter
+tangent-space classifiers on public EEG, leaving
+out each of the same 49 held recording contents.
+For each held content, the original model used
+the 49 other nominal released IDs, including
+any overlapping counterpart; the purged source
+model used the other 48 content representatives.
+Each fit independently reestimated its source
+Riemannian tangent reference, standardisation
+and classifier weights. The held target labels
+were used only for final ROC-AUC calculation,
+not for source fitting or parameter selection.
+The compared classifiers were logistic regression
+with $C=1$ (liblinear) and ridge classification
+with $\alpha=10$. Their training losses differ
+but both consume the same kind of covariance
+tangent features.
+
+\begin{table}[tb]
+\centering\small
+\caption{New retrospective model-family sensitivity
+on the same 49 held digital recording-content groups.
+All entries are purged-source-fit minus nominal
+source-fit ROC-AUC. The 49 fitted source training
+sets overlap extensively, so these rows are
+not 49 independent model replications.}
+\label{tab:p2-multimodel}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{p{.31\linewidth}rrrr}
+\toprule
+Frozen model & All 49 mean & ID 4 & Other 48 & Median \\
+\midrule
+Logistic $C=1$
+& $-0.004796$ & $-0.212500$ & $-0.000469$ & $0.000000$\\
+Ridge $\alpha=10$
+& $-0.003469$ & $-0.222500$ & $+0.001094$ & $+0.002500$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For logistic regression, the original and purged
+means were $0.580867$ and $0.576071$,
+respectively. The corresponding ridge means were
+$0.582296$ and $0.578827$. Logistic regression
+had 22 negative and 21 positive paired changes
+and ridge had 18 negative and 28 positive ones.
+The pronounced ID 4 content-group change
+therefore persists under two additional fixed
+training objectives, while the remaining
+48 groups show no consistent negative mean shift.
+The new experiments support
+\emph{model-specification sensitivity} and a
+local overlap-related effect, not a universal
+AUC correction for previously unseen patients.
+The reproducible, per-record numerical results
+are in the successful workflow artifact
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38319072438}.

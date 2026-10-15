@@ -1,0 +1,137 @@
+% Executed cross-release product correspondence, GitHub Actions 38335948686.
+% Previously exposed same public data, no acquisition identity or record ID claim.
+\subsection{Source MAT--EDF correspondence is not established by equal dimensions}
+\label{sec:p2-mat-edf-alignment}
+The publicly released source MAT arrays and
+publisher-preprocessed EDF digital samples each
+yielded 33 channels with 160,000 numeric samples
+per channel for the six selected released IDs.
+However, equality of dimensions is insufficient
+to establish a shared sample coordinate system,
+channel map or stage of processing. We therefore
+measured a conservative \emph{aligned-order
+diagnostic}, retaining the raw numeric
+MAT and digital EDF samples without the
+additional 8--30~Hz MOABB transformation.
+The diagnostic calculated per-channel
+mean-centred absolute Pearson correlations
+(i) at the same stored channel index and
+(ii) under an \emph{exploratory optimal
+one-to-one assignment} of nonconstant
+channels. An affine amplitude
+change or sign reversal cannot by itself
+invalidate a large absolute correlation;
+the assignment also relaxes a
+fixed channel permutation.
+This is \emph{not} a calibrated
+EEG-electrode provenance test or a
+reconstruction of the publisher's
+conversion chain.
+
+\begin{table}[tb]
+\centering\small
+\caption{Executed same-public-ID source
+MAT-to-publisher-EDF digital diagnostic.
+All numbers are the median \emph{absolute}
+channel correlations. The optimal matching
+is post hoc and does not validate true
+electrode identity; the source MAT to EDF
+processing and chronology remain unknown.}
+\label{tab:p2-mat-edf-alignment}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{lrr}
+\toprule
+Public ID & Same channel index & One-to-one optimal channels\\
+\midrule
+4  & 0.1354 & 0.1354\\
+5  & 0.0707 & 0.0707\\
+11 & 0.0283 & 0.0305\\
+15 & 0.0222 & 0.0224\\
+47 & 0.0316 & 0.0321\\
+49 & 0.0235 & 0.0241\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+In the same-index analysis, only one
+eligible channel in each of the six
+files attained absolute $r\geq0.95$.
+The optimal one-to-one assignment
+also found only one such
+channel per file. This isolated
+correspondence has unknown
+physiological meaning given the
+unverified channel metadata.
+Most numerical channels were
+not strongly correlated under this
+\emph{specific} alignment model.
+Thus neither the exact EDF overlap
+nor the source MAT correlations
+may be interpreted as directly
+tracing an acquisition-source
+signal through a fully documented
+release pipeline.
+
+Time shifts, trial reordering,
+different continuous-data epoch
+boundaries, rereferencing and
+signal transformation operations
+have not been inverted. Low
+aligned absolute correlation therefore
+does \emph{not} establish that
+source MAT and EDF originated
+from distinct acquisitions.
+The source-to-EDF relationship
+remains an explicit data-steward
+clarification gate. The numerical
+result, synthetic permutation and
+affine tests, and scalar-only
+receipt were executed in
+\href{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38335948686}{workflow 38335948686}.
+The released clinical identity
+of any record is not inferred.
+
+\paragraph{Exploratory within-channel trial-reordering and cross-ID diagnostic.}
+The same six released files were re-examined allowing an optimal
+one-to-one assignment of 40 trials \emph{within each stored channel
+index}, with 4,000 sample positions fixed inside each trial.
+This relaxes published trial order and is a post hoc
+best-match statistic, not a validated conversion map.
+Each comparison included 1,280 nonconstant channel--trial
+matches. The median absolute correlation is reported below;
+a matched correlation is not an independently established
+trial identity.
+\begin{table}[tb]\centering\small
+\caption{Source MAT to processed EDF matched-trial median
+absolute correlations. The four columns test both directions
+within each published ID pair, including same-ID comparisons.
+All candidate pairs were selected after EDF overlap discovery;
+these values cannot support population prevalence or patient
+identity claims.}
+\label{tab:p2-cross-release-trial}
+\begin{tabular}{lrrrr}
+\toprule
+Released pair & MAT A / EDF A & MAT A / EDF B &
+MAT B / EDF A & MAT B / EDF B\\
+\midrule
+A=4, B=5   & .7236 & .7218 & .0942 & .0942\\
+A=11, B=15 & .4946 & .4924 & .0452 & .0452\\
+A=47, B=49 & .5720 & .5702 & .0422 & .0422\\
+\bottomrule
+\end{tabular}
+\end{table}
+In each \emph{selected} pair, source MAT A has substantially
+higher best-match correlation with both processed EDF A and
+processed EDF B than source MAT B does. This asymmetry is
+consistent with shared release-layer signal content being
+associated more strongly with the earlier listed source MAT,
+but the public files do not establish the transformation,
+chronology, acquisition session, or clinical identity.
+The 40-by-40 assignments, channel index hypothesis and fixed
+sample positions were selected for a diagnostic after the
+abnormal published EDF relationships were known. Filtering,
+rereferencing, time alignment and competing source products
+remain unresolved. A data custodian and independent decoder
+are needed before stating an original-record provenance claim.
+The scalar-only comparison and SHA-256 receipt are recorded in
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38339584569}.
