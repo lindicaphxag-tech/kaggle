@@ -1,0 +1,45 @@
+name: P2 V9 original-record exact inference audit
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/p2-v9-original-record-exact-statistics.yml'
+      - 'research/defaultreg_bspc_v13/src/p2_v9_exact_source_unit_audit.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_record_audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install scipy
+      - name: Download immutable 12-original-source result from previous successful run
+        uses: actions/download-artifact@v4
+        with:
+          name: p2-v8-twelve-originals-controlled-cases
+          run-id: 38679288891
+          github-token: ${{ github.token }}
+          path: evidence
+      - name: Independently recompute source-unit paired sign test
+        run: |
+          python research/defaultreg_bspc_v13/src/p2_v9_exact_source_unit_audit.py evidence/P2_V8_12_SOURCE_FIXED_CAR_CASES.json | tee P2_EXACT_SOURCE_UNIT_AUDIT.json
+          python - <<'PY'
+          import json
+          d=json.load(open('P2_EXACT_SOURCE_UNIT_AUDIT.json'))
+          assert d['n_original_sources']==12
+          assert d['additional_controlled_positives']==5
+          assert d['n_source_wins']==4 and d['n_source_losses']==0
+          assert d['exact_two_sided_source_sign_p']==.125
+          print('PASS: no V8 SOTA significance claim; independent EDF source count preserved')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p2-v9-original-record-inference-audit
+          path: P2_EXACT_SOURCE_UNIT_AUDIT.json
+          if-no-files-found: error
