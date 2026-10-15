@@ -2130,24 +2130,32 @@
     },
     {
       "created_at": "2026-10-14T21:07:40Z",
+      "expiry_recorded_at": "2026-10-15T06:23:24Z",
+      "expiry_sha256": "9678547d0ed97147448a6d93bd04685affc7d705bb3772643fde5894d58c46aa",
+      "expiry_source": "expirations/google-deepmind__mujoco__3693.json",
       "first_frozen_at": "2026-10-14T22:36:53Z",
       "id": "google-deepmind/mujoco#3693",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3693,
       "prediction_deadline_at": "2026-10-15T04:36:53Z",
       "repository": "google-deepmind/mujoco",
       "source": "inbox/FIRST_SEEN_20261014T223653Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "67a7330e107dca45681d3ac84a172eed800ef255db66f4d8497d06e12b451c8b"
     },
     {
       "created_at": "2026-10-14T21:57:40Z",
+      "expiry_recorded_at": "2026-10-15T06:23:24Z",
+      "expiry_sha256": "aaa8abb0ea3ed6a52853b5d768a1fd6a402d6c4d39b0ef992120ac8e4e74e3ed",
+      "expiry_source": "expirations/google-deepmind__mujoco__3695.json",
       "first_frozen_at": "2026-10-14T22:36:53Z",
       "id": "google-deepmind/mujoco#3695",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3695,
       "prediction_deadline_at": "2026-10-15T04:36:53Z",
       "repository": "google-deepmind/mujoco",
       "source": "inbox/FIRST_SEEN_20261014T223653Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "48cf7583d44d1e71fa4fa666bbf5ef297fb4fa593c9999e84aa5aeee087c8dc3"
     },
     {
@@ -2171,6 +2179,17 @@
       "source": "inbox/FIRST_SEEN_20261015T043244Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "0f4ee1a37fd845c72a72f189f63a569c9534fd81263028596461cdf80364c181"
+    },
+    {
+      "created_at": "2026-10-15T05:17:01Z",
+      "first_frozen_at": "2026-10-15T06:24:48Z",
+      "id": "tesseract-robotics/tesseract#1384",
+      "issue_number": 1384,
+      "prediction_deadline_at": "2026-10-15T12:24:48Z",
+      "repository": "tesseract-robotics/tesseract",
+      "source": "inbox/FIRST_SEEN_20261015T062448Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "19380cbf6caf26dda63beaf291bded26c27c638f987ce594696c43c1f737bb40"
     }
   ]
 }

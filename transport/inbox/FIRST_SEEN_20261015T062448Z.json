@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "jf---",
+      "body": "`OFKTStateSolver(scene_graph, prefix)` throws for any non-empty `prefix`. `initHelper` prefixes the root name, then looks the prefixed name up in the unprefixed scene graph:\n\n```cpp\n// state_solver/src/ofkt_state_solver.cpp (master e8d58a0090)\nconst auto root = LinkId(prefix + scene_graph.getRoot().name());                              // :1051\n...\nboost::visitor(builder).root_vertex(scene_graph.getVertex(root)).vertex_index_map(prop_index_map));  // :1073\n```\n\nThe graph has no vertex named `prefix + root`, so `getVertex` throws (0.35.0, `ofkt_state_solver.cpp:1053`, `:1075`):\n\n```text\nSceneGraph, vertex with name 'r1_base_link' does not exist!\n```\n\n`insertSceneGraph` gets this right: it starts the search at `scene_graph.getVertex(scene_graph.getRoot())` (`:901`) and leaves the prefixing to `ofkt_builder`.\n\n**Repro:** construct `OFKTStateSolver(graph, \"r1_\")` from any non-empty `SceneGraph`.\n\n**Fix:** start the depth-first search at the unprefixed root, as `insertSceneGraph` does. Keep the prefixed `root` for `root_`, `link_map_` and `link_names_`:\n\n```cpp\nboost::visitor(builder).root_vertex(scene_graph.getVertex(scene_graph.getRoot())).vertex_index_map(prop_index_map));\n```\n",
+      "created_at": "2026-10-15T05:17:01Z",
+      "html_url": "https://github.com/tesseract-robotics/tesseract/issues/1384",
+      "id": "tesseract-robotics/tesseract#1384",
+      "issue_number": 1384,
+      "labels": [],
+      "repository": "tesseract-robotics/tesseract",
+      "surface_sha256": "19380cbf6caf26dda63beaf291bded26c27c638f987ce594696c43c1f737bb40",
+      "title": "OFKTStateSolver(scene_graph, prefix) throws for any non-empty prefix"
+    }
+  ],
+  "post_activation_issue_identities_observed": 146,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-15T06:24:48Z",
+  "schema_version": 1
+}
