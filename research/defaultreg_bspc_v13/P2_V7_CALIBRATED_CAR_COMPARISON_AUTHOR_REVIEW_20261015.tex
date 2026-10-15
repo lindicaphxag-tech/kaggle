@@ -1,0 +1,59 @@
+% P2 BSPC V7 evidence-locked comparison; 2026-10-15 author-review ONLY.
+\subsection{Informed common-average-reference comparator and source-level null ranks}
+To exclude a trivial gain from comparing artifact-sensitive raw waveforms
+against an artifact-filtering method, we added a strong fully informed
+comparison that subtracts the common average reference (CAR) across
+the eight source and target channels prior to applying the unchanged
+shared-clock assignment algorithm. The same six original CHB--MIT
+EDF digital source prefixes each produced eight controlled reuse
+positives and six constructed negatives; these are 84 \emph{correlated}
+case variants from six source records, not 84 independent clinical
+observations.
+
+On this \emph{controlled} set, raw shared-clock matching detected
+48/48 positives with 6/36 false matches; CAR preprocessing followed
+by the original shared-clock matcher detected 39/48 with 0/36 false
+matches, and the matched-channel residual verification found 48/48
+with 0/36 false matches. All six raw false matches occurred in
+the deliberately injected strong common-artifact condition.
+This result demonstrates a preservation-of-detections advantage
+relative to \emph{this specified CAR baseline and its frozen original
+thresholds}, but it does not establish advantage over source-calibrated
+CAR thresholds, robust rereferencing, component decomposition,
+multichannel device synchronization or time-series fingerprints.
+The author-review evidence is the inspectable success receipt
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38675387956};
+the threshold-tuned CAR check is separately registered
+at \url{https://github.com/lindicaphxag-tech/kaggle/actions/workflows/p2-v7-source-tuned-car-benchmark.yml}.
+No tuned-CAR result is assumed here.
+
+We also evaluated a continuous score obtained by selecting the
+common-lag or one-channel correspondence using a fit-only time
+block, followed by verification-block correlation. Rather than
+treating individual lags, electrodes or overlapping windows as
+independent null trials, an empirical rank test was applied
+to \emph{the maximum over the complete permitted source search}
+for 19 distinct published CHB--MIT case identifiers. A
+controlled positive gave score 0.999968 (common-clock endpoint)
+versus maximum null 0.184460; the one-channel endpoint scored
+1.000000 versus maximum null 0.424179. Both had the minimum
+achievable one-query rank $p=(1+0)/(19+1)=0.05$; the
+successful source-level check is
+\url{https://github.com/lindicaphxag-tech/kaggle/actions/runs/38675387852}.
+The two endpoints are not independent prespecified discoveries;
+familywise claims require multiplicity adjustment and suitable
+exchangeability of genuinely independent source recordings.
+The database is a single corpus and the positives remain engineered
+variants, so no population-wide clinical false-match guarantee is
+inferred.
+
+\paragraph{Reproducibility and honest scope.}
+Before external release, the full numerical witness must be
+independently recomputed, the original EDF prefix digests retained
+without redistributing patient waveforms, all source-group
+identities checked against the distributor manifests, and
+threshold selection performed without inspection of final
+evaluation recordings. Additional sources and naturally observed
+digital reuse, as well as a systematic cost/abstention comparison,
+remain required before promoting this component to a generally
+superior biomedical signal provenance algorithm.
