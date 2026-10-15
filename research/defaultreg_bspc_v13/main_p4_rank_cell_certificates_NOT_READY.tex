@@ -152,9 +152,18 @@ machine-verification claims.
 \input{P4_incremental_event_sweep_results_20261013.tex}
 \input{P4_strong_rational_root_isolation_comparator_20261013.tex}
 
+\input{P4_V9_CERTIFICATE_PRUNED_EVENT_EXECUTION_20261015.tex}
 \input{P4_realized_interval_refinement_negative.tex}
 
 \section{Limitations and independent-study requirement}
+A new certificate-first exact event-sweep candidate preserved complete
+rational AUC paths and showed synthetic sparse-event CPU speed gains
+relative to the same unpruned incremental solver (medians
+$9.72\times$, $3.87\times$, $2.08\times$ for stable, sparse,
+mixed sources); event-dense synthetic cases remained at
+$0.98\times$. All 48 tests were constructed rational source paths,
+not previously unseen EEG recordings nor an external SOTA victory.
+
 These percentages measure \emph{certified
 SOURCE pair stability}, NOT new EEG
 classification accuracy, AUC improvement
