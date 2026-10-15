@@ -1,0 +1,157 @@
+% P2 independent post-outcome exact-group leave-one-out influence results
+% from original V29 frozen 49 x 4 x 3 numerical result.
+\subsection{Localisation of the observed AUC change}
+\label{sec:p2-local-effect}
+The complete 49-group average loss is not representative of
+the typical held recording. In the source-macro policy,
+the affected content group represented by released ID~4
+has $Y_{AA}=0.8550$ under the original fit and
+$Y_{BB}=0.5925$ under content-disjoint refitting,
+a paired difference of $-0.2625$ AUC.
+Holding its source model fixed while changing the frozen
+selector alone produced $Y_{AB}=0.8400$;
+changing the source model while holding the old
+$\lambda$ produced $Y_{BA}=0.6075$.
+Thus the contrast at this specific held group is
+strongly associated with removing same-content
+source training records. The cross-fitted model also
+changes the tangent representation, so we do not
+ascribe the effect solely to memorisation by LDA.
+
+The remaining 48 content groups had a mean paired
+$Y_{BB}-Y_{AA}$ difference of $-0.00078125$.
+Therefore
+\[
+\underbrace{-0.00612245}_{\mathrm{all}\ 49}
+=
+\frac{
+\underbrace{-0.262500}_{\mathrm{overlap\ group}}
++48\underbrace{(-0.00078125)}_{\mathrm{other}\ 48}
+}{49}.
+\]
+This identity establishes the \emph{localised}
+nature of the study's empirical target contrast.
+It is stronger evidence of an evaluation-unit
+failure than a claim that purging improves or
+reduces AUC by a near-universal constant.
+
+\begin{table}[tb]
+\centering\small
+\caption{Original 49-held-content-record
+paired full-model/full-source-selection contrasts
+by policy. No values come from new target recordings.
+All effects are AUC differences (not accuracy pp);
+the 48-group column removes the content-overlap
+target represented by ID~4 from the \emph{average}
+only, without refitting the remaining models again.
+}
+\label{tab:p2-localisation-controls}
+\setlength{\tabcolsep}{4.5pt}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{p{.37\linewidth}rrrr}
+\toprule
+Selector & All 49 & ID~4 & Other 48 &
+Selected $\lambda$ changed\\
+\midrule
+Source-macro
+& $-0.006122$ & $-0.262500$ & $-0.000781$ & 37/49\\
+Proper predictive Gaussian
+& $-0.003724$ & $-0.245000$ & $+0.001302$ & 0/49\\
+Historical class-centred CovScore
+& $-0.006071$ & $-0.260000$ & $-0.000781$ & 0/49\\
+\bottomrule
+\end{tabular}}
+\end{table}
+The two covariance selectors never changed their
+source-selected $\lambda$ in any of 49 model conditions,
+yet the overlapping content group had losses of
+$0.2450$ and $0.2600$ AUC when its original
+source model was purged. This is a valuable
+built-in negative control against an explanation
+based entirely on parameter retuning.
+Conversely, the source-macro selector changed
+its frozen parameter in 37/49 groups, but
+this frequent change did not yield a commensurate
+aggregate advantage on the other 48 group targets.
+
+\subsection{Person-level heterogeneity and alternative reporting}
+\label{sec:p2-heterogeneity}
+For the source-macro policy, the 49 matched
+full-change values ranged from $-0.2625$
+to $+0.0375$ AUC. Their median was exactly
+zero, with 24 positive, 21 negative and four
+zero changes. Eight content groups lost more
+than 0.02 AUC, and six gained more than
+0.02 AUC. The overall sign of the average
+therefore does not describe all held-group
+outcomes. The largest absolute negative
+difference occurred in the ID~4 content group;
+the next most extreme absolute changes
+were substantially smaller (at most
+0.0375 in the original frozen row table).
+The mean paired change over all possible
+48-of-49 leave-one-recording-group descriptive
+averages lay between about $-0.00703$
+and $-0.00078$ AUC. Removing the
+overlap-affected content group makes the
+observed mean small, while most other
+single-group deletions leave the larger
+effect intact.
+
+The nominal 50-ID source-macro mean
+$0.594000$ and content-group mean
+$0.588673469$ also permit a transparent
+reporting-weight check. Because 49
+original-model evaluated content representatives
+are kept, the 50th repeated released ID
+contributed an implied originally reported
+AUC of
+$50(0.594000)-49(0.588673469)=0.8550$.
+This equals the original held outcome for
+the overlapping group. The denominator
+change alone therefore moves the original
+reported mean by $-0.005327$; it must not
+be confused with the $-0.006122$ change
+on the \emph{matched} 49 original-versus-purged
+source models, nor with a patient-level
+causal leakage effect. A high-performing
+repeat can inflate a macro-average even
+without retraining any classifier.
+
+\subsection{Implications for model evaluation workflows}
+\label{sec:p2-guidelines}
+This case suggests a concrete, low-overhead
+procedure for reusing large publicly
+released EEG collections:
+(1) version-pin the downloaded source files
+and the epoch-extraction pipeline,
+(2) hash all labelled processed trial contents
+under a deterministic byte convention,
+(3) assemble connected components of
+cross-ID identical contents before any split,
+(4) construct training, validation and
+held-record partitions on components rather
+than released IDs,
+(5) fit all preprocessing references,
+covariance estimators and hyperparameters
+strictly within source content groups,
+(6) compute both nominal-ID and unique-content
+reporting denominators and
+(7) publish any anomalies with non-identifying
+reproduction material and an opportunity for
+the data steward to clarify provenance.
+These steps are safeguards, not a novel
+cryptographic algorithm.
+A more sophisticated near-duplicate detector
+would require a new, separately evaluated
+false-positive/false-negative study.
+
+The results also establish an important
+negative conclusion: after removing the
+overlap group from the descriptive average,
+the 48 unaffected held groups exhibited
+almost no net source-macro AUC change.
+The present evidence supports a local
+released-record-content validation risk,
+rather than a broad numerical correction
+factor transferable to all EEG studies.
