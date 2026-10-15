@@ -5,7 +5,7 @@
 ## Author
 - **Zhibo Zhang** — sole author and corresponding author
 - **Hangzhou Dianzi University**, Hangzhou, Zhejiang, China
-- Corresponding email: **NOT PROVIDED**, must be filled in before submission
+- Corresponding email: **24061721@hdu.edu.cn** (provided directly by the sole author; identity and email should be independently confirmed at the publisher portal)
 - ORCID / department: not supplied; do not invent
 - Author's role, approval, authorship qualification, CRediT and accountability require Zhibo Zhang's real sign-off.
 
@@ -22,9 +22,12 @@ A separate anonymized manuscript and supplementary PDF were prepared as **option
 - The above new ZIP/PDF assets are **conversation deliverables, not committed here**. Existing GitHub P2 source retains earlier drafts. Do not infer the repository contains the new BMT PDF.
 
 ## Submission blockers
-- Real corresponding email and optional ORCID/department.
+- Corresponding email now supplied; verify address in ScholarOne profile. ORCID/department still optional and not supplied.
 - Sole author's agreement with all statements, study integrity and CRediT roles; funding and conflicts verified truthfully.
 - The **actual publisher Ethical and Legal Declarations Word template** must be customized/uploaded separately. A working copy is NOT equivalent.
 - Confirm ethical/secondary-use obligations, data publisher rights, authorship and original source content provenance.
 - A public reproducibility archive or accurate private-code availability statement; no claim private PR is publicly accessible.
 - Corresponding author submits at https://mc.manuscriptcentral.com/bmt and preserves portal receipt.
+
+## 2026-10-15 corresponding-email document revision
+The author-facing BMT PDF and optional title-page/cover-letter/declaration Word candidates have been rebuilt with `24061721@hdu.edu.cn`. The identity-free backup PDF and supplement were preserved unchanged. A new conversation-local ZIP (`P2_BMT_ZhiboZhang_已填通讯邮箱_单盲投稿包_20261015.zip`) contains the refreshed deliverables and SHA-256 manifest. GitHub records the metadata only; do not claim these conversation-generated binaries are committed to GitHub or that the manuscript has been formally submitted.
