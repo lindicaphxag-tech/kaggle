@@ -1,0 +1,39 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "kseczhouyb",
+      "body": "### Summary\n\nTwo naming/documentation findings on Fast DDS 2.14.6 (ROS 2 Jazzy distro packaging), reported while diagnosing an unrelated middleware problem. Neither is a functional bug in the library \u2014 both are silent-misconfiguration hazards we actually fell into, so we report them for the 2.14.x LTS line.\n\n### Finding 1 \u2014 `FASTDDS_DEFAULT_PROFILES_FILE` is a silent no-op on 2.14.x\n\n- We referenced a custom XML profiles file via `FASTDDS_DEFAULT_PROFILES_FILE` and assumed for a long series of runs that it was in effect. It never was.\n- Evidence on a stock 2.14.6 installation (Ubuntu 24.04, `ros-jazzy-fastrtps` 2.14.6-1noble.20260303.233638):\n  - `strings -a` exact-line scan: 0 hits for `FASTDDS_DEFAULT_PROFILES_FILE` in `libfastrtps.so.2.14.6` and in all `rmw_fastrtps*` libraries; the legacy `FASTRTPS_DEFAULT_PROFILES_FILE` is present (1 hit).\n  - Source (v2.14.6 tag): `XMLParserCommon.cpp` L20 defines only `DEFAULT_FASTRTPS_ENV_VARIABLE = \"FASTRTPS_DEFAULT_PROFILES_FILE\"`; no `FASTDDS_`-prefixed constant exists. `XMLProfileManager.cpp` (`loadDefaultXMLFile()`, ~L202/L211/L246) consults only the legacy name.\n  - Official v2.14.6 documentation (environment variables page) lists only `FASTRTPS_DEFAULT_PROFILES_FILE`; `FASTDDS_DEFAULT_PROFILES_FILE` does not appear.\n- Consequence: setting the 3.x-era name on 2.14.x produces no error, no warning, no log line \u2014 the profiles file is simply never loaded. In a deployment that relies on XML transport/QoS overrides, this failure mode is invisible until forensic inspection.\n- Runtime-verified confirmation that the legacy name is genuinely consumed: a schema-valid profile loaded via `FASTRTPS_DEFAULT_PROFILES_FILE` was actually applied at runtime \u2014 custom unicast ports declared in the profile became observable as bound sockets on the participant processes, with zero parser errors. This strengthens the case for a first-class `FASTDDS_DEFAULT_PROFILES_FILE` alias in the 2.14.x LTS line.\n\n### Finding 2 \u2014 env name drift between docs and source: `SKIP_DEFAULT_XML` vs `SKIP_DEFAULT_XML_FILE`\n\n- v2.14.6 documentation (environment variables page, \u00a711.2) uses `SKIP_DEFAULT_XML`.\n- v2.14.6 source defines `SKIP_DEFAULT_XML_FILE` (`XMLParserCommon.cpp` L23).\n- A user following the documentation will set a variable the library does not read (same silent no-op class as Finding 1).\n\n### Context (how we hit this; honest scope note)\n\nWhile diagnosing a participant-pair matching failure in a ROS 2 Jazzy system (reported to the rmw_fastrtps maintainers, since the operative mechanism there is the rmw localhost branch's unconditional SHM injection), we discovered that our XML profile injection had never been active: the env name was not consumed (Finding 1), and separately, the XML asset itself was schema-invalid \u2014 `transport_descriptors` placed outside the required `<profiles>` root wrapper \u2014 so even under the legacy name the parser correctly rejected it (`Not expected tag: 'transport_descriptors'`; we reproduced the rejection offline with `xmllint --schema` against the shipped `fastRTPS_profiles.xsd`). The parser behavior is correct; our asset was wrong. The findings above concern only the silent no-op naming hazard.\n\n### Asks\n\n1. Is there a plan to backport a `FASTDDS_DEFAULT_PROFILES_FILE` alias (or at least a warning: \"this variable is not read; did you mean FASTRTPS_DEFAULT_PROFILES_FILE?\") to the 2.14.x LTS line, given that 3.x uses the new name and mixed-version fleets make the mistake easy?\n2. Please align the documentation and source constant for the skip-default-XML variable (`SKIP_DEFAULT_XML` vs `SKIP_DEFAULT_XML_FILE`) \u2014 whichever direction is canonical.\n3. Consider a startup log line (INFO/WARNING) whenever a profiles file is referenced but not loaded (name not consumed, file missing, or schema rejection), so silent no-ops become observable.\n\n### Version anchors\n\n- eProsima Fast DDS 2.14.6-1noble.20260303.233638 (`ros-jazzy-fastrtps`, Ubuntu 24.04 distro package; `libfastrtps.so.2.14.6`)\n- `rmw_fastrtps_cpp` / `rmw_fastrtps_shared_cpp` 8.4.3-1noble.20260412 (checked for the env name as well: 0 hits)\n- Source references: v2.14.6 tag (`XMLParserCommon.cpp`, `XMLProfileManager.cpp`); documentation: v2.14.6 environment variables page. Line numbers approximate; binary cross-check performed via `strings` on the installed libraries.\n",
+      "created_at": "2026-10-15T03:46:02Z",
+      "html_url": "https://github.com/eProsima/Fast-DDS/issues/6578",
+      "id": "eProsima/Fast-DDS#6578",
+      "issue_number": 6578,
+      "labels": [],
+      "repository": "eProsima/Fast-DDS",
+      "surface_sha256": "9538488226cf4a7b0fdc4b0bd62699721069c99152ff9a9ea6b594083481587b",
+      "title": "2.14.x LTS: `FASTDDS_DEFAULT_PROFILES_FILE` is not consumed (3.x-era name) \u2014 silent no-op risk; plus env-docs name drift (`SKIP_DEFAULT_XML` in docs vs `SKIP_DEFAULT_XML_FILE` in source)"
+    },
+    {
+      "author_login": "KEYL-PH",
+      "body": "### Description\n\nWhenever I control my robot, it would act like I'm using Physx Physics despite I have set it up as Newton.\n[Issue.zip](https://github.com/user-attachments/files/33466754/Issue.zip)\n\nHow to Fix:\n1) Delete all barrier blocks and Newton Physics becomes normal. (Not ideal solution)\n2) Set Time Steps Per Second under Scene (Physx) properties to 60 (default value).\n\nFor some reason, the combination of the barrier blocks as long 1 exists and the Time Step Per Second value is not 60. The Newton physics does not work as intended.\n\n<img width=\"1905\" height=\"969\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/7d51ac03-450b-4b7f-b930-9d2affa828a5\" />\n\nUpdate:\nTime Step Per Second of Physx Scene Properties and Newton Scene Properties are linked. If the Time Step Per Second in Physx is not in default value, it overrides the value of the Newton Scene.\n\n400 Time Step Per Second in Physx Scene feels the same as 400 Time Step Per Second in Newton Scene.\n\n<img width=\"553\" height=\"352\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/e4d16310-a25f-4a86-a08e-11abcaa2601f\" />\n\n\n### Isaac Sim version\n\n6.1.0 and 6.2.0\n\n### Operating System (OS)\n\nWindows 11\n\n### GPU Name\n\nRTX 5090\n\n### GPU Driver and CUDA versions\n\nDriver 617.42, CUDA 13.4\n\n### Logs\n\n_No response_\n\n### Additional information\n\n_No response_",
+      "created_at": "2026-10-15T00:56:24Z",
+      "html_url": "https://github.com/isaac-sim/IsaacSim/issues/884",
+      "id": "isaac-sim/IsaacSim#884",
+      "issue_number": 884,
+      "labels": [
+        "isaac-sim-physics",
+        "isaac-sim-v6-1-0"
+      ],
+      "repository": "isaac-sim/IsaacSim",
+      "surface_sha256": "0f4ee1a37fd845c72a72f189f63a569c9534fd81263028596461cdf80364c181",
+      "title": "[BUG] Isaac Sim 6.1/6.2 Experiencing Physx Physics Simulation Behaviour Under Newton Physics"
+    }
+  ],
+  "post_activation_issue_identities_observed": 145,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-15T04:32:44Z",
+  "schema_version": 1
+}
