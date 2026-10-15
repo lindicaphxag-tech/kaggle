@@ -1,5 +1,12 @@
 name: P2 BSPC focused native PDF and science gates
 on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - ".github/workflows/p2-bspc-focused-pdf-preflight.yml"
+      - "research/defaultreg_bspc_v13/main_p2_BSPC_POSITIVE_METHOD_AUTHOR_REVIEW_20261015.tex"
+      - "research/defaultreg_bspc_v13/P2_V7_CALIBRATED_CAR_COMPARISON_AUTHOR_REVIEW_20261015.tex"
+      - "research/defaultreg_bspc_v13/P2_V5_COMMON_MODE_CONTROLLED_REAL_EDF_AUTHOR_REVIEW_20261015.tex"
   push:
     branches: [publication/default-eeg-p2-record-identity-20261013]
     paths:
