@@ -89,24 +89,22 @@ jobs:
               std=np.std(x)*np.std(y)
               return 0 if std<1e-18 else abs(float(np.mean((x-x.mean())*(y-y.mean()))/std))
           def screen(src,tgt,permutation=True,shift=True):
-              ss=list(src);tt=list(tgt);candidate={}
-              for k in ss:
-                  for v in tt:
+              # All candidate lags are checked, without post-outcome top-lag pruning.
+              # Single FFT-normalized channel cross-correlation per pair; precompute once.
+              ss=list(src);tt=list(tgt)
+              grid=np.zeros((2*MAXLAG+1,len(ss),len(tt)),dtype=np.float32)
+              for i,k in enumerate(ss):
+                  for j,v in enumerate(tt):
                       if not permutation and k!=v:continue
-                      lags,vals=cc_lags(tgt[v],src[k])
-                      idx=np.flatnonzero(vals>=TH*.92)
-                      if not shift:idx=idx[lags[idx]==0]
-                      if not len(idx):continue
-                      best=idx[np.argsort(vals[idx])[-2:]]
-                      for z in best:candidate[int(lags[z])]=candidate.get(int(lags[z]),0)+float(vals[z])
-              for lag in sorted(candidate,key=candidate.get,reverse=True)[:14]:
-                  m=np.zeros((len(ss),len(tt)))
-                  for i,k in enumerate(ss):
-                      for j,v in enumerate(tt):
-                          if permutation or k==v:m[i,j]=atlag(src[k],tgt[v],lag)
-                  score=np.where(m>=TH,m,0)
-                  rows,cols=linear_sum_assignment(-score)
-                  if int(np.count_nonzero(score[rows,cols]>=TH))>=MIN:return True
+                      lag,val=cc_lags(tgt[v],src[k])
+                      take=np.abs(lag)<=MAXLAG
+                      grid[lag[take]+MAXLAG,i,j]=val[take]
+              which=[MAXLAG] if not shift else range(2*MAXLAG+1)
+              for u in which:
+                  m=np.where(grid[u]>=TH,grid[u],0)
+                  if int(np.sum(m.max(axis=1)>=TH))<MIN:continue
+                  row,col=linear_sum_assignment(-m)
+                  if int(np.sum(m[row,col]>=TH))>=MIN:return True
               return False
           def permutation_uncoordinated_lag(src,tgt):
               # Strong informed baseline: every channel pair may independently pick its best lag.
@@ -125,11 +123,11 @@ jobs:
           def whole_equal(src,tgt):
               return set(src)==set(tgt) and all(np.array_equal(src[k],tgt[k]) for k in src)
           sources={};digests={}
-          for p in [1,2,3,4]:
+          for p in [1,2,5,6]:
               for run in (1,2):
                   s,h=get(p,run);sources[p,run]=s;digests[f"S{p:03d}R{run:02d}"]=h
           rows=[]
-          for p in [1,2,3,4]:
+          for p in [1,2,5,6]:
               src=sources[p,1];other=sources[p,2]
               for ix,kind in enumerate(["exact","permutation","lag","crop","gain","drop","noise","combined","independent","single_channel","asynchronous_same_source","shared_artifact"]):
                   truth=int(ix<8);target=make(src,kind,16000+p*29+ix,other)
@@ -153,7 +151,7 @@ jobs:
           o={"experiment":"real PhysioNet EDF substrate; controlled digital transformations",
              "source":"10.13026/C28G6P; EDF v1.0.0; original files not redistributed",
              "prespecified":{"abs_pearson":TH,"min_distinct_channels":MIN,"min_overlap_samples":MINLEN,"max_abs_lag":MAXLAG},
-             "partition":"S001-S002 dev, S003-S004 held; same public acquisition family",
+             "partition":"S001-S002 dev, NEW S005-S006 held (neither inspected in previous S003/S004 method comparison); same dataset family",
              "clinical_duplicate_identity_test":False,"natural_population_false_positive_rate_claim":False,
              "label_definition":"coherent multichannel shared recording clock; asynchronous per-channel copies are deliberately negative for this specific estimand",
              "strong_baseline":"permutation+independent lag Hungarian (channelwise match without shared clock)",
