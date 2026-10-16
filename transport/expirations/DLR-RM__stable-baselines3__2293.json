@@ -1,0 +1,13 @@
+{
+  "case_id": "DLR-RM/stable-baselines3#2293",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-10-16T22:46:12Z",
+  "expiry_sha256": "a54a4de889e2212e2ae09c62baee27ea31f1b9338179b0af78765c71c57f405d",
+  "first_frozen_at": "2026-10-16T16:34:38Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-10-16T22:34:38Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "e7aed318432d62701ae4bb19d836d4d47e4684609e61b2711d1e06a5a07a8b7f"
+}
