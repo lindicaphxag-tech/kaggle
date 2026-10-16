@@ -1,0 +1,13 @@
+{
+  "case_id": "isaac-sim/IsaacSim#889",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-10-16T19:54:40Z",
+  "expiry_sha256": "90eee9d4af4ae57ad29275443caac8c4f61de490a6c0edf1f44c989020f78c4a",
+  "first_frozen_at": "2026-10-16T11:15:36Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-10-16T17:15:36Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "ad0e9659fe78ea5149a8dba9adc22f526ff30f798a7579af2dd29d44578a077c"
+}
