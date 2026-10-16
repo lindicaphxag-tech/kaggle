@@ -1,0 +1,13 @@
+{
+  "case_id": "Farama-Foundation/Gymnasium-Robotics#355",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-10-16T11:52:31Z",
+  "expiry_sha256": "e520ee8bc80c15f527b3461d9e5dedcfb7416216ed6e676c0bf437aea364e881",
+  "first_frozen_at": "2026-10-16T05:47:49Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-10-16T11:47:49Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "cdac0b5a4ef2af0242c75a2665153f151d79bc38bee5a9d3d21b0dd18c87d681"
+}
