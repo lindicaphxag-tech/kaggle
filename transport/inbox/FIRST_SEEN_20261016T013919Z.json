@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "wpyaoxueros",
+      "body": "### Bug description\n\nOn current main (`62ff3a5`), `ManiSkillTrajectoryDataset(..., device=\"cpu\")` substitutes `terminated` for the recorded `success` array and `truncated` for `fail`. The default NumPy mode preserves the labels. This silently changes outcomes when a caller requests tensor storage.\n\n### Minimal reproduction\n\nThis synthetic three-step HDF5/JSON fixture exercises the genuine loader. Success and termination/truncation are intentionally independent, as in a continuing rollout that succeeds before reaching a time limit.\n\n```python\n\"\"\"Minimal synthetic HDF5 fixture for the actual ManiSkill trajectory loader.\"\"\"\n\nimport json\nimport tempfile\nfrom pathlib import Path\n\nimport h5py\nimport numpy as np\n\nfrom mani_skill.trajectory.dataset import ManiSkillTrajectoryDataset\n\nwith tempfile.TemporaryDirectory() as directory:\n    path = Path(directory) / \"trajectory.h5\"\n    with h5py.File(path, \"w\") as file:\n        trajectory = file.create_group(\"traj_0\")\n        trajectory[\"obs\"] = np.zeros((4, 2))\n        trajectory[\"actions\"] = np.zeros((3, 1))\n        trajectory[\"terminated\"] = [False, False, False]\n        trajectory[\"truncated\"] = [False, False, True]\n        trajectory[\"success\"] = [False, True, True]\n        trajectory[\"fail\"] = [False, False, False]\n    path.with_suffix(\".json\").write_text(\n        json.dumps(\n            {\n                \"env_info\": {\"env_id\": \"PickCube-v1\", \"env_kwargs\": {}},\n                \"episodes\": [{\"episode_id\": 0, \"success\": True}],\n            }\n        )\n    )\n    for device in [None, \"cpu\"]:\n        dataset = ManiSkillTrajectoryDataset(str(path), device=device)\n        try:\n            print(device, \"success:\", dataset.success.tolist())\n            print(device, \"fail:\", dataset.fail.tolist())\n        finally:\n            dataset.data.close()\n```\n\nObserved on unchanged source:\n\n```text\nNone success: [False, True, True]\nNone fail: [False, False, False]\ncpu success: [False, False, False]\ncpu fail: [False, False, True]\n```\n\nBoth modes should preserve the recorded success/fail arrays.\n\n### Cause and proposed fix\n\nIn `mani_skill/trajectory/dataset.py`, the conversion block uses `common.to_tensor(self.terminated, ...)` for success and `common.to_tensor(self.truncated, ...)` for fail. Converting `self.success` and `self.fail` respectively preserves the original fields. The copied docs example contains the same two argument mix-ups.\n\nA focused HDF5 regression covers both fields with `device=None` and `device=\"cpu\"`: **2 failed / 2 passed before**, **4 passed after** the two input corrections. Black 22.10.0, isort 5.12.0 and dependency checks passed. Validation is targeted CPU loader testing; no GPU simulation-suite result is claimed.\n\n### System info\n\nLinux x86_64; editable main checkout `62ff3a5`; Python 3.10.12, PyTorch 2.6.0+cpu, NumPy 2.2.6, h5py 3.16.0.\n\nWould a PR limited to these label inputs, the matching docs arguments, and regression tests be welcome?\n\nAI disclosure: the investigation, proposed patch and tests were prepared and executed with Codex, an AI coding agent.\n",
+      "created_at": "2026-10-16T00:42:50Z",
+      "html_url": "https://github.com/mani-skill/ManiSkill/issues/1499",
+      "id": "mani-skill/ManiSkill#1499",
+      "issue_number": 1499,
+      "labels": [],
+      "repository": "mani-skill/ManiSkill",
+      "surface_sha256": "0b652ce35f853e5536bedd29c415ac2153b9ec08f52fa45a6a33ff123a9e442d",
+      "title": "[Bug] TrajectoryDataset changes success/fail labels when device is set"
+    }
+  ],
+  "post_activation_issue_identities_observed": 167,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-16T01:39:19Z",
+  "schema_version": 1
+}

@@ -2445,13 +2445,17 @@
     },
     {
       "created_at": "2026-10-15T18:09:59Z",
+      "expiry_recorded_at": "2026-10-16T01:37:51Z",
+      "expiry_sha256": "5b59d3ba465864359831b5be5d6547f2f8b5e78773d73ef229c36d87f93d29d3",
+      "expiry_source": "expirations/RobotLocomotion__drake__25089.json",
       "first_frozen_at": "2026-10-15T19:05:48Z",
       "id": "RobotLocomotion/drake#25089",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 25089,
       "prediction_deadline_at": "2026-10-16T01:05:48Z",
       "repository": "RobotLocomotion/drake",
       "source": "inbox/FIRST_SEEN_20261015T190548Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "4164a940a129d666fc36a38f63b8e1eb1f045b1409de98ecad8a9b4dd92ac79a"
     },
     {
@@ -2486,6 +2490,17 @@
       "source": "inbox/FIRST_SEEN_20261016T002336Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "22275dc1f036c14991dd2e7b3d10c7d2d5b418ca772ef04e357c5213b1773fe2"
+    },
+    {
+      "created_at": "2026-10-16T00:42:50Z",
+      "first_frozen_at": "2026-10-16T01:39:19Z",
+      "id": "mani-skill/ManiSkill#1499",
+      "issue_number": 1499,
+      "prediction_deadline_at": "2026-10-16T07:39:19Z",
+      "repository": "mani-skill/ManiSkill",
+      "source": "inbox/FIRST_SEEN_20261016T013919Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "0b652ce35f853e5536bedd29c415ac2153b9ec08f52fa45a6a33ff123a9e442d"
     }
   ]
 }
