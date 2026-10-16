@@ -2564,6 +2564,50 @@
       "source": "inbox/FIRST_SEEN_20261016T054749Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "764fd264f5ffed63a8f89807a41307842f269fec7dc3cfca3a61e71a1d34e550"
+    },
+    {
+      "created_at": "2026-10-16T05:55:42Z",
+      "first_frozen_at": "2026-10-16T06:22:11Z",
+      "id": "isaac-sim/IsaacLab#8648",
+      "issue_number": 8648,
+      "prediction_deadline_at": "2026-10-16T12:22:11Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261016T062211Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "d2ecc78725edd7ffb2d8b7503c83a1bfc6e212774005bd928906c1b6b507a83b"
+    },
+    {
+      "created_at": "2026-10-16T05:56:01Z",
+      "first_frozen_at": "2026-10-16T06:22:11Z",
+      "id": "isaac-sim/IsaacLab#8650",
+      "issue_number": 8650,
+      "prediction_deadline_at": "2026-10-16T12:22:11Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261016T062211Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "e53590d775ec10ba5bfc369c3fe2f40df70cbf163eed42096a3e7b9e7e2b0106"
+    },
+    {
+      "created_at": "2026-10-16T06:17:36Z",
+      "first_frozen_at": "2026-10-16T06:22:11Z",
+      "id": "isaac-sim/IsaacLab#8652",
+      "issue_number": 8652,
+      "prediction_deadline_at": "2026-10-16T12:22:11Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261016T062211Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "649a0f886634e2dd9d91fd11663006c1ca1d4de2b320473bdbc3e6bb3afb32c0"
+    },
+    {
+      "created_at": "2026-10-16T05:53:50Z",
+      "first_frozen_at": "2026-10-16T06:22:11Z",
+      "id": "ros2/rclpy#1744",
+      "issue_number": 1744,
+      "prediction_deadline_at": "2026-10-16T12:22:11Z",
+      "repository": "ros2/rclpy",
+      "source": "inbox/FIRST_SEEN_20261016T062211Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "638c5f22923ab0349f749ee5e36a4d50bcbc7b9b7e8b9226dc0dfe83491f7339"
     }
   ]
 }
