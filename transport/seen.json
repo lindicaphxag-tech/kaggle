@@ -2490,24 +2490,32 @@
     },
     {
       "created_at": "2026-10-16T00:15:32Z",
+      "expiry_recorded_at": "2026-10-16T11:14:16Z",
+      "expiry_sha256": "66bc65d56851e72188fc299f2e5171918412b1873283dba39ea0bd77da7fea47",
+      "expiry_source": "expirations/ros-navigation__navigation2__6669.json",
       "first_frozen_at": "2026-10-16T00:23:36Z",
       "id": "ros-navigation/navigation2#6669",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 6669,
       "prediction_deadline_at": "2026-10-16T06:23:36Z",
       "repository": "ros-navigation/navigation2",
       "source": "inbox/FIRST_SEEN_20261016T002336Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "22275dc1f036c14991dd2e7b3d10c7d2d5b418ca772ef04e357c5213b1773fe2"
     },
     {
       "created_at": "2026-10-16T00:42:50Z",
+      "expiry_recorded_at": "2026-10-16T11:14:16Z",
+      "expiry_sha256": "0a9bce72512f2ceec723029d6186c5a87b2c54dac4df92e4eaf71f841558c1bb",
+      "expiry_source": "expirations/mani-skill__ManiSkill__1499.json",
       "first_frozen_at": "2026-10-16T01:39:19Z",
       "id": "mani-skill/ManiSkill#1499",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 1499,
       "prediction_deadline_at": "2026-10-16T07:39:19Z",
       "repository": "mani-skill/ManiSkill",
       "source": "inbox/FIRST_SEEN_20261016T013919Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "0b652ce35f853e5536bedd29c415ac2153b9ec08f52fa45a6a33ff123a9e442d"
     },
     {
@@ -2608,6 +2616,138 @@
       "source": "inbox/FIRST_SEEN_20261016T062211Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "638c5f22923ab0349f749ee5e36a4d50bcbc7b9b7e8b9226dc0dfe83491f7339"
+    },
+    {
+      "created_at": "2026-10-16T09:32:16Z",
+      "first_frozen_at": "2026-10-16T11:15:36Z",
+      "id": "Farama-Foundation/Gymnasium-Robotics#356",
+      "issue_number": 356,
+      "prediction_deadline_at": "2026-10-16T17:15:36Z",
+      "repository": "Farama-Foundation/Gymnasium-Robotics",
+      "source": "inbox/FIRST_SEEN_20261016T111536Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "d18416bd41c5e5b276afa1bf65130c6e5b0a43c9e5723207010ff3be23bb25f1"
+    },
+    {
+      "created_at": "2026-10-16T06:28:01Z",
+      "first_frozen_at": "2026-10-16T11:15:36Z",
+      "id": "NVIDIA/Isaac-GR00T#791",
+      "issue_number": 791,
+      "prediction_deadline_at": "2026-10-16T17:15:36Z",
+      "repository": "NVIDIA/Isaac-GR00T",
+      "source": "inbox/FIRST_SEEN_20261016T111536Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "da39fd405f87b2a19db004d0a04fe83c57eba8f165f8981c8142ab62f9ebddba"
+    },
+    {
+      "created_at": "2026-10-16T10:20:23Z",
+      "first_frozen_at": "2026-10-16T11:15:36Z",
+      "id": "google-deepmind/mujoco#3698",
+      "issue_number": 3698,
+      "prediction_deadline_at": "2026-10-16T17:15:36Z",
+      "repository": "google-deepmind/mujoco",
+      "source": "inbox/FIRST_SEEN_20261016T111536Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "130607179507ec14ca95f5f7a6acf81f5a1fda155f34745c4caed90b049596fb"
+    },
+    {
+      "created_at": "2026-10-16T06:24:04Z",
+      "first_frozen_at": "2026-10-16T11:15:36Z",
+      "id": "isaac-sim/IsaacLab#8654",
+      "issue_number": 8654,
+      "prediction_deadline_at": "2026-10-16T17:15:36Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261016T111536Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "d1064c9273429e07fc190076c8028493a6159007eab50fcc46ae96a66820759f"
+    },
+    {
+      "created_at": "2026-10-16T08:11:36Z",
+      "first_frozen_at": "2026-10-16T11:15:36Z",
+      "id": "isaac-sim/IsaacLab#8658",
+      "issue_number": 8658,
+      "prediction_deadline_at": "2026-10-16T17:15:36Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261016T111536Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "12ef714989953516fc819b038613a736e58b20dcc160fc2aa0d64db0ae8ca472"
+    },
+    {
+      "created_at": "2026-10-16T08:49:12Z",
+      "first_frozen_at": "2026-10-16T11:15:36Z",
+      "id": "isaac-sim/IsaacLab#8662",
+      "issue_number": 8662,
+      "prediction_deadline_at": "2026-10-16T17:15:36Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261016T111536Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "ed0a03bc0ea67d5c86c8d4f93aa202e489b1bc69b1a7e0595ae9e41ddf6a3b46"
+    },
+    {
+      "created_at": "2026-10-16T08:52:37Z",
+      "first_frozen_at": "2026-10-16T11:15:36Z",
+      "id": "isaac-sim/IsaacLab#8664",
+      "issue_number": 8664,
+      "prediction_deadline_at": "2026-10-16T17:15:36Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261016T111536Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "8be64a4736ed3df11c2194312acca5068258ab653dc892ed2cbc934a2a1099cd"
+    },
+    {
+      "created_at": "2026-10-16T08:52:39Z",
+      "first_frozen_at": "2026-10-16T11:15:36Z",
+      "id": "isaac-sim/IsaacLab#8665",
+      "issue_number": 8665,
+      "prediction_deadline_at": "2026-10-16T17:15:36Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261016T111536Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "5a98ec24aaa0e02bb6bc0ea791b4aa5c88021d6b338a7e6b6c2d2c2c0f96e705"
+    },
+    {
+      "created_at": "2026-10-16T10:13:43Z",
+      "first_frozen_at": "2026-10-16T11:15:36Z",
+      "id": "isaac-sim/IsaacLab#8669",
+      "issue_number": 8669,
+      "prediction_deadline_at": "2026-10-16T17:15:36Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261016T111536Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "fd0cc677f50417290c43c9d07cd7bdd7aa5bf75fbf47784491e2dd92413c217d"
+    },
+    {
+      "created_at": "2026-10-16T10:24:28Z",
+      "first_frozen_at": "2026-10-16T11:15:36Z",
+      "id": "isaac-sim/IsaacLab#8672",
+      "issue_number": 8672,
+      "prediction_deadline_at": "2026-10-16T17:15:36Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261016T111536Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "f0b044e7ffcc5855dc76edc2c59bb3e2f78d3994be4c86eaf6933fec1fbfb7a9"
+    },
+    {
+      "created_at": "2026-10-16T10:27:54Z",
+      "first_frozen_at": "2026-10-16T11:15:36Z",
+      "id": "isaac-sim/IsaacLab#8673",
+      "issue_number": 8673,
+      "prediction_deadline_at": "2026-10-16T17:15:36Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261016T111536Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "65ac65156e5f85f2bbc63e1ed7be5324beba5b6760e4998dee6d23c81786db17"
+    },
+    {
+      "created_at": "2026-10-16T09:33:08Z",
+      "first_frozen_at": "2026-10-16T11:15:36Z",
+      "id": "isaac-sim/IsaacSim#889",
+      "issue_number": 889,
+      "prediction_deadline_at": "2026-10-16T17:15:36Z",
+      "repository": "isaac-sim/IsaacSim",
+      "source": "inbox/FIRST_SEEN_20261016T111536Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "ad0e9659fe78ea5149a8dba9adc22f526ff30f798a7579af2dd29d44578a077c"
     }
   ]
 }
