@@ -2460,24 +2460,32 @@
     },
     {
       "created_at": "2026-10-15T19:11:25Z",
+      "expiry_recorded_at": "2026-10-16T05:46:30Z",
+      "expiry_sha256": "091497e8b26b1b5988792f60e61c3edfbcbf423fb0d9108ec4cae7058eb85a5d",
+      "expiry_source": "expirations/Genesis-Embodied-AI__genesis-world__3547.json",
       "first_frozen_at": "2026-10-15T20:32:25Z",
       "id": "Genesis-Embodied-AI/genesis-world#3547",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3547,
       "prediction_deadline_at": "2026-10-16T02:32:25Z",
       "repository": "Genesis-Embodied-AI/genesis-world",
       "source": "inbox/FIRST_SEEN_20261015T203225Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "427f74b05bd34d9693f55612b436d40ff8a7aeaec6dfb67be3e77b11109492fb"
     },
     {
       "created_at": "2026-10-15T22:38:42Z",
+      "expiry_recorded_at": "2026-10-16T05:46:30Z",
+      "expiry_sha256": "ca09a21fafd7f54b63cd9a69f27eaadc0f98072cb58326e150a34f14d764412d",
+      "expiry_source": "expirations/isaac-sim__IsaacLab__8626.json",
       "first_frozen_at": "2026-10-15T23:17:03Z",
       "id": "isaac-sim/IsaacLab#8626",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 8626,
       "prediction_deadline_at": "2026-10-16T05:17:03Z",
       "repository": "isaac-sim/IsaacLab",
       "source": "inbox/FIRST_SEEN_20261015T231703Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "b2e7f060bea5c187f7b7bf6339cd93b19227411cf6b3b5a88968ee5a4db7cddc"
     },
     {
@@ -2501,6 +2509,61 @@
       "source": "inbox/FIRST_SEEN_20261016T013919Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "0b652ce35f853e5536bedd29c415ac2153b9ec08f52fa45a6a33ff123a9e442d"
+    },
+    {
+      "created_at": "2026-10-16T02:34:41Z",
+      "first_frozen_at": "2026-10-16T05:47:49Z",
+      "id": "Farama-Foundation/Gymnasium-Robotics#355",
+      "issue_number": 355,
+      "prediction_deadline_at": "2026-10-16T11:47:49Z",
+      "repository": "Farama-Foundation/Gymnasium-Robotics",
+      "source": "inbox/FIRST_SEEN_20261016T054749Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "cdac0b5a4ef2af0242c75a2665153f151d79bc38bee5a9d3d21b0dd18c87d681"
+    },
+    {
+      "created_at": "2026-10-16T03:42:15Z",
+      "first_frozen_at": "2026-10-16T05:47:49Z",
+      "id": "isaac-sim/IsaacLab#8636",
+      "issue_number": 8636,
+      "prediction_deadline_at": "2026-10-16T11:47:49Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261016T054749Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "c8d5c18fb895f5d374c851c37ff6da75c85b787bf9344b5b06fd23fbc401e814"
+    },
+    {
+      "created_at": "2026-10-16T03:42:17Z",
+      "first_frozen_at": "2026-10-16T05:47:49Z",
+      "id": "isaac-sim/IsaacLab#8637",
+      "issue_number": 8637,
+      "prediction_deadline_at": "2026-10-16T11:47:49Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261016T054749Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "ce5df6f6d4d9dc1765d9cf01da8bbd6d780553c34e55a37362a5b35a3d859d39"
+    },
+    {
+      "created_at": "2026-10-16T04:16:09Z",
+      "first_frozen_at": "2026-10-16T05:47:49Z",
+      "id": "isaac-sim/IsaacLab#8641",
+      "issue_number": 8641,
+      "prediction_deadline_at": "2026-10-16T11:47:49Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261016T054749Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "cd9402a331bdd792051baeff9af94a5efc4c8117ed0b56d6915c9286981c474d"
+    },
+    {
+      "created_at": "2026-10-16T05:09:21Z",
+      "first_frozen_at": "2026-10-16T05:47:49Z",
+      "id": "isaac-sim/IsaacLab#8643",
+      "issue_number": 8643,
+      "prediction_deadline_at": "2026-10-16T11:47:49Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261016T054749Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "764fd264f5ffed63a8f89807a41307842f269fec7dc3cfca3a61e71a1d34e550"
     }
   ]
 }
