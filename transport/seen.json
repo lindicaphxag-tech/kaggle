@@ -3015,13 +3015,17 @@
     },
     {
       "created_at": "2026-10-17T14:46:25Z",
+      "expiry_recorded_at": "2026-10-17T22:37:42Z",
+      "expiry_sha256": "d33659959a3a463ea982ccc9ed0644a6439bd50d11ca72fbd2b516375fb94ea8",
+      "expiry_source": "expirations/huggingface__lerobot__4998.json",
       "first_frozen_at": "2026-10-17T15:28:17Z",
       "id": "huggingface/lerobot#4998",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 4998,
       "prediction_deadline_at": "2026-10-17T21:28:17Z",
       "repository": "huggingface/lerobot",
       "source": "inbox/FIRST_SEEN_20261017T152817Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "2be515a4e3aaf7261e4f6e9dd2e3dcb45d55c07c17322be72b46383b730fbd4e"
     },
     {
@@ -3056,6 +3060,17 @@
       "source": "inbox/FIRST_SEEN_20261017T212527Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "25716c112bf2be6191c0de0095c699b1426ae3ff3cdd09d1e47406a750f63560"
+    },
+    {
+      "created_at": "2026-10-17T22:23:29Z",
+      "first_frozen_at": "2026-10-17T22:38:55Z",
+      "id": "huggingface/lerobot#5002",
+      "issue_number": 5002,
+      "prediction_deadline_at": "2026-10-18T04:38:55Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261017T223855Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "84c03b7766bc77cf3d912b16fc656980ac8e29ade8589f1ddea69178ad16ca07"
     }
   ]
 }

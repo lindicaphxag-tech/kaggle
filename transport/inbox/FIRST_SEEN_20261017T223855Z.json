@@ -1,0 +1,33 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "Hadrien-Cornier",
+      "body": "## Ticket type\n\nFeature request / improvement\n\n## Description\n\nI want a Raspberry Pi 4 with 2 GB of RAM to control my SO-101 arm. The Pi will handle the arm, cameras, and tablet. A separate computer will handle the agent and model work.\n\nI want to use LeRobot's low-level hardware APIs. The controller process should not load PyTorch. An import of `SO101Follower` reaches `lerobot_types.py`, which imports `torch`. The utility package also eagerly imports tensor-related helpers.\n\nThis is a concrete controller use case for #4693. That PR already passes the disconnected-controller check described below. It could provide the runtime fix for this issue. #4742 extends that work to teleoperation.\n\n## Environment and reproduction\n\nThe reproduction on current `main` uses macOS arm64, Python 3.13.9, and LeRobot commit `146d8474932c8b566717eb2738ba459337ab71c4`. The Raspberry Pi motivates the request; the current-main reproduction uses a supported Python version on the Mac.\n\nFrom a source checkout, create a separate environment without PyTorch:\n\n```sh\nuv venv --python 3.13 .venv-device\nuv pip install --python .venv-device/bin/python \\\n  numpy==2.2.6 draccus==0.11.6 huggingface-hub==1.33.0 \\\n  pyserial==3.5 deepdiff==8.6.2 feetech-servo-sdk==1.0.0 \\\n  rustypot==1.13.1 tqdm==4.70.1 packaging==25.0\nPYTHONPATH=src .venv-device/bin/python -c \\\n  'from lerobot.robots.so_follower import SO101Follower, SO101FollowerConfig'\n```\n\nThe import fails through this chain:\n\n```text\nlerobot.robots.__init__\n  -> lerobot.robots.robot\n  -> lerobot.lerobot_types\n  -> import torch\nModuleNotFoundError: No module named 'torch'\n```\n\n## Expected behavior and checked result\n\nThe low-level controller API should import and construct a disconnected SO-101 follower without a PyTorch import. Tensor-dependent APIs should continue to load PyTorch when needed.\n\nA separate smoke check loads six synthetic calibration entries and constructs the follower with a nonexistent serial path. The check blocks serial and native bus creation, then checks that the robot stays disconnected and `torch` stays absent.\n\n- Current `main` at `146d8474`: fails during the import above.\n- #4693 at `31d4686d`: passes the controller check in the same environment without PyTorch.\n\nNo physical arm movement is part of these checks. This evidence does not establish control timing or recording performance.\n\n## Scope\n\nThis issue concerns runtime imports for the hardware API. The normal LeRobot installation still declares PyTorch as a required dependency. A supported hardware-only installation path remains a separate packaging question.\n\nCodex helped prepare the reproduction and this report.\n",
+      "created_at": "2026-10-17T22:23:29Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5002",
+      "id": "huggingface/lerobot#5002",
+      "issue_number": 5002,
+      "labels": [
+        "enhancement",
+        "question",
+        "policies",
+        "dependencies",
+        "performance",
+        "robots",
+        "teleoperators",
+        "sensors"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "84c03b7766bc77cf3d912b16fc656980ac8e29ade8589f1ddea69178ad16ca07",
+      "title": "Support a Raspberry Pi SO-101 controller without PyTorch imports"
+    }
+  ],
+  "post_activation_issue_identities_observed": 205,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-17T22:38:55Z",
+  "schema_version": 1
+}
