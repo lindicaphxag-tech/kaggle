@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "wpyaoxueros",
+      "body": "### Bug description\n\nOn current main (`62ff3a5`), `ManiSkillTrajectoryDataset(..., success_only=True)` fails when the first recorded episode is unsuccessful and a later episode is successful. The loader skips episode index 0, but observation initialization is conditional on that original index. Later observations are appended to `None`, and conversion raises `AttributeError`.\n\nA minimal dataset has two trajectories with array observations/actions and the usual terminated/truncated fields, plus a JSON episode list with `success` values `[false, true]`. Loading that file with `success_only=True` reproduces the failure for NumPy storage and `device=\"cpu\"`; retaining the first episode is a passing control.\n\n### Proposed fix and tested patch\n\nInitialize observations when `self.obs is None`, so the first retained episode initializes the buffer. Apply the identical one-condition change to the copied documentation example. This does not change filtering, load_count, empty-selection semantics or outcome-label conversion.\n\nReady patch and regression tests: [compare branch](https://github.com/mani-skill/ManiSkill/compare/main...wpyaoxueros:ManiSkill:codex/fix-first-successful-trajectory), commit `fb7df4d`.\n\n- 16 CPU/NumPy cases cover arrays/nested observations, filtering enabled/disabled, both episode orders and subsequent appending: baseline 4 failed/12 passed; fixed 16 passed.\n- Additional actual CUDA tensor-storage checks: baseline 2 failed/6 passed; fixed 8 passed. This is not a full GPU physics-suite result.\n- Black 22.10.0, isort 5.12.0, dependency and whitespace checks passed.\n- Full CPU/GPU physics suites have not completed because the test assets are unavailable in the current environment.\n\nThis is separate from outcome-label issue #1499 / PR #1500. Following CONTRIBUTING's maintainer-approval step, would a PR limited to this initialization fix and tests be welcome?\n\nAI disclosure: investigation, patch, regression tests and static review were assisted by an AI coding agent. No independent human review is claimed.\n\n\nTested implementation submitted as draft PR #1503: https://github.com/mani-skill/ManiSkill/pull/1503 . Maintainer scope approval and complete project validation are still pending; no approval or merge is claimed.",
+      "created_at": "2026-10-17T19:53:20Z",
+      "html_url": "https://github.com/mani-skill/ManiSkill/issues/1501",
+      "id": "mani-skill/ManiSkill#1501",
+      "issue_number": 1501,
+      "labels": [],
+      "repository": "mani-skill/ManiSkill",
+      "surface_sha256": "25716c112bf2be6191c0de0095c699b1426ae3ff3cdd09d1e47406a750f63560",
+      "title": "[Bug] success_only trajectory loading fails when the first episode is filtered out"
+    }
+  ],
+  "post_activation_issue_identities_observed": 204,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-17T21:25:27Z",
+  "schema_version": 1
+}

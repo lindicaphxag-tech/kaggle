@@ -2985,24 +2985,32 @@
     },
     {
       "created_at": "2026-10-17T13:13:32Z",
+      "expiry_recorded_at": "2026-10-17T21:24:20Z",
+      "expiry_sha256": "28ce0006618ab80a4ce9743b1f9e4f6a2961611f18348cc257bcb41b0b8c0fc4",
+      "expiry_source": "expirations/ros-controls__ros2_control__3701.json",
       "first_frozen_at": "2026-10-17T14:24:57Z",
       "id": "ros-controls/ros2_control#3701",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3701,
       "prediction_deadline_at": "2026-10-17T20:24:57Z",
       "repository": "ros-controls/ros2_control",
       "source": "inbox/FIRST_SEEN_20261017T142457Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "4a4631a530adeeb28a1e85ba3ec046c59fe170c6b4699bafc91a281234b70e9d"
     },
     {
       "created_at": "2026-10-17T13:52:33Z",
+      "expiry_recorded_at": "2026-10-17T21:24:20Z",
+      "expiry_sha256": "3003bf74735422e43bc0fac0d369ae0530921c968781df4b7fbd7ad98dfd7a2a",
+      "expiry_source": "expirations/ros2__launch__1047.json",
       "first_frozen_at": "2026-10-17T14:24:57Z",
       "id": "ros2/launch#1047",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 1047,
       "prediction_deadline_at": "2026-10-17T20:24:57Z",
       "repository": "ros2/launch",
       "source": "inbox/FIRST_SEEN_20261017T142457Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "78a17dad06ef6019df36567e84eabc866be71e76ceb9ab17edfb3b5b39809c0f"
     },
     {
@@ -3037,6 +3045,17 @@
       "source": "inbox/FIRST_SEEN_20261017T173238Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "c42b06294584bb17f9c2859f8e8fb07a7d8f6a452d7166bb1753d780bb29f7aa"
+    },
+    {
+      "created_at": "2026-10-17T19:53:20Z",
+      "first_frozen_at": "2026-10-17T21:25:27Z",
+      "id": "mani-skill/ManiSkill#1501",
+      "issue_number": 1501,
+      "prediction_deadline_at": "2026-10-18T03:25:27Z",
+      "repository": "mani-skill/ManiSkill",
+      "source": "inbox/FIRST_SEEN_20261017T212527Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "25716c112bf2be6191c0de0095c699b1426ae3ff3cdd09d1e47406a750f63560"
     }
   ]
 }
