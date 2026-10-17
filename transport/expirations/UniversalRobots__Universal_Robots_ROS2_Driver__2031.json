@@ -1,0 +1,13 @@
+{
+  "case_id": "UniversalRobots/Universal_Robots_ROS2_Driver#2031",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-10-17T17:31:33Z",
+  "expiry_sha256": "4bbcb2a3cc5154860fb423cd1a78824dfdcf898fa3ca4e5687d099b5d419f0d6",
+  "first_frozen_at": "2026-10-17T11:09:56Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-10-17T17:09:56Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "35b26e0095864e2866d4a7bebc1e2930df5a6a1721944eff502e345ce6bb0095"
+}

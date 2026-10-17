@@ -2955,24 +2955,32 @@
     },
     {
       "created_at": "2026-10-17T09:06:39Z",
+      "expiry_recorded_at": "2026-10-17T17:31:33Z",
+      "expiry_sha256": "0929c506433c4bed874c66a2f29a2674c091ab6fefbbd8a24c03aabd48ca75d1",
+      "expiry_source": "expirations/RobotLocomotion__drake__25096.json",
       "first_frozen_at": "2026-10-17T11:09:56Z",
       "id": "RobotLocomotion/drake#25096",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 25096,
       "prediction_deadline_at": "2026-10-17T17:09:56Z",
       "repository": "RobotLocomotion/drake",
       "source": "inbox/FIRST_SEEN_20261017T110956Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "6de30aa758a01e63c067763613b490f72a24d79a32d9070a19ce0d4ca5e9a726"
     },
     {
       "created_at": "2026-10-17T07:48:26Z",
+      "expiry_recorded_at": "2026-10-17T17:31:33Z",
+      "expiry_sha256": "4bbcb2a3cc5154860fb423cd1a78824dfdcf898fa3ca4e5687d099b5d419f0d6",
+      "expiry_source": "expirations/UniversalRobots__Universal_Robots_ROS2_Driver__2031.json",
       "first_frozen_at": "2026-10-17T11:09:56Z",
       "id": "UniversalRobots/Universal_Robots_ROS2_Driver#2031",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 2031,
       "prediction_deadline_at": "2026-10-17T17:09:56Z",
       "repository": "UniversalRobots/Universal_Robots_ROS2_Driver",
       "source": "inbox/FIRST_SEEN_20261017T110956Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "35b26e0095864e2866d4a7bebc1e2930df5a6a1721944eff502e345ce6bb0095"
     },
     {
@@ -3007,6 +3015,28 @@
       "source": "inbox/FIRST_SEEN_20261017T152817Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "2be515a4e3aaf7261e4f6e9dd2e3dcb45d55c07c17322be72b46383b730fbd4e"
+    },
+    {
+      "created_at": "2026-10-17T16:20:31Z",
+      "first_frozen_at": "2026-10-17T17:32:38Z",
+      "id": "NVlabs/alpasim#209",
+      "issue_number": 209,
+      "prediction_deadline_at": "2026-10-17T23:32:38Z",
+      "repository": "NVlabs/alpasim",
+      "source": "inbox/FIRST_SEEN_20261017T173238Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "9b2920f08a8baf7b1570304b73d22b87539d7eed0217d661d95b6410770ec2f6"
+    },
+    {
+      "created_at": "2026-10-17T16:54:51Z",
+      "first_frozen_at": "2026-10-17T17:32:38Z",
+      "id": "google-deepmind/mujoco#3701",
+      "issue_number": 3701,
+      "prediction_deadline_at": "2026-10-17T23:32:38Z",
+      "repository": "google-deepmind/mujoco",
+      "source": "inbox/FIRST_SEEN_20261017T173238Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "c42b06294584bb17f9c2859f8e8fb07a7d8f6a452d7166bb1753d780bb29f7aa"
     }
   ]
 }
