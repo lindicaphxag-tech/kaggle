@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "2630716-ship-it",
+      "body": "If you are submitting a bug report, please fill in the following details and use the tag [bug].\n\n### Describe the bug\n\nA clear and concise description of what the bug is.\n\n### Steps to reproduce\n\nPlease try to provide a minimal example to reproduce the bug. Error messages and stack traces are also helpful.\n\n<!-- Please post terminal logs, minimal example to reproduce, or command to run under three backticks (```) to allow code formatting.\n\n```\nPaste your error here\n```\n\nFor more information on this, check: https://www.markdownguide.org/extended-syntax/#fenced-code-blocks\n\n-->\n\n### System Info\n\nDescribe the characteristic of your environment:\n\n<!-- Please complete the following description. -->\n- Commit: [e.g. 8f3b9ca]\n- Isaac Sim Version: [e.g. 6.2, this can be obtained by `cat ${ISAACSIM_PATH}/VERSION`]\n- OS: [e.g. Ubuntu 22.04]\n- GPU: [e.g. RTX 5090]\n- CUDA: [e.g. 12.8]\n- GPU Driver: [e.g. 553.05, this can be seen by using `nvidia-smi` command.]\n\n### Additional context\n\nAdd any other context about the problem here.\n\n### Checklist\n\n- [ ] I have checked that there is no similar issue in the repo (**required**)\n- [ ] I have checked that the issue is not in running Isaac Sim itself and is related to the repo\n\n### Acceptance Criteria\n\nAdd the criteria for which this task is considered **done**. If not known at issue creation time, you can add this once the issue is assigned.\n\n- [ ] Criteria 1\n- [ ] Criteria 2\n",
+      "created_at": "2026-10-17T03:49:23Z",
+      "html_url": "https://github.com/isaac-sim/IsaacLab/issues/8703",
+      "id": "isaac-sim/IsaacLab#8703",
+      "issue_number": 8703,
+      "labels": [],
+      "repository": "isaac-sim/IsaacLab",
+      "surface_sha256": "5288cd0416c20c45d656bbcd4a94ad472a1313d4963912ef794202217c5f9f49",
+      "title": "[Bug Report] Bug title"
+    }
+  ],
+  "post_activation_issue_identities_observed": 195,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-17T06:09:07Z",
+  "schema_version": 1
+}
