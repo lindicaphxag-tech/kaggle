@@ -2895,24 +2895,32 @@
     },
     {
       "created_at": "2026-10-17T00:40:29Z",
+      "expiry_recorded_at": "2026-10-17T11:08:33Z",
+      "expiry_sha256": "5a8da7944e7fb543457a65664d561f4edfbbb9e42f2fc8cb7eaf16c7a2d5588f",
+      "expiry_source": "expirations/isaac-sim__IsaacLab__8698.json",
       "first_frozen_at": "2026-10-17T01:17:18Z",
       "id": "isaac-sim/IsaacLab#8698",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 8698,
       "prediction_deadline_at": "2026-10-17T07:17:18Z",
       "repository": "isaac-sim/IsaacLab",
       "source": "inbox/FIRST_SEEN_20261017T011718Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "d3b8aae839cd7deada9df1bff2e56f68455d7354be60a5d1c7900138b8881dbc"
     },
     {
       "created_at": "2026-10-17T01:21:56Z",
+      "expiry_recorded_at": "2026-10-17T11:08:33Z",
+      "expiry_sha256": "1a9588df0b26283e886da8a92b6545ac2924a6c23e8f5bb463a95c7f24d00ffa",
+      "expiry_source": "expirations/RobotLocomotion__drake__25094.json",
       "first_frozen_at": "2026-10-17T01:31:59Z",
       "id": "RobotLocomotion/drake#25094",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 25094,
       "prediction_deadline_at": "2026-10-17T07:31:59Z",
       "repository": "RobotLocomotion/drake",
       "source": "inbox/FIRST_SEEN_20261017T013159Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "0173b943c0bcde13d9b68b138a455ea2c6b2a459f408c975ed6d0bdb25950c41"
     },
     {
@@ -2936,6 +2944,28 @@
       "source": "inbox/FIRST_SEEN_20261017T065254Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "7cdd700961661470f1452f7a1d645c9503e6e1dd5c104161a29bc954cf6ab9b0"
+    },
+    {
+      "created_at": "2026-10-17T09:06:39Z",
+      "first_frozen_at": "2026-10-17T11:09:56Z",
+      "id": "RobotLocomotion/drake#25096",
+      "issue_number": 25096,
+      "prediction_deadline_at": "2026-10-17T17:09:56Z",
+      "repository": "RobotLocomotion/drake",
+      "source": "inbox/FIRST_SEEN_20261017T110956Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "6de30aa758a01e63c067763613b490f72a24d79a32d9070a19ce0d4ca5e9a726"
+    },
+    {
+      "created_at": "2026-10-17T07:48:26Z",
+      "first_frozen_at": "2026-10-17T11:09:56Z",
+      "id": "UniversalRobots/Universal_Robots_ROS2_Driver#2031",
+      "issue_number": 2031,
+      "prediction_deadline_at": "2026-10-17T17:09:56Z",
+      "repository": "UniversalRobots/Universal_Robots_ROS2_Driver",
+      "source": "inbox/FIRST_SEEN_20261017T110956Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "35b26e0095864e2866d4a7bebc1e2930df5a6a1721944eff502e345ce6bb0095"
     }
   ]
 }
