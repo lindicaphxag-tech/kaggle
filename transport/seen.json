@@ -2925,24 +2925,32 @@
     },
     {
       "created_at": "2026-10-17T03:49:23Z",
+      "expiry_recorded_at": "2026-10-17T14:23:54Z",
+      "expiry_sha256": "9e39e1436cec2786e3c234b959b381d8b080e6496a73e2e257757ce5b2f3dd2c",
+      "expiry_source": "expirations/isaac-sim__IsaacLab__8703.json",
       "first_frozen_at": "2026-10-17T06:09:07Z",
       "id": "isaac-sim/IsaacLab#8703",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 8703,
       "prediction_deadline_at": "2026-10-17T12:09:07Z",
       "repository": "isaac-sim/IsaacLab",
       "source": "inbox/FIRST_SEEN_20261017T060907Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "5288cd0416c20c45d656bbcd4a94ad472a1313d4963912ef794202217c5f9f49"
     },
     {
       "created_at": "2026-10-17T06:22:55Z",
+      "expiry_recorded_at": "2026-10-17T14:23:54Z",
+      "expiry_sha256": "d2d372164161cef7de6e888abed291d41db8d162d27b128d11df8960afb07fb2",
+      "expiry_source": "expirations/isaac-sim__IsaacLab__8705.json",
       "first_frozen_at": "2026-10-17T06:52:54Z",
       "id": "isaac-sim/IsaacLab#8705",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 8705,
       "prediction_deadline_at": "2026-10-17T12:52:54Z",
       "repository": "isaac-sim/IsaacLab",
       "source": "inbox/FIRST_SEEN_20261017T065254Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "7cdd700961661470f1452f7a1d645c9503e6e1dd5c104161a29bc954cf6ab9b0"
     },
     {
@@ -2966,6 +2974,28 @@
       "source": "inbox/FIRST_SEEN_20261017T110956Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "35b26e0095864e2866d4a7bebc1e2930df5a6a1721944eff502e345ce6bb0095"
+    },
+    {
+      "created_at": "2026-10-17T13:13:32Z",
+      "first_frozen_at": "2026-10-17T14:24:57Z",
+      "id": "ros-controls/ros2_control#3701",
+      "issue_number": 3701,
+      "prediction_deadline_at": "2026-10-17T20:24:57Z",
+      "repository": "ros-controls/ros2_control",
+      "source": "inbox/FIRST_SEEN_20261017T142457Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "4a4631a530adeeb28a1e85ba3ec046c59fe170c6b4699bafc91a281234b70e9d"
+    },
+    {
+      "created_at": "2026-10-17T13:52:33Z",
+      "first_frozen_at": "2026-10-17T14:24:57Z",
+      "id": "ros2/launch#1047",
+      "issue_number": 1047,
+      "prediction_deadline_at": "2026-10-17T20:24:57Z",
+      "repository": "ros2/launch",
+      "source": "inbox/FIRST_SEEN_20261017T142457Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "78a17dad06ef6019df36567e84eabc866be71e76ceb9ab17edfb3b5b39809c0f"
     }
   ]
 }
