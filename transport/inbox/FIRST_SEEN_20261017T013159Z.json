@@ -1,0 +1,26 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "sherm1",
+      "body": "Drake can silently assign the wrong pose to an SDF <frame> when its attached_to target is a joint or a frame declared later in the model.\n\nThe parser initially calculates the frame\u2019s pose relative to its named attachment target. If that target has no frame in the plant yet, the parser instead attaches the frame to the target\u2019s resolved body or implicit model frame\u2014but previously kept the original offset. This drops the target\u2019s translation and rotation.\nFor example, suppose F1 is at [0, 0, 3] with a 90\u00b0 yaw, and F2 is one meter along F1\u2019s x-axis. If F2 is declared first, the old parser places it at [1, 0, 0] with no rotation. The correct pose is [0, 1, 3] with a 90\u00b0 yaw.\n\nThis was discovered incidentally by Codex while working on another feature. I'll follow up with a PR to fix this.",
+      "created_at": "2026-10-17T01:21:56Z",
+      "html_url": "https://github.com/RobotLocomotion/drake/issues/25094",
+      "id": "RobotLocomotion/drake#25094",
+      "issue_number": 25094,
+      "labels": [
+        "component: multibody parsing"
+      ],
+      "repository": "RobotLocomotion/drake",
+      "surface_sha256": "0173b943c0bcde13d9b68b138a455ea2c6b2a459f408c975ed6d0bdb25950c41",
+      "title": "[parser] SDFormat parser drops attachment-frame poses for joints and forward references"
+    }
+  ],
+  "post_activation_issue_identities_observed": 194,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-17T01:31:59Z",
+  "schema_version": 1
+}
