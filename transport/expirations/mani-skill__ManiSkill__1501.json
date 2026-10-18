@@ -1,0 +1,13 @@
+{
+  "case_id": "mani-skill/ManiSkill#1501",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-10-18T04:20:05Z",
+  "expiry_sha256": "c39eb3e7705ace355316a651b005bc990448394ee2f4659cffd42f0ef24f5cc1",
+  "first_frozen_at": "2026-10-17T21:25:27Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-10-18T03:25:27Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "25716c112bf2be6191c0de0095c699b1426ae3ff3cdd09d1e47406a750f63560"
+}
