@@ -3090,13 +3090,17 @@
     },
     {
       "created_at": "2026-10-18T08:47:54Z",
+      "expiry_recorded_at": "2026-10-18T17:16:29Z",
+      "expiry_sha256": "94c9bf6954064799c03f3c26e16856dc5b35cd849cf3a6cd2298dac3d820b3a5",
+      "expiry_source": "expirations/Farama-Foundation__Gymnasium__1791.json",
       "first_frozen_at": "2026-10-18T09:31:27Z",
       "id": "Farama-Foundation/Gymnasium#1791",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 1791,
       "prediction_deadline_at": "2026-10-18T15:31:27Z",
       "repository": "Farama-Foundation/Gymnasium",
       "source": "inbox/FIRST_SEEN_20261018T093127Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "3a294f00cc23a89a8a8bafe479386e9e53005627ae3d12764063fcc2b6945317"
     },
     {
