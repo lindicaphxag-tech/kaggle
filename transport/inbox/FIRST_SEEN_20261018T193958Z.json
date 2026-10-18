@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "kimbring2",
+      "body": "### Question\n\nHello there,\n\nI followed the [tutorial](https://isaac-sim.github.io/IsaacLab/v3.0.0-EA/source/setup/tutorial.html) instructions, and there was no issue.\n\nNow, I am trying to add a custom USD asset below to the starter file.\n<img width=\"1460\" height=\"955\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/e906ec22-dfba-40d2-91e2-8747624aeca9\" />\n\n Below are the parameters for displaying a belt texture from IsaacSim 6.2.0\n<img width=\"440\" height=\"886\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/b9c3eb7a-7e12-4b59-8f70-03b617eb6576\" />\n\nI added the following code to the tutorial code.\n```\ntable = AssetBaseCfg(\n      prim_path=\"{ENV_REGEX_NS}/Table\",\n      spawn=sim_utils.UsdFileCfg(\n          usd_path=\"/home/kimbring2/IsaacLabTutorial/src/isaaclab_tutorial/assets/Collected_SES_V2_LSS_5DOF/SES_V2_LSS_CASE.usd\",\n          ),\n      init_state=AssetBaseCfg.InitialStateCfg(pos=(-1.0, -1.0, 0.26854), \n                                              #rot=(1.0, 0.0, 0.0, 0.0)\n                                              ),\n  )\n```\n\nHowever, it is displayed as a broken asset in the following image. \n<img width=\"1407\" height=\"807\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/9e7e97ac-997b-4308-bf4b-ec556c4828cb\" />\n\nI assume that **Raw USD Properties** are ignored when I render it from the Newton visualizer. \n\nI tried to use the Kit visualizer for the tutorial project using the command below, but failed with error below.\nuv run isaaclab zero_agent   --task IsaacTutorial-Place-Vial-SO101   --num_envs 1 --visualizer kit\n<img width=\"735\" height=\"356\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/2d9262c5-ed3a-49ba-a357-e00b917000b4\" />\n\nCould you please explain how to run a tutorial project in the IsaacSim visualizer, or how to correctly apply raw USD properties within the Newton visualizer?\n\nThank you.\n\n### Build Info\n\nDescribe the versions that you are currently using:\n\n<!-- Please complete the following description. -->\n- Isaac Lab Version: 3.0.0 release\n- Isaac Sim Version: 6.2\n",
+      "created_at": "2026-10-18T19:14:20Z",
+      "html_url": "https://github.com/isaac-sim/IsaacLab/issues/8716",
+      "id": "isaac-sim/IsaacLab#8716",
+      "issue_number": 8716,
+      "labels": [],
+      "repository": "isaac-sim/IsaacLab",
+      "surface_sha256": "196d147c03fae0ad2a230c92c9e68dcc46e06e6e8cac6996916290d584cfe0f0",
+      "title": "[Question] Rendering of USD asset does not work properly"
+    }
+  ],
+  "post_activation_issue_identities_observed": 209,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-18T19:39:58Z",
+  "schema_version": 1
+}
