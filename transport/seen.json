@@ -3098,6 +3098,17 @@
       "source": "inbox/FIRST_SEEN_20261018T093127Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "3a294f00cc23a89a8a8bafe479386e9e53005627ae3d12764063fcc2b6945317"
+    },
+    {
+      "created_at": "2026-10-18T13:19:48Z",
+      "first_frozen_at": "2026-10-18T13:58:57Z",
+      "id": "ros2/geometry2#1000",
+      "issue_number": 1000,
+      "prediction_deadline_at": "2026-10-18T19:58:57Z",
+      "repository": "ros2/geometry2",
+      "source": "inbox/FIRST_SEEN_20261018T135857Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "fa6b1e1ff7c294764e237830533ef833d949f0eebd282a0b6235eb89c9a519be"
     }
   ]
 }
