@@ -3075,13 +3075,17 @@
     },
     {
       "created_at": "2026-10-17T22:23:29Z",
+      "expiry_recorded_at": "2026-10-18T05:05:20Z",
+      "expiry_sha256": "d33aa2f10801493765c05cca62600ef43881a793047268cf69a317db9a15e040",
+      "expiry_source": "expirations/huggingface__lerobot__5002.json",
       "first_frozen_at": "2026-10-17T22:38:55Z",
       "id": "huggingface/lerobot#5002",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 5002,
       "prediction_deadline_at": "2026-10-18T04:38:55Z",
       "repository": "huggingface/lerobot",
       "source": "inbox/FIRST_SEEN_20261017T223855Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "84c03b7766bc77cf3d912b16fc656980ac8e29ade8589f1ddea69178ad16ca07"
     }
   ]
