@@ -3109,6 +3109,17 @@
       "source": "inbox/FIRST_SEEN_20261018T135857Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "fa6b1e1ff7c294764e237830533ef833d949f0eebd282a0b6235eb89c9a519be"
+    },
+    {
+      "created_at": "2026-10-18T13:57:46Z",
+      "first_frozen_at": "2026-10-18T14:10:01Z",
+      "id": "robocasa/robocasa#232",
+      "issue_number": 232,
+      "prediction_deadline_at": "2026-10-18T20:10:01Z",
+      "repository": "robocasa/robocasa",
+      "source": "inbox/FIRST_SEEN_20261018T141001Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "f4d9417d93e05b9fc044bed288b762cd83a135af6d948bf47204972d2bb2c3f0"
     }
   ]
 }

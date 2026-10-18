@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "ldkong1205",
+      "body": "Thank you for sharing your work on [RoboCasa](https://arxiv.org/abs/2406.02523)!\n\nI am Lingdong from the [WorldBench](https://github.com/worldbench) team and a co-author of [Agentic World Modeling: Foundations, Capabilities, Laws, and Beyond](https://arxiv.org/abs/2604.22748) and [Quo Vadis, World Modeling?](https://arxiv.org/abs/2608.02713).&#x20;\n\nWe maintain the accompanying [Agentic World Modeling reading list](https://github.com/matrix-agent/awesome-agentic-world-modeling) and [Quo Vadis reading list](https://github.com/worldbench/awesome-agentic-world-model).\n\nYour work is already included in the Quo Vadis reading list under **Dynamics Proxy**. We would welcome any corrections or updated resources, such as paper versions, project pages, code, or checkpoints, as well as suggestions for accurate coverage of your work in either survey. Please feel free to open a pull request to update the existing entry, or reply here with suggestions.\n\nThank you for sharing your work with the community!\n\nLingdong\\\nFrom the [WorldBench](https://github.com/worldbench) team\n",
+      "created_at": "2026-10-18T13:57:46Z",
+      "html_url": "https://github.com/robocasa/robocasa/issues/232",
+      "id": "robocasa/robocasa#232",
+      "issue_number": 232,
+      "labels": [],
+      "repository": "robocasa/robocasa",
+      "surface_sha256": "f4d9417d93e05b9fc044bed288b762cd83a135af6d948bf47204972d2bb2c3f0",
+      "title": "Invitation to review the RoboCasa entry in the Quo Vadis reading list"
+    }
+  ],
+  "post_activation_issue_identities_observed": 208,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-18T14:10:01Z",
+  "schema_version": 1
+}
