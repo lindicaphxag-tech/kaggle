@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "wpyaoxueros",
+      "body": "### Describe the bug\n\n`MultiDiscrete` accepts a starting value and count whose largest element cannot be represented by the selected integer dtype. Sampling then wraps around and returns values outside the intended discrete range; the space can reject its own samples.\n\n### Minimal reproduction\n\n```python\nimport numpy as np\nfrom gymnasium.spaces import MultiDiscrete\n\nspace = MultiDiscrete([4], start=[126], dtype=np.int8, seed=0)\nsample = space.sample()\nprint(sample)                 # [-128], instead of a value in 126..129\nprint(space.contains(sample)) # False\n```\n\nLikewise, `MultiDiscrete([3], start=[254], dtype=np.uint8)` can produce 0. The valid mathematical ranges extend beyond 127 / 255 respectively, so the constructor should reject them rather than silently create an unrepresentable space.\n\n### Expected behavior and fix\n\nRaise `ValueError` for unrepresentable upper endpoints. Valid spaces, including negative starts, exact dtype maxima and large uint64 starts, must remain unchanged. A validated fix and regression tests are provided in the linked PR.\n\nThe constructor can check `start > dtype_max - (nvec - 1)` after count positivity. The subtraction stays representable and avoids evaluating an overflowing upper endpoint. This is separate from #1622 (membership checks on valid spaces), #1737 (masked sampling) and #1739 (flattening).\n\n### Evidence\n\nCurrent main `57c1610`, Gymnasium 1.4.0, Linux / Python 3.11.17. New final regressions on unchanged code: 7 failed, 9 passed; patched MultiDiscrete tests: 38 passed; full spaces suite: 1615 passed. Full pre-commit passed. Whole-project pytest is blocked at collection by optional MoviePy, including on unchanged code; no full-suite pass is claimed.\n\nAI disclosure: Claude Sonnet 5.5 and Codex assisted investigation, implementation and testing; no independent human review is claimed.\n\nFix and complete regression coverage: https://github.com/Farama-Foundation/Gymnasium/pull/1790\n",
+      "created_at": "2026-10-18T08:47:54Z",
+      "html_url": "https://github.com/Farama-Foundation/Gymnasium/issues/1791",
+      "id": "Farama-Foundation/Gymnasium#1791",
+      "issue_number": 1791,
+      "labels": [],
+      "repository": "Farama-Foundation/Gymnasium",
+      "surface_sha256": "3a294f00cc23a89a8a8bafe479386e9e53005627ae3d12764063fcc2b6945317",
+      "title": "[Bug Report] MultiDiscrete accepts ranges outside its integer dtype"
+    }
+  ],
+  "post_activation_issue_identities_observed": 206,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-18T09:31:27Z",
+  "schema_version": 1
+}
