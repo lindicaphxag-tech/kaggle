@@ -3330,24 +3330,32 @@
     },
     {
       "created_at": "2026-10-19T11:58:47Z",
+      "expiry_recorded_at": "2026-10-19T19:15:25Z",
+      "expiry_sha256": "e2af438e530310e043472a7506d72946c8edf5ef501946e561e8db2d1a6959ca",
+      "expiry_source": "expirations/UniversalRobots__Universal_Robots_Client_Library__598.json",
       "first_frozen_at": "2026-10-19T12:59:52Z",
       "id": "UniversalRobots/Universal_Robots_Client_Library#598",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 598,
       "prediction_deadline_at": "2026-10-19T18:59:52Z",
       "repository": "UniversalRobots/Universal_Robots_Client_Library",
       "source": "inbox/FIRST_SEEN_20261019T125952Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "3b54aa789377f98c5ff4aa23e700060de909082b424ed3932cc166d21d01cd8c"
     },
     {
       "created_at": "2026-10-19T12:35:38Z",
+      "expiry_recorded_at": "2026-10-19T19:15:25Z",
+      "expiry_sha256": "7a3fe159d8e69bdbad28a740c444548e57df7530169558ae0b5ac49e24ed010c",
+      "expiry_source": "expirations/UniversalRobots__Universal_Robots_ROS2_Driver__2034.json",
       "first_frozen_at": "2026-10-19T12:59:52Z",
       "id": "UniversalRobots/Universal_Robots_ROS2_Driver#2034",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 2034,
       "prediction_deadline_at": "2026-10-19T18:59:52Z",
       "repository": "UniversalRobots/Universal_Robots_ROS2_Driver",
       "source": "inbox/FIRST_SEEN_20261019T125952Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "59b761d466094344d1cd15f760090bbd0d2e2fe74d12cedee310794f51647641"
     },
     {
@@ -3382,6 +3390,39 @@
       "source": "inbox/FIRST_SEEN_20261019T174652Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "e9d5bfedfc13fd7099ab94734e15242d733d3fb7445360e282ace1392816a6a6"
+    },
+    {
+      "created_at": "2026-10-19T18:23:17Z",
+      "first_frozen_at": "2026-10-19T19:17:03Z",
+      "id": "Genesis-Embodied-AI/genesis-world#3573",
+      "issue_number": 3573,
+      "prediction_deadline_at": "2026-10-20T01:17:03Z",
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "source": "inbox/FIRST_SEEN_20261019T191703Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "198e5ddba447c16313b6b8962f5d7c79491fdfbfc2ccec782224896f5a652023"
+    },
+    {
+      "created_at": "2026-10-19T18:45:01Z",
+      "first_frozen_at": "2026-10-19T19:17:03Z",
+      "id": "NVlabs/alpasim#214",
+      "issue_number": 214,
+      "prediction_deadline_at": "2026-10-20T01:17:03Z",
+      "repository": "NVlabs/alpasim",
+      "source": "inbox/FIRST_SEEN_20261019T191703Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "3f2f754ff517cea059764ff5a415f07b92dfabf4b4f4e0fc6cebdc51d9b7dc6b"
+    },
+    {
+      "created_at": "2026-10-19T18:10:42Z",
+      "first_frozen_at": "2026-10-19T19:17:03Z",
+      "id": "isaac-sim/IsaacLab#8730",
+      "issue_number": 8730,
+      "prediction_deadline_at": "2026-10-20T01:17:03Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261019T191703Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "97dc30c2edd85037ff59150106c3d08d652bb198206a9cdbd4f0ab1225ee05c7"
     }
   ]
 }

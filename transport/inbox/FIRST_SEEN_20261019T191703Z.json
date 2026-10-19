@@ -1,0 +1,50 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 3,
+  "new_candidates": [
+    {
+      "author_login": "Nas01010101",
+      "body": "### Bug Description\n\nEvery `scene.reset()` logs one warning per recorder that runs in a background thread (`CSVFile`, `NPZFile`):\n\n```\n[Genesis] [WARNING] [CSVFileWriter] start_thread(): Processor thread already exists.\n[Genesis] [WARNING] [NPZFileWriter] start_thread(): Processor thread already exists.\n```\n\n`RecorderManager.reset` calls `recorder.start()` on each recorder that is still alive, and `Recorder.start` calls `start_thread()` whenever `run_in_thread` is True. The thread is still running after a reset, so `start_thread` takes its warning branch. Partial resets (`scene.reset(envs_idx=...)`) take the same path, so an RL loop that resets finished environments gets these warnings at nearly every step. The recorded data is correct; only the log is affected.\n\n### Steps to Reproduce\n\n```python\nimport genesis as gs\n\ngs.init(backend=gs.cpu)\nscene = gs.Scene(show_viewer=False)\nbox = scene.add_entity(gs.morphs.Box(size=(0.1, 0.1, 0.1), pos=(0, 0, 1)))\nscene.add_recorder(data_func=box.get_pos, rec_options=gs.recorders.CSVFile(filename=\"pos.csv\"))\nscene.add_recorder(data_func=box.get_pos, rec_options=gs.recorders.NPZFile(filename=\"pos.npz\"))\nscene.build()\nscene.step()\nscene.reset()  # one \"Processor thread already exists.\" warning per recorder\nscene.step()\nscene.stop_recording()\n```\n\n### Expected Behavior\n\nA reset keeps the running processing thread of a recorder and logs nothing.\n\n### Relevant log output\n\n```\n[Genesis] [03:20:52] [WARNING] [CSVFileWriter] start_thread(): Processor thread already exists.\n[Genesis] [03:20:52] [WARNING] [NPZFileWriter] start_thread(): Processor thread already exists.\n```\n\n### Environment\n\n- OS: macOS 26 (arm64)\n- GPU/CPU: Apple M-series, CPU backend\n- Python 3.12, torch 2.14.1, quadrants 1.3.3\n\n### Release version or Commit ID\n\nb84599b (main)\n\n### Additional Context\n\nA one-line fix is to start the thread in `Recorder.start` only when none is running (`self._processor_thread is None`). I can open a PR.\n",
+      "created_at": "2026-10-19T18:23:17Z",
+      "html_url": "https://github.com/Genesis-Embodied-AI/genesis-world/issues/3573",
+      "id": "Genesis-Embodied-AI/genesis-world#3573",
+      "issue_number": 3573,
+      "labels": [],
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "surface_sha256": "198e5ddba447c16313b6b8962f5d7c79491fdfbfc2ccec782224896f5a652023",
+      "title": "Every scene.reset() warns 'Processor thread already exists.' for each threaded recorder"
+    },
+    {
+      "author_login": "AlwaysFeb",
+      "body": "Hi, my HF username is <AlwaysFeb>. HF Userid: 6a0bddab8834371ce639f87d\nI\u2019m a member and co-submitter of <team-try>.  My team registration has been approved but that isn\u2019t reflected in my own registration.  It shows \n- No team registration found for your Hugging Face account.\n- No approved submitter invitations found for your Hugging Face username.\n\nCould you please check whether I\u2019m listed under AlwaysFeb? If I\u2019m not, would you please update my registration to add me? Thank you!",
+      "created_at": "2026-10-19T18:45:01Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/214",
+      "id": "NVlabs/alpasim#214",
+      "issue_number": 214,
+      "labels": [
+        "bug"
+      ],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "3f2f754ff517cea059764ff5a415f07b92dfabf4b4f4e0fc6cebdc51d9b7dc6b",
+      "title": "[BUG]submitter invitation not found for approved team<team-try>"
+    },
+    {
+      "author_login": "aiwidespace",
+      "body": "### Question\n\nHi.\n\nI am currently attempting to run Robolab project within the Isaac Sim 6.1.0 / Isaac Lab 3.0.0 environment, but I have encountered an issue where the gripper penetrates (passes into/through) the objects it interacts with. I am unsure how to resolve this.\nI would appreciate your guidance on how to fix it.\n\nThanks.\n\n### Build Info\n\n- Isaac Lab Version: 3.0.0\n- Isaac Sim Version: 6.1.0\n",
+      "created_at": "2026-10-19T18:10:42Z",
+      "html_url": "https://github.com/isaac-sim/IsaacLab/issues/8730",
+      "id": "isaac-sim/IsaacLab#8730",
+      "issue_number": 8730,
+      "labels": [],
+      "repository": "isaac-sim/IsaacLab",
+      "surface_sha256": "97dc30c2edd85037ff59150106c3d08d652bb198206a9cdbd4f0ab1225ee05c7",
+      "title": "Gripper Pass"
+    }
+  ],
+  "post_activation_issue_identities_observed": 229,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-19T19:17:03Z",
+  "schema_version": 1
+}
