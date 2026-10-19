@@ -1,0 +1,42 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "urfeex",
+      "body": "### Feature summary\n\nThere's the script to extract all RTDE fields from the docs in https://github.com/UniversalRobots/Universal_Robots_Client_Library/blob/master/tests/resources/generate_rtde_outputs.py\n\nWe removed the tests utilizing it in https://github.com/UniversalRobots/Universal_Robots_Client_Library/pull/597 but this script could still be used to update the [exhaustive_rtde_output_recipe.txt](https://github.com/UniversalRobots/Universal_Robots_Client_Library/blob/master/tests/resources/exhaustive_rtde_output_recipe.txt) and the static list in [fake_rtde_server.cpp](https://github.com/UniversalRobots/Universal_Robots_Client_Library/blob/master/tests/fake_rtde_server.cpp).\n\nThe idea is that it checks for updates regularly and then automatically opens a PR if there are any changes, similar to https://github.com/UniversalRobots/Universal_Robots_Client_Library/blob/master/.github/workflows/check_error_codes.yml\n\n### Tasks\n*To complete this issue involves*\n- [ ] Implement the feature",
+      "created_at": "2026-10-19T11:58:47Z",
+      "html_url": "https://github.com/UniversalRobots/Universal_Robots_Client_Library/issues/598",
+      "id": "UniversalRobots/Universal_Robots_Client_Library#598",
+      "issue_number": 598,
+      "labels": [
+        "enhancement",
+        "good first issue"
+      ],
+      "repository": "UniversalRobots/Universal_Robots_Client_Library",
+      "surface_sha256": "3b54aa789377f98c5ff4aa23e700060de909082b424ed3932cc166d21d01cd8c",
+      "title": "Automatically update the exhaustive recipe and fake RTDE server with new fields"
+    },
+    {
+      "author_login": "urfeex",
+      "body": "### Feature summary\n\nIn our kinematics config we use RPY values, we could change that to quaternions.\n\nThis is a follow-up task from https://github.com/UniversalRobots/Universal_Robots_ROS2_Driver/pull/2030. If the kinematics file would be using quaternions we would get rid of ambiguities completely. URDF specification 1.1 supports using quaternions in origins (see https://github.com/ros/urdfdom)\n\nThis would require updating the description simultaneously.\n\nThis change should only go to Rolling and not modify existing releases. Technically, on Lyrical this wouldn't probably break things, as urdfdom and urdfdom_headers are released with recent enough versions there, but I would like to avoid changing the URDF specification version inside a released distro.\n\n### Tasks\n*To complete this issue involves*\n- [ ] Make the calibration extraction generate yaml files containing quaterions rather than RPY\n- [ ] Make the description read quaternions rather than RPY values from the kinematics config\n  - [ ] Think about a fallback path reading RPY to be able to read old configs\n- [ ] Make documentation\n- [ ] Make Unit test\n- [ ] Add migration notes for\n  - [ ] description\n  - [ ] calibration extraction\n- [ ] Test on real hardware\n",
+      "created_at": "2026-10-19T12:35:38Z",
+      "html_url": "https://github.com/UniversalRobots/Universal_Robots_ROS2_Driver/issues/2034",
+      "id": "UniversalRobots/Universal_Robots_ROS2_Driver#2034",
+      "issue_number": 2034,
+      "labels": [
+        "enhancement",
+        "good first issue"
+      ],
+      "repository": "UniversalRobots/Universal_Robots_ROS2_Driver",
+      "surface_sha256": "59b761d466094344d1cd15f760090bbd0d2e2fe74d12cedee310794f51647641",
+      "title": "Use quaternions for calibration parameters"
+    }
+  ],
+  "post_activation_issue_identities_observed": 223,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-19T12:59:52Z",
+  "schema_version": 1
+}

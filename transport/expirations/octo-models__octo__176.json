@@ -1,0 +1,13 @@
+{
+  "case_id": "octo-models/octo#176",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-10-19T12:58:39Z",
+  "expiry_sha256": "37af630ed3becbb585a3e04b45561cbf4e562bcfd861a87c48fc3f058e5d182e",
+  "first_frozen_at": "2026-10-19T05:17:38Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-10-19T11:17:38Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "6e71f9d1672a0d0bbe973f76427fd2186063dc869137ad65950b2ed51d16144d"
+}
