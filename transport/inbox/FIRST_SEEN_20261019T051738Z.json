@@ -1,0 +1,108 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 7,
+  "new_candidates": [
+    {
+      "author_login": "GuobaPei",
+      "body": "Hi organizers,\n\nI am the captain of the team registered on the challenge Space as:\n\nTeam display name: maybe a mistake\nTeam ID: maybe\nCaptain: Hugging Face @pei2333, user id 678cfd8cb43c34b5376d5acd, email peijieyuan@zjut.edu.cn\nThe Space currently shows \"Registration pending review: maybe a mistake (maybe).\" The challenge CLI reports registered: false, and terms / ecr-login / submit all return HTTP 403 \"User is not registered for this competition\", so we cannot accept the terms or submit, and the October 31 deadline is approaching.\n\nCould you please review and approve our registration? We are a genuine academic team registering with a zjut.edu.cn organizational email. The submission image is built and locally validated, and we are ready to submit on the PAI track.\n\nIf the team display name / ID need to be corrected, please let me know the right procedure \u2014 I can provide the corrected official team name and affiliation, and will not create a duplicate registration.\n\nThank you very much",
+      "created_at": "2026-10-19T03:22:05Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/210",
+      "id": "NVlabs/alpasim#210",
+      "issue_number": 210,
+      "labels": [
+        "bug"
+      ],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "3c2274b8d7af235d5c60bc47163371e558705be194a0c8fda1f76748964f1f66",
+      "title": "[AlpaSim Challenge 2026] Registration approval request \u2014 team \"maybe a mistake\" (maybe), captain @pei2333"
+    },
+    {
+      "author_login": "Xian-Bei",
+      "body": "Hi AlpaSim Challenge organizers,\n\nI submitted my registration several days before the **October 18 registration deadline**, but my registration status is still showing as **Pending**.\n\nMy Hugging Face information is:\n\n- **Hugging Face username:** `FENGYI1`\n- **Stable Hugging Face user ID:** `66d68ddb0aaebff5eac68fd8`\n- **Hugging Face email:** `fengyi.zhang@uq.edu.au`\n- **Team Name:** `MMM`\n\nI am currently able to connect to the official AlpaSim Challenge Space with this account, but because the registration is still pending, I am unable to proceed with challenge submissions.\n\nCould you please help check my registration status and approve it if everything is in order? \n\nThank you very much for your help.\n\nBest regards,  \nFengyi\n\n<img width=\"1139\" height=\"287\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/6c190c6c-3f59-4be9-b5cb-216198666c9a\" />",
+      "created_at": "2026-10-19T04:37:33Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/211",
+      "id": "NVlabs/alpasim#211",
+      "issue_number": 211,
+      "labels": [
+        "bug"
+      ],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "7342f952d8b33ff8e25548f53e52f617cd46c8467d37e4de35c6e3a22e9316ca",
+      "title": "[AlpaSim E2E Challenge] Registration submitted but still pending"
+    },
+    {
+      "author_login": "3em0",
+      "body": "## Summary\n\n`OctoModel.load_pretrained()` reads the `config.json` stored next to the Orbax checkpoint and passes `config[\"model\"]` to `OctoModule.create()`. That factory turns every entry of `heads`, `observation_tokenizers` and `task_tokenizers` into a `ModuleSpec` and instantiates it:\n\n```python\n# octo/utils/spec.py:59-67\n@staticmethod\ndef instantiate(spec: \"ModuleSpec\"):  # type: ignore\n    if set(spec.keys()) != {\"module\", \"name\", \"args\", \"kwargs\"}:\n        raise ValueError(...)\n    cls = _import_from_string(spec[\"module\"], spec[\"name\"])   # importlib.import_module + getattr\n    return partial(cls, *spec[\"args\"], **spec[\"kwargs\"])      # then the caller invokes it\n```\n\n```python\n# octo/model/octo_module.py:403-411\nobservation_tokenizer_defs = {k: ModuleSpec.instantiate(spec)() for k, spec in observation_tokenizers.items()}\ntask_tokenizer_defs        = {k: ModuleSpec.instantiate(spec)() for k, spec in task_tokenizers.items()}\nhead_defs                  = {k: ModuleSpec.instantiate(spec)() for k, spec in heads.items()}\n```\n\nOnly the dictionary keys are validated. The `module`, `name`, `args` and `kwargs` values come straight from the model package, so a checkpoint whose `config.json` names any importable callable causes that callable to be imported and called inside the victim's interpreter while the model is being loaded.\n\nThis is reachable through the documented public API \u2014 the README itself loads a model package from the Hugging Face Hub (`OctoModel.load_pretrained(\"hf://rail-berkeley/octo-base-1.5\")`), i.e. from a download that a user does not normally review for executable behaviour.\n\n## Affected version / environment\n\n- Repository: `octo-models/octo`, branch `main`, commit `241fb3514b7c40957a86d869fecb7c7fc353f540` (2024-07-30, current HEAD).\n- The same code is present in tag `v1.5` (2024-05-23) and `v0.1.0` (2023-12-14).\n- Component: `octo/utils/spec.py` (`ModuleSpec.instantiate`, lines 59-67; `_import_from_string`, lines 90-95), called from `octo/model/octo_module.py:403-411` via `octo/model/octo_model.py:317`.\n- Verified environment: WSL2 Kali, Python 3.11.15, `jax`/`jaxlib` 0.4.20, `flax` 0.7.5, `tensorflow` 2.15.0, `orbax-checkpoint` 0.2.4, `scipy` 1.11.4, `numpy` 1.24.3; `octo` installed editable from the commit above.\n- The defect is pure Python and not OS- or platform-specific.\n\n## Steps to reproduce\n\n1. Create a normal Octo checkpoint and note the layout it writes (`0/default/checkpoint`, `config.json`, `example_batch.msgpack`, `dataset_statistics.json`):\n\n   ```python\n   from octo.model.octo_model import OctoModel\n   \n   model = OctoModel.from_config(config, example_batch)   # stock \"dummy\" config works\n   model.save_pretrained(0, \"octo-checkpoint-base\")\n   ```\n\n2. Copy the directory twice and edit **only** `config.json`: replace `model.heads.action` with a `ModuleSpec` that names a callable from the standard library. Positive package:\n\n   ```json\n   {\"model\": {\"heads\": {\"action\": {\n     \"module\": \"logging\", \"name\": \"FileHandler\", \"args\": [],\n     \"kwargs\": {\"filename\": \"/out/octo_modulespec_sink_marker\", \"mode\": \"w\",\n                \"encoding\": \"utf-8\", \"delay\": false, \"errors\": null}}}}}\n   ```\n\n   Negative control: byte-identical except `\"delay\": true`.\n\n3. Make sure `/out` is writable and the sink file does not exist:\n\n   ```console\n   $ ls -la /out\n   total 8\n   drwxr-xr-x 2 user user 4096 ... .\n   ```\n\n4. Load the positive package with the public API:\n\n   ```python\n   from octo.model.octo_model import OctoModel\n   OctoModel.load_pretrained(\"checkpoints/octo-checkpoint-positive\")\n   ```\n\n   Observed (real terminal, see the screenshots attached to the report):\n\n   ```\n   load_pretrained raised: TypeError\n     File \".../octo/model/octo_model.py\", line 331, in load_pretrained\n       params_shape = jax.eval_shape(\n     File \".../octo/model/octo_module.py\", line 367, in __call__\n       head_outputs[head_name] = head(transformer_outputs, train=train)\n   TypeError: 'FileHandler' object is not callable\n   sink file exists   : True   (/out/octo_modulespec_sink_marker)\n   ```\n\n5. `ls -la /out` now lists `octo_modulespec_sink_marker` (0 bytes). Delete it, load the negative package, and run the same `ls`: the traceback is identical, the file is not created.\n\nThe two packages differ only in `kwargs.delay`:\n\n```console\n$ grep -o '\"delay\": [a-z]*' checkpoints/octo-checkpoint-positive/config.json checkpoints/octo-checkpoint-negative/config.json\ncheckpoints/octo-checkpoint-positive/config.json:\"delay\": false\ncheckpoints/octo-checkpoint-negative/config.json:\"delay\": true\n```\n\nThe checkpoint directory contains no `.py` file, no plugin, no native library and no pickle sidecar \u2014 only the four files Octo itself writes:\n\n```console\n$ find checkpoints/octo-checkpoint-positive\ncheckpoints/octo-checkpoint-positive/0/default/checkpoint\ncheckpoints/octo-checkpoint-positive/config.json\ncheckpoints/octo-checkpoint-positive/dataset_statistics.json\ncheckpoints/octo-checkpoint-positive/example_batch.msgpack\n```\n\n## Expected behavior\n\nLoading a checkpoint should reconstruct the model described by the package. Values in `config.json` should be treated as data that selects among Octo's own component classes; the loader should not import or call arbitrary objects named by the package.\n\n## Actual behavior\n\n`ModuleSpec.instantiate()` resolves `module` + `name` with `importlib.import_module()` / `getattr()` and calls the result with the package-supplied `args` / `kwargs`, before any parameter is restored (`octo/model/octo_model.py:317` runs before the `orbax` restore at line 335). With `logging.FileHandler` and `delay=false`, the file is opened during load. The negative control (`delay=true`) performs the same resolution and the same call, and creates nothing.\n\n## Impact\n\nArbitrary callable invocation in the loading process, with the victim's privileges, from a data-only artifact. The demonstrated primitive is file creation; the same field can select `os.system`, `subprocess.*` or `builtins.eval`, which is arbitrary code execution. CVSS v3.1: **8.8 (High)**, `CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H` (CWE-470).\n\nBecause Octo's documented workflow fetches model packages from the Hugging Face Hub, the crafted artifact is indistinguishable from a normal download; no build step, no plugin installation and no code review of the package contents would reveal it.\n\n## Suggested fix\n\n- Replace `_import_from_string()` with a registry or allowlist of Octo component classes, and reject `module`/`name` pairs outside it (or require an explicit registration call for third-party components).\n- Validate `model.heads`, `model.observation_tokenizers`, `model.task_tokenizers` and `text_processor` against that schema **before** instantiating anything.\n- Document that a checkpoint directory is code-equivalent input and should come from a trusted source (hash-pinned), and consider verifying a manifest/signature for hub-fetched packages.\n- Interim mitigation: inspect `config.json` before loading a downloaded checkpoint.",
+      "created_at": "2026-10-19T02:26:55Z",
+      "html_url": "https://github.com/octo-models/octo/issues/176",
+      "id": "octo-models/octo#176",
+      "issue_number": 176,
+      "labels": [],
+      "repository": "octo-models/octo",
+      "surface_sha256": "6e71f9d1672a0d0bbe973f76427fd2186063dc869137ad65950b2ed51d16144d",
+      "title": "[Security] OctoModel.load_pretrained() instantiates arbitrary importable callables from the checkpoint config.json"
+    },
+    {
+      "author_login": "github-actions[bot]",
+      "body": "An automated scheduled build failed on `jazzy`: https://github.com/ros-controls/ros2_controllers/actions/runs/39187464762\n",
+      "created_at": "2026-10-19T02:04:50Z",
+      "html_url": "https://github.com/ros-controls/ros2_controllers/issues/2712",
+      "id": "ros-controls/ros2_controllers#2712",
+      "issue_number": 2712,
+      "labels": [
+        "CI"
+      ],
+      "repository": "ros-controls/ros2_controllers",
+      "surface_sha256": "95f3ec1edeb22f984896d908bd869db8b2c18bd6a70f524dc5601ccecb861f79",
+      "title": "CI build job jazzy/testing failed!"
+    },
+    {
+      "author_login": "github-actions[bot]",
+      "body": "An automated scheduled build failed on `kilted`: https://github.com/ros-controls/ros2_controllers/actions/runs/39187294708\n",
+      "created_at": "2026-10-19T02:08:29Z",
+      "html_url": "https://github.com/ros-controls/ros2_controllers/issues/2713",
+      "id": "ros-controls/ros2_controllers#2713",
+      "issue_number": 2713,
+      "labels": [
+        "CI"
+      ],
+      "repository": "ros-controls/ros2_controllers",
+      "surface_sha256": "c0dc7227b2cbeed0caebdcb7dc04dc5807fc0cba1f2a693c83ad3cc52c4c0065",
+      "title": "CI build job kilted/testing failed!"
+    },
+    {
+      "author_login": "github-actions[bot]",
+      "body": "An automated scheduled build failed on `jazzy`: https://github.com/ros-controls/ros2_controllers/actions/runs/39194665457\n",
+      "created_at": "2026-10-19T04:20:23Z",
+      "html_url": "https://github.com/ros-controls/ros2_controllers/issues/2714",
+      "id": "ros-controls/ros2_controllers#2714",
+      "issue_number": 2714,
+      "labels": [
+        "CI"
+      ],
+      "repository": "ros-controls/ros2_controllers",
+      "surface_sha256": "3af90205e66c47a414b1dccdeb5fd738a582d85c8fb9e8f79d944d9b7e1d8130",
+      "title": "CI build job jazzy/source failed!"
+    },
+    {
+      "author_login": "github-actions[bot]",
+      "body": "An automated scheduled build failed on `kilted`: https://github.com/ros-controls/ros2_controllers/actions/runs/39194177606\n",
+      "created_at": "2026-10-19T04:29:38Z",
+      "html_url": "https://github.com/ros-controls/ros2_controllers/issues/2715",
+      "id": "ros-controls/ros2_controllers#2715",
+      "issue_number": 2715,
+      "labels": [
+        "CI"
+      ],
+      "repository": "ros-controls/ros2_controllers",
+      "surface_sha256": "9df3e082dfd1c82493f9a2b08eb223c74612646ffaf92455e5998ebff8fca861",
+      "title": "CI build job kilted/source failed!"
+    }
+  ],
+  "post_activation_issue_identities_observed": 216,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-19T05:17:38Z",
+  "schema_version": 1
+}

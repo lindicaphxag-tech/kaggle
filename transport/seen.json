@@ -3135,14 +3135,95 @@
     },
     {
       "created_at": "2026-10-18T19:14:20Z",
+      "expiry_recorded_at": "2026-10-19T05:16:12Z",
+      "expiry_sha256": "1a40c4d229dcd309766cd7e3fe7a971ab22e496a14fef908bfc92b8f5163d456",
+      "expiry_source": "expirations/isaac-sim__IsaacLab__8716.json",
       "first_frozen_at": "2026-10-18T19:39:58Z",
       "id": "isaac-sim/IsaacLab#8716",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 8716,
       "prediction_deadline_at": "2026-10-19T01:39:58Z",
       "repository": "isaac-sim/IsaacLab",
       "source": "inbox/FIRST_SEEN_20261018T193958Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "196d147c03fae0ad2a230c92c9e68dcc46e06e6e8cac6996916290d584cfe0f0"
+    },
+    {
+      "created_at": "2026-10-19T03:22:05Z",
+      "first_frozen_at": "2026-10-19T05:17:38Z",
+      "id": "NVlabs/alpasim#210",
+      "issue_number": 210,
+      "prediction_deadline_at": "2026-10-19T11:17:38Z",
+      "repository": "NVlabs/alpasim",
+      "source": "inbox/FIRST_SEEN_20261019T051738Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "3c2274b8d7af235d5c60bc47163371e558705be194a0c8fda1f76748964f1f66"
+    },
+    {
+      "created_at": "2026-10-19T04:37:33Z",
+      "first_frozen_at": "2026-10-19T05:17:38Z",
+      "id": "NVlabs/alpasim#211",
+      "issue_number": 211,
+      "prediction_deadline_at": "2026-10-19T11:17:38Z",
+      "repository": "NVlabs/alpasim",
+      "source": "inbox/FIRST_SEEN_20261019T051738Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "7342f952d8b33ff8e25548f53e52f617cd46c8467d37e4de35c6e3a22e9316ca"
+    },
+    {
+      "created_at": "2026-10-19T02:26:55Z",
+      "first_frozen_at": "2026-10-19T05:17:38Z",
+      "id": "octo-models/octo#176",
+      "issue_number": 176,
+      "prediction_deadline_at": "2026-10-19T11:17:38Z",
+      "repository": "octo-models/octo",
+      "source": "inbox/FIRST_SEEN_20261019T051738Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "6e71f9d1672a0d0bbe973f76427fd2186063dc869137ad65950b2ed51d16144d"
+    },
+    {
+      "created_at": "2026-10-19T02:04:50Z",
+      "first_frozen_at": "2026-10-19T05:17:38Z",
+      "id": "ros-controls/ros2_controllers#2712",
+      "issue_number": 2712,
+      "prediction_deadline_at": "2026-10-19T11:17:38Z",
+      "repository": "ros-controls/ros2_controllers",
+      "source": "inbox/FIRST_SEEN_20261019T051738Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "95f3ec1edeb22f984896d908bd869db8b2c18bd6a70f524dc5601ccecb861f79"
+    },
+    {
+      "created_at": "2026-10-19T02:08:29Z",
+      "first_frozen_at": "2026-10-19T05:17:38Z",
+      "id": "ros-controls/ros2_controllers#2713",
+      "issue_number": 2713,
+      "prediction_deadline_at": "2026-10-19T11:17:38Z",
+      "repository": "ros-controls/ros2_controllers",
+      "source": "inbox/FIRST_SEEN_20261019T051738Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "c0dc7227b2cbeed0caebdcb7dc04dc5807fc0cba1f2a693c83ad3cc52c4c0065"
+    },
+    {
+      "created_at": "2026-10-19T04:20:23Z",
+      "first_frozen_at": "2026-10-19T05:17:38Z",
+      "id": "ros-controls/ros2_controllers#2714",
+      "issue_number": 2714,
+      "prediction_deadline_at": "2026-10-19T11:17:38Z",
+      "repository": "ros-controls/ros2_controllers",
+      "source": "inbox/FIRST_SEEN_20261019T051738Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "3af90205e66c47a414b1dccdeb5fd738a582d85c8fb9e8f79d944d9b7e1d8130"
+    },
+    {
+      "created_at": "2026-10-19T04:29:38Z",
+      "first_frozen_at": "2026-10-19T05:17:38Z",
+      "id": "ros-controls/ros2_controllers#2715",
+      "issue_number": 2715,
+      "prediction_deadline_at": "2026-10-19T11:17:38Z",
+      "repository": "ros-controls/ros2_controllers",
+      "source": "inbox/FIRST_SEEN_20261019T051738Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "9df3e082dfd1c82493f9a2b08eb223c74612646ffaf92455e5998ebff8fca861"
     }
   ]
 }
