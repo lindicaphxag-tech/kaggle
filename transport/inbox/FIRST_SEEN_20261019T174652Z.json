@@ -1,0 +1,56 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 3,
+  "new_candidates": [
+    {
+      "author_login": "jwnimmer-tri",
+      "body": "See https://formulae.brew.sh/formula/python@3.15.\n\nWe should switch our default Python on macOS to the latest Python, which is 3.15.\n\nThis would be the version used for our `*.tar.gz` binaries, as well as for developer builds with Bazel.",
+      "created_at": "2026-10-19T17:31:36Z",
+      "html_url": "https://github.com/RobotLocomotion/drake/issues/25100",
+      "id": "RobotLocomotion/drake#25100",
+      "issue_number": 25100,
+      "labels": [
+        "component: distribution"
+      ],
+      "repository": "RobotLocomotion/drake",
+      "surface_sha256": "9e8bce87d72eed8c2ebd49e1a7a04b81ae55a09e9ad1278ee591f48aea159e96",
+      "title": "Bump macOS to Python 3.15"
+    },
+    {
+      "author_login": "jwnimmer-tri",
+      "body": "We'd like to claim support for Python 3.15 in our wheel releases https://drake.mit.edu/pip.html.\n\nDoing that requires testing against Python 3.15, so we should add 3.15 to our wheel test matrix during the wheel build.\n\nWe do NOT need to build/test 3.15 against pybind11; rather only test against nanobind.\n",
+      "created_at": "2026-10-19T17:33:11Z",
+      "html_url": "https://github.com/RobotLocomotion/drake/issues/25101",
+      "id": "RobotLocomotion/drake#25101",
+      "issue_number": 25101,
+      "labels": [
+        "component: distribution"
+      ],
+      "repository": "RobotLocomotion/drake",
+      "surface_sha256": "e228d237ca5fa4b43c06b0a63d0972db6ed49f7b7853819014ca940484cfd7ef",
+      "title": "Add wheel support for Python 3.15"
+    },
+    {
+      "author_login": "l-tschreiber-a11y",
+      "body": "### Description\n\nWhen Isaac Sim is started without the ROS 2 environment (`LD_LIBRARY_PATH` not containing `exts/isaacsim.ros2.core/humble/lib`), the ROS 2 bridge fails to load. Isaac Sim logs the failure but keeps running. Setting `inputs:messageName` on a `isaacsim.ros2.bridge.ROS2Subscriber` node afterwards then crashes the whole process with a native SIGSEGV, instead of raising an error. I would expect a Python exception (or at least a logged error) here, not a crash that takes the process down.\n\nTwo smaller observations from the same log, stated as observed, without a claim about the cause:\n- The fallback message says it is \"falling back to internal libraries\", then tries to load `<isaac-sim>/exts/isaacsim.ros2.core/humble/liblibrosidl_runtime_c.so`. That file does not exist. The library is at `<isaac-sim>/exts/isaacsim.ros2.core/humble/lib/librosidl_runtime_c.so`.\n- The startup failure is logged, but the app keeps running with the bridge unloaded.\n\n**Minimal reproduction** (headless, no ROS 2 environment sourced: `ROS_DISTRO`, `AMENT_PREFIX_PATH`, `RMW_IMPLEMENTATION` and `LD_LIBRARY_PATH` are unset in the launching shell):\n\n```python\n# repro.py -- run with: ./python.sh repro.py\nfrom isaacsim import SimulationApp\napp = SimulationApp({\"headless\": True})\n\nimport omni.kit.app, omni.graph.core as og, omni.usd\n\nem = omni.kit.app.get_app().get_extension_manager()\nem.set_extension_enabled_immediate(\"isaacsim.ros2.bridge\", True)\n\nomni.usd.get_context().new_stage()\nkeys = og.Controller.Keys\ngraph, (sub,), _, _ = og.Controller.edit(\n    {\"graph_path\": \"/G\", \"evaluator_name\": \"execution\"},\n    {keys.CREATE_NODES: [(\"Sub\", \"isaacsim.ros2.bridge.ROS2Subscriber\")]},\n)\nfor name, value in [(\"topicName\", \"/x\"), (\"messagePackage\", \"sensor_msgs\"),\n                    (\"messageSubfolder\", \"msg\"), (\"messageName\", \"JointState\")]:\n    print(\"SET\", name, value, flush=True)\n    og.Controller.attribute(f\"inputs:{name}\", sub).set(value)\nprint(\"OK done\", flush=True)\napp.close()\n```\n\nResult: the first three `SET` lines print, then `SET messageName JointState` prints, then the process dies with `Segmentation fault (core dumped)`. `OK done` is never printed.\n\nRelevant log lines before the crash:\n\n```\nChecking to see if RMW can be loaded:\nfailed to get symbol 'rmw_init_options_init' due to Environment variable 'AMENT_PREFIX_PATH' is not set or empty, ...\nRMW was not loaded\n[Error] [isaacsim.ros2.core.impl.extension] ROS2 Bridge startup failed\n...\nCould not load the dynamic library from librosidl_runtime_c.so. Error: librosidl_runtime_c.so: cannot open shared object file: No such file or directory\nLoading librosidl_runtime_c.so from sourced ROS_DISTRO failed, falling back to internal libraries.\nCould not load the dynamic library from <isaac-sim>/exts/isaacsim.ros2.core/humble/liblibrosidl_runtime_c.so. Error: ... cannot open shared object file: No such file or directory\n[Warning] [isaacsim.ros2.core.plugin] Could not load ROS2 Bridge due to missing library dependencies, please make sure your sourced ROS2 workspace has the correct packages/libraries installed\n```\n\n**Native backtrace** (gdb, Isaac Sim 6.0.1, no symbols available for the plugin frames):\n\n```\nThread 1 \"python3\" received signal SIGSEGV, Segmentation fault.\n#0  0x... in ?? () from .../exts/isaacsim.ros2.nodes/.../bin/libisaacsim.ros2.nodes.plugin.so\n#1  0x... in ?? () from .../exts/isaacsim.ros2.nodes/.../bin/libisaacsim.ros2.nodes.plugin.so\n#2  0x... in ?? () from .../omni.graph.core-3.1.2+.../bin/libomni.graph.core.plugin.so\n#3  0x... in ?? () from .../omni.graph.core-3.1.2+.../bin/libomni.graph.core.plugin.so\n#4  0x... in ?? () from .../omni/graph/core/_omni_graph_core.cpython-312-x86_64-linux-gnu.so\n...\n```\n\nThe Python-side stack written by Kit's crash reporter for this script ends at the `.set(value)` line of the loop (`repro.py:15`).\n\n**Workaround / comparison.** Starting Isaac Sim with the environment from `setup_ros_env.sh` makes the same script finish (`OK done`) on 6.0.1:\n\n```\nROS_DISTRO=humble RMW_IMPLEMENTATION=rmw_fastrtps_cpp \\\nLD_LIBRARY_PATH=<isaac-sim>/exts/isaacsim.ros2.core/humble/lib ./python.sh repro.py\n```\n\nWith that environment, the full workflow I was running (a ROS2Subscriber/ROS2Publisher graph for a gripper, driven from an external rclpy process) also works. I only observed the crash in the state where the bridge failed to load, and I understand that Isaac Sim expects the environment to be set. The report is that, in that state, the result is a native crash rather than an error.\n\n**Also checked on Isaac Sim 6.2.0-rc.14:** `./python.sh --no-ros-env repro.py` logs `ROS2 Bridge startup failed`, the same `liblibrosidl_runtime_c.so` lookup path, and the `Could not load ROS2 Bridge due to missing library dependencies` warning, then ends in `Segmentation fault`, with `OK done` never printed. I did not take a gdb backtrace on 6.2.0. By default, 6.2.0's `python.sh` sources `setup_ros_env.sh` (not tested on 6.0.1, whose `python.sh` does not), which is why the plain run there did not crash.\n\nI did not get 6.1.0 to run my script (it failed at startup for an unrelated reason), so I make no claim about it.\n\n### Isaac Sim version\n\n6.0.1 (`6.0.1-rc.7+release.42383.32955d8d.gl`; `isaacsim.ros2.bridge` 5.1.2, `isaacsim.ros2.core` 1.9.4, `isaacsim.ros2.nodes` 1.18.13). Also reproduced with `--no-ros-env` on 6.2.0-rc.14+release.52805.02189a84.gl (`isaacsim.ros2.bridge` 5.1.4, `isaacsim.ros2.core` 1.11.2, `isaacsim.ros2.nodes` 1.22.9).\n\n### Operating System (OS)\n\nUbuntu 22.04.5 LTS\n\n### GPU Name\n\nNVIDIA RTX 2000 Ada Generation Laptop GPU\n\n### GPU Driver and CUDA versions\n\nDriver 595.99.02, CUDA 13.2\n",
+      "created_at": "2026-10-19T16:01:24Z",
+      "html_url": "https://github.com/isaac-sim/IsaacSim/issues/892",
+      "id": "isaac-sim/IsaacSim#892",
+      "issue_number": 892,
+      "labels": [
+        "isaac-sim-ros",
+        "isaac-sim-v6-0-1",
+        "isaac-sim-v6-2-0"
+      ],
+      "repository": "isaac-sim/IsaacSim",
+      "surface_sha256": "e9d5bfedfc13fd7099ab94734e15242d733d3fb7445360e282ace1392816a6a6",
+      "title": "ROS2Subscriber: setting messageName segfaults (libisaacsim.ros2.nodes.plugin.so) when the ROS 2 bridge failed to load"
+    }
+  ],
+  "post_activation_issue_identities_observed": 226,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-19T17:46:52Z",
+  "schema_version": 1
+}
