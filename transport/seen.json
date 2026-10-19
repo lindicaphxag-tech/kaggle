@@ -3224,6 +3224,17 @@
       "source": "inbox/FIRST_SEEN_20261019T051738Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "9df3e082dfd1c82493f9a2b08eb223c74612646ffaf92455e5998ebff8fca861"
+    },
+    {
+      "created_at": "2026-10-19T05:34:50Z",
+      "first_frozen_at": "2026-10-19T06:07:15Z",
+      "id": "Genesis-Embodied-AI/genesis-world#3567",
+      "issue_number": 3567,
+      "prediction_deadline_at": "2026-10-19T12:07:15Z",
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "source": "inbox/FIRST_SEEN_20261019T060715Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "47ede98a75c3410ab7a5de8b8956c1a22044cf778be4e72d2ad31bbb381ca6a7"
     }
   ]
 }
