@@ -1,0 +1,66 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 4,
+  "new_candidates": [
+    {
+      "author_login": "zesn0000",
+      "body": "Hi NVIDIA Team,\n\nWe are currently working with GR00T N1.7 and exploring subtask prompt annotation strategies for fine-tuning.\n\nWhile reviewing create_language_from_meta() in lerobot_episode_loader.py, we noticed that the next subtask prompt appears to be introduced up to half an action horizon before its original start frame, with a prompt randomly selected in the overlapping region.\n\nWe would like to better understand the design considerations behind this approach and would appreciate your insights on a few questions:\n\nDesign Motivation: Could you share the main motivation behind this overlap mechanism? Are there any recommended practices for defining and annotating subtask boundaries?\n\nRecovery Data Annotation: When a robot needs to perform corrective actions within a subtask, such as regrasping an object before continuing the original task, would you generally recommend keeping the original subtask prompt or introducing a separate recovery prompt? We are also curious whether the overlap mechanism requires any special consideration in such scenarios.\n\nTraining and Inference Consistency: If prompt overlap is applied during training, while an external task manager switches prompts only after subtask completion during inference, would this difference be a concern? Are there any recommended approaches for handling this?\n\nWe would be grateful for any suggestions or practical experiences you could share, as they would help guide our upcoming experiments.\n\nThank you very much for your time and support!",
+      "created_at": "2026-10-19T09:07:08Z",
+      "html_url": "https://github.com/NVIDIA/Isaac-GR00T/issues/793",
+      "id": "NVIDIA/Isaac-GR00T#793",
+      "issue_number": 793,
+      "labels": [],
+      "repository": "NVIDIA/Isaac-GR00T",
+      "surface_sha256": "951e001aaca2b39d41e2327b9d90d6443ac5b839332bd05ac9a9bd157273789f",
+      "title": "GR00T N1.7 Questions About Subtask Prompt Overlap and Recovery Data Annotation"
+    },
+    {
+      "author_login": "Gaochengzhi",
+      "body": "Dear AlpaSim Challenge Organizers,\n\nI am a PhD student at Southeast University and a participant in the AlpaSim E2E Closed-Loop Challenge 2026. As we plan possible travel, we would be grateful for clarification on the following:\n\n1. Where and when will the results be presented? Will it be at the NeurIPS 2026 Sydney site (ICC Sydney), and on which day and session?\n2. Will winners or selected teams receive NeurIPS 2026 registration or a visa invitation letter? Main conference and workshop registration for Sydney appear to be sold out, and attendees from mainland China need an Australian visa, which can take several weeks.\n3. Is in-person attendance required, or can winners present remotely?\n\nThank you for organizing this challenge. We look forward to your reply.\nBest regards,",
+      "created_at": "2026-10-19T06:54:56Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/212",
+      "id": "NVlabs/alpasim#212",
+      "issue_number": 212,
+      "labels": [],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "fcf5fcda535c6449462abf3a4a6b0ad763165a2b6742412285fafe9547fea0c3",
+      "title": "Subject: AlpaSim E2E Closed-Loop Challenge 2026 \u2013 Questions on Award Presentation and NeurIPS Attendance"
+    },
+    {
+      "author_login": "Jang-seunghwan",
+      "body": "Hi organizers,\n\nI registered our team on the challenge Space on the night of Friday, October 16, 2026 (Singapore time, UTC+8), two days before the October 18 registration cutoff.\nThe Space still shows:\n\n\"Registration pending review: LESSERAFIM (lesserafim).\nNo approved submitter invitations found for your Hugging Face username.\"\n\nTeam display name: LESSERAFIM\nTeam ID: lesserafim\nCaptain: Hugging Face @SeunghwanJang\nAffiliation: School of EEE, Nanyang Technological University\n\nWe are a genuine academic team, and this is the only team registered from our lab.\nThe captain's Hugging Face primary email is a verified NTU organizational address (e.ntu.edu.sg).\nWe have already run the baseline locally and are preparing our first submission, so we would appreciate a review before the October 31 deadline.\n\nIf anything else is needed for verification, please let me know.\n\nThank you!",
+      "created_at": "2026-10-19T07:49:58Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/213",
+      "id": "NVlabs/alpasim#213",
+      "issue_number": 213,
+      "labels": [
+        "bug"
+      ],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "8e8ccdf9f0be07d91831fea92bc04f0413c467d6b41ecefef211ae592bea3f82",
+      "title": "[AlpaSim Challenge 2026] Registration submitted Oct 16 (before cutoff) still pending review \u2014 team LESSERAFIM (lesserafim)"
+    },
+    {
+      "author_login": "ravediamond",
+      "body": "### Ticket Type\n\n\ud83d\udc1b Bug Report (Something isn't working)\n\n### Description\n\nFour steps in `robots/so_follower/robot_kinematic_processor.py` build the joint vector for FK/IK by iterating `observation.items()` and keeping the `.pos` keys, instead of reading `motor_names` in order:\n\n- `EEReferenceAndDelta` (FK on the current joints)\n- `InverseKinematicsEEToJoints` and `InverseKinematicsRLStep` (IK initial guess)\n- `GripperVelocityToJoint` takes `q_raw[-1]` as the gripper\n\nSo the result depends on the dict's insertion order, and the IK steps also pick up any other `.pos` key. The output side already maps by `motor_names`, and `compute_forward_kinematics_joints_to_ee` already does `joints[f\"{n}.pos\"] for n in motor_names`. The three `# TODO` comments about joint order and the gripper being last point at the same assumption.\n\nIt works today because the SO follower emits joints in `motor_names` order with the gripper last, but nothing checks it, and a different order gives a wrong pose with no error.\n\n### Context & Reproduction\n\n```python\nfrom lerobot.processor.converters import create_transition\nfrom lerobot.robots.so_follower.robot_kinematic_processor import InverseKinematicsEEToJoints\n\nnames = [\"shoulder_pan\", \"shoulder_lift\", \"elbow_flex\", \"wrist_flex\", \"wrist_roll\", \"gripper\"]\nobs = {f\"{n}.pos\": float(i) for i, n in reversed(list(enumerate(names)))}\n\nclass K:\n    def inverse_kinematics(self, q, t, **kw):\n        print(q)  # [5. 4. 3. 2. 1. 0.], expected [0. 1. 2. 3. 4. 5.]\n        return q\n\nee = dict.fromkeys([\"ee.x\", \"ee.y\", \"ee.z\", \"ee.wx\", \"ee.wy\", \"ee.wz\", \"ee.gripper_pos\"], 0.0)\nInverseKinematicsEEToJoints(kinematics=K(), motor_names=names)(create_transition(observation=obs, action=ee))\n```\n\n### Checklist\n\n- [x] I have searched existing tickets to ensure this isn't a duplicate.\n- [x] I am using the latest version of the `main` branch.\n- [x] I have verified this is not an environment-specific problem.\n\n### Additional Info / Workarounds\n\nFix: `np.array([observation[f\"{n}.pos\"] for n in self.motor_names])`, and `observation[\"gripper.pos\"]` for the gripper step. I'll open a PR.\n",
+      "created_at": "2026-10-19T06:44:32Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5011",
+      "id": "huggingface/lerobot#5011",
+      "issue_number": 5011,
+      "labels": [
+        "bug",
+        "robots",
+        "teleoperators"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "ec40b8cece087e8a2e2e680fafaa00a62e8b4e8dd28132ff4e5d8a22db7319ce",
+      "title": "Kinematics steps read joints in observation dict order instead of motor_names order"
+    }
+  ],
+  "post_activation_issue_identities_observed": 221,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-19T11:14:35Z",
+  "schema_version": 1
+}
