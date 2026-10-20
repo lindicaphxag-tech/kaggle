@@ -3585,13 +3585,17 @@
     },
     {
       "created_at": "2026-10-20T10:56:40Z",
+      "expiry_recorded_at": "2026-10-20T19:09:41Z",
+      "expiry_sha256": "ce903176f423a56fc314c06eb846f600dd7462acca80f400c17344ac196dc134",
+      "expiry_source": "expirations/NVlabs__alpasim__216.json",
       "first_frozen_at": "2026-10-20T12:07:33Z",
       "id": "NVlabs/alpasim#216",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 216,
       "prediction_deadline_at": "2026-10-20T18:07:33Z",
       "repository": "NVlabs/alpasim",
       "source": "inbox/FIRST_SEEN_20261020T120733Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "d4022af488783a4e5f86f17ce0047ca5642ac62492f5fdde19d6b090b3241496"
     },
     {
