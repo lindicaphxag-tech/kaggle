@@ -1,0 +1,69 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 4,
+  "new_candidates": [
+    {
+      "author_login": "dundysm",
+      "body": "mj_objectAcceleration in mujoco c returns zero when the object's body is welded to a dof-less body (world, static or mocap). mjx reads cacc directly, and cacc[0] is -gravity, so accelerometer, framelinacc and frameangacc report 9.81 instead of 0.\n\nthis shows up in the menagerie: google_barkour_v0 has `<accelerometer site=\"origin\"/>` on a worldbody site, and mjx reports [0, 0, 9.81] where mujoco reports [0, 0, 0].\n\nrepro:\n\n```python\nimport mujoco, numpy as np, jax\nfrom mujoco import mjx\nXML = \"\"\"\n<mujoco>\n  <worldbody>\n    <site name=\"world_site\" pos=\"0.1 0 0\"/>\n    <body name=\"mocap\" mocap=\"true\" pos=\"0 0 1\"><site name=\"mocap_site\"/></body>\n    <body name=\"static\" pos=\"0 1 1\"><site name=\"static_site\"/><geom size=\".1\"/></body>\n    <body name=\"free\" pos=\"1 0 1\"><freejoint/><geom size=\".1\"/><site name=\"free_site\"/></body>\n  </worldbody>\n  <sensor>\n    <accelerometer site=\"world_site\"/>\n    <accelerometer site=\"mocap_site\"/>\n    <accelerometer site=\"static_site\"/>\n    <framelinacc objtype=\"site\" objname=\"mocap_site\"/>\n    <frameangacc objtype=\"site\" objname=\"static_site\"/>\n    <accelerometer site=\"free_site\"/>\n  </sensor>\n</mujoco>\n\"\"\"\nm = mujoco.MjModel.from_xml_string(XML); d = mujoco.MjData(m)\nmujoco.mj_forward(m, d)\nmx = mjx.put_model(m); dx = mjx.put_data(m, d)\ndx = jax.jit(mjx.forward)(mx, dx)\nprint(\"mujoco c:\", d.sensordata.reshape(-1, 3))\nprint(\"mjx:     \", np.asarray(dx.sensordata).reshape(-1, 3))\n```\n\noutput:\n\n```\nmujoco c:    [[0. 0. 0.]\n [0. 0. 0.]\n [0. 0. 0.]\n [0. 0. 0.]\n [0. 0. 0.]\n [0. 0. 0.]]\nmjx:         [[0.   0.   9.81]\n [0.   0.   9.81]\n [0.   0.   9.81]\n [0.   0.   9.81]\n [0.   0.   0.  ]\n [0.   0.   0.  ]]\n```\n\nmujoco 3.16.0, mjx from main (mujoco nightly 3.16.1.dev), jax cpu.\n\nthe same bug in mujoco_warp: google-deepmind/mujoco_warp#1804, fix in google-deepmind/mujoco_warp#1805.\n",
+      "created_at": "2026-10-20T01:55:49Z",
+      "html_url": "https://github.com/google-deepmind/mujoco/issues/3716",
+      "id": "google-deepmind/mujoco#3716",
+      "issue_number": 3716,
+      "labels": [],
+      "repository": "google-deepmind/mujoco",
+      "surface_sha256": "19084e90e8a74bb929a28da79121bf7f419529893068450c7f36ad559c08779d",
+      "title": "[MJX] accelerometer, framelinacc and frameangacc report -gravity on static and mocap bodies"
+    },
+    {
+      "author_login": "TinyGeek",
+      "body": "### Ticket Type\n\n\ud83d\udc1b Bug Report (Something isn't working)\n\n### Environment & System Info\n\nLeRobot `main` at `3991580a5673f5f0219a4e8835a5f973eeccf9a7` (`pyproject.toml` version `0.6.2`); Linux x86_64; Python 3.12.14. Installed with `uv sync --locked --extra dataset --extra test` (PyTorch 2.11.0+cu128, NumPy 2.2.6). `lerobot-info` was attempted but exits 1 because TorchCodec cannot load the system FFmpeg shared libraries; the focused image-writer tests and reproduction run independently of TorchCodec.\n\n### Description\n\n`AsyncImageWriter(num_processes=1, num_threads=0)` is accepted, but each child process starts zero worker threads and exits normally. After `save_image()` queues a frame, `wait_until_done()` waits indefinitely for a `task_done()` call that no worker can make. `DatasetWriter.save_episode()` and `finalize()` also call this wait, so recording can hang with this configuration. A negative process count with positive threads also creates no workers.\n\nExpected behavior: reject a non-positive per-process thread count or negative process count when constructing `AsyncImageWriter`, before starting processes or accepting frames.\n\n### Context & Reproduction\n\nThis exact command demonstrates the affected public class (run under a timeout so it cannot hang the shell):\n\n```bash\ntimeout -k 1s 15s uv run --locked --extra dataset --extra test python - <<'PY'\nfrom pathlib import Path\n\nimport numpy as np\n\nfrom lerobot.datasets.image_writer import AsyncImageWriter\n\nwriter = AsyncImageWriter(num_processes=1, num_threads=0)\nworker = writer.processes[0]\nworker.join(timeout=1)\nwriter.save_image(np.zeros((2, 2, 3), dtype=np.uint8), Path('/tmp/lerobot-zero-worker.png'))\nprint(f'worker_alive={worker.is_alive()} exitcode={worker.exitcode}', flush=True)\nprint('calling wait_until_done()', flush=True)\nwriter.wait_until_done()  # Never returns on the current implementation.\nPY\n```\n\nOutput on unmodified `main`:\n\n```text\nworker_alive=False exitcode=0\ncalling wait_until_done()\n```\n\nThe 15-second timeout exited with status `124`. A focused regression test expecting `ValueError` for `(num_processes, num_threads)` equal to `(1, 0)`, `(1, -1)` or `(-1, 1)` fails on unmodified `main` in all three cases; `(0, 0)` already raises. In `image_writer.py`, the constructor only rejects `num_threads <= 0` when `num_processes <= 0`, while `worker_process()` creates threads with `range(num_threads)`.\n\n### Relevant logs or stack trace\n\nThere is no exception or stack trace. `wait_until_done()` blocks in `JoinableQueue.join()` until the timeout terminates the reproducer.\n\n### Checklist\n\n- [x] I have searched existing tickets to ensure this isn't a duplicate.\n- [x] I am using the latest version of the `main` branch.\n- [ ] I have verified this is not an environment-specific problem. Verified on Linux only.\n\n### Additional Info / Workarounds\n\nUse at least one thread per process (`num_threads >= 1`) and a non-negative process count, or disable the async writer with both counts set to zero at the `LeRobotDataset` API. Existing `test_zero_threads` only checks `(num_processes=0, num_threads=0)`; it does not cover the other no-worker combinations.\n",
+      "created_at": "2026-10-20T04:16:57Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5018",
+      "id": "huggingface/lerobot#5018",
+      "issue_number": 5018,
+      "labels": [
+        "bug",
+        "dataset",
+        "tests",
+        "dependencies",
+        "configuration"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "c5dcab3345cb8b07203a0c3ca55c8aa834cf4acbceb7ee1bf0aa598316491e26",
+      "title": "AsyncImageWriter accepts zero-worker configurations and hangs on queued frames"
+    },
+    {
+      "author_login": "BarceloChristian",
+      "body": "### Description\n\n## Summary\n\n`isaacsim.robot.surface_gripper` works on PhysX but not when Isaac Sim runs on Newton.\nWorse than the gripper not gripping, adding a Surface Gripper prevents the whole Newton scene from simulating: the gripper's attachment-point joint is rejected as an \"orphan joint\", Newton's model fails to initialize, every gripper call reports \"Gripper not found\", and nothing in the scene moves.\n\nAFAIK, there is currently no way to author, in USD or through Newton's API, a constraint that attaches a free rigid body to an articulation link and can be switched on at runtime. `Attaching an object at runtime` is a common mechanism used for many applications: holding/swapping tools, starting with an object already grasped, carrying a payload, etc.\n\n`standalone_examples/api/isaacsim.robot.surface_gripper/gripper_grasp.py` passes on PhysX:\n\n```\n[close] status=Closed, gripped=['/World/TargetCube'], gripper z=0.0650\n[lift]  cube z = 0.2600, gripper z = 0.3000\n[open]  status=Open, gripped=[]\n[drop]  cube z = 0.0200\nPASS: surface gripper open/close/grasp verified.\n```\n\nThe only change needed to boot it on Newton is to its `SimulationApp` construction:\n\n```python\nsimulation_app = SimulationApp(\n    {\"headless\": args.headless or args.test},\n    experience=\"/path/to/isaacsim/apps/isaacsim.exp.full.newton.kit\",\n)\n```\n\nOn Newton (`SimulationManager.get_active_physics_engine()` returns `newton`):\n\n```\n[Newton] Initialization failed: Found 2 joint(s) not belonging to any articulation. Call add_articulation() for all joints. Orphan joints: ['/World/Joints/PrismaticZ', '/World/Surface_Gripper_Joints/AttachJoint'] [isaacsim.robot.surface_gripper.plugin]\nGripper not found: /World/SurfaceGripper   (on every call)\n[lower] gripper z = 0.2000          <- nothing moves: the model never built\n[close] status=Open, gripped=[], gripper z=0.2000\nFAIL:\n  - close: expected Closed, got Open\n  - close: expected /World/TargetCube in gripped, got []\n  - lift: cube did not rise (initial=0.0200, lifted=0.0200)\n  - lift: lost grip (status=Open, gripped=[])\n  - drop: cube did not fall (lifted=0.0200, after_open=0.0200)\n```\n\n## What's missing in Newton\n\nThe Surface Gripper (on PhysX) attaches objects through a joint that sits outside any articulation. It is enabled at runtime, and on close it is re-pointed at whichever body is within reach. Nothing equivalent can be expressed in Newton today.\n\n\n### Isaac Sim version\n\n6.2\n\n### Operating System (OS)\n\nUbuntu 24.04\n\n### GPU Name\n\nRTX 5090\n\n### GPU Driver and CUDA versions\n\n595.99.02\n\n### Logs\n\n_No response_\n\n### Additional information\n\n_No response_",
+      "created_at": "2026-10-20T04:09:23Z",
+      "html_url": "https://github.com/isaac-sim/IsaacSim/issues/893",
+      "id": "isaac-sim/IsaacSim#893",
+      "issue_number": 893,
+      "labels": [
+        "isaac-sim-physics",
+        "isaac-sim-v6-2-0"
+      ],
+      "repository": "isaac-sim/IsaacSim",
+      "surface_sha256": "7386e04ae8aefe953ef0adc741e6c44aeabbb342cf783484676ff44bca3dd626",
+      "title": "Surface Gripper doesn't work on Newton, since it has no way to attach objects at runtime"
+    },
+    {
+      "author_login": "mxgrey",
+      "body": "* https://github.com/cosai-oasis/ws2-defenders/blob/main/telemetry/CoSAI-AI-Telemetry-RFC.md\n* https://lfedge.org/wp-content/uploads/sites/24/2020/07/LFedge_Whitepaper.pdf\n* https://stateoftheedge.com/state-of-the-edge-report-2026/\n\nAgentic pipelines and operations are becoming more prevalent among Open-RMF users and will likely find their way into deployments. We should review existing work in the industry to standardize safety and metrics for agentic systems to see how these standards should inform the ongoing development of the Open-RMF project.",
+      "created_at": "2026-10-20T01:56:58Z",
+      "html_url": "https://github.com/open-rmf/rmf/issues/736",
+      "id": "open-rmf/rmf#736",
+      "issue_number": 736,
+      "labels": [],
+      "repository": "open-rmf/rmf",
+      "surface_sha256": "e71e058f454391c02e6f7b84238b596ced4af1dacbb6d755d4dba833f6c96e58",
+      "title": "Review documents on agentic security metrics"
+    }
+  ],
+  "post_activation_issue_identities_observed": 236,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-20T04:41:28Z",
+  "schema_version": 1
+}
