@@ -1,0 +1,13 @@
+{
+  "case_id": "huggingface/lerobot#5018",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-10-20T12:05:40Z",
+  "expiry_sha256": "cee1aa012be0d179312633f65c0e68aa32464cf09dc012a5c3956d47bfc2a805",
+  "first_frozen_at": "2026-10-20T04:41:28Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-10-20T10:41:28Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "c5dcab3345cb8b07203a0c3ca55c8aa834cf4acbceb7ee1bf0aa598316491e26"
+}

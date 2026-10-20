@@ -3495,46 +3495,62 @@
     },
     {
       "created_at": "2026-10-20T01:55:49Z",
+      "expiry_recorded_at": "2026-10-20T12:05:40Z",
+      "expiry_sha256": "b7b9dc8ab697e314095e06f76eccfef4d55a3e90ed2ad34bae66f12ab8d8cbb3",
+      "expiry_source": "expirations/google-deepmind__mujoco__3716.json",
       "first_frozen_at": "2026-10-20T04:41:28Z",
       "id": "google-deepmind/mujoco#3716",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3716,
       "prediction_deadline_at": "2026-10-20T10:41:28Z",
       "repository": "google-deepmind/mujoco",
       "source": "inbox/FIRST_SEEN_20261020T044128Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "19084e90e8a74bb929a28da79121bf7f419529893068450c7f36ad559c08779d"
     },
     {
       "created_at": "2026-10-20T04:16:57Z",
+      "expiry_recorded_at": "2026-10-20T12:05:40Z",
+      "expiry_sha256": "cee1aa012be0d179312633f65c0e68aa32464cf09dc012a5c3956d47bfc2a805",
+      "expiry_source": "expirations/huggingface__lerobot__5018.json",
       "first_frozen_at": "2026-10-20T04:41:28Z",
       "id": "huggingface/lerobot#5018",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 5018,
       "prediction_deadline_at": "2026-10-20T10:41:28Z",
       "repository": "huggingface/lerobot",
       "source": "inbox/FIRST_SEEN_20261020T044128Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "c5dcab3345cb8b07203a0c3ca55c8aa834cf4acbceb7ee1bf0aa598316491e26"
     },
     {
       "created_at": "2026-10-20T04:09:23Z",
+      "expiry_recorded_at": "2026-10-20T12:05:40Z",
+      "expiry_sha256": "17ccd6ed91f728add291f0bdbdd295ad951f3713305f6671197e601332446734",
+      "expiry_source": "expirations/isaac-sim__IsaacSim__893.json",
       "first_frozen_at": "2026-10-20T04:41:28Z",
       "id": "isaac-sim/IsaacSim#893",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 893,
       "prediction_deadline_at": "2026-10-20T10:41:28Z",
       "repository": "isaac-sim/IsaacSim",
       "source": "inbox/FIRST_SEEN_20261020T044128Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "7386e04ae8aefe953ef0adc741e6c44aeabbb342cf783484676ff44bca3dd626"
     },
     {
       "created_at": "2026-10-20T01:56:58Z",
+      "expiry_recorded_at": "2026-10-20T12:05:40Z",
+      "expiry_sha256": "2c7477bdf30b0dd017de69a1efa70cff3bf8001d9d46fbf53dad653d260a01db",
+      "expiry_source": "expirations/open-rmf__rmf__736.json",
       "first_frozen_at": "2026-10-20T04:41:28Z",
       "id": "open-rmf/rmf#736",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 736,
       "prediction_deadline_at": "2026-10-20T10:41:28Z",
       "repository": "open-rmf/rmf",
       "source": "inbox/FIRST_SEEN_20261020T044128Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "e71e058f454391c02e6f7b84238b596ced4af1dacbb6d755d4dba833f6c96e58"
     },
     {
@@ -3558,6 +3574,17 @@
       "source": "inbox/FIRST_SEEN_20261020T095924Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "e711430fc3895f10319f99f2ff9efc7cacc343bf1f53cb6adb895aaefda7ac7f"
+    },
+    {
+      "created_at": "2026-10-20T10:56:40Z",
+      "first_frozen_at": "2026-10-20T12:07:33Z",
+      "id": "NVlabs/alpasim#216",
+      "issue_number": 216,
+      "prediction_deadline_at": "2026-10-20T18:07:33Z",
+      "repository": "NVlabs/alpasim",
+      "source": "inbox/FIRST_SEEN_20261020T120733Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "d4022af488783a4e5f86f17ce0047ca5642ac62492f5fdde19d6b090b3241496"
     }
   ]
 }
