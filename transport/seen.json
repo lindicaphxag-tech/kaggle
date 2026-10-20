@@ -3619,6 +3619,17 @@
       "source": "inbox/FIRST_SEEN_20261020T173053Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "a03598d39348da8e6c0c9eb23935226b39536148f12921650de9c5389b9a4e1b"
+    },
+    {
+      "created_at": "2026-10-20T21:05:38Z",
+      "first_frozen_at": "2026-10-20T22:17:10Z",
+      "id": "ros2/rosbag2#2535",
+      "issue_number": 2535,
+      "prediction_deadline_at": "2026-10-21T04:17:10Z",
+      "repository": "ros2/rosbag2",
+      "source": "inbox/FIRST_SEEN_20261020T221710Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "4adef4cfe6ae31e033cbfe30437ec4e322edecdc3a6e3188ef6d86c30d24e331"
     }
   ]
 }

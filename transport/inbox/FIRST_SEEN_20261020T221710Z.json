@@ -1,0 +1,26 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "miguelgonrod",
+      "body": "## Description\nWe are getting a warning related to a file path length exceding the expected\n\n### Expected Behavior\nBuild without warnings\n\n### Actual Behavior\nBuilding with warnings\n\n## To Reproduce\n** Steps to reproduce the behavior, e.g.\n1. Go to \n2. Build a job\n3. See warnings\n\n## System (please complete the following information)\n - OS: Windows 11\n - ROS 2 Distro: Rolling\n - Install Method: Source\n\n\n### Reference Build\n- [nightly_win_rep#4266](https://ci.ros2.org/job/nightly_win_rep/4266)\n\n### Log Output\n```\n--- stderr: rosbag2_performance_benchmarking_msgs\nCMake Warning in CMakeLists.txt:\n  The object file directory\n\n    W:/build/rosbag2_performance_benchmarking_msgs/CMakeFiles/rosbag2_performance_benchmarking_msgs_s__rosidl_typesupport_introspection_c.dir/./\n\n  has 140 characters.  The maximum full path to an object file is 250\n  characters (see CMAKE_OBJECT_PATH_MAX).  Object file\n\n    2d3c5cb92dbe29a6b0c85089fcc2845e/_rosbag2_performance_benchmarking_msgs_s.ep.rosidl_typesupport_introspection_c.c.obj\n\n  cannot be safely placed under this directory.  The build may not work\n  correctly.\n\n\n---\nFinished <<< rosbag2_performance_benchmarking_msgs [45.6s]\n```\n\nhappening since https://ci.ros2.org/job/nightly_win_rep/4247.\n",
+      "created_at": "2026-10-20T21:05:38Z",
+      "html_url": "https://github.com/ros2/rosbag2/issues/2535",
+      "id": "ros2/rosbag2#2535",
+      "issue_number": 2535,
+      "labels": [
+        "bug"
+      ],
+      "repository": "ros2/rosbag2",
+      "surface_sha256": "4adef4cfe6ae31e033cbfe30437ec4e322edecdc3a6e3188ef6d86c30d24e331",
+      "title": ":farmer: Windows build warns about exceeding CMake object file path length in rosbag2_performance_benchmarking_msgs"
+    }
+  ],
+  "post_activation_issue_identities_observed": 242,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-20T22:17:10Z",
+  "schema_version": 1
+}
