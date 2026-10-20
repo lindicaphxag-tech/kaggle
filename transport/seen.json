@@ -3360,35 +3360,47 @@
     },
     {
       "created_at": "2026-10-19T17:31:36Z",
+      "expiry_recorded_at": "2026-10-20T01:14:34Z",
+      "expiry_sha256": "b8cfb9670ed90e934e85d1e1c3e6377f26bb36d081def9f3ac671609ada949b9",
+      "expiry_source": "expirations/RobotLocomotion__drake__25100.json",
       "first_frozen_at": "2026-10-19T17:46:52Z",
       "id": "RobotLocomotion/drake#25100",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 25100,
       "prediction_deadline_at": "2026-10-19T23:46:52Z",
       "repository": "RobotLocomotion/drake",
       "source": "inbox/FIRST_SEEN_20261019T174652Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "9e8bce87d72eed8c2ebd49e1a7a04b81ae55a09e9ad1278ee591f48aea159e96"
     },
     {
       "created_at": "2026-10-19T17:33:11Z",
+      "expiry_recorded_at": "2026-10-20T01:14:34Z",
+      "expiry_sha256": "8c6b0e5c6e8c865793435a9fe5aeb5d5a512b279d20de146e04fba79962b0da2",
+      "expiry_source": "expirations/RobotLocomotion__drake__25101.json",
       "first_frozen_at": "2026-10-19T17:46:52Z",
       "id": "RobotLocomotion/drake#25101",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 25101,
       "prediction_deadline_at": "2026-10-19T23:46:52Z",
       "repository": "RobotLocomotion/drake",
       "source": "inbox/FIRST_SEEN_20261019T174652Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "e228d237ca5fa4b43c06b0a63d0972db6ed49f7b7853819014ca940484cfd7ef"
     },
     {
       "created_at": "2026-10-19T16:01:24Z",
+      "expiry_recorded_at": "2026-10-20T01:14:34Z",
+      "expiry_sha256": "6537271e0a98daeceb288340e1115460c21bdd0a7e8a7314c6426691b9afe38f",
+      "expiry_source": "expirations/isaac-sim__IsaacSim__892.json",
       "first_frozen_at": "2026-10-19T17:46:52Z",
       "id": "isaac-sim/IsaacSim#892",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 892,
       "prediction_deadline_at": "2026-10-19T23:46:52Z",
       "repository": "isaac-sim/IsaacSim",
       "source": "inbox/FIRST_SEEN_20261019T174652Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "e9d5bfedfc13fd7099ab94734e15242d733d3fb7445360e282ace1392816a6a6"
     },
     {
@@ -3423,6 +3435,39 @@
       "source": "inbox/FIRST_SEEN_20261019T191703Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "97dc30c2edd85037ff59150106c3d08d652bb198206a9cdbd4f0ab1225ee05c7"
+    },
+    {
+      "created_at": "2026-10-19T23:52:07Z",
+      "first_frozen_at": "2026-10-20T01:16:03Z",
+      "id": "google-deepmind/mujoco#3714",
+      "issue_number": 3714,
+      "prediction_deadline_at": "2026-10-20T07:16:03Z",
+      "repository": "google-deepmind/mujoco",
+      "source": "inbox/FIRST_SEEN_20261020T011603Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "571194f4a5b4e8c85f19c247606334b39b3e066398dd30836940080845f5a909"
+    },
+    {
+      "created_at": "2026-10-19T23:55:19Z",
+      "first_frozen_at": "2026-10-20T01:16:03Z",
+      "id": "google-deepmind/mujoco#3715",
+      "issue_number": 3715,
+      "prediction_deadline_at": "2026-10-20T07:16:03Z",
+      "repository": "google-deepmind/mujoco",
+      "source": "inbox/FIRST_SEEN_20261020T011603Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "fca75399e3a031a731695f158b359be84981d1f89aba72cee0aee0e64669bcef"
+    },
+    {
+      "created_at": "2026-10-20T00:45:03Z",
+      "first_frozen_at": "2026-10-20T01:16:03Z",
+      "id": "isaac-sim/IsaacLab#8747",
+      "issue_number": 8747,
+      "prediction_deadline_at": "2026-10-20T07:16:03Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261020T011603Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "1f4c8bd3596afe176620db1ce4569d5cf110dd28ae5dd88dab8a056f78355eac"
     }
   ]
 }
