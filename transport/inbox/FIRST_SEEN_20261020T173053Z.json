@@ -1,0 +1,38 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "Gaochengzhi",
+      "body": "Hi organizers, thanks for running this challenge.\n\nWe are a team from Southeast University in mainland China. The Official Terms (official-2026-08), Section 2, list the People's Republic of China among excluded jurisdictions, and the Challenge Page notes that \"some teams may be ineligible for prizes\". Could you please clarify:\n\n1. If a team based in mainland China finishes first in a track, will it be officially recognized as the track winner, for example listed as the winner in the final results announcement, given a winner certificate, and invited to present its method, even if the hardware prize cannot be delivered?\n2. After the final submission, can a team update its organization/affiliation or add an additional affiliation (as discussed in #209), and would that change be reflected on the final leaderboard and in the results announcement?\n\nThank you!",
+      "created_at": "2026-10-20T16:47:29Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/218",
+      "id": "NVlabs/alpasim#218",
+      "issue_number": 218,
+      "labels": [],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "0b2b810b787a738a521ff56669202540746f07dce18723d4b03273af45787041",
+      "title": "Clarification on prize eligibility for teams based in mainland China"
+    },
+    {
+      "author_login": "SANTHOSH-MAMIDISETTI",
+      "body": "## Description\n\nExpose per-topic dropped-message counts during rosbag2 recording so callers can\nmonitor data loss in real time without waiting for a bag split or close.\n\nOur recorder counts its message rate at the subscription, before the cache, so a\nrecorder discarding a third of its data reports exactly the same numbers as a\nhealthy one. The first indication anything was lost is a log line at close, by\nwhich point the data is gone.\n\nSame on [`rolling`](https://github.com/ros2/rosbag2/blob/rolling/rosbag2_cpp/include/rosbag2_cpp/cache/message_cache.hpp#L121-L123),\nso this isn't already addressed in a later release.\n\nAlternatively, a callback triggered when messages are dropped would also solve\nthis problem.\n\n**Version:** rosbag2 `0.26.11` (Jazzy)\n\n## Related Issues\n\nNone known.\n\n## Completion Criteria\n\n- [ ] Dropped-message counts are queryable per topic during recording\n- [ ] Counts match those reported by `log_dropped()` at close\n- [ ] Reading counts is thread-safe during concurrent recording\n- [ ] Behaviour is defined for disabled caching and snapshot mode\n- [ ] The feature is documented alongside the cache options\n\n## Implementation Notes / Suggestions\n\nConsider adding a dropped-count accessor to `MessageCacheInterface` and exposing\nit through the writer.\n\nThe count already exists as `MessageCache::messages_dropped_per_topic_`, but it\nis `protected` and there is no route to it from outside. Links are to `0.26.11`:\n\n| what | where |\n|---|---|\n| the count | [`message_cache.hpp#L114-L116`](https://github.com/ros2/rosbag2/blob/0.26.11/rosbag2_cpp/include/rosbag2_cpp/cache/message_cache.hpp#L114-L116) |\n| incremented here | [`message_cache.cpp#L56-L57`](https://github.com/ros2/rosbag2/blob/0.26.11/rosbag2_cpp/src/rosbag2_cpp/cache/message_cache.cpp#L56-L57) |\n| only exposed via `log_dropped()` | [`message_cache_interface.hpp#L38-L75`](https://github.com/ros2/rosbag2/blob/0.26.11/rosbag2_cpp/include/rosbag2_cpp/cache/message_cache_interface.hpp#L38-L75) |\n| writer holds it `protected` | [`sequential_writer.hpp#L153`](https://github.com/ros2/rosbag2/blob/0.26.11/rosbag2_cpp/include/rosbag2_cpp/writers/sequential_writer.hpp#L153) |\n\n```cpp\n// what we'd want on MessageCacheInterface\nvirtual std::unordered_map<std::string, uint32_t> get_dropped_counts() const;\n```\n\n> [!NOTE]\n> The map is mutated without a lock at\n> [`message_cache.cpp#L56-L57`](https://github.com/ros2/rosbag2/blob/0.26.11/rosbag2_cpp/src/rosbag2_cpp/cache/message_cache.cpp#L56-L57).\n> That's safe today because `push` only runs under `Writer::writer_mutex_`, but\n> a public getter introduces readers outside that mutex.\n\n## Testing Notes / Suggestions\n\n- Verify counts are readable and increase **during** recording, not only at close\n- Verify per-topic counts match `log_dropped()` at close\n- Test disabled caching (`max_cache_size == 0`) and snapshot mode\n- Test concurrent reads during recording, ideally under TSan",
+      "created_at": "2026-10-20T16:10:57Z",
+      "html_url": "https://github.com/ros2/rosbag2/issues/2534",
+      "id": "ros2/rosbag2#2534",
+      "issue_number": 2534,
+      "labels": [
+        "enhancement"
+      ],
+      "repository": "ros2/rosbag2",
+      "surface_sha256": "a03598d39348da8e6c0c9eb23935226b39536148f12921650de9c5389b9a4e1b",
+      "title": "Expose the per-topic dropped-message count from MessageCache at runtime"
+    }
+  ],
+  "post_activation_issue_identities_observed": 241,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-20T17:30:53Z",
+  "schema_version": 1
+}
