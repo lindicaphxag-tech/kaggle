@@ -3450,35 +3450,47 @@
     },
     {
       "created_at": "2026-10-19T23:52:07Z",
+      "expiry_recorded_at": "2026-10-20T09:57:56Z",
+      "expiry_sha256": "897f694a999cbc176ed91d931a2441ff5df6580143d0338631d366d9cc0465ef",
+      "expiry_source": "expirations/google-deepmind__mujoco__3714.json",
       "first_frozen_at": "2026-10-20T01:16:03Z",
       "id": "google-deepmind/mujoco#3714",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3714,
       "prediction_deadline_at": "2026-10-20T07:16:03Z",
       "repository": "google-deepmind/mujoco",
       "source": "inbox/FIRST_SEEN_20261020T011603Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "571194f4a5b4e8c85f19c247606334b39b3e066398dd30836940080845f5a909"
     },
     {
       "created_at": "2026-10-19T23:55:19Z",
+      "expiry_recorded_at": "2026-10-20T09:57:56Z",
+      "expiry_sha256": "4858d2e6ada45de013a5f7e826247beccae18d93731165f8487623d222bb25a3",
+      "expiry_source": "expirations/google-deepmind__mujoco__3715.json",
       "first_frozen_at": "2026-10-20T01:16:03Z",
       "id": "google-deepmind/mujoco#3715",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3715,
       "prediction_deadline_at": "2026-10-20T07:16:03Z",
       "repository": "google-deepmind/mujoco",
       "source": "inbox/FIRST_SEEN_20261020T011603Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "fca75399e3a031a731695f158b359be84981d1f89aba72cee0aee0e64669bcef"
     },
     {
       "created_at": "2026-10-20T00:45:03Z",
+      "expiry_recorded_at": "2026-10-20T09:57:56Z",
+      "expiry_sha256": "58d4dcdf29e1b4bbf1a6fb861c0ca2e14c40d3a45a73dc3f26212714a144e9f1",
+      "expiry_source": "expirations/isaac-sim__IsaacLab__8747.json",
       "first_frozen_at": "2026-10-20T01:16:03Z",
       "id": "isaac-sim/IsaacLab#8747",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 8747,
       "prediction_deadline_at": "2026-10-20T07:16:03Z",
       "repository": "isaac-sim/IsaacLab",
       "source": "inbox/FIRST_SEEN_20261020T011603Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "1f4c8bd3596afe176620db1ce4569d5cf110dd28ae5dd88dab8a056f78355eac"
     },
     {
@@ -3524,6 +3536,28 @@
       "source": "inbox/FIRST_SEEN_20261020T044128Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "e71e058f454391c02e6f7b84238b596ced4af1dacbb6d755d4dba833f6c96e58"
+    },
+    {
+      "created_at": "2026-10-20T07:17:39Z",
+      "first_frozen_at": "2026-10-20T09:59:24Z",
+      "id": "eProsima/Fast-DDS#6587",
+      "issue_number": 6587,
+      "prediction_deadline_at": "2026-10-20T15:59:24Z",
+      "repository": "eProsima/Fast-DDS",
+      "source": "inbox/FIRST_SEEN_20261020T095924Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "9f4166eb10ee14b07e765759b5d534c1defb87b47c964acf2cf3cbc93d530bfd"
+    },
+    {
+      "created_at": "2026-10-20T09:39:15Z",
+      "first_frozen_at": "2026-10-20T09:59:24Z",
+      "id": "google-deepmind/mujoco#3719",
+      "issue_number": 3719,
+      "prediction_deadline_at": "2026-10-20T15:59:24Z",
+      "repository": "google-deepmind/mujoco",
+      "source": "inbox/FIRST_SEEN_20261020T095924Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "e711430fc3895f10319f99f2ff9efc7cacc343bf1f53cb6adb895aaefda7ac7f"
     }
   ]
 }
