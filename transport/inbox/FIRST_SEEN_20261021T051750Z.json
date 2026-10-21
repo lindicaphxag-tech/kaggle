@@ -1,0 +1,26 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "github-actions[bot]",
+      "body": "An automated scheduled build failed on `kilted`: https://github.com/ros-controls/control_toolbox/actions/runs/39538268216\n",
+      "created_at": "2026-10-21T03:29:59Z",
+      "html_url": "https://github.com/ros-controls/control_toolbox/issues/682",
+      "id": "ros-controls/control_toolbox#682",
+      "issue_number": 682,
+      "labels": [
+        "CI"
+      ],
+      "repository": "ros-controls/control_toolbox",
+      "surface_sha256": "2196324c9a0fd7c0f9df2a779c9a61f5a602eaf3a3d5a13e8afb37ab994b53ff",
+      "title": "CI build job kilted/source failed!"
+    }
+  ],
+  "post_activation_issue_identities_observed": 245,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-21T05:17:50Z",
+  "schema_version": 1
+}

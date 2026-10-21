@@ -3630,13 +3630,17 @@
     },
     {
       "created_at": "2026-10-20T21:05:38Z",
+      "expiry_recorded_at": "2026-10-21T05:16:03Z",
+      "expiry_sha256": "624ce8e1957bb71a1ea2084bbf75b3023470afdbb0ded3b4ac1276425829d805",
+      "expiry_source": "expirations/ros2__rosbag2__2535.json",
       "first_frozen_at": "2026-10-20T22:17:10Z",
       "id": "ros2/rosbag2#2535",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 2535,
       "prediction_deadline_at": "2026-10-21T04:17:10Z",
       "repository": "ros2/rosbag2",
       "source": "inbox/FIRST_SEEN_20261020T221710Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "4adef4cfe6ae31e033cbfe30437ec4e322edecdc3a6e3188ef6d86c30d24e331"
     },
     {
@@ -3660,6 +3664,17 @@
       "source": "inbox/FIRST_SEEN_20261021T013039Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "1fde1b1fee71e05a4453d7d072f0dc96044a3a2f349e4786a1b80de14152c03f"
+    },
+    {
+      "created_at": "2026-10-21T03:29:59Z",
+      "first_frozen_at": "2026-10-21T05:17:50Z",
+      "id": "ros-controls/control_toolbox#682",
+      "issue_number": 682,
+      "prediction_deadline_at": "2026-10-21T11:17:50Z",
+      "repository": "ros-controls/control_toolbox",
+      "source": "inbox/FIRST_SEEN_20261021T051750Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "2196324c9a0fd7c0f9df2a779c9a61f5a602eaf3a3d5a13e8afb37ab994b53ff"
     }
   ]
 }
