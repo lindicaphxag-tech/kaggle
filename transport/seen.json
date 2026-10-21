@@ -3600,24 +3600,32 @@
     },
     {
       "created_at": "2026-10-20T16:47:29Z",
+      "expiry_recorded_at": "2026-10-21T00:06:41Z",
+      "expiry_sha256": "033593fc21df48f56eca8b8d96537299de180f956301b3079fca1325f13e39d1",
+      "expiry_source": "expirations/NVlabs__alpasim__218.json",
       "first_frozen_at": "2026-10-20T17:30:53Z",
       "id": "NVlabs/alpasim#218",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 218,
       "prediction_deadline_at": "2026-10-20T23:30:53Z",
       "repository": "NVlabs/alpasim",
       "source": "inbox/FIRST_SEEN_20261020T173053Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "0b2b810b787a738a521ff56669202540746f07dce18723d4b03273af45787041"
     },
     {
       "created_at": "2026-10-20T16:10:57Z",
+      "expiry_recorded_at": "2026-10-21T00:06:41Z",
+      "expiry_sha256": "bcef3fd0b3c1436d42433bd13a83b586e3395621343069f428c4e1a0ba581ead",
+      "expiry_source": "expirations/ros2__rosbag2__2534.json",
       "first_frozen_at": "2026-10-20T17:30:53Z",
       "id": "ros2/rosbag2#2534",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 2534,
       "prediction_deadline_at": "2026-10-20T23:30:53Z",
       "repository": "ros2/rosbag2",
       "source": "inbox/FIRST_SEEN_20261020T173053Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "a03598d39348da8e6c0c9eb23935226b39536148f12921650de9c5389b9a4e1b"
     },
     {
@@ -3630,6 +3638,17 @@
       "source": "inbox/FIRST_SEEN_20261020T221710Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "4adef4cfe6ae31e033cbfe30437ec4e322edecdc3a6e3188ef6d86c30d24e331"
+    },
+    {
+      "created_at": "2026-10-20T22:30:00Z",
+      "first_frozen_at": "2026-10-21T00:07:48Z",
+      "id": "RobotLocomotion/drake#25109",
+      "issue_number": 25109,
+      "prediction_deadline_at": "2026-10-21T06:07:48Z",
+      "repository": "RobotLocomotion/drake",
+      "source": "inbox/FIRST_SEEN_20261021T000748Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "b0edfa301b54b339728c25de5662e4646d0eace02924ffeb83666331698cc3f5"
     }
   ]
 }

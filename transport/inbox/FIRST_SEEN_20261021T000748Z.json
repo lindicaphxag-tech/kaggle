@@ -1,0 +1,27 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "sherm1",
+      "body": "(Per discussion in PR #25102)\n\n### Background\nStandard SDFormat provides a set of joints defined by the `<joint>` tag which contains tags `<parent>` and `<child>`. Drake has additional joints defined by the `<drake:joint>` tag which contains tags `<drake:parent>` and `<drake:child>`. The sematics of `<drake:parent>` and standard `<parent>` are subtly different (also for `<child>`). They probably should not be different.\n\nThe difference is as follows. `<drake:parent>` implements Drake joint semantics directly. It defines both (a) the parent link, and (b) the parent frame Jp on that link. Similarly `<drake:child>` defines the child link and frame Jc on that link. In contrast, standard `<parent>` defines the parent link (even if given a frame) but a joint frame J is inferred by various heuristics involving the specified poses of the parent and child links. Then we generate Jp and Jc for Drake assuming they are coincident with J.\n\nPR #25102 extends SDFormat's standard `<joint>` to contain additional tags `<drake:parent_frame>` and `<drake:child_frame>` to explicitly provide Jp and Jc. Those aren't needed in the Drake extension joints since the `<drake:parent>` and child tags perform that extra duty already.\n\n### Proposal\nMake the `<drake:parent>` and `<drake:child>` tags have the reduced functionality of the standard tags and then allow `<drake:joint>` to use `<drake:parent_frame>` etc to provide explicit Jp and Jc frames.\n\n### Discussion\nThe proposed change would be a breaking change if anyone is already specifying frame in a `<drake:joint>`. The workaround would be to add the new tags. Although the `<drake:joint>` behavior is the correct one, we would gain consistency by nerfing it.",
+      "created_at": "2026-10-20T22:30:00Z",
+      "html_url": "https://github.com/RobotLocomotion/drake/issues/25109",
+      "id": "RobotLocomotion/drake#25109",
+      "issue_number": 25109,
+      "labels": [
+        "type: usability",
+        "component: multibody parsing"
+      ],
+      "repository": "RobotLocomotion/drake",
+      "surface_sha256": "b0edfa301b54b339728c25de5662e4646d0eace02924ffeb83666331698cc3f5",
+      "title": "[parsing] Inconsistent semantics between <drake:parent> and standard <parent> in sdf"
+    }
+  ],
+  "post_activation_issue_identities_observed": 243,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-21T00:07:48Z",
+  "schema_version": 1
+}
