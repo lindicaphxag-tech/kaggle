@@ -3645,13 +3645,17 @@
     },
     {
       "created_at": "2026-10-20T22:30:00Z",
+      "expiry_recorded_at": "2026-10-21T07:29:17Z",
+      "expiry_sha256": "99abe7d6b1d44c5a62d3477e922412251816fea5acffaa2763fa2dd7aa403d20",
+      "expiry_source": "expirations/RobotLocomotion__drake__25109.json",
       "first_frozen_at": "2026-10-21T00:07:48Z",
       "id": "RobotLocomotion/drake#25109",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 25109,
       "prediction_deadline_at": "2026-10-21T06:07:48Z",
       "repository": "RobotLocomotion/drake",
       "source": "inbox/FIRST_SEEN_20261021T000748Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "b0edfa301b54b339728c25de5662e4646d0eace02924ffeb83666331698cc3f5"
     },
     {
@@ -3675,6 +3679,17 @@
       "source": "inbox/FIRST_SEEN_20261021T051750Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "2196324c9a0fd7c0f9df2a779c9a61f5a602eaf3a3d5a13e8afb37ab994b53ff"
+    },
+    {
+      "created_at": "2026-10-21T06:02:40Z",
+      "first_frozen_at": "2026-10-21T07:30:31Z",
+      "id": "stepjam/RLBench#301",
+      "issue_number": 301,
+      "prediction_deadline_at": "2026-10-21T13:30:31Z",
+      "repository": "stepjam/RLBench",
+      "source": "inbox/FIRST_SEEN_20261021T073031Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "100bc7a5df815c3ff64cdc7a1f269c9ac0d0dc30ec6d863c123b72ef0f925e40"
     }
   ]
 }
