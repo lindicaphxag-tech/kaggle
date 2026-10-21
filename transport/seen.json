@@ -3705,13 +3705,17 @@
     },
     {
       "created_at": "2026-10-21T08:10:36Z",
+      "expiry_recorded_at": "2026-10-21T18:33:35Z",
+      "expiry_sha256": "d9fcb63db4e4111ced083f56cd2a93bfbc759fa638d9e7f9de04b4aa4e564265",
+      "expiry_source": "expirations/huggingface__lerobot__5029.json",
       "first_frozen_at": "2026-10-21T10:34:39Z",
       "id": "huggingface/lerobot#5029",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 5029,
       "prediction_deadline_at": "2026-10-21T16:34:39Z",
       "repository": "huggingface/lerobot",
       "source": "inbox/FIRST_SEEN_20261021T103439Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "743ec88e85db5affd2793a409a9aa1ca74f5b5865621a506a5173ff864fe6d9b"
     },
     {
@@ -3812,6 +3816,17 @@
       "source": "inbox/FIRST_SEEN_20261021T153610Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "0076577da80911423e8543f1d170d91809a978ea1103bee33932d19771f42805"
+    },
+    {
+      "created_at": "2026-10-21T17:19:10Z",
+      "first_frozen_at": "2026-10-21T18:34:50Z",
+      "id": "isaac-sim/IsaacSim#898",
+      "issue_number": 898,
+      "prediction_deadline_at": "2026-10-22T00:34:50Z",
+      "repository": "isaac-sim/IsaacSim",
+      "source": "inbox/FIRST_SEEN_20261021T183450Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "127f243e04921bec4ccb814a4526f86b9184f687910caf83e2e4b78169a902fa"
     }
   ]
 }

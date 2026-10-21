@@ -1,0 +1,27 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "PeterL-NV",
+      "body": "\n### Discussed in https://github.com/isaac-sim/IsaacSim/discussions/890\n\n<div type='discussions-op-text'>\n\n<sup>Originally posted by **pheldsynaptics** October 18, 2026</sup>\nWe have an extension that runs a tactile sensor on the Newton backend (MuJoCo solver, hydroelastic contacts). Every physics step, after `collision_pipeline.collide()` and before `solver.step()`, we need to launch a couple of Warp kernels that modify the per-contact data in `contacts` (stiffness and damping) before the solver reads it. Later we also want to compute our own contact forces at that point and write them into `state.body_f`.\r\n\r\nIsaac Sim has no place to do this. `NewtonStage.physics_callbacks` run after the whole step, which is too late. The only option we found is to replace `collision_pipeline.collide` with a wrapper and set `stage.graph = None` so the CUDA graph is recaptured with our kernels in it. That works on 6.1.0 but depends on private details of `NewtonStage` and will break when they change.\r\n\r\nIsaac Lab already has this: `NewtonManager.register_state_force_callback()` runs a callback before every solver substep, inside the captured graph. Something equivalent in Isaac Sim's `NewtonStage` would be enough for us, for example:\r\n\r\n```python\r\nstage.register_pre_solve_callback(fn)   # fn(state, contacts), called after collide, before each solver.step\r\nstage.unregister_pre_solve_callback(fn)\r\n```\r\n\r\nCallbacks would only launch kernels, so they can be recorded into the CUDA graph like the rest of the step.\r\n\r\nThe `ovnewton` engine in 7.0.0a1 (`NewtonStage.subscribe_step_event(pre_step=True, ...)`, also on `develop`) is close, but the pre-step subscribers run before `collide()` and only get `(dt, ctx)`, so the contacts for that step don't exist yet and there is no handle to `state` or `contacts`. A phase after `collide()` that passes `state` and `contacts` would cover this.\r\n\r\nChecked on Isaac Sim 6.1.0 (`isaacsim.physics.newton` 1.0.6) and in the `develop` and `release/6.2` sources: the step loop is the same, no hook between collide and the solver.\r\n</div>",
+      "created_at": "2026-10-21T17:19:10Z",
+      "html_url": "https://github.com/isaac-sim/IsaacSim/issues/898",
+      "id": "isaac-sim/IsaacSim#898",
+      "issue_number": 898,
+      "labels": [
+        "isaac-sim-physics",
+        "isaac-sim-v6-1-0"
+      ],
+      "repository": "isaac-sim/IsaacSim",
+      "surface_sha256": "127f243e04921bec4ccb814a4526f86b9184f687910caf83e2e4b78169a902fa",
+      "title": "[Feature] Newton backend: callback between collide and solver step"
+    }
+  ],
+  "post_activation_issue_identities_observed": 257,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-21T18:34:50Z",
+  "schema_version": 1
+}
