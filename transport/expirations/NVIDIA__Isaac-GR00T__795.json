@@ -1,0 +1,13 @@
+{
+  "case_id": "NVIDIA/Isaac-GR00T#795",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-10-21T22:16:52Z",
+  "expiry_sha256": "dded1309c3cd295c6c955fcb87ba442cf7fbaad67a4222f4c39613c7a010aa36",
+  "first_frozen_at": "2026-10-21T13:44:08Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-10-21T19:44:08Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "3dcd8ddffe999948473e5914a448a79d70642aeb799c2944ed31e4084dabbee3"
+}
