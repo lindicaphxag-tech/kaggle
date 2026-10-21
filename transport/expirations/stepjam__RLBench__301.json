@@ -1,0 +1,13 @@
+{
+  "case_id": "stepjam/RLBench#301",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-10-21T13:42:35Z",
+  "expiry_sha256": "abda70be5095dd9b619bfc521066891b38d3b6b8ce1fce24f7ec3de39bc78ceb",
+  "first_frozen_at": "2026-10-21T07:30:31Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-10-21T13:30:31Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "100bc7a5df815c3ff64cdc7a1f269c9ac0d0dc30ec6d863c123b72ef0f925e40"
+}
