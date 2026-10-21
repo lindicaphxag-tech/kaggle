@@ -3649,6 +3649,17 @@
       "source": "inbox/FIRST_SEEN_20261021T000748Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "b0edfa301b54b339728c25de5662e4646d0eace02924ffeb83666331698cc3f5"
+    },
+    {
+      "created_at": "2026-10-21T00:26:26Z",
+      "first_frozen_at": "2026-10-21T01:30:39Z",
+      "id": "ros2/rclcpp#3369",
+      "issue_number": 3369,
+      "prediction_deadline_at": "2026-10-21T07:30:39Z",
+      "repository": "ros2/rclcpp",
+      "source": "inbox/FIRST_SEEN_20261021T013039Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "1fde1b1fee71e05a4453d7d072f0dc96044a3a2f349e4786a1b80de14152c03f"
     }
   ]
 }
