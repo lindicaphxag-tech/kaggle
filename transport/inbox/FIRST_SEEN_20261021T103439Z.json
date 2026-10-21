@@ -1,0 +1,31 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "TinyGeek",
+      "body": "### Ticket Type\n\ud83d\udc1b Bug Report (Something isn't working)\n\n### Environment & System Info\n```text\nLeRobot 0.6.2, upstream/main cf169608 (2026-10-21)\nLinux WSL2 x86_64, Python 3.12.14, NumPy 2.2.6, PyTorch 2.11.0+cu128\nDatasets 4.8.5, CPU-only reproduction; no camera, GPU operation, or disk write required\n```\n`lerobot-info` reports these versions; I ran it with locally provided FFmpeg 7 libraries because TorchCodec could not load with the default library path. The reproduction itself does not use TorchCodec.\n\n### Description\n`AsyncImageWriter` creates `queue.Queue()` in thread mode and `multiprocessing.JoinableQueue()` in process mode without a `maxsize`. `save_image()` puts every incoming image on that queue. If image production outpaces PNG/TIFF writes, pending array references can accumulate without a queue limit. This can exhaust RAM during a long recording; the controlled reproduction below demonstrates memory growth, not an actual OOM.\n\nExpected: pending writes have a finite bound, with an explicit policy when that bound is reached. Frames must not silently disappear, and enqueue should not wait indefinitely on saturation. Normal `wait_until_done()` and `stop()` should still drain accepted writes; shutdown can still wait on slow or stuck I/O.\n\n### Context & Reproduction\nOn current `main`, save this as `/tmp/lerobot_bound_image_queue_repro.py` and run:\n\n```bash\nuv sync --locked --extra dataset --extra test\nuv run --locked --extra dataset --extra test python /tmp/lerobot_bound_image_queue_repro.py\n```\n\n```python\n\"\"\"Reproduce queued-image memory growth without cameras or disk writes.\"\"\"\nimport threading\nfrom pathlib import Path\nfrom unittest.mock import patch\n\nimport numpy as np\n\nfrom lerobot.datasets.image_writer import AsyncImageWriter\n\nstarted = threading.Event()\nrelease = threading.Event()\n\n\ndef slow_write(*args):\n    started.set()\n    if not release.wait(timeout=20):\n        raise TimeoutError(\"worker was not released\")\n\n\ndef rss_mib():\n    with open(\"/proc/self/status\") as status:\n        for line in status:\n            if line.startswith(\"VmRSS:\"):\n                return int(line.split()[1]) / 1024\n    raise RuntimeError(\"VmRSS missing\")\n\n\nwith patch(\"lerobot.datasets.image_writer.write_image\", side_effect=slow_write):\n    writer = AsyncImageWriter(num_processes=0, num_threads=1)\n    try:\n        writer.save_image(np.full((1024, 1024), 255, dtype=np.uint8), Path(\"first.png\"))\n        assert started.wait(timeout=5), \"worker did not start\"\n        baseline = rss_mib()\n        print(f\"queue.maxsize={writer.queue.maxsize}, baseline_rss_mib={baseline:.1f}\", flush=True)\n        for index in range(64):\n            writer.save_image(np.full((1024, 1024), index, dtype=np.uint8), Path(f\"{index}.png\"))\n            if index in (31, 63):\n                print(f\"queued={writer.queue.qsize()}, rss_delta_mib={rss_mib()-baseline:.1f}\", flush=True)\n    finally:\n        release.set()\n        writer.stop()\n```\n\nThe worker is held by an event so the saturation is deterministic. Each queued array is a distinct 1 MiB buffer; the script releases the worker and drains the queue before exiting.\n\n### Relevant logs or stack trace\n```text\nqueue.maxsize=0, baseline_rss_mib=790.0\nqueued=32, rss_delta_mib=31.8\nqueued=64, rss_delta_mib=63.8\nexit code: 0\n```\n\n### Checklist\n- [x] I have searched existing tickets and PRs to ensure this isn't a duplicate. #4462 covers the separate streaming video encoder queue; #4720 is a dataset-writer refactor and does not bound pending image writes.\n- [x] I am using the latest `upstream/main` fetched for this reproduction (`cf169608`).\n- [ ] I have verified this is not an environment-specific problem. Reproduced on Linux/WSL2 only; both queue constructors in source lack a bound.\n\n### Additional Info / Workarounds\nIncreasing image-writer workers, reducing image production, or using streaming encoding may reduce accumulation for some workloads but does not set a bound on this queue. A fix should document its saturation behavior and cover both thread and process modes with deterministic tests. The record path calls `LeRobotDataset.add_frame()` and `AsyncImageWriter.save_image()` through `DatasetWriter`; the streaming encoder's separate `encoder_queue_maxsize` does not apply here.\n",
+      "created_at": "2026-10-21T08:10:36Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5029",
+      "id": "huggingface/lerobot#5029",
+      "issue_number": 5029,
+      "labels": [
+        "bug",
+        "policies",
+        "dataset",
+        "tests",
+        "performance",
+        "sensors"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "743ec88e85db5affd2793a409a9aa1ca74f5b5865621a506a5173ff864fe6d9b",
+      "title": "fix(datasets): bound pending AsyncImageWriter frames"
+    }
+  ],
+  "post_activation_issue_identities_observed": 247,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-21T10:34:39Z",
+  "schema_version": 1
+}
