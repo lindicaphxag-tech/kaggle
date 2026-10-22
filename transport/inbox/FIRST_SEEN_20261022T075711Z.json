@@ -1,0 +1,26 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "caiocj1",
+      "body": "Hi, team stla-mines here.\n\nOur two nuplan-warmup submissions failed with CONTESTANT_GRPC_NOT_READY (wait_for_driver_grpc): e920adec-b87b-49c7-97be-ef833c135db5 and e67ec2cf-1459-453a-93c3-4ed98e406920.\n\nLocally the image (non-root, read-only rootfs, /tmp tmpfs) answers get_version in ~25 s with 4 replicas per GPU, on both A100 and H100.\n\nCould you share the archived contestant driver logs (stdout/stderr of one or two replicas) for either run, as in #201 ? Also, are the per-replica container limits the same as in the sample run_local_container.sh (--memory 32g, --cpus 8, --pids-limit 1024)? Thanks!",
+      "created_at": "2026-10-22T07:47:21Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/220",
+      "id": "NVlabs/alpasim#220",
+      "issue_number": 220,
+      "labels": [
+        "bug"
+      ],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "2410ef99f8af16f5730aabc646d7187ebee0bc07c7b915a0075a7d652c071af5",
+      "title": "[AlpaSim E2E Challenge] nuplan-warmup CONTESTANT_GRPC_NOT_READY, driver logs request"
+    }
+  ],
+  "post_activation_issue_identities_observed": 266,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-22T07:57:11Z",
+  "schema_version": 1
+}
