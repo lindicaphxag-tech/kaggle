@@ -1,0 +1,40 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "skr3178",
+      "body": "Hello,\n\nSince September the public baseline has been resnet34_v0.1.0 model_0014, and many teams, ours included, have spent the competition fine-tuning that checkpoint and building the driver around it. v0.2.0 is a much stronger model family. \n\nReleased this late, it makes most of the work done on the original baseline obsolete.\nTypically everyone is provided with a base checkpoint on which build on: fine tuning and other tricks applied which are reasonable. (At least this is how the behavior 1k challenge was organized). \n\nThe participants have different resources at their disposal and some can train on larger resources. but that is different when the organizers release newer and better models close to the submission timelines. It defeats all the work I have done on the older baseline and puts me at disadvantage on using up my slots. \n\nAs far as I see, there is higher chances of someone who just stepped into the competition, picked up this model, improves it with slots available more likely to win the competition than someone working on it over the last few months!\n\n- Skr3178",
+      "created_at": "2026-10-22T10:08:21Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/221",
+      "id": "NVlabs/alpasim#221",
+      "issue_number": 221,
+      "labels": [
+        "bug"
+      ],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "dada14f08c02fac31462c626bedd75ca9811a00ccf94656f1f1c9f5cf0f446c7",
+      "title": "Timing of the py123d_garage v0.2.0 release relative to the final deadline"
+    },
+    {
+      "author_login": "gaofushuaia",
+      "body": "Hello organizers,\n\nWe are **team-zyt**. During the challenge, we encountered two issues and hope to get your help.\n\n## Description of our local evaluation environment\n\nTo investigate the gap between our local scores and leaderboard scores, we tried to reproduce the official evaluation locally as faithfully as possible:\n\n- **Driver image**: It is exactly the image we submitted (the digest is completely identical), using its built-in config/checkpoint, with no local modifications.\n- **Scenario set**: Internal NuRec val, **441 scenarios**, rendered using **NRE 26.04** assets, without harmonizer processing (`--no-enable-nrend --no-enable-harmonizer`), `render_bundling=BATCH_RENDER_RGB`.\n- **Controller**: The same controller parameters as in the official submission.\n- **Topology**: We reproduced the official service split (renderer and driver+physics placed on different GPUs), but at a smaller scale \u2014 **12-way concurrency (6 driver endpoints \u00d7 2 concurrent rollouts each)**, while the official setting is `8gpu_32rollouts` (16 replicas \u00d7 2 = 32-way), because the 5090 does not have enough VRAM.\n- **Hardware**: Locally, we use 8\u00d7 RTX 5090 (32 GB).\n\n## Background data\n\n| Submission | Submission ID | Leaderboard Scene Score | Local val441 Scene Score | Leaderboard At-Fault Dist | Local At-Fault Dist | Policy Capability |\n|---|---|---|---|---|---|---|\n| exp9-150k | f406ceef-5148-460a-afc4-32c625552a09 | 0.592 | 0.7090 | 0.339 | 1.234 | 2033 |\n| exp13-010k | a2cb152c-e084-4b45-8bda-07c3d9803038 | 0.544 | 0.6957 | 0.290 | 1.138 | 1997 |\n| exp11-150k | 906c8172-3b6c-404f-a818-25f13cdcaac1 | 0.535 | 0.6298 | 0.284 | 0.948 | 1949 |\n\n## Question 1 \u2014 Large gap between local and leaderboard scores\n\nFor our recent submissions, the **Scene Score drops by about 0.10\u20130.15 compared with local**, while **At-Fault Distance is 3\u20134 times lower on the leaderboard than locally** (for example, exp9-150k: 0.339 vs. 1.234). The gap in At-Fault Distance is much larger than the gap in Scene Score, which indicates that our policy enters at-fault accidents (loss of control / error accumulation) much more frequently in your environment than in our local environment.\n\nCould you help us understand the possible reasons? In particular:\n\n- Could the **higher concurrency** (official 32-way concurrency vs. our local 12-way) significantly change the timing / planning latency of a single rollout, thereby hurting a pure-vision policy?\n- Are there any differences that we need to consider between leaderboard runs and the public `ec2` / `dev` presets in terms of **scenario set, rendering version, or default controller gains (when no gain is submitted)**?\n\n## Question 2 \u2014 OOM handling\n\nWhen we locally reproduce the official-style parallel inference, the **renderer probabilistically throws CUDA OOM on `batch_render_rgb`** (`RESOURCE_EXHAUSTED: CUDA out of memory`) \u2014 in our case, because two renderer processes share one 32 GB GPU. We would like to understand how this is handled on your side.\n\n- Does the official evaluation **detect renderer / driver OOMs (or any rollout-level failures)**?\n- If a rollout encounters OOM / RESOURCE_EXHAUSTED, how is it **scored** \u2014 counted as 0, retried, or excluded from aggregation?\n\n**Request:** Could you help us check whether the three submissions above (IDs listed) had **any OOM / failures / terminated rollouts**? If so, **how many were there, and how were they scored**?\n\nThank you very much for your help!\n\nBest regards,  \nteam-zyt",
+      "created_at": "2026-10-22T12:43:30Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/222",
+      "id": "NVlabs/alpasim#222",
+      "issue_number": 222,
+      "labels": [
+        "bug"
+      ],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "99875b1d4c3ba09376af896c946045aa96e06755fb7fb9d0d0457e2a8ae7101e",
+      "title": "[E2E Challenge][PAI]# Questions about the gap between local and leaderboard scores, and OOM handling (team-zyt)"
+    }
+  ],
+  "post_activation_issue_identities_observed": 268,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-22T13:45:56Z",
+  "schema_version": 1
+}
