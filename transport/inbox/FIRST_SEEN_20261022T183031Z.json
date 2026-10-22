@@ -1,0 +1,64 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 4,
+  "new_candidates": [
+    {
+      "author_login": "AndrBaer",
+      "body": "Dear e2e challenge organizer team,\n\nI have a question concerning the tech report.\n\nThe current template gives a predefined section structure consisting of\n- Abstract\n- Method summary\n- Policy description\n- Resources and training\n- Runtime and reproducibility\n- Limitations and safety considerations\n\nEach section also expects certain content.\n\nSince the current structure differs a bit from a typical paper structure (abstract, introduction, related works, method, experimental setup, experimental results, conclusion), i have the following question(s):\nHow strictly should we follow the structure? Are we allowed to change section titles? Add/move/remove sections? Or should we follow the exact structure as is?\n\nPS: I'm aware that if we change the structure, we should still make sure to include all necessary information (e.g., datasets, policy, limitations, ...).",
+      "created_at": "2026-10-22T16:16:35Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/223",
+      "id": "NVlabs/alpasim#223",
+      "issue_number": 223,
+      "labels": [],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "97251a03b802c75f166298615fd298f4d85c36f7efc6faefcbdb21fe0b4860a0",
+      "title": "[E2E CHALLENGE] Clarification for writing tech report"
+    },
+    {
+      "author_login": "Olexandr88",
+      "body": "**Problem**\n`stripJSON5` in `test/integration/config_runner_test.go` applies its regexes\n(trailing-comma removal and bare-key quoting) to the whole file, including\nthe inside of string literals. A test case can therefore end up checking\nsomething different from what was written, or fail to parse.\n\n**Steps to reproduce**\nPass these through `stripJSON5` and `json.Unmarshal`:\n\n1. `{ text: \"wait, }\" }` \u2192 decoded as `\"wait }\"` (silent change; valid JSON,\n   so an `arg_contains` check would assert on the wrong substring)\n2. `{ description: \"hello, name: John\" }` \u2192 `{ \"description\": \"hello, \"name\": John\" }`\n   (invalid JSON: `invalid character 'n' after object key:value pair`)\n\nAlso, `commentIndex` does not handle `\\\"`, so\n`\"say \\\" // not a comment\"` is cut at the `//`.\n\n**Impact**\nLatent: none of the current files in `testdata/` contain such strings (I\nchecked all of them; output is byte-identical before/after my fix). It will\nhit the first test case whose strings contain `, word:` or `, }` / `, ]`.\n\n**Proposed fix**\nApply the rewrites only outside string literals and make `commentIndex`\nescape-aware. No new dependencies. I'd like to work on this.\n\n**Environment:** <OS>, Go <version>",
+      "created_at": "2026-10-22T15:40:51Z",
+      "html_url": "https://github.com/OpenMind/OM1/issues/2701",
+      "id": "OpenMind/OM1#2701",
+      "issue_number": 2701,
+      "labels": [],
+      "repository": "OpenMind/OM1",
+      "surface_sha256": "b2ecdd2485508fa5e6cb4481dbd566ee6074eb14c1c1c457d30b7bf53b845b6e",
+      "title": "integration tests: stripJSON5 corrupts string values in test-case files"
+    },
+    {
+      "author_login": "tom-osika",
+      "body": "### What happened?\n\n1. https://drake-jenkins.csail.mit.edu/view/Nightly%20Production/job/mac-tahoe-clang-bazel-nightly-everything-release/6/consoleFull\n2. https://drake-jenkins.csail.mit.edu/job/mac-tahoe-clang-bazel-continuous-release/12/consoleFull\n\n`stubgen` fails due to a timeout. This seems to boil down to a matplotlib import issue. From the relevant log output:\n\n\"`/Users/ec2-user/.matplotlib is not a writable directory`\" -> matplotlib creating a temporary cache directory -> \"`it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.`\"\n\n### Version\n\n_No response_\n\n### What operating system are you using?\n\nmacOS 26 (Tahoe)\n\n### What installation option are you using?\n\n_No response_\n\n### Relevant log output\n\n```shell\n[2:49:11 AM]  ERROR: /Users/ec2-user/workspace/mac-tahoe-clang-bazel-nightly-everything-release/src/bindings/pydrake/BUILD.bazel:472:22: GenerateMypyStubs bindings/pydrake/pydrake/autodiffutils.pyi failed: (Exit 1): stubgen failed: error executing GenerateMypyStubs command (from generate_python_stubs rule target //bindings/pydrake:pydrake_pyi) bazel-out/darwin_arm64-opt/bin/bindings/pydrake/stubgen bazel-out/darwin_arm64-opt/bin/bindings/pydrake/pydrake/autodiffutils.pyi ... (remaining 41 arguments skipped)\n[2:49:11 AM]  \n[2:49:11 AM]  Use --sandbox_debug to see verbose messages from the sandbox and retain the sandbox build root for debugging\n[2:49:11 AM]  /Users/ec2-user/.matplotlib is not a writable directory\n[2:49:11 AM]  Matplotlib created a temporary cache directory at /var/folders/m5/mhddkc2d6c5_3f_vljmqvq_40000gn/T/matplotlib-8wxg33ye because there was an issue with the default path (/Users/ec2-user/.matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.\n[2:49:11 AM]  Torch not available; skipping vector env tests.\n[2:49:11 AM]  Traceback (most recent call last):\n[2:49:11 AM]    File \"/Users/ec2-user/workspace/mac-tahoe-clang-bazel-nightly-everything-release/build/_bazel_ec2-user/f3807f0d7023d83cd7f73fa07539a43b/sandbox/darwin-sandbox/30935/execroot/_main/bazel-out/darwin_arm64-opt/bin/bindings/pydrake/stubgen.runfiles/_main/bindings/pydrake/stubgen.py\", line 176, in <module>\n[2:49:11 AM]      sys.exit(_wrapper_main())\n[2:49:11 AM]               ~~~~~~~~~~~~~^^\n[2:49:11 AM]    File \"/Users/ec2-user/workspace/mac-tahoe-clang-bazel-nightly-everything-release/build/_bazel_ec2-user/f3807f0d7023d83cd7f73fa07539a43b/sandbox/darwin-sandbox/30935/execroot/_main/bazel-out/darwin_arm64-opt/bin/bindings/pydrake/stubgen.runfiles/_main/bindings/pydrake/stubgen.py\", line 172, in _wrapper_main\n[2:49:11 AM]      return _actual_main()\n[2:49:11 AM]    File \"/Users/ec2-user/workspace/mac-tahoe-clang-bazel-nightly-everything-release/build/_bazel_ec2-user/f3807f0d7023d83cd7f73fa07539a43b/sandbox/darwin-sandbox/30935/execroot/_main/bazel-out/darwin_arm64-opt/bin/bindings/pydrake/stubgen.runfiles/_main/bindings/pydrake/stubgen.py\", line 110, in _actual_main\n[2:49:11 AM]      returncode = stubgen.main(args=args) or 0\n[2:49:11 AM]                   ~~~~~~~~~~~~^^^^^^^^^^^\n[2:49:11 AM]    File \"mypy/stubgen.py\", line 2060, in main\n[2:49:11 AM]    File \"mypy/stubgen.py\", line 1847, in generate_stubs\n[2:49:11 AM]      py_modules, pyc_modules, c_modules = collect_build_targets(options, mypy_opts)\n[2:49:11 AM]    File \"mypy/stubgen.py\", line 1599, in collect_build_targets\n[2:49:11 AM]      py_modules, c_modules = find_module_paths_using_imports(\n[2:49:11 AM]    File \"mypy/stubgen.py\", line 1633, in find_module_paths_using_imports\n[2:49:11 AM]      result = find_module_path_and_all_py3(inspect, mod, verbose)\n[2:49:11 AM]    File \"mypy/stubutil.py\", line 125, in find_module_path_and_all_py3\n[2:49:11 AM]    File \"mypy/moduleinspect.py\", line 146, in get_package_properties\n[2:49:11 AM]    File \"mypy/moduleinspect.py\", line 172, in _get_from_queue\n[2:49:11 AM]      raise RuntimeError(\"Timeout waiting for subprocess\")\n[2:49:11 AM]  RuntimeError: Timeout waiting for subprocess\n```",
+      "created_at": "2026-10-22T14:25:24Z",
+      "html_url": "https://github.com/RobotLocomotion/drake/issues/25118",
+      "id": "RobotLocomotion/drake#25118",
+      "issue_number": 25118,
+      "labels": [
+        "type: bug",
+        "component: continuous integration",
+        "component: build system"
+      ],
+      "repository": "RobotLocomotion/drake",
+      "surface_sha256": "340d079ecb40c674acc7c5e06a5e43720611b1b3369b5f322f50af26bddd4b36",
+      "title": "[ci] `stubgen` timeout waiting for process"
+    },
+    {
+      "author_login": "omry",
+      "body": "Hi Isaac Lab team,\n\nI noticed you\u2019re already using Hydra 1.4 development builds. [Hydra 1.4.0rc2](https://github.com/hydra-ecosystem/hydra/releases/tag/v1.4.0rc2) is now available, and you\u2019re welcome to give it a try!\n\nThe [1.3 \u2192 1.4 migration guide](https://hydra.cc/docs/upgrades/1.3_to_1.4/prepare_for_1_4/) covers the changes and deprecations to address. Your current integration still passes `version_base=\"1.3\"` and may encounter ConfigStore collision warnings when registering the same task again.\n\nPlease try rc2 and address any migration warnings. Feel free to report feedback or issues in the [Hydra repository](https://github.com/hydra-ecosystem/hydra/issues).\n\nThanks!  \nOmry\n",
+      "created_at": "2026-10-22T18:08:57Z",
+      "html_url": "https://github.com/isaac-sim/IsaacLab/issues/8784",
+      "id": "isaac-sim/IsaacLab#8784",
+      "issue_number": 8784,
+      "labels": [],
+      "repository": "isaac-sim/IsaacLab",
+      "surface_sha256": "a5a4d608c554f9c0a0ffdc8dc48f0252c883cb0af992b747c7f80ce7e0031277",
+      "title": "Hydra 1.4 release candidate: invitation to test and share feedback"
+    }
+  ],
+  "post_activation_issue_identities_observed": 273,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-22T18:30:31Z",
+  "schema_version": 1
+}
