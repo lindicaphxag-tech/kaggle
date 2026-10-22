@@ -3889,6 +3889,17 @@
       "source": "inbox/FIRST_SEEN_20261022T012815Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "e89331c700e3266325a23bec97d94b6ec16f6fbd30d2880038c156f084e78c7d"
+    },
+    {
+      "created_at": "2026-10-22T01:46:45Z",
+      "first_frozen_at": "2026-10-22T01:49:31Z",
+      "id": "isaac-sim/IsaacSim#901",
+      "issue_number": 901,
+      "prediction_deadline_at": "2026-10-22T07:49:31Z",
+      "repository": "isaac-sim/IsaacSim",
+      "source": "inbox/FIRST_SEEN_20261022T014931Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "fc76577b4db9e9027f4810c08b415da7c14ebec128da2049e9895406ae352eb4"
     }
   ]
 }

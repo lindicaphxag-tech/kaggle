@@ -1,0 +1,27 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "vick-yu",
+      "body": "\n### Discussed in https://github.com/isaac-sim/IsaacSim/discussions/894\n\n<div type='discussions-op-text'>\n\n<sup>Originally posted by **junminkyung** October 20, 2026</sup>\n[isaac62_256states_repro.zip](https://github.com/user-attachments/files/33706060/isaac62_256states_repro.zip)\r\n\r\nTitle: [Isaac Sim 6.2] RTX LiDAR uses only the first 256 emitter states per prim (tickStates wraps at 256)\r\n\r\nFollowing up on #828 (closed), as requested by @zwdoescode.\r\n\r\n### Description\r\n\r\nA ROTARY OmniLidar renders only its first 256 emitter states. With more states authored, `tickStates` wraps from 255 to 0 and the rendered directions repeat states 0\u2013255. No error or warning about the state count is printed. Attribute size does not seem to be the limit: a 600-state, 12 M-ray profile (~229 MiB of attributes) loads without a size error (GPU memory 3,524 MiB, vs 2,653 MiB for 250 states).\r\n\r\n### Minimal repro (attached `isaac62_256states_repro.zip`)\r\n\r\nEmpty stage (one 20 m cube), one ROTARY OmniLidar from `isaacsim.sensors.experimental.rtx.Lidar.create`, scanRateBaseHz 1, patternFiringRateHz 10, stateResolutionStep 1, 8 rays per state. Emitter state `s` fires at elevation `-60 + 0.2*s` degrees, so the state rendered in each frame is read back from the output elevation. Output is copied from GenericModelOutput in a Replicator Writer callback. No robot, ROS or project assets.\r\n\r\n    ./python.sh repro_256_states.py --out out600                               # 600 states\r\n    ./python.sh repro_256_states.py --out out250 --states 250 --updates 520    # control\r\n\r\n| States authored | Frames | Max tickStates | First frame not rendering state k mod N | Distinct rendered states |\r\n|---|---|---|---|---|\r\n| 600 | 619 | 255 | 256 (renders state 0) | 256 |\r\n| 250 (control) | 519 | 249 | none | 250 |\r\n\r\nAround the boundary with 600 states, frames 250\u2013262 render states 250, 251, \u2026, 255, 0, 1, 2, \u2026, and tickStates for frames 254\u2013257 are 254, 255, 0, 1.\r\n\r\nThe same limit appears with our measured MID360 pattern (20,000 rays per state): with 600 states only states 0\u2013255 are used. Because the ROTARY pre-compensation is 36\u00b0 per tick at 1 Hz scan / 10 Hz pattern, the usable state count must also be a multiple of 10: with 256 states the wrap leaves 256 \u00d7 36\u00b0 \u2261 216\u00b0 of pre-compensation, so after the wrap the directions are off by 144\u00b0 (we measured this with a 256-state measured sequence). Our practical maximum is therefore 250 states per prim (25 s at 20k rays per state). A 250-state measured sequence replays correctly (299 frames, wraps correctly, max direction error 0.00049\u00b0).\r\n\r\n### Why this matters for us\r\n\r\nThe real sensor has a non-repetitive scan, and our recorded firing sequence is about 10 minutes long. With 250 states the replay repeats every 25 s, which becomes visible when points are accumulated for more than 25 s while the sensor is stationary.\r\n\r\n### Questions\r\n\r\n1. Is the 256-state limit per prim intended?\r\n2. Could it be raised, so that a longer measured sequence can be replayed by one prim?\r\n3. If not, does the RTX LiDAR re-read the emitterState attributes (azimuthDeg, elevationDeg, fireTimeNs) after play starts? That is, if we overwrite states that were already played, will the next pass use the new values? This would let us stream a longer non-repeating sequence through one prim.\r\n\r\n### Environment\r\n\r\n- Isaac Sim 6.2.0-rc.14+release.52805.02189a84.gl, omni.sensors.nv.lidar 3.4.0\r\n- Ubuntu 22.04.5 LTS, 2\u00d7 GeForce RTX 3090 Ti (24 GB), run with multi_gpu=False (one active GPU), driver 580.159.04\r\n\r\nRelated: #828 (ROTARY state progression and 5 MiB limit, fixed in 6.2), #818 (SOLID_STATE).</div>",
+      "created_at": "2026-10-22T01:46:45Z",
+      "html_url": "https://github.com/isaac-sim/IsaacSim/issues/901",
+      "id": "isaac-sim/IsaacSim#901",
+      "issue_number": 901,
+      "labels": [
+        "isaac-sim-sensors",
+        "isaac-sim-v6-2-0"
+      ],
+      "repository": "isaac-sim/IsaacSim",
+      "surface_sha256": "fc76577b4db9e9027f4810c08b415da7c14ebec128da2049e9895406ae352eb4",
+      "title": "[Isaac Sim 6.2] RTX LiDAR uses only the first 256 emitter states per prim (tickStates wraps at 256)"
+    }
+  ],
+  "post_activation_issue_identities_observed": 260,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-22T01:49:31Z",
+  "schema_version": 1
+}
