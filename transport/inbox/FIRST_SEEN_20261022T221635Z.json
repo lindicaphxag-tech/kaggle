@@ -1,0 +1,238 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 14,
+  "new_candidates": [
+    {
+      "author_login": "azeey",
+      "body": "## Desired behavior\n\nUpdate the `JointStatePublisher` system (`src/systems/joint_state_publisher/JointStatePublisher.cc`) to resolve its `<topic>` using the model namespace when one is set:\n- `<topic>` (default without namespace: `/world/{world_name}/model/{model_name}/joint_state` via `topicFromScopedName(this->model.Entity(), _ecm, false) + \"/joint_state\"`; default with namespace: `{ns}/joint_state`)\n\nExpected topic resolution rules:\n- If the model has a namespace, the default topic uses `{ns}/joint_state`.\n- Relative custom `<topic>` values are prefixed with `{ns}` when a namespace is present.\n- Absolute custom `<topic>` values remain unchanged.\n- Models without a namespace retain their existing default topic behavior.\n\n## Alternatives considered\n\nN/A\n\n## Implementation suggestion\n\n- Use `gz::sim::scopedNamespace` and `gz::sim::resolvedTopicName` (with `gz::sim::TopicNameOptions`, setting `defaultTopicPrefix` to `topicFromScopedName(this->model.Entity(), _ecm, false)` and `defaultTopicSuffix` to `\"joint_state\"`).\n- Document the behavior in `JointStatePublisher.hh` and add unit tests using `test/helpers/UnitTestUtil.hh` (updating `CMakeLists.txt` and `BUILD.bazel`).\n\n## Additional context\n\nSee reference PRs:\n- https://github.com/gazebosim/gz-sim/pull/3878 (`DiffDrive`)\n- https://github.com/gazebosim/gz-sim/pull/4066 (`MecanumDrive`)\n",
+      "created_at": "2026-10-22T21:36:44Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4102",
+      "id": "gazebosim/gz-sim#4102",
+      "issue_number": 4102,
+      "labels": [
+        "enhancement",
+        "good first issue",
+        "help wanted"
+      ],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "976d7641790ea2f92074a0bfe3abf371bc8a5972246ec88819b0e78d9a4ec6c0",
+      "title": "Add namespace support to JointStatePublisher"
+    },
+    {
+      "author_login": "azeey",
+      "body": "## Desired behavior\n\nUpdate the `SwerveDrive` system (`src/systems/swerve_drive/SwerveDrive.cc`) to resolve its transport topics using the model namespace when one is set:\n- `<topic>` (default without namespace: `/model/{model_name}/cmd_vel`; default with namespace: `{ns}/cmd_vel`)\n- `<odom_topic>` (default without namespace: `/model/{model_name}/odometry`; default with namespace: `{ns}/odometry`)\n- `<tf_topic>` (default without namespace: `/model/{model_name}/tf`; default with namespace: `{ns}/tf`)\n\nExpected topic resolution rules:\n- If the model has a namespace, default topics use `{ns}` as the prefix instead of `/model/{model_name}`.\n- Relative custom topics (not starting with `/`) are prefixed with `{ns}` when a namespace is present.\n- Absolute custom topics (starting with `/`) remain unchanged.\n- Models without a namespace retain their existing behavior.\n\n## Alternatives considered\n\nN/A\n\n## Implementation suggestion\n\n- Use `gz::sim::scopedNamespace` and `gz::sim::resolvedTopicName` (with `gz::sim::TopicNameOptions`) from `gz/sim/Util.hh` to resolve `topic`, `odom_topic`, and `tf_topic` in `SwerveDrive::Configure`.\n- Expose a `ResolvedTopicNames()` accessor on `SwerveDrive` and document the namespace behavior in `SwerveDrive.hh`.\n- Add a unit test (`src/systems/swerve_drive/SwerveDrive_TEST.cc`) using `gz::sim::test::LoadModelContext` from `test/helpers/UnitTestUtil.hh` covering absolute, relative, default, and no-namespace cases, and register the test in `src/systems/swerve_drive/CMakeLists.txt` and `BUILD.bazel`.\n\n## Additional context\n\nSee reference PRs:\n- https://github.com/gazebosim/gz-sim/pull/3878 (`DiffDrive`)\n- https://github.com/gazebosim/gz-sim/pull/4066 (`MecanumDrive`)\n- https://github.com/gazebosim/gz-sim/pull/4067 (`DiffDrive` documentation)\n",
+      "created_at": "2026-10-22T21:36:54Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4103",
+      "id": "gazebosim/gz-sim#4103",
+      "issue_number": 4103,
+      "labels": [
+        "enhancement",
+        "good first issue",
+        "help wanted"
+      ],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "8770ec02346fe1a0c22c9f2fea642e29871d9e5a69f448daf3744d887d5b5c55",
+      "title": "Add namespace support to SwerveDrive"
+    },
+    {
+      "author_login": "azeey",
+      "body": "## Desired behavior\n\nUpdate the `OdometryPublisher` system (`src/systems/odometry_publisher/OdometryPublisher.cc`) to resolve its transport topics using the model namespace when one is set:\n- `<odom_topic>` (default without namespace: `/model/{model_name}/odometry`; default with namespace: `{ns}/odometry`)\n- `<odom_covariance_topic>` (default without namespace: `/model/{model_name}/odometry_with_covariance`; default with namespace: `{ns}/odometry_with_covariance`)\n- `<tf_topic>` (default without namespace: `/model/{model_name}/pose`; default with namespace: `{ns}/pose`)\n\nExpected topic resolution rules:\n- If the model has a namespace, default topics use `{ns}` as the prefix instead of `/model/{model_name}`.\n- Relative custom topics (not starting with `/`) are prefixed with `{ns}` when a namespace is present.\n- Absolute custom topics (starting with `/`) remain unchanged.\n- Models without a namespace retain their existing behavior.\n\n## Alternatives considered\n\nN/A\n\n## Implementation suggestion\n\n- Use `gz::sim::scopedNamespace` and `gz::sim::resolvedTopicName` (with `gz::sim::TopicNameOptions`) from `gz/sim/Util.hh` in `OdometryPublisher::Configure`.\n- Expose the resolved topic names for testing, update the header documentation in `OdometryPublisher.hh`, and add unit tests in `src/systems/odometry_publisher/OdometryPublisher_TEST.cc` using `gz::sim::test::LoadModelContext` from `test/helpers/UnitTestUtil.hh` (updating `CMakeLists.txt` and `BUILD.bazel`).\n\n## Additional context\n\nSee reference PRs:\n- https://github.com/gazebosim/gz-sim/pull/3878 (`DiffDrive`)\n- https://github.com/gazebosim/gz-sim/pull/4066 (`MecanumDrive`)\n",
+      "created_at": "2026-10-22T21:37:22Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4104",
+      "id": "gazebosim/gz-sim#4104",
+      "issue_number": 4104,
+      "labels": [
+        "enhancement",
+        "good first issue",
+        "help wanted"
+      ],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "c73174876cca8b51daba5a08bf3ce0f24ec268ca061a54a99faba5647a6b42f2",
+      "title": "Add namespace support to OdometryPublisher"
+    },
+    {
+      "author_login": "azeey",
+      "body": "## Desired behavior\n\nUpdate the `JointTrajectoryController` system (`src/systems/joint_traj_control/JointTrajectoryController.cc`) to resolve its command and progress topics using the model namespace when one is set:\n- `<topic>` (default without namespace: `/model/{model_name}/joint_trajectory`; default with namespace: `{ns}/joint_trajectory`)\n- Progress topic: `<resolved_trajectory_topic>_progress` (default without namespace: `/model/{model_name}/joint_trajectory_progress`; default with namespace: `{ns}/joint_trajectory_progress`)\n\nExpected topic resolution rules:\n- If the model has a namespace, the default trajectory topic uses `{ns}` as the prefix instead of `/model/{model_name}`.\n- Relative custom `<topic>` values are prefixed with `{ns}` when a namespace is present.\n- Absolute custom `<topic>` values remain unchanged.\n- The progress topic is derived by appending `_progress` to the resolved trajectory topic.\n\n## Alternatives considered\n\nN/A\n\n## Implementation suggestion\n\n- Use `gz::sim::scopedNamespace` and `gz::sim::resolvedTopicName` (with `gz::sim::TopicNameOptions`) from `gz/sim/Util.hh` in `JointTrajectoryController::Configure`.\n- Update documentation in `JointTrajectoryController.hh` and add unit tests in `src/systems/joint_traj_control/JointTrajectoryController_TEST.cc` using `gz::sim::test::LoadModelContext` from `test/helpers/UnitTestUtil.hh` to verify both the command and progress topic names.\n\n## Additional context\n\nSee reference PRs:\n- https://github.com/gazebosim/gz-sim/pull/3878 (`DiffDrive`)\n- https://github.com/gazebosim/gz-sim/pull/4066 (`MecanumDrive`)\n",
+      "created_at": "2026-10-22T21:37:33Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4105",
+      "id": "gazebosim/gz-sim#4105",
+      "issue_number": 4105,
+      "labels": [
+        "enhancement",
+        "good first issue",
+        "help wanted"
+      ],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "8c31dad2cd5db5333c3352e2c6290e5d758cf2b75d7ac1c22eab96f7a3fa282a",
+      "title": "Add namespace support to JointTrajectoryController"
+    },
+    {
+      "author_login": "azeey",
+      "body": "## Desired behavior\n\nUpdate the `PosePublisher` system (`src/systems/pose_publisher/PosePublisher.cc`) to resolve its pose and static pose topics using the model namespace when one is set:\n- `<topic>` (default without namespace: `topicFromScopedName(_entity, _ecm, true) + \"/pose\"`; default with namespace: `{ns}/pose`)\n- Static pose topic: `<resolved_pose_topic>_static`\n\nExpected topic resolution rules:\n- If the model has a namespace, the default topic becomes `{ns}/pose` (and `{ns}/pose_static`).\n- Relative custom `<topic>` values are prefixed with `{ns}` when a namespace is present.\n- Absolute custom `<topic>` values remain unchanged.\n- Models without a namespace retain their existing behavior.\n\n## Alternatives considered\n\nN/A\n\n## Implementation suggestion\n\n- Use `gz::sim::scopedNamespace` and `gz::sim::resolvedTopicName` (with `gz::sim::TopicNameOptions`) from `gz/sim/Util.hh` in `PosePublisher::Configure`, then derive `staticPoseTopic = poseTopic + \"_static\"`.\n- Update header documentation in `PosePublisher.hh` and add unit tests using `gz::sim::test::LoadModelContext` from `test/helpers/UnitTestUtil.hh` (updating `CMakeLists.txt` and `BUILD.bazel`).\n\n## Additional context\n\nSee reference PRs:\n- https://github.com/gazebosim/gz-sim/pull/3878 (`DiffDrive`)\n- https://github.com/gazebosim/gz-sim/pull/4066 (`MecanumDrive`)\n",
+      "created_at": "2026-10-22T21:37:45Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4106",
+      "id": "gazebosim/gz-sim#4106",
+      "issue_number": 4106,
+      "labels": [
+        "enhancement",
+        "good first issue",
+        "help wanted"
+      ],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "d121b8610613babaf571699b005a175bea892bd8a4c7a7eb664cf0330c9e594b",
+      "title": "Add namespace support to PosePublisher"
+    },
+    {
+      "author_login": "azeey",
+      "body": "## Desired behavior\n\nUpdate the `Breadcrumbs` system (`src/systems/breadcrumbs/Breadcrumbs.cc`) to resolve its deploy and remaining topics using the model namespace when one is set:\n- `<topic>` (default without namespace: `/model/{model_name}/breadcrumbs/{breadcrumb_name}/deploy`; default with namespace: `{ns}/breadcrumbs/{breadcrumb_name}/deploy`)\n- Remaining count topic: `<resolved_deploy_topic>/remaining`\n\nExpected topic resolution rules:\n- If the model has a namespace, the default deploy topic uses `{ns}` instead of `/model/{model_name}`.\n- Relative custom `<topic>` values are prefixed with `{ns}` when a namespace is present.\n- Absolute custom `<topic>` values remain unchanged.\n- Models without a namespace retain their existing behavior.\n\n## Alternatives considered\n\nN/A\n\n## Implementation suggestion\n\n- Use `gz::sim::scopedNamespace` and `gz::sim::resolvedTopicName` (with `gz::sim::TopicNameOptions`) from `gz/sim/Util.hh` in `Breadcrumbs::Configure`.\n- Update header documentation in `Breadcrumbs.hh` and add unit tests using `gz::sim::test::LoadModelContext` from `test/helpers/UnitTestUtil.hh` (updating `CMakeLists.txt` and `BUILD.bazel`).\n\n## Additional context\n\nSee reference PRs:\n- https://github.com/gazebosim/gz-sim/pull/3878 (`DiffDrive`)\n- https://github.com/gazebosim/gz-sim/pull/4066 (`MecanumDrive`)\n",
+      "created_at": "2026-10-22T21:37:51Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4107",
+      "id": "gazebosim/gz-sim#4107",
+      "issue_number": 4107,
+      "labels": [
+        "enhancement",
+        "good first issue",
+        "help wanted"
+      ],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "14b864b2b1dbbe23db546449f68a1d8cc38d8ef974c88508b45b2ef3d4ff4fe7",
+      "title": "Add namespace support to Breadcrumbs"
+    },
+    {
+      "author_login": "azeey",
+      "body": "## Desired behavior\n\nUpdate the `KineticEnergyMonitor` system (`src/systems/kinetic_energy_monitor/KineticEnergyMonitor.cc`) to resolve its `<topic>` using the model namespace when one is set:\n- `<topic>` (default without namespace: `/model/{model_name}/kinetic_energy`; default with namespace: `{ns}/kinetic_energy`)\n\nExpected topic resolution rules:\n- If the model has a namespace, the default topic uses `{ns}/kinetic_energy`.\n- Relative custom `<topic>` values are prefixed with `{ns}` when a namespace is present.\n- Absolute custom `<topic>` values remain unchanged.\n- Models without a namespace retain their existing behavior.\n\n## Alternatives considered\n\nN/A\n\n## Implementation suggestion\n\n- Use `gz::sim::scopedNamespace` and `gz::sim::resolvedTopicName` (with `gz::sim::TopicNameOptions`) from `gz/sim/Util.hh` in `KineticEnergyMonitor::Configure`.\n- Update `KineticEnergyMonitor.hh` documentation and add unit tests using `gz::sim::test::LoadModelContext` from `test/helpers/UnitTestUtil.hh` (updating `CMakeLists.txt` and `BUILD.bazel`).\n\n## Additional context\n\nSee reference PRs:\n- https://github.com/gazebosim/gz-sim/pull/3878 (`DiffDrive`)\n- https://github.com/gazebosim/gz-sim/pull/4066 (`MecanumDrive`)\n",
+      "created_at": "2026-10-22T21:38:01Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4108",
+      "id": "gazebosim/gz-sim#4108",
+      "issue_number": 4108,
+      "labels": [
+        "enhancement",
+        "good first issue",
+        "help wanted"
+      ],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "3966d25d21bbd093270bea579df4ad1d19b849ae08da0d24696c9c09f9725f49",
+      "title": "Add namespace support to KineticEnergyMonitor"
+    },
+    {
+      "author_login": "azeey",
+      "body": "## Desired behavior\n\nUpdate the `PerformerDetector` system (`src/systems/performer_detector/PerformerDetector.cc`) to resolve its `<topic>` using the model namespace when one is set:\n- `<topic>` (default without namespace: `/model/{model_name}/performer_detector/status`; default with namespace: `{ns}/performer_detector/status`)\n\nExpected topic resolution rules:\n- If the model has a namespace, the default topic uses `{ns}/performer_detector/status`.\n- Relative custom `<topic>` values are prefixed with `{ns}` when a namespace is present.\n- Absolute custom `<topic>` values remain unchanged.\n- Models without a namespace retain their existing behavior.\n\n## Alternatives considered\n\nN/A\n\n## Implementation suggestion\n\n- Use `gz::sim::scopedNamespace` and `gz::sim::resolvedTopicName` (with `gz::sim::TopicNameOptions`) from `gz/sim/Util.hh` in `PerformerDetector::Configure`.\n- Update `PerformerDetector.hh` documentation and add unit tests using `gz::sim::test::LoadModelContext` from `test/helpers/UnitTestUtil.hh` (updating `CMakeLists.txt` and `BUILD.bazel`).\n\n## Additional context\n\nSee reference PRs:\n- https://github.com/gazebosim/gz-sim/pull/3878 (`DiffDrive`)\n- https://github.com/gazebosim/gz-sim/pull/4066 (`MecanumDrive`)\n",
+      "created_at": "2026-10-22T21:38:17Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4109",
+      "id": "gazebosim/gz-sim#4109",
+      "issue_number": 4109,
+      "labels": [
+        "enhancement",
+        "good first issue",
+        "help wanted"
+      ],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "30e2c95b41149ec26a0173e594419e7c88c3615355ea994cc90be07e5af238de",
+      "title": "Add namespace support to PerformerDetector"
+    },
+    {
+      "author_login": "azeey",
+      "body": "## Desired behavior\n\nUpdate the `TrajectoryFollower` system (`src/systems/trajectory_follower/TrajectoryFollower.cc`) to resolve its pause `<topic>` using the model namespace when one is set:\n- `<topic>` (default without namespace: `/model/{model_name}/trajectory_follower/pause`; default with namespace: `{ns}/trajectory_follower/pause`)\n\nExpected topic resolution rules:\n- If the model has a namespace, the default topic uses `{ns}/trajectory_follower/pause`.\n- Relative custom `<topic>` values are prefixed with `{ns}` when a namespace is present.\n- Absolute custom `<topic>` values remain unchanged.\n- Models without a namespace retain their existing behavior.\n\n## Alternatives considered\n\nN/A\n\n## Implementation suggestion\n\n- Use `gz::sim::scopedNamespace` and `gz::sim::resolvedTopicName` (with `gz::sim::TopicNameOptions`) from `gz/sim/Util.hh` in `TrajectoryFollower::Configure`.\n- Update `TrajectoryFollower.hh` documentation and add unit tests using `gz::sim::test::LoadModelContext` from `test/helpers/UnitTestUtil.hh` (updating `CMakeLists.txt` and `BUILD.bazel`).\n\n## Additional context\n\nSee reference PRs:\n- https://github.com/gazebosim/gz-sim/pull/3878 (`DiffDrive`)\n- https://github.com/gazebosim/gz-sim/pull/4066 (`MecanumDrive`)\n",
+      "created_at": "2026-10-22T21:38:30Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4110",
+      "id": "gazebosim/gz-sim#4110",
+      "issue_number": 4110,
+      "labels": [
+        "enhancement",
+        "good first issue",
+        "help wanted"
+      ],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "48a1b0a500e194f178ceb75c2e446ee5f8f3bbc7bf4d1966b50656efeea4240b",
+      "title": "Add namespace support to TrajectoryFollower"
+    },
+    {
+      "author_login": "azeey",
+      "body": "## Desired behavior\n\nUpdate the `FreeSpaceExplorer` system (`src/systems/free_space_explorer/FreeSpaceExplorer.cc`) to resolve its transport topics using the model namespace when one is set:\n- `<lidar_topic>` (default without namespace: `scan`; default with namespace: `{ns}/scan`)\n- `<image_topic>` (default without namespace: `scan_image`; default with namespace: `{ns}/scan_image`)\n- `<start_topic>` (default without namespace: `start`; default with namespace: `{ns}/start`)\n\nExpected topic resolution rules:\n- If the model has a namespace, default and relative custom topics are prefixed with `{ns}`.\n- Absolute custom topics (starting with `/`) remain unchanged.\n- Models without a namespace retain their existing behavior.\n\n## Alternatives considered\n\nN/A\n\n## Implementation suggestion\n\n- Use `gz::sim::scopedNamespace` and `gz::sim::resolvedTopicName` (with `gz::sim::TopicNameOptions`) from `gz/sim/Util.hh` in `FreeSpaceExplorer::Configure`.\n- Update `FreeSpaceExplorer.hh` documentation and add unit tests using `gz::sim::test::LoadModelContext` from `test/helpers/UnitTestUtil.hh` (updating `CMakeLists.txt` and `BUILD.bazel`).\n\n## Additional context\n\nSee reference PRs:\n- https://github.com/gazebosim/gz-sim/pull/3878 (`DiffDrive`)\n- https://github.com/gazebosim/gz-sim/pull/4066 (`MecanumDrive`)\n",
+      "created_at": "2026-10-22T21:39:13Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4111",
+      "id": "gazebosim/gz-sim#4111",
+      "issue_number": 4111,
+      "labels": [
+        "enhancement",
+        "good first issue",
+        "help wanted"
+      ],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "792ea97ef7cd4d1397a6d017558bff677c3d62c3317f674f35f6d21105a28e03",
+      "title": "Add namespace support to FreeSpaceExplorer"
+    },
+    {
+      "author_login": "azeey",
+      "body": "## Desired behavior\n\nUpdate the `Contact` sensor system (`src/systems/contact/Contact.cc`) to resolve contact sensor topics using the parent model's namespace when one is set:\n- `<contact><topic>` (default without namespace: `scopedName(_entity, _ecm, \"/\") + \"/contact\"`; default with namespace: `{ns}/contact`)\n\nExpected topic resolution rules:\n- Relative `<topic>` values use the model namespace `{ns}` as their prefix when one is set.\n- Absolute `<topic>` values (starting with `/`) remain unchanged.\n- Default topics use `{ns}/contact` when a namespace is set, or fall back to `scopedName(_entity, _ecm, \"/\") + \"/contact\"` when no namespace is set.\n\n## Alternatives considered\n\nN/A\n\n## Implementation suggestion\n\n- In `ContactPrivate::CreateSensors` / `ContactSensor::Load`, query `gz::sim::scopedNamespace(_ecm, _entity)` and resolve the `<contact><topic>` element using `gz::sim::resolvedTopicName` (with `gz::sim::TopicNameOptions`).\n- Expose resolved topic names per sensor entity (and clean them up when sensors are removed), update documentation in `Contact.hh`, and add unit tests in `src/systems/contact/Contact_TEST.cc` using `gz::sim::test::LoadWorldContext` from `test/helpers/UnitTestUtil.hh` (updating `CMakeLists.txt` and `BUILD.bazel`).\n\n## Additional context\n\nSee reference PRs for sensor plugins:\n- https://github.com/gazebosim/gz-sim/pull/4050\n- https://github.com/gazebosim/gz-sim/pull/4052\n",
+      "created_at": "2026-10-22T21:39:27Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4112",
+      "id": "gazebosim/gz-sim#4112",
+      "issue_number": 4112,
+      "labels": [
+        "enhancement",
+        "good first issue",
+        "help wanted"
+      ],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "c5cee516d989e25a76c788bd5ebc56f4b6c9d3e42102306de4214d1570b82537",
+      "title": "Add namespace support to Contact sensor system"
+    },
+    {
+      "author_login": "azeey",
+      "body": "## Desired behavior\n\nUpdate the `CameraVideoRecorder` system (`src/systems/camera_video_recorder/CameraVideoRecorder.cc`), which attaches to a `<sensor type=\"camera\">`, to resolve its service and camera sensor topics using the parent model's namespace when one is set:\n- `<service>` on the plugin SDF (default without namespace: `{scoped_name}/record_video`; default with namespace: `{ns}/record_video`)\n- Camera sensor `<topic>` (default without namespace: `{scoped_name}/image`; default with namespace: `{ns}/image`), which is also used as the prefix for `<sensor_topic>/stats` and `<sensor_topic>/marker`.\n\nExpected topic/service resolution rules:\n- Relative `<service>` and camera `<topic>` values are prefixed with `{ns}` when a namespace is set.\n- Absolute `<service>` and `<topic>` values (starting with `/`) remain unchanged.\n- Default `<service>` and `<topic>` values use `{ns}` as the prefix when a namespace is set, or fall back to `scopedName` when no namespace is set.\n\n## Alternatives considered\n\nN/A\n\n## Implementation suggestion\n\n- Use `gz::sim::scopedNamespace(_ecm, _entity)` and `gz::sim::resolvedTopicName` (with `gz::sim::TopicNameOptions`) from `gz/sim/Util.hh` to resolve `<service>` on the plugin SDF and `<topic>` on the camera sensor SDF.\n- Update `CameraVideoRecorder.hh` documentation and add unit tests using `test/helpers/UnitTestUtil.hh` (updating `CMakeLists.txt` and `BUILD.bazel`).\n\n## Additional context\n\nSee reference PRs:\n- https://github.com/gazebosim/gz-sim/pull/4041 (rendering sensor namespace support)\n- https://github.com/gazebosim/gz-sim/pull/4050\n",
+      "created_at": "2026-10-22T21:39:36Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4113",
+      "id": "gazebosim/gz-sim#4113",
+      "issue_number": 4113,
+      "labels": [
+        "enhancement",
+        "good first issue",
+        "help wanted"
+      ],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "02974c273783c40ffe96bd1a063b9ea28114900f0a61c05285f6031d62b6ef31",
+      "title": "Add namespace support to CameraVideoRecorder system"
+    },
+    {
+      "author_login": "azeey",
+      "body": "## Desired behavior\n\nUpdate the `DetachableJoint` system (`src/systems/detachable_joint/DetachableJoint.cc`) to resolve its transport topics using the model namespace when one is set:\n- `<detach_topic>` / `<topic>` (default without namespace: `/model/{model_name}/detachable_joint/detach`; default with namespace: `{ns}/detachable_joint/detach`)\n- `<attach_topic>` (default without namespace: `/model/{model_name}/detachable_joint/attach`; default with namespace: `{ns}/detachable_joint/attach`)\n- `<output_topic>` (default without namespace: `/model/{child_model_name}/detachable_joint/state`; default with namespace: `{ns}/detachable_joint/state`)\n\nExpected topic resolution rules:\n- If the model has a namespace, default topics use `{ns}` as the prefix.\n- Relative custom topics are prefixed with `{ns}` when a namespace is present.\n- Absolute custom topics (starting with `/`) remain unchanged.\n- Models without a namespace retain their existing behavior.\n\n## Alternatives considered\n\nN/A\n\n## Implementation suggestion\n\n- Use `gz::sim::scopedNamespace` and `gz::sim::resolvedTopicName` (with `gz::sim::TopicNameOptions`) from `gz/sim/Util.hh` in `DetachableJoint::Configure`.\n- Update `DetachableJoint.hh` documentation and add unit tests using `gz::sim::test::LoadModelContext` from `test/helpers/UnitTestUtil.hh` (updating `CMakeLists.txt` and `BUILD.bazel`).\n\n## Additional context\n\nSee reference PRs:\n- https://github.com/gazebosim/gz-sim/pull/3878 (`DiffDrive`)\n- https://github.com/gazebosim/gz-sim/pull/4066 (`MecanumDrive`)\n",
+      "created_at": "2026-10-22T21:40:58Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4114",
+      "id": "gazebosim/gz-sim#4114",
+      "issue_number": 4114,
+      "labels": [
+        "enhancement",
+        "good first issue",
+        "help wanted"
+      ],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "aae65372b95b92fa2c0abdfa7837510fbe6afe659d27f5954f06a798a13dc11a",
+      "title": "Add namespace support to DetachableJoint"
+    },
+    {
+      "author_login": "diegoakel",
+      "body": "### Ticket Type\n\n\ud83d\udc1b Bug Report (Something isn't working)\n\n### Environment & System Info\n\n```Shell\n- LeRobot version: 0.6.1\n- Platform: macOS-26.5.2-arm64-arm-64bit\n- Python version: 3.12.3\n- Huggingface Hub version: 1.33.0\n- Numpy version: 2.2.6\n- PyTorch version: 2.11.0\n- Hardware: Koch v1.1 leader, 6x Dynamixel XL330-M077 (firmware v50), 1 Mbps\n```\n\n### Description\n\nCalibrating the Koch leader fails at the end with `ValueError: Negative values are not allowed`, because `elbow_flex` is homed to the wrong position.\n\n`koch_leader` puts `elbow_flex` in reverse drive mode (`Drive_Mode = 1`). In that mode the motor reports its position the other way, **homing offset included**, so the offset is subtracted from the position instead of added. `set_half_turn_homings` always assumes `present = actual + offset` for Dynamixel motors. For an inverted motor at reported position `p`, it writes `2047 - p`, and the motor then reads `p - (2047 - p) = 2p - 2047` instead of 2047.\n\nDepending on where the horn sits, the recorded range then goes below 0 and writing `Min_Position_Limit` fails. When it doesn't fail, the calibrated range is silently off-center.\n\nThe same logic is still on `main` after the motors refactor: `homing_offset_sign` comes only from the motor definition and ignores the drive mode.\n\n### Context & Reproduction\n\n```bash\nlerobot-calibrate --teleop.type=koch_leader --teleop.port=/dev/tty... --teleop.id=my_leader_arm\n```\n1. Hold the middle pose and press ENTER.\n2. Sweep all joints through their range and press ENTER.\n\nAfter homing, `elbow_flex` should start the sweep at 2047, but its **max** over the whole sweep is 1449, so it was never at 2047.\n\nI confirmed the sign directly on the elbow motor (ID 3, `Drive_Mode = 1`), writing only the `Homing_Offset` register with the arm at rest:\n\n| Homing_Offset | Present_Position |\n|---|---|\n| 0 | -10 |\n| 200 | -210 |\n| 0 | -10 |\n\nThe offset subtracts from the position it reports.\n\n### Relevant logs or stack trace\n\n```Shell\nNAME            |    MIN |    POS |    MAX\nshoulder_lift   |   1156 |   3112 |   3136\nelbow_flex      |   -728 |    257 |   1449\nwrist_flex      |    889 |   1931 |   3045\ngripper         |   1684 |   1684 |   2453\nINFO 2026-10-22 20:10:42 h_leader.py:178 my_leader_arm KochLeader disconnected.\nTraceback (most recent call last):\n  ...\n  File \".../lerobot/teleoperators/koch_leader/koch_leader.py\", line 130, in calibrate\n    self.bus.write_calibration(self.calibration)\n  File \".../lerobot/motors/dynamixel/dynamixel.py\", line 185, in write_calibration\n    self.write(\"Min_Position_Limit\", motor, calibration.range_min)\n  ...\n  File \".../lerobot/motors/motors_bus.py\", line 932, in _serialize_data\n    raise ValueError(f\"Negative values are not allowed: {value}\")\nValueError: Negative values are not allowed: -728\n```\n\n### Checklist\n\n- [x] I have searched existing tickets to ensure this isn't a duplicate.\n- [ ] I am using the latest version of the `main` branch.\n- [x] I have verified this is not an environment-specific problem.\n\n### Additional Info / Workarounds\n\nProbably the same as item 5 of #1489 (\"the homing offset on the wrist flex gets set wrong, so half way becomes 0 instead of 2048\"), which was closed as stale. #3586 is about a different wrap-around problem.\n\n**Fix:** in `set_half_turn_homings`, negate the offset sign for motors whose `Drive_Mode` has the reverse bit set. I have a PR ready with tests and will link it here.\n\n**Workaround on 0.6.1:** after `set_half_turn_homings`, read back `Present_Position`. For any motor that doesn't read about 2047, write the negated offset. With that, Koch leader calibration completes.\n\nOnly tested on XL330-M077 firmware v50. \n\nI haven't specifically done on Main but the faulty code is there.",
+      "created_at": "2026-10-22T18:51:28Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5060",
+      "id": "huggingface/lerobot#5060",
+      "issue_number": 5060,
+      "labels": [
+        "bug",
+        "policies",
+        "tests",
+        "robots",
+        "teleoperators"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "6dbd1e09bb808aa62541b60bf80bfdfb9f26f374aa24b1ae9d0a84782167bf94",
+      "title": "Koch leader calibration fails with \"Negative values are not allowed\": homing offset has the wrong sign on motors in reverse drive mode"
+    }
+  ],
+  "post_activation_issue_identities_observed": 287,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-22T22:16:35Z",
+  "schema_version": 1
+}
