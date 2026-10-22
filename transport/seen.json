@@ -3990,13 +3990,17 @@
     },
     {
       "created_at": "2026-10-22T07:47:21Z",
+      "expiry_recorded_at": "2026-10-22T14:04:29Z",
+      "expiry_sha256": "307fc99b9ca9384fe6f85bcac588570fe41bf0313d3ee96a0b4297ab1a5a920a",
+      "expiry_source": "expirations/NVlabs__alpasim__220.json",
       "first_frozen_at": "2026-10-22T07:57:11Z",
       "id": "NVlabs/alpasim#220",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 220,
       "prediction_deadline_at": "2026-10-22T13:57:11Z",
       "repository": "NVlabs/alpasim",
       "source": "inbox/FIRST_SEEN_20261022T075711Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "2410ef99f8af16f5730aabc646d7187ebee0bc07c7b915a0075a7d652c071af5"
     },
     {
@@ -4020,6 +4024,17 @@
       "source": "inbox/FIRST_SEEN_20261022T134556Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "99875b1d4c3ba09376af896c946045aa96e06755fb7fb9d0d0457e2a8ae7101e"
+    },
+    {
+      "created_at": "2026-10-22T13:59:22Z",
+      "first_frozen_at": "2026-10-22T14:06:30Z",
+      "id": "RobotLocomotion/drake#25117",
+      "issue_number": 25117,
+      "prediction_deadline_at": "2026-10-22T20:06:30Z",
+      "repository": "RobotLocomotion/drake",
+      "source": "inbox/FIRST_SEEN_20261022T140630Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "5da02400e81f23830360b196e17781540881159cf6e066d66e0ee390b3849180"
     }
   ]
 }
