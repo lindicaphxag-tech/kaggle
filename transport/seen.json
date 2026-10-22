@@ -3855,14 +3855,40 @@
     },
     {
       "created_at": "2026-10-21T17:19:10Z",
+      "expiry_recorded_at": "2026-10-22T01:26:42Z",
+      "expiry_sha256": "4946c8095b445c85b9500445ec61615659c2786b7494e506f37499951f9707af",
+      "expiry_source": "expirations/isaac-sim__IsaacSim__898.json",
       "first_frozen_at": "2026-10-21T18:34:50Z",
       "id": "isaac-sim/IsaacSim#898",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 898,
       "prediction_deadline_at": "2026-10-22T00:34:50Z",
       "repository": "isaac-sim/IsaacSim",
       "source": "inbox/FIRST_SEEN_20261021T183450Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "127f243e04921bec4ccb814a4526f86b9184f687910caf83e2e4b78169a902fa"
+    },
+    {
+      "created_at": "2026-10-21T23:06:55Z",
+      "first_frozen_at": "2026-10-22T01:28:15Z",
+      "id": "isaac-sim/IsaacSim#899",
+      "issue_number": 899,
+      "prediction_deadline_at": "2026-10-22T07:28:15Z",
+      "repository": "isaac-sim/IsaacSim",
+      "source": "inbox/FIRST_SEEN_20261022T012815Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "8a7d9cef2e6342fe6da8c7536b8f49b38a1191c88c45d6c7af188a28d7e92c46"
+    },
+    {
+      "created_at": "2026-10-22T00:57:41Z",
+      "first_frozen_at": "2026-10-22T01:28:15Z",
+      "id": "ros-controls/ros2_control#3715",
+      "issue_number": 3715,
+      "prediction_deadline_at": "2026-10-22T07:28:15Z",
+      "repository": "ros-controls/ros2_control",
+      "source": "inbox/FIRST_SEEN_20261022T012815Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "e89331c700e3266325a23bec97d94b6ec16f6fbd30d2880038c156f084e78c7d"
     }
   ]
 }
