@@ -3870,24 +3870,32 @@
     },
     {
       "created_at": "2026-10-21T23:06:55Z",
+      "expiry_recorded_at": "2026-10-22T07:28:58Z",
+      "expiry_sha256": "8fce2114f9d518918d6b1c9a51b523498862a47c1dafde43147f0a54f4b92707",
+      "expiry_source": "expirations/isaac-sim__IsaacSim__899.json",
       "first_frozen_at": "2026-10-22T01:28:15Z",
       "id": "isaac-sim/IsaacSim#899",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 899,
       "prediction_deadline_at": "2026-10-22T07:28:15Z",
       "repository": "isaac-sim/IsaacSim",
       "source": "inbox/FIRST_SEEN_20261022T012815Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "8a7d9cef2e6342fe6da8c7536b8f49b38a1191c88c45d6c7af188a28d7e92c46"
     },
     {
       "created_at": "2026-10-22T00:57:41Z",
+      "expiry_recorded_at": "2026-10-22T07:28:58Z",
+      "expiry_sha256": "c6328a7ea06a57a14663acefb8ed7fbd0dc21ebc78439ef1126bbe5047d7f39a",
+      "expiry_source": "expirations/ros-controls__ros2_control__3715.json",
       "first_frozen_at": "2026-10-22T01:28:15Z",
       "id": "ros-controls/ros2_control#3715",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3715,
       "prediction_deadline_at": "2026-10-22T07:28:15Z",
       "repository": "ros-controls/ros2_control",
       "source": "inbox/FIRST_SEEN_20261022T012815Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "e89331c700e3266325a23bec97d94b6ec16f6fbd30d2880038c156f084e78c7d"
     },
     {
@@ -3900,6 +3908,61 @@
       "source": "inbox/FIRST_SEEN_20261022T014931Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "fc76577b4db9e9027f4810c08b415da7c14ebec128da2049e9895406ae352eb4"
+    },
+    {
+      "created_at": "2026-10-22T07:00:57Z",
+      "first_frozen_at": "2026-10-22T07:30:29Z",
+      "id": "Genesis-Embodied-AI/genesis-world#3585",
+      "issue_number": 3585,
+      "prediction_deadline_at": "2026-10-22T13:30:29Z",
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "source": "inbox/FIRST_SEEN_20261022T073029Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "fd4f0ae1a55646dab469fa9ebee44158c88e81e8f4e3c08037c644c63df5ef9f"
+    },
+    {
+      "created_at": "2026-10-22T03:09:06Z",
+      "first_frozen_at": "2026-10-22T07:30:29Z",
+      "id": "NVlabs/alpasim#219",
+      "issue_number": 219,
+      "prediction_deadline_at": "2026-10-22T13:30:29Z",
+      "repository": "NVlabs/alpasim",
+      "source": "inbox/FIRST_SEEN_20261022T073029Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "311936467011186ae8023f8f766b632e78b8cb9ca8ecdd94d941601015406136"
+    },
+    {
+      "created_at": "2026-10-22T02:03:22Z",
+      "first_frozen_at": "2026-10-22T07:30:29Z",
+      "id": "huggingface/lerobot#5048",
+      "issue_number": 5048,
+      "prediction_deadline_at": "2026-10-22T13:30:29Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261022T073029Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "af42b95fdd828d3dfbbf7c42297a0f0d22fa9d14d4461ecdbdfea18ace7f1269"
+    },
+    {
+      "created_at": "2026-10-22T02:03:43Z",
+      "first_frozen_at": "2026-10-22T07:30:29Z",
+      "id": "isaac-sim/IsaacLab#8777",
+      "issue_number": 8777,
+      "prediction_deadline_at": "2026-10-22T13:30:29Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261022T073029Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "21995629deb86e0668a0df99a7562f72e305d10d4047fe13e7e0f486fcc6c59b"
+    },
+    {
+      "created_at": "2026-10-22T05:53:55Z",
+      "first_frozen_at": "2026-10-22T07:30:29Z",
+      "id": "isaac-sim/IsaacLab#8779",
+      "issue_number": 8779,
+      "prediction_deadline_at": "2026-10-22T13:30:29Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261022T073029Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "76e4517a8a2cc0d8a417193a08b418e8b5fc0ebfe7118e712a5f7579d680d043"
     }
   ]
 }
