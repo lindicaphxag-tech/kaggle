@@ -1,0 +1,13 @@
+{
+  "case_id": "OpenMind/OM1#2701",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-10-23T01:25:56Z",
+  "expiry_sha256": "63235675e92598f28fabbffc70147c91a8cab286bfdd81b210b5848573cdf170",
+  "first_frozen_at": "2026-10-22T18:30:31Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-10-23T00:30:31Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "b2ecdd2485508fa5e6cb4481dbd566ee6074eb14c1c1c457d30b7bf53b845b6e"
+}
