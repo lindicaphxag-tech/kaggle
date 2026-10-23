@@ -1,0 +1,50 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 3,
+  "new_candidates": [
+    {
+      "author_login": "JiChern",
+      "body": "## Summary\n\nWe identified a cross-backend compatibility issue in Isaac Lab when training a wheeled quadruped robot using Newton + MuJoCo Warp (MJWarp).\n\nThe Newton RayCaster height scanner includes the robot's own collision geometry in ray-casting queries, even when the scanner is intended to measure terrain height.\n\nConsequently, our task-specific `feet_edge` reward incorrectly classifies wheels in contact with flat ground as being near a terrain edge.\n\nThis silently introduces incorrect reward signals during reinforcement learning and can lead to undesirable locomotion policies.\n\n## Observed Behavior\n\nWe conducted training and evaluation experiments using two simulation configurations.\n\n**1. PhysX-based training**\n\nThe quadruped successfully learned the high-platform climbing task without exhibiting persistent left-rear-leg lifting.\n\n**2. Newton + MJWarp-based training**\n\nThe learned policy consistently kept its left-rear foot/wheel lifted when approaching a high platform.\n\n**3. Cross-backend evaluation**\n\nWhen transferring the Newton-trained policy to PhysX for evaluation, the abnormal left-rear-leg lifting behavior persisted.\n\nThis indicates that the abnormal behavior was learned during training, rather than being solely caused by Newton's runtime contact dynamics.\n\n**4. Root-cause investigation**\n\nWe traced false terrain-edge detections to the Newton RayCaster height scanner.\n\nOn flat terrain, ray-casting queries can intersect the robot's own collision geometry.\n\nThese self-intersections contaminate the estimated terrain heights and cause the `feet_edge` reward to report false terrain-edge contacts.\n\nWe have identified the incorrect sensor-to-reward behavior. A controlled retraining experiment is still needed to establish how much it contributes to the learned asymmetric locomotion policy.\n\n## Expected Behavior\n\nA height scanner configured for terrain measurements should not mistake the robot's own collision geometry for terrain.\n\nIn particular:\n\n- Grounded wheels on flat terrain should not trigger false terrain-edge detection.\n- The sensor should support excluding the robot's own collision geometry.\n- Terrain and obstacles within individual training environments should remain detectable.\n- Backend differences affecting sensor filtering should be clearly communicated.\n\n## Steps to Reproduce\n\n1. Create a quadruped locomotion environment with a ray-cast height scanner.\n2. Configure the scanner to measure terrain height near the robot's feet or wheels.\n3. Place the robot on flat terrain and ensure its wheels are in contact with the ground.\n4. Run the same height-scanning configuration under PhysX and Newton + MJWarp.\n5. Compare the reported terrain heights and the task-specific `feet_edge` reward.\n6. Inspect ray intersections with the robot's own collision shapes.\n\n**Observed result:** Newton height scans include self-collision geometry, causing false terrain-edge detections.\n\n## Technical Explanation\n\nIsaac Lab currently has different RayCaster semantics across physics backends.\n\n**PhysX:**\n\nRay-casting queries operate on configured meshes specified through `mesh_prim_paths`.\n\n**Newton:**\n\nRay-casting queries operate on the live scene BVH, which can include the robot's own collision geometry.\n\nFurthermore, Newton ignores the `mesh_prim_paths` configuration.\n\nAlthough this behavior is documented, it can silently break reinforcement-learning tasks that assume the height scanner measures terrain only.\n\nThe problem is particularly important when ray-cast measurements are used directly to calculate rewards.\n\n## Suggested Improvements\n\nWe suggest introducing an explicit filtering mechanism for the Newton RayCaster.\n\nFor example:\n\n```python\nheight_scanner = NewtonRaycastSensorCfg(\n    # Existing sensor configuration\n    exclude_self=True,\n)\n```\n\nThe example above represents a **proposed API**, not an existing supported parameter.\n\nAlternatively, the sensor could support configurable excluded collision shapes or prim paths.\n\nIt would also be useful to:\n\n- Warn when `mesh_prim_paths` is ignored by Newton.\n- Add regression tests for terrain-only height scanning.\n- Document the implications for rewards and observations when migrating locomotion tasks from PhysX to Newton.\n\nThe existing `global_world_only` option may provide a workaround when terrain belongs to the shared global world. However, it does not generally solve the problem when terrain obstacles are instantiated separately within each training environment.\n\n## Impact\n\nThis issue can silently corrupt reinforcement-learning reward signals without producing an explicit runtime error.\n\nPotential consequences include incorrect terrain classification, unintended penalties for valid foot contacts, abnormal locomotion strategies, and poor cross-backend consistency.\n\nOur experiments demonstrate that these errors can coincide with a persistent abnormal gait in the learned policy.\n\nWe would appreciate guidance on the recommended approach for implementing terrain-only ray casting while excluding robot self-collisions in Newton.\n\n",
+      "created_at": "2026-10-23T14:13:18Z",
+      "html_url": "https://github.com/isaac-sim/IsaacLab/issues/8796",
+      "id": "isaac-sim/IsaacLab#8796",
+      "issue_number": 8796,
+      "labels": [],
+      "repository": "isaac-sim/IsaacLab",
+      "surface_sha256": "285c48f138e4abac6ba3ecf3d3b0b05ded6793a05bc6da1763f9cc5272e0cba5",
+      "title": "[Bug Report] Newton RayCaster self-hits corrupt terrain height scans and feet_edge rewards in quadruped RL"
+    },
+    {
+      "author_login": "daniel-debrun",
+      "body": "### Proposal\n\nImplement `_check_solver_status()` in `NewtonMJWarpManager` using Newton's overflow observable (`SolverMuJoCo.ObservableKind.OVERFLOW`, newton-physics/newton#4086): warn (or raise) when a step overflows `nconmax`, `njmax` or the collision pipeline's contact buffer, naming the buffer.\n\n### Motivation\n\nOn overflow, MuJoCo-Warp drops contacts/constraints and Newton only prints a line, which is easy to miss in training logs; the simulation can then misbehave or go to NaN (newton-physics/newton#3702). `NewtonMPMManager` already raises on its own capacity overflow through `_check_solver_status()`; the MJWarp manager has no equivalent.\n\n### Alternatives\n\nUsers request the observable themselves, which means reaching into the manager's solver step.\n\n### Build Info\n\n- Isaac Lab Version: main (b03345bbf2); ( wait for `Newton` dependency version bump which includes newton-physics/newton#4086)\n- Isaac Sim Version: 6.2\n\n### Checklist\n\n- [x] I have checked that there is no similar issue in the repo (**required**)\n\n### Acceptance Criteria\n\n- [ ] An MJWarp contact or constraint buffer overflow is reported by the manager, naming the buffer",
+      "created_at": "2026-10-23T18:00:18Z",
+      "html_url": "https://github.com/isaac-sim/IsaacLab/issues/8801",
+      "id": "isaac-sim/IsaacLab#8801",
+      "issue_number": 8801,
+      "labels": [],
+      "repository": "isaac-sim/IsaacLab",
+      "surface_sha256": "f67823ba8b6860445fc602969aefb8b09c32eecdace91048dfe1a46902ed6e87",
+      "title": "[Proposal] MJWarp manager: report contact/constraint buffer overflow via `_check_solver_status`"
+    },
+    {
+      "author_login": "engnfrc",
+      "body": "I'm designing a node that I want to inherit the rosbag2_transport Recorder directly and implement a few higher level controls to easily start/stop/pause/resume recordings and also report details back to other nodes.\n\nI'm finding that the first two constructors in the Recorder class immediately start the recording, which is undesirable in my design, as my node needs to first gather up external information before it knows enough to start recording, one of those being a customized filename prefix. The remaining two constructors do not start recording during construction, but they require a lot of additional work with my node having to provide a writer, building out the storage options and record options from parameter values that are hard to obtain prior to being in a ROS node instance, and it stop the parameter events publisher.\n\nMy request is a new constructor similar to the first two that would either not start recording or would provide the user with a Boolean to pass in that determines if recording will start immediately or not. I suppose alternatively the existing second constructor could be modified to take this additional parameter with a default value of true. By going this route I can allow the constructor to build the writer and I can fully leverage the underlying parameters that are created and not have to re-implement them in my node, this would be substantially cleaner on my side.\n\nI'm currently in Jazzy, so if this feature is approved, a backport would be needed.",
+      "created_at": "2026-10-23T13:58:48Z",
+      "html_url": "https://github.com/ros2/rosbag2/issues/2541",
+      "id": "ros2/rosbag2#2541",
+      "issue_number": 2541,
+      "labels": [
+        "enhancement"
+      ],
+      "repository": "ros2/rosbag2",
+      "surface_sha256": "7eeaf7822a6ca87368a2b08cfdd85a9ffdb24011576c82966346cd4dd5d1cfcf",
+      "title": "Requesting a New rosbag2_transport Recorder Constructor That Doesn't Immediately Start Recording"
+    }
+  ],
+  "post_activation_issue_identities_observed": 292,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-23T18:16:56Z",
+  "schema_version": 1
+}

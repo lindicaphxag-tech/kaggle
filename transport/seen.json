@@ -4343,6 +4343,39 @@
       "source": "inbox/FIRST_SEEN_20261023T132117Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "9071a0cd75d6e9ef22f9b534b29cc2ef2def114ff43eea5053653c250b6fb4ce"
+    },
+    {
+      "created_at": "2026-10-23T14:13:18Z",
+      "first_frozen_at": "2026-10-23T18:16:56Z",
+      "id": "isaac-sim/IsaacLab#8796",
+      "issue_number": 8796,
+      "prediction_deadline_at": "2026-10-24T00:16:56Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261023T181656Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "285c48f138e4abac6ba3ecf3d3b0b05ded6793a05bc6da1763f9cc5272e0cba5"
+    },
+    {
+      "created_at": "2026-10-23T18:00:18Z",
+      "first_frozen_at": "2026-10-23T18:16:56Z",
+      "id": "isaac-sim/IsaacLab#8801",
+      "issue_number": 8801,
+      "prediction_deadline_at": "2026-10-24T00:16:56Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261023T181656Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "f67823ba8b6860445fc602969aefb8b09c32eecdace91048dfe1a46902ed6e87"
+    },
+    {
+      "created_at": "2026-10-23T13:58:48Z",
+      "first_frozen_at": "2026-10-23T18:16:56Z",
+      "id": "ros2/rosbag2#2541",
+      "issue_number": 2541,
+      "prediction_deadline_at": "2026-10-24T00:16:56Z",
+      "repository": "ros2/rosbag2",
+      "source": "inbox/FIRST_SEEN_20261023T181656Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "7eeaf7822a6ca87368a2b08cfdd85a9ffdb24011576c82966346cd4dd5d1cfcf"
     }
   ]
 }
