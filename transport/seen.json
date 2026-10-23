@@ -4332,6 +4332,17 @@
       "source": "inbox/FIRST_SEEN_20261023T012729Z.json",
       "status": "deadline_missed_unadjudicated",
       "surface_sha256": "8579f90c5b58f7fb08ba2a595e6ffc5871bfbe72480fd375659bb8c183810ab3"
+    },
+    {
+      "created_at": "2026-10-23T11:53:04Z",
+      "first_frozen_at": "2026-10-23T13:21:17Z",
+      "id": "BehaviorTree/BehaviorTree.CPP#1246",
+      "issue_number": 1246,
+      "prediction_deadline_at": "2026-10-23T19:21:17Z",
+      "repository": "BehaviorTree/BehaviorTree.CPP",
+      "source": "inbox/FIRST_SEEN_20261023T132117Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "9071a0cd75d6e9ef22f9b534b29cc2ef2def114ff43eea5053653c250b6fb4ce"
     }
   ]
 }

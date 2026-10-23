@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "ottojo",
+      "body": "Hi!\n\nI just stumbled upon the change in #1121, which broke a BT for us, but i'm not sure what the intended/correct behavior is. We have subtrees similar to this:\n\n```xml\n  <BehaviorTree ID=\"LogAndDoX\">\n    <Sequence>\n      <Log mode_string=\"{mode}\"/>\n      <DoX mode_string=\"{mode}\" />\n    </Sequence>\n  </BehaviorTree>\n```\n\n```xml\n  <BehaviorTree ID=\"LogAndDoY\">\n    <Sequence>\n      <Log mode_string=\"{mode}\"/>\n      <DoY mode_int=\"{mode}\" />\n    </Sequence>\n  </BehaviorTree>\n```\n\nwhich we call like\n\n```xml\n<SubTree ID=\"DoX\" mode=\"some_mode\" />\n```\n\nand\n\n\n```xml\n<SubTree ID=\"DoY\" mode=\"1\" />\n```\n\nwhere `Log` has a string input, `DoX` has a string input, but `DoY` has an integer input.\nPreviously, both cases worked, but after the linked PR, the second case fails with the error `The creation of the tree failed because the port [mode] was initially created with type [int] and, later type [std::string] was used somewhere else.`.\n\nIs there a recommended method of resolving a variable to the stringified version, or some other pattern usually used here? I could imagine something like \n```xml\n  <BehaviorTree ID=\"LogAndDoY\">\n    <Sequence>\n      <Log mode_string=\"{to_string(mode)}\"/>\n      <DoY mode_int=\"{mode}\" />\n    </Sequence>\n  </BehaviorTree>\n```\nbut can't find anything like that.",
+      "created_at": "2026-10-23T11:53:04Z",
+      "html_url": "https://github.com/BehaviorTree/BehaviorTree.CPP/issues/1246",
+      "id": "BehaviorTree/BehaviorTree.CPP#1246",
+      "issue_number": 1246,
+      "labels": [],
+      "repository": "BehaviorTree/BehaviorTree.CPP",
+      "surface_sha256": "9071a0cd75d6e9ef22f9b534b29cc2ef2def114ff43eea5053653c250b6fb4ce",
+      "title": "Question about automatic promotion of string to int in ports"
+    }
+  ],
+  "post_activation_issue_identities_observed": 289,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-23T13:21:17Z",
+  "schema_version": 1
+}
