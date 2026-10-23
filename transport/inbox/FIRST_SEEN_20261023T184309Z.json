@@ -1,0 +1,29 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "JonnyFaeth",
+      "body": "### Ticket Type\n\n\ud83d\udc1b Bug Report (Something isn't working)\n\n### Environment & System Info\n\n```Shell\nWindows; Python 3.12.14; PyAV 15.1.0; CPU. Exact video_utils.py from d3793b7e over checkout 3991580a. Full-current-main checklist left unchecked because this is a source-file overlay.\n```\n\n### Description\n\n`concatenate_video_files` writes each input as `file '<absolute path>'` without escaping apostrophes. With two valid local MP4 files under `owner's clips`, the concat demuxer interprets the filename incorrectly and raises `av.error.FileNotFoundError` naming the temporary `.ffconcat` file. The input videos and concat file exist; ordinary folder names and names containing spaces work.\n\nI reproduced this using the exact `video_utils.py` from main `d3793b7e36522321c1c455f0dc4826db3793dceb`, over local checkout `3991580a` (not a complete current-main checkout). Windows, Python 3.12.14, PyAV 15.1.0, CPU. No camera, network dataset, or GPU required.\n\nThe regression creates two real MPEG-4 videos, calls the public concatenation helper, then decodes the result and checks all six frames and their order by pixel intensity. Before: 1 failed (apostrophe), 2 passed (plain/spaces). Escaping each apostrophe by closing the quoted string, escaping the literal quote, and reopening it: all 3 pass; the 3 existing `test_video_utils_helpers.py` cases also pass (6 total). Ruff lint/format checks pass for the new test.\n\nThis was investigated after seeing the Windows concat limitation mentioned in #5057, but I have not established that it explains that author's failure. This is independent of the visual-statistics fix. Error cleanup is separately addressed in #3025 and is not changed here. Linux/macOS, audio streams, and the full dataset re-encoding suite were not tested.\n\nSuggested fix and executable regression test (run `pytest tests/datasets/test_concat_local_paths.py -q`):\n\n<details><summary>Patch</summary>\n\n```diff\n--- a/src/lerobot/datasets/video_utils.py\n+++ b/src/lerobot/datasets/video_utils.py\n@@ -746,7 +746,9 @@\n     with tempfile.NamedTemporaryFile(mode=\"w\", suffix=\".ffconcat\", delete=False) as tmp_concatenate_file:\n         tmp_concatenate_file.write(\"ffconcat version 1.0\\n\")\n         for input_path in input_video_paths:\n-            tmp_concatenate_file.write(f\"file '{Path(input_path).resolve()}'\\n\")\n+            # ffconcat single quotes must be closed before escaping a literal apostrophe.\n+            escaped_path = str(Path(input_path).resolve()).replace(\"'\", \"'\\\\''\")\n+            tmp_concatenate_file.write(f\"file '{escaped_path}'\\n\")\n         tmp_concatenate_file.flush()\n         tmp_concatenate_path = tmp_concatenate_file.name\n \n--- /dev/null\n+++ b/tests/datasets/test_concat_local_paths.py\n@@ -0,0 +1,36 @@\n+from pathlib import Path\n+\n+import av\n+import numpy as np\n+import pytest\n+\n+from lerobot.datasets.video_utils import concatenate_video_files\n+\n+\n+@pytest.mark.parametrize(\"folder\", [\"plain\", \"space here\", \"owner's clips\"])\n+def test_concatenate_local_paths(tmp_path: Path, folder: str) -> None:\n+    directory = tmp_path / folder\n+    directory.mkdir()\n+    inputs = []\n+    for index, value in enumerate([40, 200]):\n+        path = directory / f\"{index}.mp4\"\n+        with av.open(str(path), \"w\") as container:\n+            stream = container.add_stream(\"mpeg4\", rate=10)\n+            stream.width = stream.height = 16\n+            stream.pix_fmt = \"yuv420p\"\n+            for _ in range(3):\n+                frame = av.VideoFrame.from_ndarray(\n+                    np.full((16, 16, 3), value, dtype=np.uint8), format=\"rgb24\"\n+                )\n+                for packet in stream.encode(frame):\n+                    container.mux(packet)\n+            for packet in stream.encode():\n+                container.mux(packet)\n+        inputs.append(path)\n+    output = directory / \"combined.mp4\"\n+    concatenate_video_files(inputs, output)\n+    with av.open(str(output)) as container:\n+        frames = list(container.decode(video=0))\n+    assert len(frames) == 6\n+    means = [frame.to_ndarray(format=\"rgb24\").mean() for frame in frames]\n+    np.testing.assert_allclose(means, [40] * 3 + [200] * 3, atol=4)\n```\n</details>\n\nAI disclosure: Codex assisted with investigation, patch/test development, execution, and this report.\n\n\n### Context & Reproduction\n\n_No response_\n\n### Relevant logs or stack trace\n\n```Shell\n\n```\n\n### Checklist\n\n- [x] I have searched existing tickets to ensure this isn't a duplicate.\n- [ ] I am using the latest version of the `main` branch.\n- [ ] I have verified this is not an environment-specific problem.\n\n### Additional Info / Workarounds\n\n_No response_",
+      "created_at": "2026-10-23T18:32:59Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5075",
+      "id": "huggingface/lerobot#5075",
+      "issue_number": 5075,
+      "labels": [
+        "bug",
+        "dataset",
+        "tests",
+        "sensors"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "60b67baa0ddec653b2bd2f67553a86372a54d0399260468a7261572e81dfd651",
+      "title": "concatenate_video_files fails for input paths containing apostrophes (tested fix included)"
+    }
+  ],
+  "post_activation_issue_identities_observed": 293,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-23T18:43:09Z",
+  "schema_version": 1
+}
