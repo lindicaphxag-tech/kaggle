@@ -4335,13 +4335,17 @@
     },
     {
       "created_at": "2026-10-23T11:53:04Z",
+      "expiry_recorded_at": "2026-10-23T22:02:24Z",
+      "expiry_sha256": "2fd88ba23edbf46d16ceaa9c1dbf6f556f44f2b0025e6ca43acd670f5da113b9",
+      "expiry_source": "expirations/BehaviorTree__BehaviorTree.CPP__1246.json",
       "first_frozen_at": "2026-10-23T13:21:17Z",
       "id": "BehaviorTree/BehaviorTree.CPP#1246",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 1246,
       "prediction_deadline_at": "2026-10-23T19:21:17Z",
       "repository": "BehaviorTree/BehaviorTree.CPP",
       "source": "inbox/FIRST_SEEN_20261023T132117Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "9071a0cd75d6e9ef22f9b534b29cc2ef2def114ff43eea5053653c250b6fb4ce"
     },
     {
