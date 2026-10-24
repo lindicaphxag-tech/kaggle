@@ -1,0 +1,13 @@
+{
+  "case_id": "bulletphysics/bullet3#4819",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-10-24T10:49:39Z",
+  "expiry_sha256": "90322880d00c2185a3ae3553f02fccebaed8e86bb89854b1233eb1160efb21cd",
+  "first_frozen_at": "2026-10-24T01:02:43Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-10-24T07:02:43Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "251d2983e1eac3ae02c22b2f9acc3525578143493b989a4144a1898f9b5cb53f"
+}

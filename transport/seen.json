@@ -4410,14 +4410,73 @@
     },
     {
       "created_at": "2026-10-24T01:00:53Z",
+      "expiry_recorded_at": "2026-10-24T10:49:39Z",
+      "expiry_sha256": "90322880d00c2185a3ae3553f02fccebaed8e86bb89854b1233eb1160efb21cd",
+      "expiry_source": "expirations/bulletphysics__bullet3__4819.json",
       "first_frozen_at": "2026-10-24T01:02:43Z",
       "id": "bulletphysics/bullet3#4819",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 4819,
       "prediction_deadline_at": "2026-10-24T07:02:43Z",
       "repository": "bulletphysics/bullet3",
       "source": "inbox/FIRST_SEEN_20261024T010243Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "251d2983e1eac3ae02c22b2f9acc3525578143493b989a4144a1898f9b5cb53f"
+    },
+    {
+      "created_at": "2026-10-24T07:59:13Z",
+      "first_frozen_at": "2026-10-24T10:50:57Z",
+      "id": "ARISE-Initiative/robosuite#841",
+      "issue_number": 841,
+      "prediction_deadline_at": "2026-10-24T16:50:57Z",
+      "repository": "ARISE-Initiative/robosuite",
+      "source": "inbox/FIRST_SEEN_20261024T105057Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "c651492cfc9d38b92521848a0577ac66b48c121da9803cb4a1b1e62df9bf8825"
+    },
+    {
+      "created_at": "2026-10-24T09:28:34Z",
+      "first_frozen_at": "2026-10-24T10:50:57Z",
+      "id": "NVlabs/alpasim#225",
+      "issue_number": 225,
+      "prediction_deadline_at": "2026-10-24T16:50:57Z",
+      "repository": "NVlabs/alpasim",
+      "source": "inbox/FIRST_SEEN_20261024T105057Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "d51e3c74a3f00deb496245db33e5bfc7a84e496dfff44ea0af65e6cc26a34f54"
+    },
+    {
+      "created_at": "2026-10-24T07:05:20Z",
+      "first_frozen_at": "2026-10-24T10:50:57Z",
+      "id": "huggingface/lerobot#5080",
+      "issue_number": 5080,
+      "prediction_deadline_at": "2026-10-24T16:50:57Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261024T105057Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "74cd298dfa2a62d24836e78b4fbee05d0cf7f0bf1cf815479ff17523ec276319"
+    },
+    {
+      "created_at": "2026-10-24T07:31:30Z",
+      "first_frozen_at": "2026-10-24T10:50:57Z",
+      "id": "huggingface/lerobot#5082",
+      "issue_number": 5082,
+      "prediction_deadline_at": "2026-10-24T16:50:57Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261024T105057Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "f072e2f0d1789c366ce19e8c6a6d1377d2d88b99713320ab0609f1c3f4dddcf5"
+    },
+    {
+      "created_at": "2026-10-24T07:52:47Z",
+      "first_frozen_at": "2026-10-24T10:50:57Z",
+      "id": "ros-navigation/navigation2#6690",
+      "issue_number": 6690,
+      "prediction_deadline_at": "2026-10-24T16:50:57Z",
+      "repository": "ros-navigation/navigation2",
+      "source": "inbox/FIRST_SEEN_20261024T105057Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "b8a3b640b394ef5ddd9281fc4d5a2e3a8a3d997325a9bc5ac8fca5fe126d76a1"
     }
   ]
 }
