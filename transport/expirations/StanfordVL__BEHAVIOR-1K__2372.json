@@ -1,0 +1,13 @@
+{
+  "case_id": "StanfordVL/BEHAVIOR-1K#2372",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-10-24T20:40:53Z",
+  "expiry_sha256": "2c22ef4430290e4d64f72f5dc839326d5d910e203e0ef8ed1d83569fcb7997aa",
+  "first_frozen_at": "2026-10-24T14:28:52Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-10-24T20:28:52Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "9772e90c1405feab2bf366ab649b8198dab6bc6f2aecca4b54b7cccb342007d1"
+}

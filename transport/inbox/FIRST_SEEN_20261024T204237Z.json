@@ -1,0 +1,26 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "yunyv",
+      "body": "### Bug Description\n\nFrameImageExporter.export_frame_single_camera accepts depth arrays shaped ([n_envs,] H, W), but widths 1 through 4 are interpreted as channels. Single images raise GenesisException. Batched images produce missing or incorrectly shaped PNGs, including one color image in place of multiple grayscale depth images.\n\n### Steps to Reproduce\n\nRun the following with Genesis installed from the commit below. No scene, rendering context, or external assets are required.\n\n```python\nfrom pathlib import Path\nfrom tempfile import TemporaryDirectory\n\nimport cv2\nimport numpy as np\n\nimport genesis as gs\nfrom genesis.utils.image_exporter import FrameImageExporter\n\ngs.init(backend=gs.cpu)\nwith TemporaryDirectory() as output:\n    exporter = FrameImageExporter(output)\n    try:\n        exporter.export_frame_single_camera(i_step=0, i_cam=0, depth=np.arange(6, dtype=np.float32).reshape(2, 3))\n    except gs.GenesisException as error:\n        print(type(error).__name__, str(error))\n    exporter.export_frame_single_camera(i_step=1, i_cam=0, depth=np.arange(30, dtype=np.float32).reshape(2, 5, 3))\n    for path in sorted(Path(output).glob('*.png')):\n        image = cv2.imread(str(path), cv2.IMREAD_UNCHANGED)\n        print(path.name, image.shape, image.tolist())\ngs.destroy()\n```\n\n### Expected Behavior\n\nThe (2, 3) input should export one grayscale PNG with shape (2, 3). The (2, 5, 3) input should export two grayscale PNGs, each with shape (5, 3), preserving each environment independently.\n\n### Screenshots/Videos\n\n_No response_\n\n### Relevant log output\n\n```shell\nGenesisException '{imgs_data}' images must be arrays of shape ([n_envs,] H, W [, C>1])\nDEPTH_cam0_env0_001.png (2, 5, 3)\n\nOnly one file is produced for the batched input.\n```\n\n### Environment\n\n- OS: Debian GNU/Linux 13 (trixie), x86_64\n- CPU: AMD EPYC 9V74 80-Core Processor\n- Backend: gs.cpu\n- GPU driver / CUDA: N/A, CPU reproduction\n- Python: 3.12.14\n- PyTorch: 2.14.1+cpu\n- NumPy: 2.5.4\n- OpenCV: 5.0.0\n- Quadrants: 1.3.3\n\n### Release version or Commit ID\n\n1ac23c39b32e567cc76e20a467fee99aaad257b7 (package version 1.4.5)\n\n### Additional Context\n\nTested widths 1, 2, 3, 4, and 5 with height 5. Single depth images fail at widths 1-4 and work at width 5. For batches of two depth images, width 1 produces one (2, 5) PNG, width 2 produces no PNG, widths 3 and 4 produce one (2, 5, 3) or (2, 5, 4) PNG, and width 5 correctly produces two (5, 5) grayscale PNGs. RGB and colorized-segmentation controls passed file count, shape, and exact-pixel comparisons for all five widths in both layouts. The shape normalization currently uses the last dimension to infer a channel axis even for depth, which has no channel axis.",
+      "created_at": "2026-10-24T19:10:52Z",
+      "html_url": "https://github.com/Genesis-Embodied-AI/genesis-world/issues/3608",
+      "id": "Genesis-Embodied-AI/genesis-world#3608",
+      "issue_number": 3608,
+      "labels": [
+        "bug"
+      ],
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "surface_sha256": "fb24417ae51ed787dc2b4b8eeaaba0302eecc50628b6d1ea551f0e42f1758df9",
+      "title": "[Bug]: Narrow depth images fail or lose environment boundaries during PNG export"
+    }
+  ],
+  "post_activation_issue_identities_observed": 304,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-24T20:42:37Z",
+  "schema_version": 1
+}
