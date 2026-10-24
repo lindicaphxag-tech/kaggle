@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "sunxiaoling",
+      "body": "Problem overview\n\nBullet's default allocators can pass a null pointer to memset after an\nallocation failure. For a nonzero allocation size, these unchecked memory\ninitialization calls cause undefined behavior and can crash the host process.\n\nAffected version\n\nConfirmed by source inspection in Bullet 3.2.5 and master at commit\nd3afe76132fc76b0f9b2359cbaef47a3766e7fbb. No runtime crash reproduction was\nexecuted for this report. The affected memset path is the generic allocator\nimplementation; the platform-specific aligned allocator branches differ.\n\nNative API and failure-path evidence\n\nIn src/LinearMath/btAlignedAllocator.cpp:\n\n1. btAllocDefault calls malloc(size), then immediately calls memset(data, 0,\n   size), without checking the allocation result.\n2. The generic btAlignedAllocDefault calls sAllocFunc. If it returns null,\n   the else branch assigns null to ret, but execution still reaches\n   memset((char*)ret, 0, size). For a nonzero size, this is an invalid memory\n   access and can crash the process.\n\nSource:\nhttps://github.com/bulletphysics/bullet3/blob/d3afe76132fc76b0f9b2359cbaef47a3766e7fbb/src/LinearMath/btAlignedAllocator.cpp#L22-L75\n\nMinimal reproduction\n\nThe following source-based probe injects a failing allocation without requiring\nmemory exhaustion or robot assets. It has not been executed for this report.\nUse the generic allocator path with BT_HAS_ALIGNED_ALLOCATOR,\n__CELLOS_LV2__, and BT_DEBUG_MEMORY_ALLOCATIONS undefined.\n\n```cpp\n#include <cstddef>\n#include <LinearMath/btAlignedAllocator.h>\n\nstatic void* failAllocation(std::size_t) { return nullptr; }\nstatic void freeNothing(void*) {}\n\nint main()\n{\n    btAlignedAllocSetCustom(failAllocation, freeNothing);\n    (void)btAlignedAlloc(16, 16);\n}\n```\n\nThe inspected implementation routes this call through btAlignedAllocDefault\nand reaches memset(nullptr, 0, 16).\n\nActual impact\n\nA failed native allocation can cause undefined behavior and terminate the host\nprocess inside memset during native object construction.\n\nDownstream context\n\nA downstream entry point is Tesseract 0.35.0 makeCastCollisionObject. Its\ncompound-shape branch constructs btCompoundShape with the dynamic AABB tree\nenabled. The Bullet constructor calls btAlignedAlloc(sizeof(btDbvt), 16),\nwhich reaches the allocator above. This allocation happens inside the\nconstructor, after the outer std::make_shared allocation.\n\nSources:\nhttps://github.com/tesseract-robotics/tesseract/blob/0.35.0/collision/bullet/src/bullet_utils.cpp#L1277-L1282\nhttps://github.com/tesseract-robotics/tesseract/blob/0.35.0/collision/bullet/include/tesseract/collision/bullet/bullet_utils.h#L65\nhttps://github.com/bulletphysics/bullet3/blob/3.25/src/BulletCollision/CollisionShapes/btCompoundShape.cpp#L18-L34",
+      "created_at": "2026-10-24T01:00:53Z",
+      "html_url": "https://github.com/bulletphysics/bullet3/issues/4819",
+      "id": "bulletphysics/bullet3#4819",
+      "issue_number": 4819,
+      "labels": [],
+      "repository": "bulletphysics/bullet3",
+      "surface_sha256": "251d2983e1eac3ae02c22b2f9acc3525578143493b989a4144a1898f9b5cb53f",
+      "title": "Null pointer passed to memset after allocation failure in Bullet default allocators"
+    }
+  ],
+  "post_activation_issue_identities_observed": 294,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-24T01:02:43Z",
+  "schema_version": 1
+}
