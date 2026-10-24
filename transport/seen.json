@@ -4477,6 +4477,39 @@
       "source": "inbox/FIRST_SEEN_20261024T105057Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "b8a3b640b394ef5ddd9281fc4d5a2e3a8a3d997325a9bc5ac8fca5fe126d76a1"
+    },
+    {
+      "created_at": "2026-10-24T13:04:36Z",
+      "first_frozen_at": "2026-10-24T14:28:52Z",
+      "id": "StanfordVL/BEHAVIOR-1K#2372",
+      "issue_number": 2372,
+      "prediction_deadline_at": "2026-10-24T20:28:52Z",
+      "repository": "StanfordVL/BEHAVIOR-1K",
+      "source": "inbox/FIRST_SEEN_20261024T142852Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "9772e90c1405feab2bf366ab649b8198dab6bc6f2aecca4b54b7cccb342007d1"
+    },
+    {
+      "created_at": "2026-10-24T13:04:37Z",
+      "first_frozen_at": "2026-10-24T14:28:52Z",
+      "id": "StanfordVL/BEHAVIOR-1K#2373",
+      "issue_number": 2373,
+      "prediction_deadline_at": "2026-10-24T20:28:52Z",
+      "repository": "StanfordVL/BEHAVIOR-1K",
+      "source": "inbox/FIRST_SEEN_20261024T142852Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "44328d0d0ea0644e47f82a2a196a8a69779ef1f0e542b3c0c4c811bfed87d014"
+    },
+    {
+      "created_at": "2026-10-24T13:22:18Z",
+      "first_frozen_at": "2026-10-24T14:28:52Z",
+      "id": "isaac-sim/IsaacSim#905",
+      "issue_number": 905,
+      "prediction_deadline_at": "2026-10-24T20:28:52Z",
+      "repository": "isaac-sim/IsaacSim",
+      "source": "inbox/FIRST_SEEN_20261024T142852Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "937b234f0a4152bf5eac063765a679af023193cfab959e073e76d367fb4cfda7"
     }
   ]
 }
