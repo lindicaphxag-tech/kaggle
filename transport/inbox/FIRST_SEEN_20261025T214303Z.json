@@ -1,0 +1,26 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "lkloliver",
+      "body": "### Is there an already existing issue for this?\n\n- [x] I have searched the existing issues\n\n### Expected behavior\n\nCommit 65010b234 (\"Improve validation of EDP static properties\") states in its code\ncomment that after the change \"any other malformed input (consecutive dots,\nleading/trailing dots, non-numeric characters...) is rejected instead of being silently\naccepted\".\n\nExpected: an entity ID string containing an octet outside the 0-255 range, such as\n`300.0.0.4`, `256.0.0.4`, or `-1.0.0.4`, is rejected the same way consecutive dots or\nnon-numeric characters are, since it cannot represent a valid `EntityId_t`.\n\n### Current behavior\n\nThe four octets are parsed into `int` and then cast to `octet` with no range check, in\nboth property formats (legacy `eProsimaEDPStatic_*` and the `EDS_*` format added by\n65010b234):\n\n    src/cpp/rtps/builtin/discovery/endpoint/EDPStatic.cpp, EDPStaticProperty::fromProperty\n    (~line 483 legacy branch, ~line 549 EDS_ branch):\n\n    ss >> a >> ch >> b >> ch >> c >> ch >> d;\n    bool success = !ss.fail() && ss.eof();\n    if (success) { m_entityId.value[0] = (octet)a; ... }\n\nOut-of-range values are silently truncated (mod 256) into a different, valid entity ID:\n\n    \"0.0.1.300\"   -> accepted, becomes 0.0.1.44\n    \"0.0.1.-1\"    -> accepted, becomes 0.0.1.255\n    \"0.0.1.256\"   -> accepted, becomes 0.0.1.0\n    \"0.0.1.999999\"-> accepted, becomes 0.0.1.63\n\nNo warning or log is emitted. The truncated ID is then used as-is by\nEDPStatic::assignRemoteEndpoints / newRemoteReader to synthesize the remote endpoint, so\na peer announcing such a value gets paired under a different entity ID than the string\nsays \u2014 for a configuration typo this can silently pair the wrong endpoint or silently\nfail to pair, with nothing to diagnose.\n\n### Steps to reproduce\n\n1. Parser level (same statement as fromProperty, deterministic):\n\n       std::stringstream ss; ss << \"300.0.0.4\";\n       int a, b, c, d; char ch;\n       ss >> a >> ch >> b >> ch >> c >> ch >> d;\n       bool success = !ss.fail() && ss.eof();   // true\n       // (octet)a == 44\n\n2. End-to-end (master, static EDP):\n   - Participant created with use_SIMPLE_EndpointDiscoveryProtocol = false,\n     use_STATIC_EndpointDiscoveryProtocol = true, exchange format v1, and a static XML\n     declaring remote participant \"attacker\" reader userId=1, entityID=4, on the local\n     writer's topic. A DataWriterListener prints the matched remote reader's entity ID.\n   - Send one SPDP DATA(p) UDP packet to the discovery port carrying\n     PID_PROPERTY_LIST (0x0059) with property\n     `eProsimaEDPStatic_Reader_ALIVE_ID_1` = `300.0.0.4`.\n   - Observed: publication matched, remote reader entity ID = 2c.00.00.04 (44), i.e.\n     the out-of-range announcement was accepted and paired under the truncated ID.\n   - Control 1: value `0.0.0.4` -> matched, entity ID 00.00.00.04.\n   - Control 2: value `1.2.3.4.5` -> no match (correctly rejected, as intended by\n     65010b234).\n\n### Fast DDS version/commit\n\nmaster @ 51521ef (2026-10-20). The unguarded (octet) cast predates the hardening, but\n65010b234 (2026-09-10, currently master-only) is the commit whose comment claims\nmalformed input is rejected, so the gap is most visible there.\n\n### Platform/Architecture\n\nOther. Please specify in Additional context section.\n\n### Transport layer\n\nUDPv4\n\n### Additional context\n\nLinux x86_64 (Ubuntu 22.04 container)\n\n### XML configuration file\n\n```xml\n\n```\n\n### Relevant log output\n\n```shell\n\n```\n\n### Network traffic capture\n\n_No response_",
+      "created_at": "2026-10-25T21:38:35Z",
+      "html_url": "https://github.com/eProsima/Fast-DDS/issues/6595",
+      "id": "eProsima/Fast-DDS#6595",
+      "issue_number": 6595,
+      "labels": [
+        "triage"
+      ],
+      "repository": "eProsima/Fast-DDS",
+      "surface_sha256": "818e0a5cb0a6923a345a8869488b635ca7b89a232c0457004d30d46afd43f6e2",
+      "title": "EDPStatic: out-of-range entity ID octets are silently truncated instead of rejected"
+    }
+  ],
+  "post_activation_issue_identities_observed": 318,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-25T21:43:03Z",
+  "schema_version": 1
+}
