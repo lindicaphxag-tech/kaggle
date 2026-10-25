@@ -1,0 +1,26 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "J0ySF",
+      "body": "<!-- If you're not sure whether your problem is a bug, please ask a question at\nhttps://robotics.stackexchange.com instead.-->\n\n## Environment\n* OS Version: Ubuntu 24.04 <!-- e.g, Ubuntu 24.04 -->\n* Source or binary build? Binary build, version 8.15.0\n  <!-- If binary, which version? -->\n  <!-- If source, which branch and what is the latest commit? -->\n\n## Description\n* Expected behavior: As per the documentation, calling Actor::WorldPose should return the combined actor and trajectory pose <!-- Tell us what you expected to happen -->\n* Actual behavior: The function returns the actor's pose without taking into account the trajectory pose <!-- What happened instead -->\n\n## Steps to reproduce\n<!-- Provide steps so we can try to reproduce this issue -->\n\n1. Create an actor with a scripted trajectory, I am using the example at https://gazebosim.org/docs/harmonic/actors/ \n2. Access the actor's world pose from a C++ system plugin using Actor::WorldPose\n3. The method returns the actor's base pose without taking into account trajectory",
+      "created_at": "2026-10-25T18:42:16Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4131",
+      "id": "gazebosim/gz-sim#4131",
+      "issue_number": 4131,
+      "labels": [
+        "bug"
+      ],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "e07ca593a412ed78b3c8f68326b89b06cc163ffd908769678ea949d08183eca5",
+      "title": "Actor::WorldPose always returns the actor's base pose when using an SDF scripted trajectory"
+    }
+  ],
+  "post_activation_issue_identities_observed": 317,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-25T18:58:24Z",
+  "schema_version": 1
+}
