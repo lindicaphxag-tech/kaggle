@@ -4705,6 +4705,17 @@
       "source": "inbox/FIRST_SEEN_20261025T111638Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "40a14d53c2c04e0e3057c91a91df698f4fa4717e51462286569fdd9357f4ed89"
+    },
+    {
+      "created_at": "2026-10-25T11:42:50Z",
+      "first_frozen_at": "2026-10-25T12:46:23Z",
+      "id": "eProsima/Fast-DDS#6594",
+      "issue_number": 6594,
+      "prediction_deadline_at": "2026-10-25T18:46:23Z",
+      "repository": "eProsima/Fast-DDS",
+      "source": "inbox/FIRST_SEEN_20261025T124623Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "1d0f3c5604ef97b7a0089e93c47823e137dda9e1fa3cac01646e58a8bc555f52"
     }
   ]
 }
