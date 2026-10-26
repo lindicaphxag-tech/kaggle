@@ -4755,13 +4755,17 @@
     },
     {
       "created_at": "2026-10-25T18:42:16Z",
+      "expiry_recorded_at": "2026-10-26T01:39:04Z",
+      "expiry_sha256": "2c3202e0bbe37b60d9375bd4946fecb6ac97579ea90469a87a392c7b7c39fe18",
+      "expiry_source": "expirations/gazebosim__gz-sim__4131.json",
       "first_frozen_at": "2026-10-25T18:58:24Z",
       "id": "gazebosim/gz-sim#4131",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 4131,
       "prediction_deadline_at": "2026-10-26T00:58:24Z",
       "repository": "gazebosim/gz-sim",
       "source": "inbox/FIRST_SEEN_20261025T185824Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "e07ca593a412ed78b3c8f68326b89b06cc163ffd908769678ea949d08183eca5"
     },
     {
