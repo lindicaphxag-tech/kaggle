@@ -4826,6 +4826,50 @@
       "source": "inbox/FIRST_SEEN_20261026T060407Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "ff439900a35b1b1e817c04b40eae7d9d8079fff182206705f532a72686e7d9ac"
+    },
+    {
+      "created_at": "2026-10-26T06:26:49Z",
+      "first_frozen_at": "2026-10-26T06:58:41Z",
+      "id": "gazebosim/gz-sensors#690",
+      "issue_number": 690,
+      "prediction_deadline_at": "2026-10-26T12:58:41Z",
+      "repository": "gazebosim/gz-sensors",
+      "source": "inbox/FIRST_SEEN_20261026T065841Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "e412d9be057b512ed1ea476be66d99ed01f5e1a131ec481f71cc3281979ba21c"
+    },
+    {
+      "created_at": "2026-10-26T06:26:39Z",
+      "first_frozen_at": "2026-10-26T06:58:41Z",
+      "id": "gazebosim/gz-transport#991",
+      "issue_number": 991,
+      "prediction_deadline_at": "2026-10-26T12:58:41Z",
+      "repository": "gazebosim/gz-transport",
+      "source": "inbox/FIRST_SEEN_20261026T065841Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "7bf0b1d15b223afbf1cfc3efc157f36d44741255c03e1a4630c841cc49a6d439"
+    },
+    {
+      "created_at": "2026-10-26T06:26:59Z",
+      "first_frozen_at": "2026-10-26T06:58:41Z",
+      "id": "gazebosim/gz-transport#992",
+      "issue_number": 992,
+      "prediction_deadline_at": "2026-10-26T12:58:41Z",
+      "repository": "gazebosim/gz-transport",
+      "source": "inbox/FIRST_SEEN_20261026T065841Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "c03e90cd3d7275ebc8fba293cca5c3cab51224d206ab0ffa138bf06494b130a6"
+    },
+    {
+      "created_at": "2026-10-26T06:09:26Z",
+      "first_frozen_at": "2026-10-26T06:58:41Z",
+      "id": "isaac-sim/IsaacSim#909",
+      "issue_number": 909,
+      "prediction_deadline_at": "2026-10-26T12:58:41Z",
+      "repository": "isaac-sim/IsaacSim",
+      "source": "inbox/FIRST_SEEN_20261026T065841Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "dbb42b853f9cb66082cc28340b121eaeb7957fd188eaa94917e88f626531cf76"
     }
   ]
 }
