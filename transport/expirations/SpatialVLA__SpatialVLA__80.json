@@ -1,0 +1,13 @@
+{
+  "case_id": "SpatialVLA/SpatialVLA#80",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-10-26T19:11:56Z",
+  "expiry_sha256": "85f71c2c3de7aaf10e117096cca3e404dd44e79cdc0b311d5bbf33ce703f82f9",
+  "first_frozen_at": "2026-10-26T12:50:59Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-10-26T18:50:59Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "795cbb570d80ad3cacb7fdf301a970b626d064eb3e1655e21f316bd4805e8c32"
+}
