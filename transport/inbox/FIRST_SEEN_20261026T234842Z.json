@@ -1,0 +1,53 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 3,
+  "new_candidates": [
+    {
+      "author_login": "bobpaw",
+      "body": "### What happened?\n\nrules_rust is emitting clang warnings on Tahoe:\n\nhttps://drake-jenkins.csail.mit.edu/job/mac-tahoe-clang-bazel-experimental-release/job/PR-25136/1/consoleFull\n\nAnd on Golden Gate:\n\nhttps://drake-jenkins.csail.mit.edu/job/mac-goldengate-clang-cmake-experimental-packaging/job/PR-25136/1/console\n\n### Version\n\n_No response_\n\n### What operating system are you using?\n\n_No response_\n\n### What installation option are you using?\n\n_No response_\n\n### Relevant log output\n\nTahoe:\n```shell\n[0:14:15.445]  INFO: From Compiling Rust (without process_wrapper) bin @@rules_rs++rules_rust+rules_rust//util/process_wrapper:process_wrapper (6 files) [for tool]:\n[0:14:15.445]  warning: linker stderr: clang: overriding '-mmacosx-version-min=11.0.0' option with '-target arm64-apple-macosx27.0' [-Woverriding-option]\n[0:14:15.445]    |\n[0:14:15.445]    = note: `#[warn(linker_messages)]` on by default\n[0:14:15.445]  \n[0:14:15.445]  warning: 1 warning emitted\n```\n\nGolden Gate:\n```shell\n[0:16:41.093]  INFO: From Compiling Rust bin @@rules_rs++rules_rust+rules_rust//cargo/private/cargo_build_script_runner:runner (1 file) [for tool]:\n[0:16:41.093]  warning: linker stderr: clang: overriding '-mmacosx-version-min=11.0.0' option with '-target arm64-apple-macosx27.0' [-Woverriding-option]\n[0:16:41.094]    |\n[0:16:41.094]    = note: `#[warn(linker_messages)]` on by default\n[0:16:41.094]  \n[0:16:41.094]  warning: 1 warning emitted\n```",
+      "created_at": "2026-10-26T20:17:56Z",
+      "html_url": "https://github.com/RobotLocomotion/drake/issues/25137",
+      "id": "RobotLocomotion/drake#25137",
+      "issue_number": 25137,
+      "labels": [
+        "type: bug",
+        "component: build system"
+      ],
+      "repository": "RobotLocomotion/drake",
+      "surface_sha256": "afc29e49ddbdf2a4ac0535afdd8fbd4ca6a3da459cfb7a63fad739292f290f88",
+      "title": "[build] rules_rust clang overriding option warning under Xcode 27"
+    },
+    {
+      "author_login": "davidhozic",
+      "body": "### The feature, motivation and pitch\n\nCurrently, most MuJoCo functions do one of the two:\n1. return a non-null pointer on success and a null pointer on failure, with the error written as a string into an error buffer;\n2.  return an `int` with 0 usually being success and -1 being a failure, with the error written as a string into an error buffer;\n3. ( a C++ exception gets raised and tries to unwind over C ABI. This is probably treated as a bug?).\n\nIn both of those cases, we can only detect an error occurred and print the error into the console, without an easy way to actually handle different cases (unless we parse the error string).\n\nI kindly request a consideration for changing the MuJoCo's API (C and all bindings) to instead return enumerated error types, possibly unions containing the `type` (being some enum) and `info` (containing a struct of structs; each struct belonging to some specific error `type` enum). These unions could be split across major MuJoCo modules, for example:  `MjModelError`, `MjDataError`, `MjBatchError`, etc.\n\nFor example:\n\n```c\ntypedef enum mjtBatchResult {         // type of batch result\n  mjBATCH_OK                    = 0,  // no errors\n  mjBATCH_ERR_NOT_PERSISTENT,         // sleep and IPC require a persistent batch\n  mjBATCH_ERR_FAILED_MODEL_COPY,      // could not copy the model\n  mjBATCH_ERR_OTHER                   // some other unknown error\n} mjtBatchResult;\n\ntypedef struct mjBatchResult_ {       // result of a batch function\n  int type;                           // mjtBatchResult\n\n  // type-specific information\n  union {\n    struct { int num_failed; } ok;               // mjBATCH_OK: number of failed simulations\n    struct { uint64_t signature; } failed_copy;  // mjBATCH_ERR_FAILED_MODEL_COPY: model signature\n    struct { char message[1000]; } other;        // mjBATCH_ERR_OTHER: error message\n  } info;\n} mjBatchResult;\n```\n\n```c\n// Examples of use\nmjBatchResult result = {\n  .type = mjBATCH_ERR_OTHER,\n  .info = {.other = {.message = \"some unknown error happened\"}}\n};\n\nswitch (result.type) {\ncase mjBATCH_ERR_OTHER:\n  {\n    const char* error_message = result.info.other.message;\n    printf(\"An unknown error occurred in batching API (mjBATCH_ERR_OTHER): %s\\n\", error_message);\n    // Some extra logic\n    break;\n  }\n\ndefault:\n  break;\n}\n```\n\n\n\n\n### Alternatives\n\nPersonally, I'd be happy if at least error enums were used (like `MjBatchErrorType` in the above example) instead of `int`/pointers, even if no further extra inner information is given.\n\n### Additional context\n\n_No response_",
+      "created_at": "2026-10-26T20:41:55Z",
+      "html_url": "https://github.com/google-deepmind/mujoco/issues/3734",
+      "id": "google-deepmind/mujoco#3734",
+      "issue_number": 3734,
+      "labels": [
+        "enhancement"
+      ],
+      "repository": "google-deepmind/mujoco",
+      "surface_sha256": "ba8980c97c1bdd89d2e6928b0cb04aa8d12c3eda7695b13a7b94f5ffff2633e9",
+      "title": "[API] Explicit enumerated (unionized) error types"
+    },
+    {
+      "author_login": "devteamaegis",
+      "body": "### Describe the bug\n\nConstructing a `@configclass` whose base class defines a read-only `@property` raises\n`AttributeError: property '<name>' of '<Child>' object has no setter`.\n\n`_custom_post_init` (source/isaaclab/isaaclab/utils/configclass.py) skips properties when it deep-copies\nmembers, but it looks the member up with `obj.__class__.__dict__.get(key)`, which only sees the instance's\nown class. An inherited property is therefore treated as a data member, deep-copied, and assigned back\nwith `setattr`, which fails for a property without a setter. (An inherited property with a setter has its\nsetter called on every construction instead.)\n\nThis affects shipped configs: the Newton `ContactSensorCfg` defines the read-only alias\n`sensor_body_prim_expr`, so any `@configclass` subclass of it cannot be constructed.\n\n### Steps to reproduce\n\n    from isaaclab.utils import configclass\n    from isaaclab_newton.sensors.contact_sensor.contact_sensor_cfg import ContactSensorCfg\n\n    @configclass\n    class FootContactSensorCfg(ContactSensorCfg):\n        history_length: int = 3\n\n    FootContactSensorCfg(prim_path=\"/World/envs/env_.*/Robot/foot\")\n    # AttributeError: property 'sensor_body_prim_expr' of 'FootContactSensorCfg' object has no setter\n\nMinimal version without Newton:\n\n    @configclass\n    class Parent:\n        a: int = 1\n\n        @property\n        def double(self) -> int:\n            return 2 * self.a\n\n    @configclass\n    class Child(Parent):\n        b: int = 2\n\n    Child()  # AttributeError: property 'double' of 'Child' object has no setter\n\n### System Info\n\n- Commit: dae8b7991 (main)\n- Isaac Sim Version: not needed (config construction only, reproduced without the simulator)\n- OS: macOS\n- GPU / CUDA / GPU Driver: not needed\n\n### Additional context\n\nLooking the member up through the MRO (`getattr(obj.__class__, key, None)`) fixes it without changing\nhow fields are copied. I have a one-line fix with a regression test ready and would be glad to open a PR\nreferencing this issue.\n\n### Checklist\n\n- [x] I have checked that there is no similar issue in the repo (**required**)\n- [x] I have checked that the issue is not in running Isaac Sim itself and is related to the repo\n\n### Acceptance Criteria\n\n- [ ] A configclass subclass of a config with a read-only property can be constructed\n- [ ] Inherited properties are not treated as fields during post-init copying\n",
+      "created_at": "2026-10-26T21:03:54Z",
+      "html_url": "https://github.com/isaac-sim/IsaacLab/issues/8836",
+      "id": "isaac-sim/IsaacLab#8836",
+      "issue_number": 8836,
+      "labels": [],
+      "repository": "isaac-sim/IsaacLab",
+      "surface_sha256": "33705cc5fb3106d1a985f5882201d1d50a74ce5ca161e2aa0b7a6ace4434fc2b",
+      "title": "[Bug Report] configclass subclass fails to construct when a base class defines a read-only property"
+    }
+  ],
+  "post_activation_issue_identities_observed": 349,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-26T23:48:42Z",
+  "schema_version": 1
+}
