@@ -1,0 +1,13 @@
+{
+  "case_id": "gazebosim/gz-transport#992",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-10-26T14:32:12Z",
+  "expiry_sha256": "45420f1bfc888513ff23c70afbfcfd570afe0b2f3523aa0a4a6753614f28bd9a",
+  "first_frozen_at": "2026-10-26T06:58:41Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-10-26T12:58:41Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "c03e90cd3d7275ebc8fba293cca5c3cab51224d206ab0ffa138bf06494b130a6"
+}
