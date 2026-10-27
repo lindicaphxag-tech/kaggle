@@ -1,0 +1,100 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 6,
+  "new_candidates": [
+    {
+      "author_login": "facontidavide",
+      "body": "## Environment\n* OS Version: Ubuntu 24.04 (Docker)\n* Source or binary build? Binary, `ros-jazzy-ros-gz-sim` 1.0.24 with Gazebo Harmonic. The code involved is the same on `jazzy` at 95e6fde (1.0.25), `kilted` and `lyrical`.\n\n## Description\n* Expected behavior: a process that hosts `GzSimulationInterfaces` exits cleanly on SIGINT.\n* Actual behavior: it intermittently segfaults at exit, in a CycloneDDS thread, after `main()` has returned.\n\n`gz_simulation_interfaces` on Jazzy has two bugs that #984 fixed on `ros2`. #984 is titled as a CI fix and wasn't backported, so I'm reporting them here with a backport PR.\n\n1. `HandlerBase` has no virtual destructor, and `GzSimulationInterfaces::Implementation` owns the handlers as `std::vector<std::unique_ptr<HandlerBase>>`. Deleting a derived handler through the base pointer is undefined behaviour, and in practice the derived destructors don't run: the services and the `simulate_steps` action server stay alive, and `~SimulateSteps()` never waits for its worker. They keep the node's rcl handle, so `rcl_node_fini` never runs and the DDS participant is still running when the static destructor of `librmw_implementation` unloads the RMW library at exit.\n2. `GazeboProxy::InitializeAllCanonicalLinks` runs on the `std::async` thread started by the `scene/info` subscription. It holds `state_sync_mutex_` only while it lists the canonical links, then calls `InitializeCanonicalLinks`, which runs `ecm_.CreateComponent()` and `ecm_.State()` without the lock. Meanwhile `UpdateStateFromMsg` writes the same ECM, under the lock, on a gz-transport thread.\n\n## Steps to reproduce\nWe see the crash in a full system test (a quadruped with sensors, about 60 ROS processes, a world reset at the start of each test) and not with a standalone server, so timing and DDS traffic matter.\n\n1. Run `gz::sim::Server` and `GzSimulationInterfaces` in one process, the way `GzServer` does, on a world with dynamic models.\n2. Reset the world and let it run for a few seconds while other ROS processes are up.\n3. Send SIGINT.\n\nWith the 1.0.24 library the server crashed at exit in 5 of 6 runs. With the backport in an overlay it exited cleanly in 4 of 4.\n\n## Output\nMain thread at the crash, from gdb. The segfault itself is in the CycloneDDS `tev` thread.\n\n```\nThread 8 \"tev\" received signal SIGSEGV, Segmentation fault.\n\nThread 1 (main):\n#5  dlclose () from libc.so.6\n#6  rcutils_unload_shared_library () from librcutils.so\n#7  rcpputils::SharedLibrary::~SharedLibrary() () from librcpputils.so\n#8  ?? () from librmw_implementation.so\n#9  __cxa_finalize () from libc.so.6\n```\n\nWith breakpoints on `rcl_node_init`, `rcl_node_fini` and `rclcpp::Node::~Node`: `~Node` runs for the server node and for the sub-node passed to `GzSimulationInterfaces`, and `rcl_node_fini` never follows for them. The other node in the process is finalized normally.\n",
+      "created_at": "2026-10-27T15:12:30Z",
+      "html_url": "https://github.com/gazebosim/ros_gz/issues/1006",
+      "id": "gazebosim/ros_gz#1006",
+      "issue_number": 1006,
+      "labels": [],
+      "repository": "gazebosim/ros_gz",
+      "surface_sha256": "22697b788d0ff864d9529db52670758defd3df05f091a073c71a54a14669b5a7",
+      "title": "Jazzy: simulation interfaces leak their handlers and write the ECM without its lock (fixed on ros2 by #984)"
+    },
+    {
+      "author_login": "facontidavide",
+      "body": "## Environment\n* OS Version: Ubuntu 24.04 (Docker), NVIDIA GPU\n* Source or binary build? Binary, `ros-jazzy-ros-gz-sim` 1.0.24 with Gazebo Harmonic. `ros_gz_sim/src/gzserver.cpp` is the same on `jazzy`, `kilted`, `lyrical` and `ros2`.\n\n## Description\n* Expected behavior: `gzserver` exits with code 0 on SIGINT.\n* Actual behavior: on worlds with rendering sensors it segfaults on SIGINT in almost every run. On other worlds it sometimes hangs.\n\n`GzServer` uninstalls rclcpp's signal handlers and runs `gz::sim::Server::Run(true)` on its own thread in `OnStart`. The server installs gz-common's SIGINT and SIGTERM handler, which calls `ServerPrivate::Stop()` from the thread that takes the signal, in practice the main thread spinning the executor. Once the server stops, `Run()` returns in `OnStart`, which destroys the server with `server.reset()` while the handler can still be running on the main thread. With rendering sensors the handler stays busy longer (the Sensors system's stop waits for its render thread), so the overlap happens almost every time.\n\n## Steps to reproduce\n```bash\nW=/opt/ros/jazzy/opt/gz_sim_vendor/share/gz/gz-sim8/worlds/sensors_demo.sdf\n$(ros2 pkg prefix ros_gz_sim)/lib/ros_gz_sim/gzserver --ros-args -p world_sdf_file:=$W &\nsleep 8; kill -INT $!; wait $!; echo \"exit $?\"\n```\n\nRuns with SIGINT 8 s after start:\n\n| `gzserver` | world | result |\n|---|---|---|\n| 1.0.24 binary | `sensors_demo.sdf` | 5 of 6 segfault (139), 1 hangs |\n| 1.0.24 binary | `shapes.sdf` | 4 of 6 exit 0, 2 hang |\n| 1.0.24 + #984 (#1007) | `sensors_demo.sdf` | 6 of 6 segfault |\n| 1.0.24 + #984 (#1007) | `shapes.sdf` | 6 of 6 exit 0 |\n| 1.0.24, `GzServer` loaded in `component_container` | `sensors_demo.sdf` | 3 of 4 segfault, 1 hangs |\n\nThe hangs on `shapes.sdf` go away with #984, the segfaults with sensors don't.\n\n## Output\nMain thread at the crash (1.0.24, gdb). The simulation runner's worker threads had already logged their exit:\n\n```\nThread 1 \"gzserver\" received signal SIGSEGV, Segmentation fault.\n#0  std::_Rb_tree_increment(std::_Rb_tree_node_base*) () from libstdc++.so.6\n#1  ?? () from libgz-sim8.so.8\n#2  ?? () from libgz-sim8.so.8\n#3  gz::common::SignalHandlerPrivate::OnSignal(int) () from libgz-common5.so.5\n#4  onSignal(int) () from libgz-common5.so.5\n#5  <signal handler called>\n...\n#16 rclcpp::executors::SingleThreadedExecutor::spin() () from librclcpp.so\n#17 main ()\n```\n",
+      "created_at": "2026-10-27T15:40:17Z",
+      "html_url": "https://github.com/gazebosim/ros_gz/issues/1011",
+      "id": "gazebosim/ros_gz#1011",
+      "issue_number": 1011,
+      "labels": [],
+      "repository": "gazebosim/ros_gz",
+      "surface_sha256": "182c481fbe5efccbb557733c377e0932f88a3fc7180ec9ac75141cf1130ef2f2",
+      "title": "gzserver segfaults or hangs on SIGINT: gz-common's signal handler stops the server while OnStart destroys it"
+    },
+    {
+      "author_login": "yathAg",
+      "body": "### Summary\n\nThe Fast-WAM docs (`docs/source/fastwam.mdx`, `docs/source/policy_fastwam_README.md`) point to `ZibinDong/fastwam_libero_uncond_2cam224`. The current revision of that repo (`a784645f`, 2026-06-10) ships a preprocessor that normalizes images with `VISUAL: MEAN_STD` and mean = std = 0.5, which maps pixels from [0, 1] to [-1, 1]. `FastWAM` then applies the same mapping again (`src/lerobot/policies/fastwam/wan/modular.py`, `_encode_video_latents` and `_encode_input_image_latents_tensor`: `x * 2.0 - 1.0`, with the comment \"VISUAL is IDENTITY in the preprocessor\"). As a result, the Wan VAE receives pixels in [-3, 1], and the policy fails on LIBERO.\n\nThe mirror `lerobot/fastwam_libero_uncond_2cam224` is configured correctly (`VISUAL: IDENTITY`, and no image stats in the normalizer). So is the earlier revision `1109a00764` of the ZibinDong repo, whose normalizer has no image stats.\n\n### Reproduce\n\nThe reproduce command from the docs (`lerobot-eval --policy.path=ZibinDong/fastwam_libero_uncond_2cam224 ... --env.type=libero --env.task=libero_spatial`) gave 0/2 successes on a smoke run with lerobot `dd5313e` (bf16).\n\n```python\n# what the checkpoint ships today\npolicy_preprocessor.json  -> normalizer_processor.norm_map = {\"VISUAL\": \"MEAN_STD\", \"STATE\": \"MIN_MAX\", \"ACTION\": \"MIN_MAX\"}\npolicy_preprocessor_step_3_normalizer_processor.safetensors -> observation.images.image{,2}.{mean,std} = 0.5\nconfig.json               -> normalization_mapping.VISUAL = \"MEAN_STD\"\n```\n\n### Evidence\n\n- **Open-loop test.** We ran 128 frames from `HuggingFaceVLA/libero` and compared the first 10 predicted actions with the demonstration.\n  - Stock preprocessor: arm-dimension MAE 0.105, which is worse than predicting zeros (0.093).\n  - Normalizer overridden to `VISUAL: IDENTITY`, all else unchanged: MAE 0.0168, with per-dimension correlation 0.94\u20130.996.\n- **Closed loop with the override.** Fast-WAM reached 95.05 % over 2,000 episodes in fp32, 50 per task (spatial 92.0, object 99.0, goal 95.4, libero_10 93.8). This was in our own harness: lerobot v0.6.1 policy code, per-episode noise instead of the fixed `inference_seed`, and the docs' episode lengths. That is close to the 96.4 % in the docs.\n\n### Suggested fix\n\nPoint the docs and the reproduce command at `lerobot/fastwam_libero_uncond_2cam224`. Optionally, add a guard in `FastWAMPolicy` that warns or raises when the loaded normalizer maps `VISUAL` to anything other than `IDENTITY`, since the model rescales images itself.\n\nThe same ZibinDong revision also has `tokenizer_model_id: \".\"`, which resolves against the working directory. The lerobot mirror already fixes this (`google/umt5-xxl`).\n\nI have also reported this to the checkpoint author on the Hub.\n",
+      "created_at": "2026-10-27T13:08:05Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5116",
+      "id": "huggingface/lerobot#5116",
+      "issue_number": 5116,
+      "labels": [
+        "documentation",
+        "policies",
+        "tests",
+        "performance",
+        "processor",
+        "evaluation"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "da0ac9129fa7d17b51987e595fd9c46f959460bf58f6c17aee2d8fc34d2c0634",
+      "title": "FastWAM: docs checkpoint ZibinDong/fastwam_libero_uncond_2cam224 (rev a784645f) normalizes images twice -> fails on LIBERO"
+    },
+    {
+      "author_login": "chaoshengsc",
+      "body": "### Ticket Type\n\n\ud83d\udc1b Bug Report (Something isn't working)\n\n### Environment & System Info\n\n```Shell\nlerobot 0.6.1, Ubuntu 24.04, Python 3.12, RTX A5000\nChecked in src/lerobot/policies/{pi0,pi05,smolvla}\n```\n\n### Description\n\nWhen one camera is missing from the batch, PI0, PI05 and SmolVLA move the remaining cameras into the wrong image slots. The model then reads one camera's image in another camera's slot, and nothing warns about it.\n\nThe image preprocessing first appends the cameras present in the batch, in `config.image_features` order, and then appends one blank image (all -1, mask 0) for each missing camera:\n\n- `pi0/modeling_pi0.py`: lines 995\u2013996 split present and missing keys, line 1004 loops over present keys, line 1040 appends the blanks\n- `pi05/modeling_pi05.py`: lines 964\u2013965, 974, 1010\n- `smolvla/modeling_smolvla.py`: lines 340\u2013341, 348, 373\n\nThis is only correct when the missing camera is last in `image_features`. For example, with `lerobot/pi05_libero_finetuned_v044` the features are `[observation.images.image, observation.images.image2, observation.images.empty_camera_0]` (agent view, wrist view, empty slot). If `observation.images.image` is absent, the wrist image goes into slot 0, the agent-view slot, and the blank goes into slot 1.\n\nThis matters whenever a camera is left out on purpose or by accident: camera ablations, sensor dropout, or a real-robot stream that stops sending one camera.\n\n### Context & Reproduction\n\nWe hit this while ablating cameras in LIBERO-Spatial evaluation with `lerobot-eval`. We logged `(min, max)` per slot after `_preprocess_images` for `pi05_libero_finetuned_v044`:\n\n- Batch without `observation.images.image`: slot 0 = `(-1.0, 0.88)` (this is the wrist image), slot 1 = `(-1.0, -1.0)` (blank), masks `[True, False, False]`.\n- Expected: slot 0 blank with mask False, slot 1 wrist image with mask True.\n\nMinimal check without running a simulator:\n\n```python\nfrom lerobot.policies.pi05.modeling_pi05 import PI05Policy\nimport torch\np = PI05Policy.from_pretrained(\"lerobot/pi05_libero_finetuned_v044\").eval()\nwrist = torch.rand(1, 3, 224, 224)\nimages, masks = p._preprocess_images({\"observation.images.image2\": wrist})\nprint([(round(float(i.min()), 2), round(float(i.max()), 2)) for i in images], [bool(m[0]) for m in masks])\n# Output on lerobot 0.6.1 (CPU):\n# [(-1.0, 1.0), (-1.0, -1.0), (-1.0, -1.0)] [True, False, False]\n# Slot 0 (agent view) holds the wrist image; slot 1 (wrist) is the blank.\n```\n\n### Expected behavior / Suggested fix\n\nIterate over `config.image_features` in order and build each slot in place: the real image if the key is present, a blank (-1, mask 0) if it is missing. This keeps every camera in its own slot. The current output is unchanged when only trailing cameras are missing, which covers the existing `empty_cameras` use.\n\n",
+      "created_at": "2026-10-27T14:37:56Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5118",
+      "id": "huggingface/lerobot#5118",
+      "issue_number": 5118,
+      "labels": [
+        "bug",
+        "policies",
+        "configuration",
+        "sensors",
+        "examples",
+        "evaluation"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "68d4f78160e2e8b66240137571f596f69e8cac791278500850ffbcc6b6f15f69",
+      "title": "PI0 / PI05 / SmolVLA put remaining cameras in the wrong slots when one camera is missing"
+    },
+    {
+      "author_login": "pvonwirth",
+      "body": "**Describe the bug**\nOn shutdown, ControllerManager::shutdown_controllers() (pre-shutdown callback) deactivates controllers and calls release_interfaces(), while the RT loop in ros2_control_node keeps calling update(). A controller's update() can therefore run while its interfaces are being released.\n\n**To Reproduce**\n1. Activate a controller with this update() on mock_components/GenericSystem:\ncontroller_interface::return_type update(const rclcpp::Time &, const rclcpp::Duration &) override\n{\n  if (command_interfaces_.size() != n_joints_) {\n    RCLCPP_ERROR(get_node()->get_logger(), \"update() called with released interfaces\");\n  }\n  return controller_interface::return_type::OK;\n}\n2. Stop ros2_control_node with Ctrl+C.\n3. See the error logged after \"Shutting down all controllers in the controller manager.\"\n\n**Expected behavior**\nupdate() is never called during or after release_interfaces().\n\n**Screenshots**\nn/a\n\n**Environment**\nOS: Ubuntu 24.04\nVersion: Jazzy (controller_manager 4.45.2); same code on master\n\n**Additional context**\nNo modifications to ros2_control.",
+      "created_at": "2026-10-27T12:53:51Z",
+      "html_url": "https://github.com/ros-controls/ros2_control/issues/3716",
+      "id": "ros-controls/ros2_control#3716",
+      "issue_number": 3716,
+      "labels": [
+        "bug"
+      ],
+      "repository": "ros-controls/ros2_control",
+      "surface_sha256": "52542ef23111d7e1974b4bf325e5dcb7b3e3875549fba44190a0f2d9024374e6",
+      "title": "Controller update() called while its interfaces are being released on shutdown"
+    },
+    {
+      "author_login": "nirwester",
+      "body": "## Feature request\n\nFollowing #5036 and #4842, add variants of ReactiveFallback and ReactiveSequence that preserve condition state while the control node is active and continue to reevaluate conditions on each tick.\n\nFor example, this tree should follow a path until the robot has moved 2 m:\n\n<ReactiveFallback>\n  <DistanceTraveled distance=\"2.0\"/>\n  <FollowPath path=\"{path}\"/>\n</ReactiveFallback>\n\nCurrently, whenever FollowPath returns RUNNING, ReactiveFallback resets DistanceTraveled to IDLE. On the next tick, the condition records a new starting pose and returns FAILURE, so it never detects the displacement. The equivalent sequence pattern\u2014an inverted DistanceTraveled followed by FollowPath\u2014has the same problem.\n\nExisting conditions affected by this behavior include:\n\nDistanceTraveled: loses its reference pose.\nTimeExpired: restarts its timer.\nGoalUpdated: replaces its previous goal before checking for changes.\n\nThese conditions retain history even though they return only SUCCESS or FAILURE. Preserving that history would let them monitor a running sibling reactively.\n\nThe new controls should reevaluate conditions on each tick and halt a running action when a condition changes the selected branch. Condition state should reset when the enclosing control completes or is halted, so a later activation starts with a fresh baseline.\n",
+      "created_at": "2026-10-27T15:48:40Z",
+      "html_url": "https://github.com/ros-navigation/navigation2/issues/6697",
+      "id": "ros-navigation/navigation2#6697",
+      "issue_number": 6697,
+      "labels": [],
+      "repository": "ros-navigation/navigation2",
+      "surface_sha256": "eb328524f5a64785dcc42ca2ba1b02de7ef0621d0fb1b8cf4b0e37cbb428adab",
+      "title": "Add stateful reactive control nodes to support stateful conditions"
+    }
+  ],
+  "post_activation_issue_identities_observed": 363,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-27T16:30:01Z",
+  "schema_version": 1
+}
