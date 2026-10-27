@@ -5246,6 +5246,17 @@
       "source": "inbox/FIRST_SEEN_20261027T045437Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "48ff14257975470ae978b43aca9ad9c7b0f3dbb3069fa21e113f6da79a943ac6"
+    },
+    {
+      "created_at": "2026-10-27T05:26:04Z",
+      "first_frozen_at": "2026-10-27T05:33:50Z",
+      "id": "ros-navigation/navigation2#6694",
+      "issue_number": 6694,
+      "prediction_deadline_at": "2026-10-27T11:33:50Z",
+      "repository": "ros-navigation/navigation2",
+      "source": "inbox/FIRST_SEEN_20261027T053350Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "154593a2635c8035944491b124a082c8f62d90df80a4a3762ca12291173c57b8"
     }
   ]
 }

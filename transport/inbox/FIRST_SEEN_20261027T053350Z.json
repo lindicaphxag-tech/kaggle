@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "Nisarg236",
+      "body": "<!--\nFor general questions, please ask on Robotics Stack Exchange: https://robotics.stackexchange.com/, make sure to include at least the `ros2` and `nav2` tags and the rosdistro version you are running, e.g. `ardent`.\nFor general design discussions, please post on discourse: https://discourse.ros.org/c/ng-ros\nNot sure if this is the right repository? Open an issue on https://github.com/ros-navigation/navigation2\nFor Bug report or feature requests, please fill out the relevant category below\n-->\n\n## Bug report\n\nGoalDist, GoalAlign, PathDist and PathAlign measured distance straight through lethal and inscribed cells. This makes the best scoring trajectory the one going through obstacles when the obstacle is between robot and goal and the robot got stuck against it.\n\nThis is because the [propogateManhatanDistances()](https://github.com/ros-navigation/navigation2/blob/94bace6f7bcf60ecfc17cd3a97155657c3c249aa/nav2_dwb_controller/dwb_critics/src/map_grid.cpp#L103) used MapGridCritic's [validCellToQueue](https://github.com/ros-navigation/navigation2/blob/94bace6f7bcf60ecfc17cd3a97155657c3c249aa/nav2_dwb_controller/dwb_critics/src/map_grid.cpp#L52) which always returns true.\n\nI took the after video with a fix which runs bfs which skips adding neighbors which are lethal, inscribed or no information ().\nThis was just a quick fix I came up with claude to validate the root cause. but seems like behaviour improves a lot after this change.\n\nexample fix: https://github.com/Nisarg236/navigation2/pull/1\n\n\nBefore: robot was getting stuck in this case where goal is on other side of obstacle\n\n\n[stuck_robot.webm](https://github.com/user-attachments/assets/82f321a4-cfa8-4424-9d1e-00c0dbb01bfc)\n\n\n\nAfter: robot is not getting stuck\n\n\n[not_stuck.webm](https://github.com/user-attachments/assets/c33fb9ff-faa9-4e0a-822d-c088b1bf5704)\n\n\n\n**Required Info:**\n\n- Operating System:\n  - <!-- OS and version (e.g. Windows 10, Ubuntu 16.04...) -->\n- Computer:\n  - <!-- Nvidia Jetson Orin, 13th Gen Intel NUC, Ryzen 9 7940-HS -->\n- ROS2 Version:\n  - <!-- ROS2 distribution and install method (e.g. Foxy binaries, Dashing source...) -->\n- Version or commit hash:\n  - <!-- from source: output of `git -C navigation2 rev-parse HEAD\n         apt binaries: output of: dpkg-query --show \"ros-$ROS_DISTRO-navigation2\"\n                              or: dpkg-query --show \"ros-$ROS_DISTRO-nav2-*\" -->\n- DDS implementation:\n  - <!-- rmw_implementation used (e.g. Fast-RTPS, RTI Connext, etc.) -->\n\n#### Steps to reproduce issue\n<!-- Detailed instructions on how to reliably reproduce this issue http://sscce.org/\n``` code that can be copy-pasted is preferred ``` -->\n```\n\n```\n\n#### Expected behavior\n\n#### Actual behavior\n\n#### Reproduction instructions\n\n#### Additional information\n",
+      "created_at": "2026-10-27T05:26:04Z",
+      "html_url": "https://github.com/ros-navigation/navigation2/issues/6694",
+      "id": "ros-navigation/navigation2#6694",
+      "issue_number": 6694,
+      "labels": [],
+      "repository": "ros-navigation/navigation2",
+      "surface_sha256": "154593a2635c8035944491b124a082c8f62d90df80a4a3762ca12291173c57b8",
+      "title": "DWB, robot is getting stuck because of how goal distance critic calculates distance"
+    }
+  ],
+  "post_activation_issue_identities_observed": 351,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-27T05:33:50Z",
+  "schema_version": 1
+}
