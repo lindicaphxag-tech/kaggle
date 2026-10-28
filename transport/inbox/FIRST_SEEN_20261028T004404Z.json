@@ -1,0 +1,39 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "sherm1",
+      "body": "Frame names in `<drake:parent>`, `<drake:child>`, `<drake:bushing_frameA>`, and `<drake:bushing_frameC>` are looked up among the plant's frames, not among the names the SDFormat source declares. So they also resolve to frames that Drake generates for joints, such as `foo_parent` and `foo_child` for a joint `foo`, including joints in included URDF and MJCF models. Those names are undocumented, and whether one exists depends on the joint's pose. A file can come to depend on one without anyone noticing, and then break when a joint's `<pose>` becomes the identity.\n\nRaised in the review of #25132 ([discussion](https://reviewable.io/reviews/robotlocomotion/drake/25132#-P4yg6OZ-_nKWEeWR6GK)). The lookup predates that PR: master at 0b3db8d7c5 uses the same `HasFrameNamed()` / `GetFrameByName()` lookup.\n\nObserved at 2166a5919b (#25132 r2), Linux, opt build.\n\n**Repro.** This model has an SDFormat joint `foo` and a non-merged include `u` of `multibody/parsing/test/sdf_parser_test/imported_joint_frames.urdf`, which has a fixed joint `bar` from `R` to `B` with `<origin xyz=\"1 0 0\"/>`:\n\n```xml\n<model name='m'>\n  <include merge='false'><uri>imported_joint_frames.urdf</uri><name>u</name></include>\n  <link name='A'/>\n  <link name='B'/>\n  <link name='D'/>\n  <joint name='foo' type='revolute'>\n    <pose>0.1 0.2 0.3 0 0 0.5</pose>\n    <parent>A</parent>\n    <child>B</child>\n    <axis><xyz>0 0 1</xyz></axis>\n  </joint>\n  <drake:joint name='j' type='planar'>\n    <drake:parent>NAME</drake:parent>\n    <drake:child>D</drake:child>\n    <drake:damping>0 0 0</drake:damping>\n  </drake:joint>\n</model>\n```\n\n**Output**, for each `NAME`, with `foo`'s `<pose>` as above and with an identity pose:\n\n| `NAME` | `<pose>0.1 0.2 0.3 0 0 0.5</pose>` | identity `<pose>` |\n|---|---|---|\n| `foo_parent` | accepted: Drake's frame on `A` at p = [0.1 0.2 0.3] | error: \"Frame 'foo_parent' specified for \\<drake:parent\\> does not exist in the model.\" |\n| `foo_child` | accepted: Drake's frame on `B` at p = [0.1 0.2 0.3] | accepted: Drake's frame on `B` at p = [0 0 0] |\n| `u::bar_parent` | accepted: Drake's frame for URDF joint `bar`, on `R` at p = [1 0 0] | same |\n| `nope` | error: \"Frame 'nope' specified for \\<drake:parent\\> does not exist in the model.\" | same |\n\n**Expected:** only names that the source declares resolve: `world` (in the tags that accept it), and the links, frames, and models in scope, including the links and frames of included URDF and MJCF models (e.g. `u::B`, `u::Fc`). Any other name is an error, whatever the joint's pose.\n\n**Possible fix** (suggested in the review): before looking a name up in the plant, check it with `sdf::Model::FrameNameExists()`, `LinkNameExists()`, and `ModelNameExists()`, plus the links and frames of the included interface models.\n\n**Compatibility.** Files may already depend on these names; #24729 describes a model that relied on a generated `foo_parent` frame. So rejecting them may need a deprecation period. The alternative is to document them, which would first need these frames to exist regardless of pose, as #24729 proposes.\n",
+      "created_at": "2026-10-27T23:33:13Z",
+      "html_url": "https://github.com/RobotLocomotion/drake/issues/25145",
+      "id": "RobotLocomotion/drake#25145",
+      "issue_number": 25145,
+      "labels": [
+        "type: bug",
+        "component: multibody parsing"
+      ],
+      "repository": "RobotLocomotion/drake",
+      "surface_sha256": "9e0aa5bbb1598ae9d9808476ba426cfb82d25d73f12d180a20da438e118e5d60",
+      "title": "[parsing] SDFormat drake: tags resolve Drake-generated joint frame names"
+    },
+    {
+      "author_login": "facontidavide",
+      "body": "## Desired behavior\n`PhysicsPrivate::CreateWorldEntities` in `src/systems/physics/Physics.cc` builds an `sdf::World` for `Engine::ConstructWorld` with the name and the gravity of the world only. The `<physics>` element of the world is not part of it, although the Physics system already uses it for its own options (collision detector, solver, max contacts).\n\nA physics engine plugin that is not shipped with gz-physics cannot read its own settings from the SDF. We have a MuJoCo engine plugin for gz-physics that reads `<physics><gz:mujoco>...</gz:mujoco></physics>`, and it cannot get them through `ConstructWorld`.\n\nThe Physics system should put the `<physics>` profile of the world entity into the `sdf::World` it passes to `ConstructWorld`, so `sdf::World::PhysicsByIndex(0)->Element()` has the settings, including custom elements.\n\n## Alternatives considered\n* A parameter on `<plugin name=\"gz::sim::systems::Physics\">` that the Physics system forwards to the engine: needs a new interface, while `sdf::World` already has a place for the physics profile.\n* Reading the SDF file from the engine plugin: the engine does not know the file, and worlds can be generated or changed at runtime.\n\n## Implementation suggestion\nAfter `world.SetGravity(...)`:\n\n```cpp\nauto worldPhysics = _ecm.Component<components::Physics>(_entity);\nif (worldPhysics)\n{\n  world.ClearPhysics();\n  world.AddPhysics(worldPhysics->Data());\n}\n```\n\n`SdfEntityCreator` creates `components::Physics` for every world (the default profile if the SDF has none), so an engine always gets one profile. Engines that ignore it are not affected.\n\n## Additional context\nChecked `main` (11.0.0-pre3): `ConstructWorld(world)` is still called with name and gravity only. I found no existing issue or PR for this.\n",
+      "created_at": "2026-10-27T21:46:07Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4143",
+      "id": "gazebosim/gz-sim#4143",
+      "issue_number": 4143,
+      "labels": [],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "7167984d861ec7d2163a019c22b6d7a699555381c401428c28946de48f7b113c",
+      "title": "Physics system: pass the world's <physics> element to the physics engine plugin"
+    }
+  ],
+  "post_activation_issue_identities_observed": 369,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-28T00:44:04Z",
+  "schema_version": 1
+}
