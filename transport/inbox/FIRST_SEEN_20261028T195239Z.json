@@ -1,0 +1,41 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "YannBerthelot",
+      "body": "### Intro\n\nHi!\n\nI just finished my PhD at Inria Scool (France), I use MuJoCo for my research on Reinforcement Learning.\n\n\n### My setup\n\nmujoco 3.17.0, mujoco-mjx 3.17.0 (Python API), warp-lang 1.12.1, jax 0.11.2, Python 3.12.8, macOS 15.7.4 on Apple M4 Pro (arm64), CPU only.\n\n### What's happening? What did you expect?\n\n`import mujoco.mjx` raises a `TypeError`, instead of falling back to the JAX backend, when the installed warp-lang is older than the bundled mujoco_warp needs. I expected the import to succeed and MJX to use the JAX backend, as it does when warp-lang is not installed.\n\nWhere (main):\n- [mjx/warp/__init__.py#L36-L42](https://github.com/google-deepmind/mujoco/blob/a6289c13780bfb876d496bf76ba9ac6a91b50760/mjx/mujoco/mjx/warp/__init__.py#L36-L42) always tries to import the bundled mujoco_warp, and catches only `ImportError` and `RuntimeError`:\n\n```python\n  try:\n    from mujoco.mjx.third_party import mujoco_warp\n    from mujoco.mjx.third_party.mujoco_warp._src import types as mjwp_types\n    from mujoco.mjx.third_party.mujoco_warp._src import io as mjwp_io\n  except (ImportError, RuntimeError) as e:\n    print('Failed to import mujoco_warp:', e)\n    pass\n```\n\n- [mujoco_warp/_src/solver.py#L1700](https://github.com/google-deepmind/mujoco/blob/a6289c13780bfb876d496bf76ba9ac6a91b50760/mjx/mujoco/mjx/third_party/mujoco_warp/_src/solver.py#L1700) uses `@wp.kernel(grid_stride=True)`, which warp-lang 1.12.1 rejects with a `TypeError` at import time.\n\nThe `warp` extra pins `warp-lang==1.18.0` ([mjx/pyproject.toml#L38-L41](https://github.com/google-deepmind/mujoco/blob/a6289c13780bfb876d496bf76ba9ac6a91b50760/mjx/pyproject.toml#L38-L41)), but nothing stops another package from bringing an older one. For example, MuJoCo Playground 0.2.0 declares `mujoco-mjx>=3.6.0` and `warp-lang>=1.11`, so a resolver can pick exactly this pair. Then `import mujoco.mjx` fails, even for users who only need the JAX backend. The docs' `pip install mujoco-mjx[warp]` avoids this; here the older warp-lang comes from another package. Related, but the other way round: #2894 (a warp-lang too new for `impl='warp'`).\n\nA possible fix is to catch any exception from the bundled import:\n\n```diff\n     from mujoco.mjx.third_party.mujoco_warp._src import io as mjwp_io\n-  except (ImportError, RuntimeError) as e:\n+  except Exception as e:  # pylint: disable=broad-exception-caught\n+    # e.g. TypeError when warp-lang is older than the bundled mujoco_warp needs.\n     print('Failed to import mujoco_warp:', e)\n```\n\nWith this change applied to a local copy of 3.17.0, the import succeeds with warp-lang 1.12.1, prints the message, and `mjx.step` runs on the JAX backend. Naming the required warp-lang version in the message could also help. I'm happy to send a PR.\n\n### Steps for reproduction\n\n1. Install mujoco-mjx 3.17.0 together with warp-lang 1.12.1 (and jax).\n2. Run the code below.\n3. The import fails:\n\n```\n  File \".../mujoco/mjx/warp/__init__.py\", line 37, in <module>\n    from mujoco.mjx.third_party import mujoco_warp\n  ...\n  File \".../mujoco/mjx/third_party/mujoco_warp/_src/solver.py\", line 1677, in <module>\n    @wp.kernel(grid_stride=True)\n     ^^^^^^^^^^^^^^^^^^^^^^^^^^^\nTypeError: kernel() got an unexpected keyword argument 'grid_stride'\n```\n\nWithout warp-lang installed, the same import prints the two \"Failed to import\" messages and succeeds.\n\n### Minimal model for reproduction\n\nNot needed: the error happens at `import mujoco.mjx`, before any model is loaded.\n\n### Code required for reproduction\n\n```python\nimport importlib.metadata as md\n\nfor dist in (\"mujoco\", \"mujoco-mjx\", \"warp-lang\", \"jax\"):\n    try:\n        print(dist, md.version(dist))\n    except md.PackageNotFoundError:\n        print(dist, \"not installed\")\n\nimport mujoco.mjx  # noqa: E402,F401\n\nprint(\"import mujoco.mjx: ok\")\n```\n\n### Confirmations\n\n- [x] I searched the [latest documentation](https://mujoco.readthedocs.io/en/latest/overview.html) thoroughly before posting.\n- [x] I searched previous [Issues](https://github.com/google-deepmind/mujoco/issues) and [Discussions](https://github.com/google-deepmind/mujoco/discussions), I am certain this has not been raised before.",
+      "created_at": "2026-10-28T16:34:46Z",
+      "html_url": "https://github.com/google-deepmind/mujoco/issues/3738",
+      "id": "google-deepmind/mujoco#3738",
+      "issue_number": 3738,
+      "labels": [
+        "bug"
+      ],
+      "repository": "google-deepmind/mujoco",
+      "surface_sha256": "25506ca8b4e4d2c4dd4e4a758b017f520615bf3ed06d81c3072282b9d8b7263c",
+      "title": "`import mujoco.mjx` fails with TypeError when warp-lang is too old"
+    },
+    {
+      "author_login": "roncapat",
+      "body": "Because of this code:\nhttps://github.com/ros-controls/ros2_control/blob/45e248614f64d6d8ed1ed35763d2329357be981a/controller_manager/controller_manager/controller_manager_services.py#L357-L362\n\nonly YAML files built in one of the following form works:\n```YAML\ncontroller:\n  ros__args:\n     dummy: 0\n\n/ns/controller:\n  ros__args:\n     dummy: 0\n\n/**/controller:\n  ros__args:\n     dummy: 0\n\n/**/ns/controller:\n  ros__args:\n     dummy: 0\n```\n\nbut if you have perfeclty valid:\n```yaml\n/ns:\n  controller:\n     ros__args:\n        dummy: 0\n\nns:\n  controller:\n    ros__args:\n      dummy: 0\n```\n\nthe YAML file gets discarded.",
+      "created_at": "2026-10-28T16:20:28Z",
+      "html_url": "https://github.com/ros-controls/ros2_control/issues/3718",
+      "id": "ros-controls/ros2_control#3718",
+      "issue_number": 3718,
+      "labels": [
+        "bug",
+        "persistent"
+      ],
+      "repository": "ros-controls/ros2_control",
+      "surface_sha256": "fb79c452416b7e8d74a4021c94f0fc65a705a3e07769e2a5286424b463b5f58c",
+      "title": "`ros2 control load_controller` discards valid YAML files"
+    }
+  ],
+  "post_activation_issue_identities_observed": 385,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-28T19:52:39Z",
+  "schema_version": 1
+}
