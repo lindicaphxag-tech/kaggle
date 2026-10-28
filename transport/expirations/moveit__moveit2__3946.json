@@ -1,0 +1,13 @@
+{
+  "case_id": "moveit/moveit2#3946",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-10-28T20:58:45Z",
+  "expiry_sha256": "41fe70a6f2046f66526071b7652df3289c898e0b594e1cce8399d753685b696f",
+  "first_frozen_at": "2026-10-28T14:29:10Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-10-28T20:29:10Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "dc5e18cc68bfbe85caa177f32690dc7dcae897614a643d25bf11f69e0bd0a07e"
+}

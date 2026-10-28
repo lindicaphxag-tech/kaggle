@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "facontidavide",
+      "body": "## Environment\n* OS Version: Ubuntu 24.04\n* Source or binary build? Source. `gz-sim8` (8.15.0 plus later commits) and `main` (3c9c865c). The code is the same in both.\n\n## Description\n* Expected behavior: A model that starts at rest publishes a twist of zero from the first odometry message on, wherever it is placed.\n* Actual behavior: The first messages carry a large twist when the model does not start at the origin. The error is the distance to the origin divided by the time step.\n\nIn a test world with a model at rest at `3 -2 1` with a yaw of 0.7 rad, a 1 ms step and `<odom_publish_frequency>1000</odom_publish_frequency>`, the first messages have:\n\n```\nmessage  linear x   linear y   angular z\n0        1006.1    -3462.3     700.0\n1         503.0    -1731.2     350.0\n2         335.4    -1154.1     233.3\n3         251.5     -865.6     175.0\n```\n\nThe values are the first sample divided by 1, 2, 3, 4, because the rolling mean has only the samples it has seen so far. On a legged robot model that starts away from the origin we saw a first linear velocity of `(1600, -2080, 640)` m/s.\n\n## Cause\n`OdometryPublisherPrivate::UpdateOdometry` runs a first call that only sets `lastUpdateTime` and returns. `lastUpdatePose` keeps its default value (identity at the origin). The next call computes the displacement as `pose - lastUpdatePose`, which is the whole pose of the model, and divides it by one time step. A yaw other than zero gives the same error in the angular velocity.\n\n## Steps to reproduce\n1. Load a world with a model at a pose away from the origin, for example `<pose>3 -2 1 0 0 0.7</pose>`, that nothing moves, and an `OdometryPublisher` on it with `<odom_publish_frequency>1000</odom_publish_frequency>`. A message has to go out within the first 10 updates. With a lower rate and a 1 ms step, the rolling mean (10 samples) has dropped the first sample before the first message.\n2. `gz topic -e -t /model/<name>/odometry`\n3. Look at the `twist` of the first messages.\n\nA fix and a test are in a pull request that follows.\n\nGenerated with [Claude Code](https://claude.com/claude-code)\n\nhttps://claude.ai/code/session_01CXABnmhZ8i4TpKjsaPugjd\n",
+      "created_at": "2026-10-28T20:29:52Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4145",
+      "id": "gazebosim/gz-sim#4145",
+      "issue_number": 4145,
+      "labels": [],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "fec03829604cfd0d8b8d95d5a4cfbd4d0ea9c8c52c532a9cde044d002897f3cc",
+      "title": "OdometryPublisher: the first twist is large when the model does not start at the origin"
+    }
+  ],
+  "post_activation_issue_identities_observed": 386,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-28T21:00:15Z",
+  "schema_version": 1
+}
