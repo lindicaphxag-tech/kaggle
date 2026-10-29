@@ -5790,6 +5790,39 @@
       "source": "inbox/FIRST_SEEN_20261028T210015Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "fec03829604cfd0d8b8d95d5a4cfbd4d0ea9c8c52c532a9cde044d002897f3cc"
+    },
+    {
+      "created_at": "2026-10-28T21:14:28Z",
+      "first_frozen_at": "2026-10-29T00:23:04Z",
+      "id": "RobotLocomotion/drake#25148",
+      "issue_number": 25148,
+      "prediction_deadline_at": "2026-10-29T06:23:04Z",
+      "repository": "RobotLocomotion/drake",
+      "source": "inbox/FIRST_SEEN_20261029T002304Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "aa0ce280c6a7a1b057d5121d6b80128f65871412893d1a66a893c34fa3034cc2"
+    },
+    {
+      "created_at": "2026-10-28T21:14:29Z",
+      "first_frozen_at": "2026-10-29T00:23:04Z",
+      "id": "RobotLocomotion/drake#25149",
+      "issue_number": 25149,
+      "prediction_deadline_at": "2026-10-29T06:23:04Z",
+      "repository": "RobotLocomotion/drake",
+      "source": "inbox/FIRST_SEEN_20261029T002304Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "33dbd691049f8d1c1e8a2c0103e61590d5e1303e361d1f71401aff00eb2a9910"
+    },
+    {
+      "created_at": "2026-10-28T23:31:35Z",
+      "first_frozen_at": "2026-10-29T00:23:04Z",
+      "id": "RobotLocomotion/drake#25151",
+      "issue_number": 25151,
+      "prediction_deadline_at": "2026-10-29T06:23:04Z",
+      "repository": "RobotLocomotion/drake",
+      "source": "inbox/FIRST_SEEN_20261029T002304Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "d084248a5519bcb812fc201823900cd7c641a056d906e3fd0c407a5006f1ae73"
     }
   ]
 }

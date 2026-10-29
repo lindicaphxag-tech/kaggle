@@ -1,0 +1,57 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 3,
+  "new_candidates": [
+    {
+      "author_login": "rpoyner-tri",
+      "body": "Context: a [drake-developers Slack thread](https://drakedevelopers.slack.com/archives/C2WBPQDB7/p1793152921383789) (2026-10-27/28) following #25087. A user wants to switch an existing discrete-mode plant to ICF/CENIC by changing MbP config alone, without modifying their other systems. Today that requires a continuous plant, and continuous mode slows down the other systems in the diagram. #23765 is also a blocker for adopting continuous mode in that use case.\n\nThere is no fundamental reason fixed-step ICF couldn't be a discrete solver. However, `DiscreteUpdateManager` would have to learn to use `IcfSolver`, which is a large effort. The current plan is to offer the \"discrete\" use case through continuous-time, fixed-step CENIC (`time_step = 0`, `use_error_control = False`). This issue covers what is needed to make that path usable.\n\n**1. Feature: treat the plant's external inputs explicitly**\nActuation and external forces are differentiated by finite differences so they can be treated implicitly. That means re-evaluating whole upstream subsystems, which is expensive when those inputs come from complicated external systems. Add an option to treat them explicitly (hold them fixed across the step) and skip the finite difference. Any external continuous state would then be integrated with explicit Euler in fixed-step mode.\n\n**2. Docs/UX: how to simulate MbP in a discrete-like ICF mode**\nDocument clearly how to get discrete-like behavior (fixed step, explicit external inputs). If possible, keep the required config (YAML) succinct.\n\n**Notes**\n- CENIC currently integrates all continuous states in the diagram, which may add to slowdowns when external systems have state.\n- Related: #23765, #25087, #25149 (geometry contact cache).\n",
+      "created_at": "2026-10-28T21:14:28Z",
+      "html_url": "https://github.com/RobotLocomotion/drake/issues/25148",
+      "id": "RobotLocomotion/drake#25148",
+      "issue_number": 25148,
+      "labels": [
+        "priority: medium",
+        "component: multibody plant"
+      ],
+      "repository": "RobotLocomotion/drake",
+      "surface_sha256": "aa0ce280c6a7a1b057d5121d6b80128f65871412893d1a66a893c34fa3034cc2",
+      "title": "[CENIC] Option to treat plant external inputs explicitly, and document discrete-like ICF mode"
+    },
+    {
+      "author_login": "rpoyner-tri",
+      "body": "Context: same [drake-developers Slack thread](https://drakedevelopers.slack.com/archives/C2WBPQDB7/p1793152921383789) as above (also see #25087).\n\n`IcfBuilder::CalcGeometryContactData` queries `QueryObject` directly instead of using the plant's cached `GeometryContactData` (`MultibodyPlant::EvalGeometryContactData`). Any other system that reads contact results (e.g. one that locks items) triggers a second geometry query per step. For workloads where geometry queries are the bottleneck, evaluating them twice per step badly hurts performance.\n\nExpected fix: have `IcfBuilder` use the plant's cached `EvalGeometryContactData`. This should be a small change (roughly 10 lines).\n\n**Notes**\n- In fixed-step continuous mode there is one geometry query per integration step. In error-controlled mode there are two, because the second yields the error estimate. This issue is about the extra query that comes from bypassing the cache.\n- Related: #25148.\n- Other optimizations from the \"sampled output ports\" MbP work may also be worth mapping onto continuous-time CENIC.\n",
+      "created_at": "2026-10-28T21:14:29Z",
+      "html_url": "https://github.com/RobotLocomotion/drake/issues/25149",
+      "id": "RobotLocomotion/drake#25149",
+      "issue_number": 25149,
+      "labels": [
+        "priority: medium",
+        "component: multibody plant"
+      ],
+      "repository": "RobotLocomotion/drake",
+      "surface_sha256": "33dbd691049f8d1c1e8a2c0103e61590d5e1303e361d1f71401aff00eb2a9910",
+      "title": "[CENIC] IcfBuilder recomputes geometry contact data instead of using MultibodyPlant's cache"
+    },
+    {
+      "author_login": "sherm1",
+      "body": "An SDFormat `<joint>` whose `<parent>` or `<child>` names a frame of a static\nmodel with no links makes the parser throw an unrelated exception from\n`GetRigidBodyByName()`. It names neither the joint nor the file location.\nlibsdformat reports no error. It doesn't matter whether the joint names an\nexplicit frame of the model (`s::F`) or the model's own implicit frame (`s`).\n\nObserved on master at 9726576eb6 (Ubuntu 24.04, Bazel opt build).\n\n**Repro.** This program compiles as is against Drake.\n\n```cpp\n#include <iostream>\n#include <string>\n\n#include <fmt/format.h>\n\n#include \"drake/multibody/parsing/parser.h\"\n#include \"drake/multibody/plant/multibody_plant.h\"\n\nusing drake::multibody::MultibodyPlant;\nusing drake::multibody::Parser;\n\nint main() {\n  // A static model 's' with no links, only a frame, and a joint that names a\n  // frame of 's' as its <parent> or <child>.\n  for (const char* parent_and_child :\n       {\"<parent>s::F</parent><child>D</child>\",\n        \"<parent>s</parent><child>D</child>\",\n        \"<parent>D</parent><child>s::F</child>\"}) {\n    MultibodyPlant<double> plant(0.0);\n    std::cout << parent_and_child << \"\\n\";\n    try {\n      Parser(&plant).AddModelsFromString(\n          fmt::format(R\"(<sdf version='1.12'>\n  <model name='m'>\n    <model name='s'>\n      <static>true</static>\n      <frame name='F'/>\n    </model>\n    <link name='D'/>\n    <joint name='j' type='revolute'>\n      {}\n      <axis><xyz>0 0 1</xyz></axis>\n    </joint>\n  </model>\n</sdf>)\",\n                      parent_and_child),\n          \"sdf\");\n      std::cout << \"  parsed\\n\";\n    } catch (const std::exception& e) {\n      std::cout << \"  threw: \" << e.what() << \"\\n\";\n    }\n  }\n}\n```\n\n**Output:**\n\n```\n<parent>s::F</parent><child>D</child>\n  threw: GetRigidBodyByName(): There is no RigidBody named '__model__' anywhere in the model (valid names in model instance 'WorldModelInstance' are: world; valid names in model instance 'm' are: D)\n<parent>s</parent><child>D</child>\n  threw: GetRigidBodyByName(): There is no RigidBody named '__model__' anywhere in the model (valid names in model instance 'WorldModelInstance' are: world; valid names in model instance 'm' are: D)\n<parent>D</parent><child>s::F</child>\n  threw: GetRigidBodyByName(): There is no RigidBody named '__model__' anywhere in the model (valid names in model instance 'WorldModelInstance' are: world; valid names in model instance 'm' are: D)\n```\n\n**Expected:** at least a parse error that names the joint and its location.\nFor `<parent>`, a joint to the world at that frame might be better, since a\nstatic model's frames are fixed to the world. A `<drake:joint>` can already do\nthat: since #25132, `<drake:parent>s::F</drake:parent>` works and gives a\njoint frame on the world.\n\n**Cause:** `AddJointFromSpecification()` looks up the joint's links by the\nnames that `sdf::Joint::ResolveParentLink()` and `ResolveChildLink()` return\n([detail_sdf_parser.cc#L862-L866](https://github.com/RobotLocomotion/drake/blob/9726576eb689de7582ed81c4c6b8319aef0ae3da/multibody/parsing/detail_sdf_parser.cc#L862-L866)).\nFor a frame of a model with no links, the resolved name is the model's\n`__model__` frame rather than a link. `GetBodyByLinkSpecificationName()` then\nthrows while looking it up as a body.\n\n**Interaction with #25125:** a `<joint>` with `<drake:independent_frames/>`\nmust not name these frames in either `<parent>` or `<child>`. Doing so is a\nlocated parse error, and a TODO there refers to this issue.\n",
+      "created_at": "2026-10-28T23:31:35Z",
+      "html_url": "https://github.com/RobotLocomotion/drake/issues/25151",
+      "id": "RobotLocomotion/drake#25151",
+      "issue_number": 25151,
+      "labels": [
+        "type: bug",
+        "component: multibody parsing"
+      ],
+      "repository": "RobotLocomotion/drake",
+      "surface_sha256": "d084248a5519bcb812fc201823900cd7c641a056d906e3fd0c407a5006f1ae73",
+      "title": "[parsing] SDFormat <joint> naming a frame of a static model with no links throws from GetRigidBodyByName()"
+    }
+  ],
+  "post_activation_issue_identities_observed": 389,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-29T00:23:04Z",
+  "schema_version": 1
+}
