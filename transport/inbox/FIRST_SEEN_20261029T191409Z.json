@@ -1,0 +1,65 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 4,
+  "new_candidates": [
+    {
+      "author_login": "Myzhar",
+      "body": "### Summary\n\nOn Isaac ROS 5, a component container that runs the RT-DETR object detection pipeline crashes with SIGSEGV (exit code -11) almost every time it is stopped with Ctrl+C. In some runs it hangs instead, and `ros2 launch` has to SIGKILL it after SIGINT and SIGTERM.\n\nThe core dump points to the `cuda_buffer` IPC manager: every Isaac ROS node library embeds its own copy of `cuda_buffer_backend::CudaVmmIPCManager`, and each copy runs its own `FDDispatcher` thread. When the container unloads the node libraries at shutdown, these threads keep running code that is no longer mapped.\n\n### Environment\n\n- Jetson AGX Thor, JetPack 7.2 (L4T 39.2), MAXN, CUDA 13.2\n- Isaac ROS 5.0.0 buildfarm packages, ROS 2 Lyrical, Docker (Isaac ROS CLI 2.6.0)\n- `ros-lyrical-cuda-buffer` 0.1.2, `rmw_fastrtps_cpp`\n- Pipeline in one `component_container` (`--executor-type multi-threaded`): `ResizeNode`, `PadNode`, `ImageFormatConverterNode`, `ImageToTensorNode`, `InterleavedToPlanarNode`, `ReshapeNode`, `TensorRTNode`, `RtDetrPreprocessorNode`, `RtDetrDecoderNode`, fed by a camera node in another container at 30 FPS\n\n### Results\n\n| Nodes loaded in the container | Stop with SIGINT |\n| --- | --- |\n| Full pipeline, inference running | SIGSEGV in 11 of 12 runs, 1 to 4 s after SIGINT |\n| Full pipeline, input images published as plain CPU data | SIGSEGV in 4 of 4 runs |\n| Full pipeline, `--executor-type single-threaded` | SIGSEGV in 3 of 4 runs |\n| `ResizeNode` only | clean exit (2 runs) |\n| Image and tensor nodes without `TensorRTNode` | clean exit (2 runs) |\n| `TensorRTNode` only, no input | clean exit (2 runs) |\n| Image and tensor nodes + `TensorRTNode`, inference running | SIGSEGV in 2 of 2 runs |\n\nUnder gdb the container exits normally, so the crash depends on timing.\n\n### Core dump\n\nThe crashing thread executes an address that belongs to no loaded library:\n\n```text\nProgram terminated with signal SIGSEGV, Segmentation fault.\n#0  0x0000fffd180dbf08 in ?? ()\n```\n\nOther threads are in `FDDispatcher::run()` from different node libraries, and some of them also run code at unmapped addresses:\n\n```text\nThread 15: #1 cuda_buffer_backend::CudaVmmIPCManager::FDDispatcher::run() () from /opt/ros/lyrical/lib/libresize_node.so\nThread 11: #1 cuda_buffer_backend::CudaVmmIPCManager::FDDispatcher::run() () from /opt/ros/lyrical/lib/libinterleaved_to_planar_node.so\nThread 7:  #1 cuda_buffer_backend::CudaVmmIPCManager::FDDispatcher::run() () from /opt/ros/lyrical/lib/libimage_to_tensor_node.so\nThread 18: #0 __GI_epoll_pwait  #1 0x0000fffd12f9e278 in ?? ()\nThread 16: #0 __GI_epoll_pwait  #1 0x0000fffd1175a418 in ?? ()\nThread 14: #5 cuda_buffer_backend::CudaBuffer::BufferRecycler::run() () from /opt/ros/lyrical/lib/libcuda_buffer.so\n```\n\nEach node library defines the IPC manager itself instead of using `libcuda_buffer.so`:\n\n```text\n$ nm -DC /opt/ros/lyrical/lib/libresize_node.so | grep -E \" T .*(get_dispatcher|FDDispatcher::run)\"\n0000000000117b10 T cuda_buffer_backend::CudaVmmIPCManager::FDDispatcher::run()\n0000000000117d10 T cuda_buffer_backend::CudaVmmIPCManager::get_dispatcher()\n```\n\nThe same symbols are defined in `libpad_node.so`, `libimage_format_converter_node.so`, `libimage_to_tensor_node.so`, `libinterleaved_to_planar_node.so`, `libreshape_node.so`, `libtensor_rt_node.so`, `librtdetr_preprocessor_node.so`, `librtdetr_decoder_node.so` and `libcuda_buffer.so`.\n\n### Expected behavior\n\nThe container stops cleanly on SIGINT: the dispatcher threads are stopped and joined before their library is unloaded, or the node libraries share the single IPC manager of `libcuda_buffer.so`.\n",
+      "created_at": "2026-10-29T18:19:38Z",
+      "html_url": "https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/issues/246",
+      "id": "NVIDIA-ISAAC-ROS/isaac_ros_common#246",
+      "issue_number": 246,
+      "labels": [],
+      "repository": "NVIDIA-ISAAC-ROS/isaac_ros_common",
+      "surface_sha256": "dd11d4f618976d24b82fd922b6e030f121b87cef03b9be5ae0ed62c75d50360e",
+      "title": "Isaac ROS 5: component container crashes (SIGSEGV) on shutdown, each node library embeds its own cuda_buffer IPC manager thread"
+    },
+    {
+      "author_login": "junhee-yoo",
+      "body": "Hi organizers,\n\nA follow-up to #139 and #206.\n\nIf some `Drive` calls take longer than 0.1 s but the average over a rollout stays under 0.1 s (10 Hz), and the submission passes the throughput budget, is that within the rules? For example, is it fine to work the same way as the official `sample_submission_vavam` driver, which runs model inference inside `Drive` only every `VAVAM_INFERENCE_INTERVAL_US` (500 ms by default)?\n\nSorry about the `bug` label. I created this issue from a pop-up form and didn't notice that the label was added automatically. This is a question about the rules, not a bug report.\n\nThank you!",
+      "created_at": "2026-10-29T16:16:23Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/229",
+      "id": "NVlabs/alpasim#229",
+      "issue_number": 229,
+      "labels": [
+        "bug"
+      ],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "b40cba5f99c18411a248b26b6c6892c8affb966f60ac30dbe46b7caef2d231df",
+      "title": "[AlpaSim E2E Challenge] Is the 0.1 s target per call or on average?"
+    },
+    {
+      "author_login": "sherm1",
+      "body": "Most topological computations are isolated in multibody/topology. However, several places in MultibodyPlant define \"cliques\" which vary in minor ways from already-calculated trees. Per discussion in #25087, it would make more sense for the topology code to discover the cliques with several benefits:\n- would continue the separation of concerns that motivated the topology code in the first place\n- would eliminate duplicate clique computations current in MultibodyPlant\n- could be done more efficiently as a side effect of tree computation.\n\n### Discussion from 25087\n\nSherm: BTW just a thought: the identification of cliques seems like something that should be done in the topology code, where they could probably be identified at the same time as the trees. There are probably several clique calculators in MbP that could be replaced with a service provided by multibody/topology. That might be a nice separation of concerns so we don't mix topology with numerical calculations.\nIt would be easy to get Claude to rearrange things if we wanted to do that (in a separate PR).\nPossible issue: if clique calculations depend on joint locking we'd need to supply that information to the topology code at runtime. (I don't see that in the calculation below)\n\nClaude: Looked into this more. I agree it's a good follow-up, and I'd keep it out of this PR.\n\nCliques are now purely static. They come from the SpanningForest walk (split each tree at its anchored \"world composite\") plus the coupler merge from the fix for the P1 coupler thread. They don't depend on joint locking: locking is applied afterward by ReduceInto(), which can drop a fully locked clique but never splits one. So topology wouldn't need runtime information.\nThe one wrinkle is couplers. The merge needs MbP's coupler specs, which LinkJointGraph doesn't know about. Either topology provides the anchored-branch split and MbP/ICF applies the coupler merge on top, or topology accepts extra \"coupled velocity\" edges.\nSAP would benefit too. SapDriver currently uses whole trees as cliques (forest.num_trees()), so it misses the same decoupling at anchored branches.\nIslands stay in ICF. They depend on which constraints and contacts are active at each step, so they're numerical-time data, not topology. If SAP wants islands later, icf_partition could move up to contact_solvers/ to be shared.\n\nProposal: a follow-up PR that adds a forest service for \"movable branches off the anchored composite\", switches ICF (and possibly SAP) to it, and keeps the coupler merge on the MbP/ICF side.",
+      "created_at": "2026-10-29T18:17:03Z",
+      "html_url": "https://github.com/RobotLocomotion/drake/issues/25157",
+      "id": "RobotLocomotion/drake#25157",
+      "issue_number": 25157,
+      "labels": [
+        "type: cleanup",
+        "component: multibody plant"
+      ],
+      "repository": "RobotLocomotion/drake",
+      "surface_sha256": "b7b685cb2b1a57c3de5b2d2d7a334fa68f5794910ac7e59fa62e406380f51ae3",
+      "title": "[multibody] Move clique discovery to multibody/topology"
+    },
+    {
+      "author_login": "dcer1989",
+      "body": "# Environment\n* Host: Windows 11, WSL2 (kernel 6.18.54.1-microsoft-standard-WSL2)\n* Guest: Ubuntu 24.04.4 LTS, ROS 2 Jazzy\n* GPU: Intel integrated graphics (renderer string: \"D3D12 (Intel(R) Graphics)\")\n* Mesa: 26.2.5 (kisak-mesa PPA); also reproduced with stock 25.2.8\n* Gazebo: 8.15.0 Harmonic via ros-jazzy-gz-sim-vendor 0.0.13, gz-rendering-vendor 0.0.7, gz-ogre-next-vendor 0.0.5\n* LIBGL_ALWAYS_SOFTWARE is NOT set (I want GPU rendering)\n* Related: #2670\n\n# Expected behavior\n`gz sim` shows the 3D scene.\n\n# Actual behavior\nGUI opens but the 3D view stays black with both ogre2 and ogre. glxgears renders fine.\nHeadless (`gz sim -s`) with sensors renders correctly with d3d12.\n\n# Workarounds tried\n- GALLIUM_DRIVER=d3d12 with QT_QPA_PLATFORM=xcb: froze all screens, hard reboot needed.\n- GUI log: \"Out of GPU memory... D3D12: Removing Device\".\n- mesa_glthread=false: all screens briefly black.\n- QSG_RENDER_LOOP=basic: whole system crashed.\n- QT_QPA_PLATFORM=wayland: abort in Intel IGC (\"igc-disable-inlined-alloca-merging registered more than once\").\n\n* Logs\n[glxinfo.txt](https://github.com/user-attachments/files/34144166/glxinfo.txt)\n[gz_v4.log](https://github.com/user-attachments/files/34144165/gz_v4.log)\n[ogre.log](https://github.com/user-attachments/files/34144164/ogre.log)\n[ogre2.log](https://github.com/user-attachments/files/34144167/ogre2.log)\n",
+      "created_at": "2026-10-29T17:01:46Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4154",
+      "id": "gazebosim/gz-sim#4154",
+      "issue_number": 4154,
+      "labels": [],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "894627f48144a4d3dfd84072aac1947ffb8566acef8cddfadba0e9b038b0d6b1",
+      "title": "Black 3D view with ogre2 on WSL2 + Intel iGPU (Mesa 26.2.5 d3d12), Jazzy/Harmonic; GUI freezes or crashes on some workarounds"
+    }
+  ],
+  "post_activation_issue_identities_observed": 401,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-29T19:14:09Z",
+  "schema_version": 1
+}
