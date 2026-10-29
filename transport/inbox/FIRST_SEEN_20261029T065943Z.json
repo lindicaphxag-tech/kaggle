@@ -1,0 +1,64 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 4,
+  "new_candidates": [
+    {
+      "author_login": "bupeshr",
+      "body": "### Description\n\nI have added the UFACTORY 850 (6-DoF, 850 mm reach, 5 kg payload) to robosuite\nas a new robot model, and I'd like to contribute it upstream.\n\nWhat is included:\n- robots/ufactory850/robot.xml (MJCF) plus link meshes\n- UFactory850 robot class, registered like UR5e\n- default_ufactory850.json (OSC_POSE controller config)\n\nStatus: it loads and resets in Wipe, and I have run it in other tasks too.\nKinematics, inertias and joint torque limits come from UFACTORY's\nxarm_ros description files (xarm_description). The flange offset and\ncontact-force tuning are not fully validated yet.\n\n### Suggested Solution\n\nOpen a PR adding the model to this repo, if you are happy to host it.\nIf you would rather keep extra arms in ARISE-Initiative/robosuite_models,\nI can submit it there instead. Which do you prefer?\n\nI will include an example script and screenshots in the PR.",
+      "created_at": "2026-10-29T06:33:20Z",
+      "html_url": "https://github.com/ARISE-Initiative/robosuite/issues/842",
+      "id": "ARISE-Initiative/robosuite#842",
+      "issue_number": 842,
+      "labels": [],
+      "repository": "ARISE-Initiative/robosuite",
+      "surface_sha256": "89b38d585696dbe9289d44850e8261a8b52196ea6a5eb7b622443b45c39cdd77",
+      "title": "[Feature]: New robot model: UFACTORY 850"
+    },
+    {
+      "author_login": "lovorange",
+      "body": "### Describe the bug\n\nIn `ForgeEnv`, the policy's `ee_linvel` observation appears to lose the actual end-effector motion because `FactoryEnv` and `ForgeEnv` reuse and update the same position-history buffer during one call.\n\nChecked on October 29, 2026 against **v3.0.0** (`e3f7d9ff1f5d7f8280de3ece9000b7117f66bcf4`), the latest stable release at the time of checking, and **main at `0ca25c56eec6fe7860fdcba44f8848f19693d6f6`**. Both contain the same linear-velocity bookkeeping. The issue is also present in v2.3.0.\n\n**I would be happy to work on a fix and submit a PR with regression tests. Before implementing it, I would appreciate confirmation of the intended observation semantics and the preferred fix direction, as described below.**\n\n1. `ForgeEnv._compute_intermediate_values(dt)` first calls `super()._compute_intermediate_values(dt)`.\n2. The parent computes a finite-difference velocity, then immediately replaces `self.prev_fingertip_pos` with the **current true position**.\n3. The child computes a noisy position and overwrites `self.ee_linvel_fd` using that already-updated buffer.\n\nConsequently, with `p_t` the current true position and `epsilon_t` its additive observation noise:\n\n```text\nactual ee_linvel_fd = ((p_t + epsilon_t) - p_t) / dt\n                   = epsilon_t / dt\n```\n\nThe result is independent of the actual displacement. Disabling position noise makes the observed linear velocity zero even while the end effector moves.\n\nIf the intent is finite differencing noisy position measurements, the expected result is:\n\n```text\nexpected ee_linvel_fd = ((p_t + epsilon_t) - (p_previous + epsilon_previous)) / dt\n```\n\nHere `previous` means the previous position sample at the interval represented by `dt`, which need not be the previous policy decision.\n\n### Source references\n\nPermalinks to the checked main commit:\n\n- [Parent updates position history: factory_env.py, lines 115\u2013116](https://github.com/isaac-sim/IsaacLab/blob/0ca25c56eec6fe7860fdcba44f8848f19693d6f6/source/isaaclab_tasks/isaaclab_tasks/contrib/factory/factory_env.py#L115-L116).\n- [Child calls parent, adds noise, and overwrites velocity: forge_env.py, lines 66\u201391](https://github.com/isaac-sim/IsaacLab/blob/0ca25c56eec6fe7860fdcba44f8848f19693d6f6/source/isaaclab_tasks/isaaclab_tasks/contrib/forge/forge_env.py#L66-L91).\n- [Policy uses ee_linvel_fd; critic uses simulator velocity: factory_env.py, lines 133\u2013153](https://github.com/isaac-sim/IsaacLab/blob/0ca25c56eec6fe7860fdcba44f8848f19693d6f6/source/isaaclab_tasks/isaaclab_tasks/contrib/factory/factory_env.py#L133-L153).\n\n`ForgeEnv._get_observations()` retains this `ee_linvel` entry when constructing the policy observation, and the default `ForgeEnvCfg.obs_order` includes it. Thus this affects the actor's linear-velocity input. The critic's linear-velocity entry uses a different variable.\n\n### Steps to reproduce\n\nThe following reduced reproducer preserves the original velocity statements and parent/child call order, while supplying positions directly. It requires only Python and PyTorch; it does **not** launch Isaac Sim.\n\n```python\nimport torch\n\n\nclass FactoryEnv:\n    def _compute_intermediate_values(self, dt):\n        self.ee_linvel_fd = (self.fingertip_midpoint_pos - self.prev_fingertip_pos) / dt\n        self.prev_fingertip_pos = self.fingertip_midpoint_pos.clone()\n\n\nclass ForgeEnv(FactoryEnv):\n    def _compute_intermediate_values(self, dt):\n        super()._compute_intermediate_values(dt)\n        self.ee_linvel_fd = (self.noisy_fingertip_pos - self.prev_fingertip_pos) / dt\n        self.prev_fingertip_pos = self.noisy_fingertip_pos.clone()\n\n\ndt = 0.01\nenv = ForgeEnv()\nenv.prev_fingertip_pos = torch.zeros((1, 3), dtype=torch.float64)\n\nfor step in range(1, 6):\n    # Move 10 mm per update; disable position noise.\n    env.fingertip_midpoint_pos = torch.tensor([[step * 0.01, 0, 0]], dtype=torch.float64)\n    env.noisy_fingertip_pos = env.fingertip_midpoint_pos.clone()\n    env._compute_intermediate_values(dt)\n    print(f\"step {step}: expected vx=1.0 m/s, actual vx={env.ee_linvel_fd[0, 0].item():.1f} m/s\")\n    assert torch.count_nonzero(env.ee_linvel_fd).item() == 0\n```\n\nActual output on all five updates: `actual vx=0.0 m/s`; expected: `1.0 m/s`. This demonstrates that the issue persists beyond the initial update.\n\nWith a previous noise of zero and a current x-position noise of `0.00025 m`, the same `0.01 m` displacement and `0.01 s` interval give `0.025 m/s` instead of the expected noisy finite difference of `1.025 m/s`.\n\n### System Info\n\n- Source versions: v3.0.0 and main commit listed above.\n- Reproducer: CPU tensors, PyTorch 2.7.0+cu128.\n- Isaac Sim / GPU / driver: not used by this reduced reproducer. A full simulator rollout on the latest release has not been performed.\n\n### Additional context\n\nThis report establishes the history-buffer overwrite and its connection to policy observations. It does not establish the magnitude of any training or sim-to-real performance impact.\n\n### Proposed fix and questions for maintainers\n\nThe comment \"Repeat finite differencing with noisy fingertip positions\" suggests that the intended observation is the difference between consecutive noisy position samples divided by their sampling interval.\n\nMy proposed approach is to give FORGE a dedicated previous-noisy-position buffer, keeping the parent's true-position history separate. The buffer would be initialized/reset for the affected environment IDs and updated once per position sample. This should preserve Factory's history while allowing FORGE to compute the noisy finite difference.\n\nBefore I implement the fix, could you please confirm:\n\n1. **Expected behavior:** Should the actor's `ee_linvel` be the finite difference of consecutive noisy position measurements, as in the expected formula above, or is a different velocity observation intended?\n2. **Fix direction:** Would a separate noisy-position history buffer in FORGE be appropriate, or would you prefer a change to the parent/child update structure?\n3. **Reset and compatibility:** Should the velocity observation be zeroed on reset, with noisy history initialized from the reset sample? Are there existing-checkpoint compatibility requirements the PR should follow?\n\nIf this approach is appropriate and nobody is already working on it, I would be happy to prepare a focused PR covering zero-noise motion, noisy consecutive samples, and reset behavior, following the project's testing conventions.\n\nThe angular-velocity path also reuses a history buffer updated by the parent. I would keep this report's verified finding focused on linear velocity and ask whether you would like the analogous angular-history behavior investigated in the same PR or separately.\n\n### Checklist\n\n- [x] I searched the repository's open/closed issues and PRs for FORGE and relevant variable names and did not find a matching report.\n- [x] The reduced reproducer isolates repository-level tensor bookkeeping without running Isaac Sim.\n\n### Proposed Acceptance Criteria (pending confirmation of intended behavior)\n\n- [ ] With position noise disabled, nonzero displacement over a known sampling interval produces the expected nonzero policy linear velocity.\n- [ ] With noise enabled, the result includes the true displacement and the difference between consecutive position-noise samples.\n- [ ] History is handled consistently across resets and repeated updates, with appropriate regression coverage.\n",
+      "created_at": "2026-10-29T06:37:28Z",
+      "html_url": "https://github.com/isaac-sim/IsaacLab/issues/8874",
+      "id": "isaac-sim/IsaacLab#8874",
+      "issue_number": 8874,
+      "labels": [],
+      "repository": "isaac-sim/IsaacLab",
+      "surface_sha256": "cef5f036658869d1dfd1d387e1a35e6ccc2494e52a0f3e1ca25e73b3f6da513b",
+      "title": "[Bug Report] FORGE policy linear velocity loses motion due to overwritten position history"
+    },
+    {
+      "author_login": "github-actions[bot]",
+      "body": "An automated scheduled build failed on `kilted`: https://github.com/ros-controls/control_toolbox/actions/runs/40830479290\n",
+      "created_at": "2026-10-29T06:43:35Z",
+      "html_url": "https://github.com/ros-controls/control_toolbox/issues/683",
+      "id": "ros-controls/control_toolbox#683",
+      "issue_number": 683,
+      "labels": [
+        "CI"
+      ],
+      "repository": "ros-controls/control_toolbox",
+      "surface_sha256": "0205bd2e67165eb8544edd594d5c65dc9fd8ea4d74cd6c44ca80b5d269f8190c",
+      "title": "CI build job kilted/testing failed!"
+    },
+    {
+      "author_login": "solonovamax",
+      "body": "### Description\n\nI think it would be helpful to add `[[clang::always_inline]]` to the message builder functions:\nhttps://github.com/ros2/rosidl/blob/rolling/rosidl_generator_cpp/resource/msg__builder.hpp.em\n\n### Motivation\n\nWhile messing around in godbolt to see how the builder functions compiled, I noticed that the clang builder functions did not end up compiling to the nicest machine code, whereas GCC's output was substantially better.\n\nAdding `[[clang::always_inline]]` to all of the builder functions did marginally improve the output, although it didn't bring it at all near GCC's.\n\nSee: https://tech.lgbt/@solonovamax/117521588200813019\n\n### Design / Implementation Considerations\n\n_No response_\n\n### Additional Information\n\n_No response_",
+      "created_at": "2026-10-29T02:16:15Z",
+      "html_url": "https://github.com/ros2/rosidl/issues/1021",
+      "id": "ros2/rosidl#1021",
+      "issue_number": 1021,
+      "labels": [
+        "enhancement"
+      ],
+      "repository": "ros2/rosidl",
+      "surface_sha256": "c55775ad918338c8c8e68905a26169981454af77144a1094d7fecf6c1d44b438",
+      "title": "Always inline builder functions in C++"
+    }
+  ],
+  "post_activation_issue_identities_observed": 393,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-29T06:59:43Z",
+  "schema_version": 1
+}

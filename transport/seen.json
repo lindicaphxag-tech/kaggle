@@ -5847,6 +5847,50 @@
       "source": "inbox/FIRST_SEEN_20261029T002304Z.json",
       "status": "deadline_missed_unadjudicated",
       "surface_sha256": "d084248a5519bcb812fc201823900cd7c641a056d906e3fd0c407a5006f1ae73"
+    },
+    {
+      "created_at": "2026-10-29T06:33:20Z",
+      "first_frozen_at": "2026-10-29T06:59:43Z",
+      "id": "ARISE-Initiative/robosuite#842",
+      "issue_number": 842,
+      "prediction_deadline_at": "2026-10-29T12:59:43Z",
+      "repository": "ARISE-Initiative/robosuite",
+      "source": "inbox/FIRST_SEEN_20261029T065943Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "89b38d585696dbe9289d44850e8261a8b52196ea6a5eb7b622443b45c39cdd77"
+    },
+    {
+      "created_at": "2026-10-29T06:37:28Z",
+      "first_frozen_at": "2026-10-29T06:59:43Z",
+      "id": "isaac-sim/IsaacLab#8874",
+      "issue_number": 8874,
+      "prediction_deadline_at": "2026-10-29T12:59:43Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261029T065943Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "cef5f036658869d1dfd1d387e1a35e6ccc2494e52a0f3e1ca25e73b3f6da513b"
+    },
+    {
+      "created_at": "2026-10-29T06:43:35Z",
+      "first_frozen_at": "2026-10-29T06:59:43Z",
+      "id": "ros-controls/control_toolbox#683",
+      "issue_number": 683,
+      "prediction_deadline_at": "2026-10-29T12:59:43Z",
+      "repository": "ros-controls/control_toolbox",
+      "source": "inbox/FIRST_SEEN_20261029T065943Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "0205bd2e67165eb8544edd594d5c65dc9fd8ea4d74cd6c44ca80b5d269f8190c"
+    },
+    {
+      "created_at": "2026-10-29T02:16:15Z",
+      "first_frozen_at": "2026-10-29T06:59:43Z",
+      "id": "ros2/rosidl#1021",
+      "issue_number": 1021,
+      "prediction_deadline_at": "2026-10-29T12:59:43Z",
+      "repository": "ros2/rosidl",
+      "source": "inbox/FIRST_SEEN_20261029T065943Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "c55775ad918338c8c8e68905a26169981454af77144a1094d7fecf6c1d44b438"
     }
   ]
 }
