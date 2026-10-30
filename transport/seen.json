@@ -6090,35 +6090,47 @@
     },
     {
       "created_at": "2026-10-30T07:23:09Z",
+      "expiry_recorded_at": "2026-10-30T16:48:46Z",
+      "expiry_sha256": "44358f15781138117003ec35ad3558dee571976b4c384643b4007c03f036ca25",
+      "expiry_source": "expirations/NVIDIA__Isaac-GR00T__799.json",
       "first_frozen_at": "2026-10-30T10:27:49Z",
       "id": "NVIDIA/Isaac-GR00T#799",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 799,
       "prediction_deadline_at": "2026-10-30T16:27:49Z",
       "repository": "NVIDIA/Isaac-GR00T",
       "source": "inbox/FIRST_SEEN_20261030T102749Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "5949d7b4411b01dabc732d074baf4097ce52ddf9d94dff8c361bd1dbbc985550"
     },
     {
       "created_at": "2026-10-30T09:06:26Z",
+      "expiry_recorded_at": "2026-10-30T16:48:46Z",
+      "expiry_sha256": "6a05f9f87ba0699a84117229f15b54fbd0fe9c41b9405084baaf68e40325b9d0",
+      "expiry_source": "expirations/NVlabs__alpasim__230.json",
       "first_frozen_at": "2026-10-30T10:27:49Z",
       "id": "NVlabs/alpasim#230",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 230,
       "prediction_deadline_at": "2026-10-30T16:27:49Z",
       "repository": "NVlabs/alpasim",
       "source": "inbox/FIRST_SEEN_20261030T102749Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "b86cce82649d471c367a5fcfb6393bc2bdbcceb8fcd34258109524caa61943cb"
     },
     {
       "created_at": "2026-10-30T07:12:58Z",
+      "expiry_recorded_at": "2026-10-30T16:48:46Z",
+      "expiry_sha256": "93d358589ae4cf0a053bed03bad69d1090e14e6c7647dae31c558f0901f7b56e",
+      "expiry_source": "expirations/gazebosim__gz-sim__4160.json",
       "first_frozen_at": "2026-10-30T10:27:49Z",
       "id": "gazebosim/gz-sim#4160",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 4160,
       "prediction_deadline_at": "2026-10-30T16:27:49Z",
       "repository": "gazebosim/gz-sim",
       "source": "inbox/FIRST_SEEN_20261030T102749Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "cb5be73cde09fdb2b8890417f4c84961bb4c6f6cf37d613adb3e524a547a4b36"
     },
     {
@@ -6131,6 +6143,50 @@
       "source": "inbox/FIRST_SEEN_20261030T124411Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "2c1d09316263d5a3380650f73b6c2f2f3ec779be0a02d8508f7b6aec118be74f"
+    },
+    {
+      "created_at": "2026-10-30T16:11:47Z",
+      "first_frozen_at": "2026-10-30T16:50:15Z",
+      "id": "Farama-Foundation/PettingZoo#1531",
+      "issue_number": 1531,
+      "prediction_deadline_at": "2026-10-30T22:50:15Z",
+      "repository": "Farama-Foundation/PettingZoo",
+      "source": "inbox/FIRST_SEEN_20261030T165015Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "06cd91151c69bbc4153cdc36950c8e46cd83510991a6ca60509837d48e7c031b"
+    },
+    {
+      "created_at": "2026-10-30T14:01:24Z",
+      "first_frozen_at": "2026-10-30T16:50:15Z",
+      "id": "Physical-Intelligence/openpi#1076",
+      "issue_number": 1076,
+      "prediction_deadline_at": "2026-10-30T22:50:15Z",
+      "repository": "Physical-Intelligence/openpi",
+      "source": "inbox/FIRST_SEEN_20261030T165015Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "2b08672621766e83483dafb3c9c1b837123b0db04415641c66574807203119fe"
+    },
+    {
+      "created_at": "2026-10-30T15:43:54Z",
+      "first_frozen_at": "2026-10-30T16:50:15Z",
+      "id": "huggingface/lerobot#5164",
+      "issue_number": 5164,
+      "prediction_deadline_at": "2026-10-30T22:50:15Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261030T165015Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "a4071c0b51b945ef1318849b110d4693919f571e9ee8211ee46eff5ce6025a0c"
+    },
+    {
+      "created_at": "2026-10-30T14:28:42Z",
+      "first_frozen_at": "2026-10-30T16:50:15Z",
+      "id": "isaac-sim/IsaacLab#8889",
+      "issue_number": 8889,
+      "prediction_deadline_at": "2026-10-30T22:50:15Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261030T165015Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "777bff2ac89059b20a05157ca6c49abc3e13a2739374787d6f05f4a134b0f16b"
     }
   ]
 }

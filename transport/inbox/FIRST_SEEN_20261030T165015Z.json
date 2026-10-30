@@ -1,0 +1,67 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 4,
+  "new_candidates": [
+    {
+      "author_login": "aroraanushri",
+      "body": "### Proposal\n\nAdd a **Copy code** button to code blocks throughout the [[PettingZoo documentation](https://pettingzoo.farama.org/)](https://pettingzoo.farama.org/), similar to the feature recently added to Gymnasium in [[PR #1756](https://github.com/Farama-Foundation/Gymnasium/pull/1756)](https://github.com/Farama-Foundation/Gymnasium/pull/1756).\n\n### Motivation\n\nPettingZoo's guides and tutorials contain code snippets that users frequently copy into their own scripts or notebooks. Currently, users have to manually select the text, which can be inconvenient for longer examples and may result in accidentally copying unwanted lines.\n\nA copy button would make the documentation easier to use and keep the experience consistent with Gymnasium.\n\n### Pitch\n\nSince PettingZoo already uses Sphinx and the Celshast theme, we could adapt Gymnasium's existing implementation:\n\n- Enable `sphinx-copybutton` globally.\n- Strip interactive Python prompts (`>>>` and `...`) when copying examples.\n- Preserve indentation and blank lines.\n- Make the button keyboard-accessible and compatible with light/dark themes.\n- Ensure it doesn't overlap code on smaller screens.\n\nThis should only require changes to the Sphinx configuration, documentation dependencies, and a small CSS file.\n\n### Alternatives\n\nUsers can continue manually selecting and copying snippets, but a built-in button would provide a more convenient and consistent experience.\n\n### Additional context\n\nReference implementation: https://github.com/Farama-Foundation/Gymnasium/pull/1756\n\n### Checklist\n\n- [x] I have checked that there is no similar [issue](https://github.com/Farama-Foundation/PettingZoo/issues) in the repo\n",
+      "created_at": "2026-10-30T16:11:47Z",
+      "html_url": "https://github.com/Farama-Foundation/PettingZoo/issues/1531",
+      "id": "Farama-Foundation/PettingZoo#1531",
+      "issue_number": 1531,
+      "labels": [
+        "enhancement"
+      ],
+      "repository": "Farama-Foundation/PettingZoo",
+      "surface_sha256": "06cd91151c69bbc4153cdc36950c8e46cd83510991a6ca60509837d48e7c031b",
+      "title": "[Proposal] Add copy buttons to documentation code blocks"
+    },
+    {
+      "author_login": "victorming666",
+      "body": "I collected 1500 episodes of data with a dual-arm robot. The scenario is quite simple, just to grasp some fruits with the left arm and put them into the basket lifted-up by the right arm. I want the robot to follow human's instructions so I made some annotations on these episodes. I segmented each episode into clips, and give these clips some action captions like \"move the left arm to apple\", \"grasp the apple with left-gripper\", \"pick-up the apple and move the left arm onto the basket\" etc. Following is the tree structure of one episode:\n```\nepisode_xxx\n\u2502   manifest.json\n\u2502   README.md\n\u251c\u2500\u2500\u2500annotations\n\u2502       frames.jsonl\n\u2502       segments.jsonl\n\u251c\u2500\u2500\u2500data\n\u2502   \u2514\u2500\u2500\u2500chunk-000\n\u2502           file-000.parquet\n\u251c\u2500\u2500\u2500meta\n\u2502   \u2502   info.json\n\u2502   \u2502   stats.json\n\u2502   \u2502   tasks.parquet\n\u2502   \u2502\n\u2502   \u2514\u2500\u2500\u2500episodes\n\u2502       \u2514\u2500\u2500\u2500chunk-000\n\u2502               file-000.parquet\n\u2514\u2500\u2500\u2500videos\n    \u251c\u2500\u2500\u2500observation.images.cam_high\n    \u2502   \u2514\u2500\u2500\u2500chunk-000\n    \u2502           file-000.mp4\n    \u251c\u2500\u2500\u2500observation.images.cam_left\n    \u2502   \u2514\u2500\u2500\u2500chunk-000\n    \u2502           file-000.mp4\n    \u2514\u2500\u2500\u2500observation.images.cam_right\n        \u2514\u2500\u2500\u2500chunk-000\n                file-000.mp4\n```\nAnd the file 'annotations/segments.jsonl' above contains the segments with annotations, just like below:\n```\n{\"episode_index\": 0, \"segment_id\": 7, \"asset_id\": 4, \"start_ns\": 1792718945755986700, \"end_ns\": 1792718951710286600, \"skill\": \"reach_fruit\", \"object\": \"mango\", \"target\": \"up_table\", \"desc_en\": \"the left arm reach the mango\", \"quality\": 4, \"is_valid\": true}\n...\n```\nI want to know how to use these custom annotated data to fine-tune pi-0.5 model, so I can use the model to finish the job of picking-up fruits. Thanks for any reply!",
+      "created_at": "2026-10-30T14:01:24Z",
+      "html_url": "https://github.com/Physical-Intelligence/openpi/issues/1076",
+      "id": "Physical-Intelligence/openpi#1076",
+      "issue_number": 1076,
+      "labels": [],
+      "repository": "Physical-Intelligence/openpi",
+      "surface_sha256": "2b08672621766e83483dafb3c9c1b837123b0db04415641c66574807203119fe",
+      "title": "how to use custom annotated data to fine-tune pi-0.5 model"
+    },
+    {
+      "author_login": "Hadrien-Cornier",
+      "body": "# Streaming-WAM: 2.9x faster warm inference for Fast-WAM, no pause at chunk refresh\n\n## Ticket Type\n\n\ud83d\udca1 Feature Request / Improvement\n\n## Description\n\nToday Fast-WAM pauses at every chunk refresh. Inference takes about 656 ms on an L40S, which is longer than the 400 ms that the queued actions cover (8 actions at 50 ms each), so the robot stops and waits.\n\n[Streaming-WAM: Action-Conditioned World-Action Model for Asynchronous Robot Manipulation](https://arxiv.org/abs/2609.28927) (Xuyao Huang et al., SJTU and collaborators) fixes this. It starts the next inference while the robot is still carrying out the actions it already has, and it conditions the new chunk on the actions already committed for execution. The authors release [code](https://github.com/SJTU-DENG-Lab/Streaming-WAM) and [LIBERO checkpoints](https://huggingface.co/SJTU-DENG-Lab/Streaming-WAM) under Apache-2.0, and the checkpoint needs one consistency step instead of Fast-WAM's 10 sampler steps.\n\nThis would be the second speedup for Fast-WAM, after Faster-WAM (#5048, #5049).\n\nProposal: an opt-in `streaming_wam` flag on `FastWAMConfig`, off by default, so current checkpoints and the synchronous path keep their behavior. With the flag on, Fast-WAM loads a converted Streaming-WAM checkpoint and runs inference in the background while the robot executes the queued actions.\n\n```\nwindow                         [######## 400 ms ########]\n\nBefore, synchronous Fast-WAM   [################ 656 ms ################]\n                               inference is still running when the window ends\n\nAfter, async Streaming-WAM     [###### 230 ms ######]\n                               warm inference finished inside the window\n```\n\n### Speed test\n\nOne NVIDIA L40S, synthetic fixtures, simulated 50 ms action time:\n\n| Mode | Actions/s | Slowest warm inference | Warm inferences over 400 ms |\n| --- | ---: | ---: | ---: |\n| Sync Fast-WAM | 14.283 | 667.65 ms | 14 of 14 |\n| Sync Streaming-WAM | 18.116 | 199.92 ms | 0 of 14 |\n| Async Streaming-WAM | 19.613 | 229.53 ms | 0 of 32 |\n\n667.65 / 229.53 = 2.9x. Async continuation misses were 0 of 30.\n\n### Limits\n\n- This compares speed, not task quality. Fast-WAM used its 10-step sampler and Streaming-WAM used one consistency step. The inputs were synthetic; this was not LIBERO and not a robot.\n- The port is the eager implementation, not the paper's compiled CUDA runtime.\n- On a CPU-only Mac, inference takes tens of seconds, so a 400 ms window cannot hide it there.\n\n## Context & Reproduction\n\nImplementation and evidence: https://github.com/huggingface/lerobot/pull/5151\n\n## Checklist\n\n- [x] I have searched existing tickets to ensure this isn't a duplicate.\n- [x] I am using the latest version of the `main` branch.\n- [x] I have verified this is not an environment-specific problem.\n\n## Additional Info / Workarounds\n\nPorted files keep the upstream Apache-2.0 notice. Checkpoint conversion uses Hub revision `8dcc67ce14c72a5cce0c04c87a518b4ccfec217e` of SJTU-DENG-Lab/Streaming-WAM. This is the September paper (arXiv 2609.28927), not the separate October StreamingWAM (arXiv 2610.15585).\n",
+      "created_at": "2026-10-30T15:43:54Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5164",
+      "id": "huggingface/lerobot#5164",
+      "issue_number": 5164,
+      "labels": [
+        "enhancement",
+        "policies",
+        "tests",
+        "performance"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "a4071c0b51b945ef1318849b110d4693919f571e9ee8211ee46eff5ce6025a0c",
+      "title": "Streaming-WAM: 2.9x faster warm inference for Fast-WAM, no pause at chunk refresh"
+    },
+    {
+      "author_login": "ram-cherukuri",
+      "body": "\u201cfull-surface contact + two-way coupling\u201d must be a supported, physically consistent combination in Isaac Lab\u2019s Newton backend. Turning on both configuration options is insufficient if the coupling implementation cannot return all the contact reactions.\n\nTo properly simulate interactions with deformable objects such as polybags under two-way coupling, Newton\u2019s third law needs to be preserved at the implementation level. Specifically, the reaction to every force that the **VBD solver** applies to the deformable object through particle, edge, and face contacts should be applied in full to the hand (rigid body), and it should be computed with the same contact model: the same contact points, normals, and penetration depths, the same relative velocities, and the same stiffness, damping, and friction laws. \nTo ensure this, our Sim calls the same function the VBD solver uses to obtain the force acting on the polybag, negates it, and applies it to the hand as a wrench, including the resulting torque about the link\u2019s center of mass. \n\n_**Because the current Isaac Lab reaction kernel does not handle edge and face contacts, we were previously unable to use full-surface contact, which keeps the thin fingers from penetrating the polybag, together with two-way coupling, which lets the hand feel the polybag\u2019s reaction forces. Enabling both caused the robot\u2019s posture to collapse at the moment of grasping the polybag. Once this consistency was ensured, we were able to enable both at the same time, with no loss in simulation speed.**_\n\nWhat should change for Isaac Lab configs?\n- Treat this as a backend correctness requirement. Increasing damping, reducing stiffness, or increasing iterations cannot restore missing reaction forces.\n- Validate the combination at initialization. If the selected coupling implementation cannot return vertex, edge, and face reactions, reject full-surface contact with two-way coupling and explain why.\n- Use one contact-model definition. The reaction path should consume the same effective material parameters and contact evaluation as VBD, rather than exposing separately tuned \u201chand reaction\u201d parameters.\n- Test the resulting preset. Check equal-and-opposite contact impulses, correct torque, and a thin-finger polybag grasp. Matching force formulas is necessary; consistent substep timing and impulse transfer also matter.",
+      "created_at": "2026-10-30T14:28:42Z",
+      "html_url": "https://github.com/isaac-sim/IsaacLab/issues/8889",
+      "id": "isaac-sim/IsaacLab#8889",
+      "issue_number": 8889,
+      "labels": [],
+      "repository": "isaac-sim/IsaacLab",
+      "surface_sha256": "777bff2ac89059b20a05157ca6c49abc3e13a2739374787d6f05f4a134b0f16b",
+      "title": "Full-surface contact and two-way coupling"
+    }
+  ],
+  "post_activation_issue_identities_observed": 413,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-30T16:50:15Z",
+  "schema_version": 1
+}
