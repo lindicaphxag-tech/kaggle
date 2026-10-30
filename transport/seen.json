@@ -6150,46 +6150,62 @@
     },
     {
       "created_at": "2026-10-30T16:11:47Z",
+      "expiry_recorded_at": "2026-10-30T22:55:46Z",
+      "expiry_sha256": "b0c4ec3c4a7f0333e708039336e657a7539c3243a424349befc5d19218626f77",
+      "expiry_source": "expirations/Farama-Foundation__PettingZoo__1531.json",
       "first_frozen_at": "2026-10-30T16:50:15Z",
       "id": "Farama-Foundation/PettingZoo#1531",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 1531,
       "prediction_deadline_at": "2026-10-30T22:50:15Z",
       "repository": "Farama-Foundation/PettingZoo",
       "source": "inbox/FIRST_SEEN_20261030T165015Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "06cd91151c69bbc4153cdc36950c8e46cd83510991a6ca60509837d48e7c031b"
     },
     {
       "created_at": "2026-10-30T14:01:24Z",
+      "expiry_recorded_at": "2026-10-30T22:55:46Z",
+      "expiry_sha256": "62cada485a0131e726d5583a71ac1eaf8d7d82c9395f7215723d37696d1fbd73",
+      "expiry_source": "expirations/Physical-Intelligence__openpi__1076.json",
       "first_frozen_at": "2026-10-30T16:50:15Z",
       "id": "Physical-Intelligence/openpi#1076",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 1076,
       "prediction_deadline_at": "2026-10-30T22:50:15Z",
       "repository": "Physical-Intelligence/openpi",
       "source": "inbox/FIRST_SEEN_20261030T165015Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "2b08672621766e83483dafb3c9c1b837123b0db04415641c66574807203119fe"
     },
     {
       "created_at": "2026-10-30T15:43:54Z",
+      "expiry_recorded_at": "2026-10-30T22:55:46Z",
+      "expiry_sha256": "23a2648935039434ab95bfed72bf835beb7b8289a29582baeb3d0041981317ee",
+      "expiry_source": "expirations/huggingface__lerobot__5164.json",
       "first_frozen_at": "2026-10-30T16:50:15Z",
       "id": "huggingface/lerobot#5164",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 5164,
       "prediction_deadline_at": "2026-10-30T22:50:15Z",
       "repository": "huggingface/lerobot",
       "source": "inbox/FIRST_SEEN_20261030T165015Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "a4071c0b51b945ef1318849b110d4693919f571e9ee8211ee46eff5ce6025a0c"
     },
     {
       "created_at": "2026-10-30T14:28:42Z",
+      "expiry_recorded_at": "2026-10-30T22:55:46Z",
+      "expiry_sha256": "f42ac8ad2ded8c3ec549d8adb9a036176b925892c140a5cb37ca3c92fc577427",
+      "expiry_source": "expirations/isaac-sim__IsaacLab__8889.json",
       "first_frozen_at": "2026-10-30T16:50:15Z",
       "id": "isaac-sim/IsaacLab#8889",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 8889,
       "prediction_deadline_at": "2026-10-30T22:50:15Z",
       "repository": "isaac-sim/IsaacLab",
       "source": "inbox/FIRST_SEEN_20261030T165015Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "777bff2ac89059b20a05157ca6c49abc3e13a2739374787d6f05f4a134b0f16b"
     },
     {
@@ -6224,6 +6240,17 @@
       "source": "inbox/FIRST_SEEN_20261030T214230Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "70773d8abb468763a8a94ccbf4ab92d6a72e7ca6b595d843a5c7029c493a9bd1"
+    },
+    {
+      "created_at": "2026-10-30T22:16:34Z",
+      "first_frozen_at": "2026-10-30T22:57:01Z",
+      "id": "micro-ROS/micro_ros_setup#842",
+      "issue_number": 842,
+      "prediction_deadline_at": "2026-10-31T04:57:01Z",
+      "repository": "micro-ROS/micro_ros_setup",
+      "source": "inbox/FIRST_SEEN_20261030T225701Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "c5a068b95c45ed742aa2d32947d4bf758a4fa8f0c06533cab3b31df1b9156b75"
     }
   ]
 }

@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "konstc",
+      "body": "Hi,\n\nI have been working on a micro-ROS integration for Connectivity Manager (Cortex-M4) of TI TMS320F2838x, on TMDSCNCD28388D board, with FreeRTOS, lwIP and UDP transport.\n\nThe project uses the standard micro_ros_setup static library workflow (`generate_lib` in `micro_ros_static_library_builder`), with a toolchain file for TI Arm Clang and TI's archiver to pack the library. It also comes with CCS examples, CI and a first release for Jazzy, tested on the board mentioned.\n\nRepo: https://github.com/konstc/micro_ros_f2838x_cm\n\nWould it be useful to add it to micro_ros_setup as a standalone component, and is this kind of contribution in scope?\n\nThanks!",
+      "created_at": "2026-10-30T22:16:34Z",
+      "html_url": "https://github.com/micro-ROS/micro_ros_setup/issues/842",
+      "id": "micro-ROS/micro_ros_setup#842",
+      "issue_number": 842,
+      "labels": [],
+      "repository": "micro-ROS/micro_ros_setup",
+      "surface_sha256": "c5a068b95c45ed742aa2d32947d4bf758a4fa8f0c06533cab3b31df1b9156b75",
+      "title": "Standalone component for TI F2838x Connectivity Manager"
+    }
+  ],
+  "post_activation_issue_identities_observed": 417,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-30T22:57:01Z",
+  "schema_version": 1
+}
