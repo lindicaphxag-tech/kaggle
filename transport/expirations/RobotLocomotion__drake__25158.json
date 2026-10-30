@@ -1,0 +1,13 @@
+{
+  "case_id": "RobotLocomotion/drake#25158",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-10-30T05:35:54Z",
+  "expiry_sha256": "16f558f000e9744d5fb604388c1e3460d3c30d96b81ec231d70aecbf9b77a5a9",
+  "first_frozen_at": "2026-10-29T23:34:56Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-10-30T05:34:56Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "1323e7e7fde851d5736089524db367d3c81f3b74512d6a77a2c8c77499f43cca"
+}
