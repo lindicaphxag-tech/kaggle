@@ -6075,14 +6075,51 @@
     },
     {
       "created_at": "2026-10-30T00:31:12Z",
+      "expiry_recorded_at": "2026-10-30T10:26:07Z",
+      "expiry_sha256": "452821ba8e389343957001d1ffdd4dfc8d5929f8b590006a2e6a8730fac9a3de",
+      "expiry_source": "expirations/Farama-Foundation__PettingZoo__1530.json",
       "first_frozen_at": "2026-10-30T02:55:13Z",
       "id": "Farama-Foundation/PettingZoo#1530",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 1530,
       "prediction_deadline_at": "2026-10-30T08:55:13Z",
       "repository": "Farama-Foundation/PettingZoo",
       "source": "inbox/FIRST_SEEN_20261030T025513Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "e0ad9fc597140171f27be9cefb292f4fe9eb99d07bc2b8ce6be611e2a3210758"
+    },
+    {
+      "created_at": "2026-10-30T07:23:09Z",
+      "first_frozen_at": "2026-10-30T10:27:49Z",
+      "id": "NVIDIA/Isaac-GR00T#799",
+      "issue_number": 799,
+      "prediction_deadline_at": "2026-10-30T16:27:49Z",
+      "repository": "NVIDIA/Isaac-GR00T",
+      "source": "inbox/FIRST_SEEN_20261030T102749Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "5949d7b4411b01dabc732d074baf4097ce52ddf9d94dff8c361bd1dbbc985550"
+    },
+    {
+      "created_at": "2026-10-30T09:06:26Z",
+      "first_frozen_at": "2026-10-30T10:27:49Z",
+      "id": "NVlabs/alpasim#230",
+      "issue_number": 230,
+      "prediction_deadline_at": "2026-10-30T16:27:49Z",
+      "repository": "NVlabs/alpasim",
+      "source": "inbox/FIRST_SEEN_20261030T102749Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "b86cce82649d471c367a5fcfb6393bc2bdbcceb8fcd34258109524caa61943cb"
+    },
+    {
+      "created_at": "2026-10-30T07:12:58Z",
+      "first_frozen_at": "2026-10-30T10:27:49Z",
+      "id": "gazebosim/gz-sim#4160",
+      "issue_number": 4160,
+      "prediction_deadline_at": "2026-10-30T16:27:49Z",
+      "repository": "gazebosim/gz-sim",
+      "source": "inbox/FIRST_SEEN_20261030T102749Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "cb5be73cde09fdb2b8890417f4c84961bb4c6f6cf37d613adb3e524a547a4b36"
     }
   ]
 }
