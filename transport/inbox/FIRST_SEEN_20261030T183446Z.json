@@ -1,0 +1,41 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "OniNoOdori",
+      "body": "### Description\n\n`computeTimeStamps()` has a bug that causes bounds of active joints to be mapped to inactive joints under certain conditions. As a consequence, it can cause velocity or acceleration limits for specific joints to be ignored.\n\nBounds are correctly accessed with\n`vars[active_joint_indices[idx]]`\n\nwhereas max_velocity is initialized with\n`Eigen::VectorXd max_velocity(num_active_joints);`\nand assigned with\n`max_velocity[idx] = ...`\nNote the difference in indexing (`active_joint_indices[idx]` vs. `idx`). Therefore, `max_velocity` only contains one entry for each ACTIVE joint.\n\nHowever, `totgComputeTimeStamps()` does NOT check for active joints and therefore creates paths that include entries for mimic joints as well:\n\n```\nconst unsigned num_joints = group->getVariableCount();\n...\nfor (size_t p = 0; p < num_points; ++p)\n  {\n    moveit::core::RobotStatePtr waypoint = trajectory.getWayPointPtr(p);\n    Eigen::VectorXd new_point(num_joints);\n   ...\n   points.push_back(new_point);\n\n   ...\nstd::optional<Path> path = Path::create(points, path_tolerance_);\n...\nstd::optional<Trajectory> parameterized = Trajectory::create(*path, max_velocity, max_acceleration, DEFAULT_TIMESTEP);\n```\n\n\nConsequently, there is later an index mismatch when creating waypoints:\n```\nfor (size_t j = 0; j < num_joints; ++j)\n    {\n      waypoint.setVariablePosition(idx[j], position[j]);\n      waypoint.setVariableVelocity(idx[j], velocity[j]);\n      waypoint.setVariableAcceleration(idx[j], acceleration[j]);\n    }\n```\n\nHere, `num_joints` is the number of active joints. `position` contains entries for all joints (including mimic joints), whereas `velocity` and `acceleration` only contain entries for active joints. Using the same index for both causes a mismatch when mimic joints are present.\n\n\n\nExample: An industrial palletizing robot arm with four DOF and a parallel linkage mechanism modeled as:\n\nLink1\nJoint1\nLink2\nJoint2\nLink3\nJoint3\nLink4\nMimicJoint1\nVirtualLink\nMimicJoint2\nLink5\nJoint4\nEEF\n\nBoundaries set for Joint4 are wrongly mapped onto MimicJoint1 and consequently ignored during planning. This leads to much faster movement than intended.\n\n### ROS Distro\n\nJazzy\n\n### OS and version\n\nUbuntu 24.04\n\n### Source or binary build?\n\nSource\n\n### If binary, which release version?\n\n_No response_\n\n### If source, which branch?\n\nmain\n\n### Which RMW are you using?\n\nNone\n\n### Steps to Reproduce\n\n1. Use a robot model with at least one mimic joint followed by an active joint.\n2. Set low velocity / acceleration limits for the joint that follows the mimic joint. Set high limits for all other joints.\n3. Run any task that involves movement. Observe that the limits for the joint following the mimic joint are ignored.\n\n### Expected behavior\n\nvelocity / acceleration limits for all active joints should be respected\n\n### Actual behavior\n\nvelocity / acceleration limits for active joints that follow a mimic joint are ignored\n\n### Backtrace or Console output\n\n_No response_",
+      "created_at": "2026-10-30T17:04:46Z",
+      "html_url": "https://github.com/moveit/moveit2/issues/3953",
+      "id": "moveit/moveit2#3953",
+      "issue_number": 3953,
+      "labels": [
+        "bug"
+      ],
+      "repository": "moveit/moveit2",
+      "surface_sha256": "88b301fba2960b44f8018f7b55771e9f319b005000adfdc777cd4304a401ea70",
+      "title": "Indexing bug in TOTG computeTimeStamps() - joint bounds ignored when mimic joints present"
+    },
+    {
+      "author_login": "j-matheron",
+      "body": "### \ud83d\udc1e Bug\n\nSame defect as the one mentionned for connect in #2962 . For <weld>, the MJCF parser misplaces the constraint frames.\n\n**Problems**\n- anchor is expressed in body2 coordinates (MuJoCo doc). The parser uses it as if it were in joint2 coordinates.\n- With an explicit relpose, i1Mc is built from i2Mc, which already contains anchor. The anchor of body 2 therefore leaks into body\u00a01. In MuJoCo, body 1 depends only on relpose.\n \n When relpose is omitted (MuJoCo uses the qref pose), the i1Mc formula is correct but inherits the wrong i2Mc.\n\n**Expected fixes**\n - Convert anchor from body2 to joint2 coordinates: i2Mc = i2Mb2 * b2Mc.\n- Handle body2 == \"\" (world) separately: no body to joint conversion in that case.\n- Use the correct frame for i1Mc when relpose is explicit: i1Mc = i1Mb1 * relpose.\n\n\n### Reproduction steps\n\nLoad an MJCF with <weld body1=... body2=... anchor=\"0.1 0 0\" relpose=\"...\"> where body1 and body2 have a non-identity placement relative to their joints. \nCompare the constraint placements with MuJoCo's\n\n\n### System Info\n\n- OS: Ubuntu 24\n- Pinocchio: devel\n- Built from source with pixi\n\n### Checklist\n\n- [x] I have read the [contributing guidelines](https://github.com/stack-of-tasks/pinocchio/blob/devel/CONTRIBUTING.md)\n- [x] I have checked that all my packages are installed from the same package manager (conda-forge, Nix, PyPI, robotpkg, ROS, ...)\n- [x] I have checked that there is no similar [issue](https://github.com/stack-of-tasks/pinocchio/issues)/[discussion](https://github.com/stack-of-tasks/pinocchio/discussions) in the repo\n- [x] I have provided a minimal and working example to reproduce the bug\n- [x] I have used [Markdown code blocks](https://help.github.com/en/articles/creating-and-highlighting-code-blocks) for code, stack traces and compiler errors\n- [ ] I have used an AI assistant",
+      "created_at": "2026-10-30T16:59:29Z",
+      "html_url": "https://github.com/stack-of-tasks/pinocchio/issues/2971",
+      "id": "stack-of-tasks/pinocchio#2971",
+      "issue_number": 2971,
+      "labels": [
+        "bug",
+        "core developers"
+      ],
+      "repository": "stack-of-tasks/pinocchio",
+      "surface_sha256": "549781f672806acde280c5231f1527198654f9b9a8f84858579670918bbb5fda",
+      "title": "[Bug]: MJCF weld anchors ignore the body-to-joint placement"
+    }
+  ],
+  "post_activation_issue_identities_observed": 415,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-30T18:34:46Z",
+  "schema_version": 1
+}

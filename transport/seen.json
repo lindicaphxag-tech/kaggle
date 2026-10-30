@@ -6187,6 +6187,28 @@
       "source": "inbox/FIRST_SEEN_20261030T165015Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "777bff2ac89059b20a05157ca6c49abc3e13a2739374787d6f05f4a134b0f16b"
+    },
+    {
+      "created_at": "2026-10-30T17:04:46Z",
+      "first_frozen_at": "2026-10-30T18:34:46Z",
+      "id": "moveit/moveit2#3953",
+      "issue_number": 3953,
+      "prediction_deadline_at": "2026-10-31T00:34:46Z",
+      "repository": "moveit/moveit2",
+      "source": "inbox/FIRST_SEEN_20261030T183446Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "88b301fba2960b44f8018f7b55771e9f319b005000adfdc777cd4304a401ea70"
+    },
+    {
+      "created_at": "2026-10-30T16:59:29Z",
+      "first_frozen_at": "2026-10-30T18:34:46Z",
+      "id": "stack-of-tasks/pinocchio#2971",
+      "issue_number": 2971,
+      "prediction_deadline_at": "2026-10-31T00:34:46Z",
+      "repository": "stack-of-tasks/pinocchio",
+      "source": "inbox/FIRST_SEEN_20261030T183446Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "549781f672806acde280c5231f1527198654f9b9a8f84858579670918bbb5fda"
     }
   ]
 }
