@@ -5970,46 +5970,62 @@
     },
     {
       "created_at": "2026-10-29T18:19:38Z",
+      "expiry_recorded_at": "2026-10-30T02:53:40Z",
+      "expiry_sha256": "779e0abcb13b4381268e0de97f3dd228c73eb6483a3591d1b9a513d78f980be4",
+      "expiry_source": "expirations/NVIDIA-ISAAC-ROS__isaac_ros_common__246.json",
       "first_frozen_at": "2026-10-29T19:14:09Z",
       "id": "NVIDIA-ISAAC-ROS/isaac_ros_common#246",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 246,
       "prediction_deadline_at": "2026-10-30T01:14:09Z",
       "repository": "NVIDIA-ISAAC-ROS/isaac_ros_common",
       "source": "inbox/FIRST_SEEN_20261029T191409Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "dd11d4f618976d24b82fd922b6e030f121b87cef03b9be5ae0ed62c75d50360e"
     },
     {
       "created_at": "2026-10-29T16:16:23Z",
+      "expiry_recorded_at": "2026-10-30T02:53:40Z",
+      "expiry_sha256": "3aeb52eac0421b7b48b3792824a88e5a618c75906150a36db57d5e82e200f9a8",
+      "expiry_source": "expirations/NVlabs__alpasim__229.json",
       "first_frozen_at": "2026-10-29T19:14:09Z",
       "id": "NVlabs/alpasim#229",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 229,
       "prediction_deadline_at": "2026-10-30T01:14:09Z",
       "repository": "NVlabs/alpasim",
       "source": "inbox/FIRST_SEEN_20261029T191409Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "b40cba5f99c18411a248b26b6c6892c8affb966f60ac30dbe46b7caef2d231df"
     },
     {
       "created_at": "2026-10-29T18:17:03Z",
+      "expiry_recorded_at": "2026-10-30T02:53:40Z",
+      "expiry_sha256": "ca6a3e72bda98416fc3bd5a8ff5c1b4820fa7b986f843320777d2f4815e5edcc",
+      "expiry_source": "expirations/RobotLocomotion__drake__25157.json",
       "first_frozen_at": "2026-10-29T19:14:09Z",
       "id": "RobotLocomotion/drake#25157",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 25157,
       "prediction_deadline_at": "2026-10-30T01:14:09Z",
       "repository": "RobotLocomotion/drake",
       "source": "inbox/FIRST_SEEN_20261029T191409Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "b7b685cb2b1a57c3de5b2d2d7a334fa68f5794910ac7e59fa62e406380f51ae3"
     },
     {
       "created_at": "2026-10-29T17:01:46Z",
+      "expiry_recorded_at": "2026-10-30T02:53:40Z",
+      "expiry_sha256": "81f9484a52815d4fcb8b40583800a2e8acea8338a939bd228be886e3136db257",
+      "expiry_source": "expirations/gazebosim__gz-sim__4154.json",
       "first_frozen_at": "2026-10-29T19:14:09Z",
       "id": "gazebosim/gz-sim#4154",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 4154,
       "prediction_deadline_at": "2026-10-30T01:14:09Z",
       "repository": "gazebosim/gz-sim",
       "source": "inbox/FIRST_SEEN_20261029T191409Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "894627f48144a4d3dfd84072aac1947ffb8566acef8cddfadba0e9b038b0d6b1"
     },
     {
@@ -6044,6 +6060,17 @@
       "source": "inbox/FIRST_SEEN_20261029T233456Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "e86cdc39ad97b180b872cf4ccc180d272666a88f739ea421341cea18864a61ca"
+    },
+    {
+      "created_at": "2026-10-30T00:31:12Z",
+      "first_frozen_at": "2026-10-30T02:55:13Z",
+      "id": "Farama-Foundation/PettingZoo#1530",
+      "issue_number": 1530,
+      "prediction_deadline_at": "2026-10-30T08:55:13Z",
+      "repository": "Farama-Foundation/PettingZoo",
+      "source": "inbox/FIRST_SEEN_20261030T025513Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "e0ad9fc597140171f27be9cefb292f4fe9eb99d07bc2b8ce6be611e2a3210758"
     }
   ]
 }

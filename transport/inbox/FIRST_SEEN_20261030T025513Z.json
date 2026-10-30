@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "jkterry1",
+      "body": "We're in the process of reskinning all of Farama's pixel art environments across projects to a single professional format given the amount they're used in schools. If contributors could start throwing up a PR using these sets of pixel art over time, I'd be highly grateful",
+      "created_at": "2026-10-30T00:31:12Z",
+      "html_url": "https://github.com/Farama-Foundation/PettingZoo/issues/1530",
+      "id": "Farama-Foundation/PettingZoo#1530",
+      "issue_number": 1530,
+      "labels": [],
+      "repository": "Farama-Foundation/PettingZoo",
+      "surface_sha256": "e0ad9fc597140171f27be9cefb292f4fe9eb99d07bc2b8ce6be611e2a3210758",
+      "title": "Use New Pixel Art"
+    }
+  ],
+  "post_activation_issue_identities_observed": 405,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-30T02:55:13Z",
+  "schema_version": 1
+}
