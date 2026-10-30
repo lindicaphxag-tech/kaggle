@@ -1,0 +1,31 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "Hadrien-Cornier",
+      "body": "# IMPRINT: opt-in latent memory policy, random weights and a CPU smoke\n\n## Ticket Type\n\n\ud83d\udca1 Feature Request / Improvement\n\n## Description\n\nLeRobot has no IMPRINT policy. [Memory Without Curation: Learning Multi-Stream Latent Memory for Robot Policies](https://arxiv.org/abs/2610.14406) trains a multi-stream latent memory and then conditions a flow-matching action expert on it. The reference code is Apache-2.0 at [amazon-far/imprint](https://github.com/amazon-far/imprint).\n\nProposal: an opt-in policy type `imprint`, selected with `--policy.type=imprint`. Existing policy defaults stay as they are. `TinyFrameEncoder` is the image stem. It is a stand-in for DINOv3 and Wan 2.2, and its weights are this policy's own random initialization. Stage `memory` trains the memory decoder. `load_memory_weights` copies that memory into a joint policy and leaves the decoder behind. Stage `joint` trains the small flow-matching expert.\n\nThis is the architecture with random weights and a CPU smoke run, not a paper result.\n\n### CPU smoke\n\nDry run on one Mac, `device=cpu`, public dataset `lerobot/pusht` episode 0 (161 frames, 1 episode). Batch size 2. Two optimizer steps per stage. PyAV decoded the video after TorchCodec failed to load.\n\n| Stage | Learnable parameters | Step 1 loss | Step 2 loss |\n| --- | ---: | ---: | ---: |\n| memory | 109325 | 2.083 | 1.746 |\n| joint | 49210 | 2.218 | 2.436 |\n\nStage memory step 1 split: visual 0.528, action 2.052, proprio 0.880, progress 0.177. Step 2 split: visual 0.480, action 1.512, proprio 0.925, progress 0.096. Stage joint reports `loss_action` only.\n\nThe handoff loaded 76 memory tensors and skipped 42 decoder tensors. After the joint stage the expert is present and the decoder is absent. The copied memory tensor changed across the two joint steps. That shows the handoff is wired. It is not evidence that memory helps.\n\nTwo `select_action` calls returned finite actions of shape `(1, 2)`. `reset` cleared the chunk counts.\n\n### Limits\n\n- Two optimizer steps with random weights do not measure the paper. These losses are a Dry run.\n- No RMBench, RoboCasa, or real-robot success rate is claimed.\n- DINOv3, Wan 2.2, Pi0.5, and the Amazon-FAR checkpoints were not downloaded.\n- The RoboCasa replay archive published with amazon-far/imprint `252ae09fcc2a94874fe0876d15142fe483ac553f` is not in this change.\n- `chunkwise_wy` is not implemented. The checked path is the Python event scan.\n- The paper training stack is Linux x86_64, Python 3.11, CUDA 12.8, and four 80 GB GPUs. That run was not launched.\n\n## Context & Reproduction\n\nImplementation and evidence: https://github.com/huggingface/lerobot/pull/5171\n\nThe pull request head is `fb0cc45b9a1c908c6b65b8cf9e9cf0ba39ab64c6`, rebased onto huggingface/lerobot `d9da92cfa8cf6d5df1e803d3baa7a9287bff099a`. The CPU smoke ran on the parent `6c13bfb5e23b2b69e24c6f4361ffb59b7930c522`. The later commit only aligns the README table for prettier. Local checks on that smoke commit:\n\n- `uv run ruff check` and `uv run ruff format --check` on the imprint package and tests: clean\n- `uv run mypy src/lerobot/policies/imprint src/lerobot/policies/__init__.py`: no issues in 6 source files\n- `uv run pytest tests/policies/imprint -q`: 20 passed\n\n## Checklist\n\n- [x] I have searched existing tickets to ensure this isn't a duplicate.\n- [x] I am using the latest version of the `main` branch.\n- [x] I have verified this is not an environment-specific problem.\n\n## Additional Info / Workarounds\n\nThe image stem is `TinyFrameEncoder`, a stride-2 convolution and a spatial mean. Paper-scale training, frozen DINOv3, Wan 2.2, and Pi0.5 weights stay out of scope.\n",
+      "created_at": "2026-10-30T19:12:14Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5172",
+      "id": "huggingface/lerobot#5172",
+      "issue_number": 5172,
+      "labels": [
+        "documentation",
+        "enhancement",
+        "policies",
+        "dataset",
+        "tests",
+        "training"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "70773d8abb468763a8a94ccbf4ab92d6a72e7ca6b595d843a5c7029c493a9bd1",
+      "title": "IMPRINT: opt-in latent memory policy, random weights and a CPU smoke"
+    }
+  ],
+  "post_activation_issue_identities_observed": 416,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-30T21:42:30Z",
+  "schema_version": 1
+}
