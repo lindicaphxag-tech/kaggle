@@ -1,0 +1,32 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "jdubray",
+      "body": "**Version:** LeRobot 0.6.1, `--env.type=libero --env.task=libero_10`, Tesla T4, EGL, seed 1000.\n\n**What happens.** `LiberoEnv` renders 360 x 360 images by default (`observation_height` / `observation_width`). The SmolVLA LIBERO checkpoints declare 3 x 256 x 256 camera inputs (`input_features` in the checkpoint config). Running them with the default size gives a much lower success rate than running them at 256, with nothing in the log pointing to the mismatch.\n\n**Measured** (LIBERO-10 tasks 0 and 4, 10 episodes each, same initial states and seed, `policy.n_action_steps=10`):\n\n| Checkpoint | Obs size | Tool | Task 0 | Task 4 | Total |\n|---|---|---|---|---|---|\n| HuggingFaceVLA/smolvla_libero | 256 (`--env.observation_height=256 --env.observation_width=256`) | stock `lerobot-eval` | 4/10 | 2/10 | 6/20 |\n| HuggingFaceVLA/smolvla_libero | 360 (default) | a wrapper around LeRobot's own `make_env` and processors | 0/10 | 0/10 | 0/20 |\n| lerobot/smolvla_libero (with `--rename_map` camera1/camera2) | 256 | stock `lerobot-eval` | 2/10 | 6/10 | 8/20 |\n\nFisher exact test, 256 vs 360 on the HuggingFaceVLA checkpoint: p = 0.02. `lerobot/smolvla_libero` was not run at 360 px. The wrapper and stock `lerobot-eval` agree episode for episode at the same settings (256 px, `n_action_steps` 1: 2/20 in both), so the 360 result is not an artifact of the wrapper.\n\n**Expected.** Either the default observation size matches the checkpoint, or loading a policy whose `input_features` image shape differs from the env's rendered shape warns (or the eval script sets the env size from the policy config).\n\n**Suggestion.** Warn in `lerobot-eval` when the env image shape differs from the policy's image `input_features`, and/or note the required `--env.observation_height/width=256` in the SmolVLA LIBERO model cards.\n\n**Reproduce.**\nlerobot-eval --policy.path=HuggingFaceVLA/smolvla_libero --env.type=libero --env.task=libero_10 --env.task_ids=[0,4] --eval.batch_size=1 --eval.n_episodes=10 --policy.n_action_steps=10 --seed=1000 [--env.observation_height=256 --env.observation_width=256]",
+      "created_at": "2026-10-31T20:55:43Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5185",
+      "id": "huggingface/lerobot#5185",
+      "issue_number": 5185,
+      "labels": [
+        "policies",
+        "tests",
+        "configuration",
+        "visualization",
+        "sensors",
+        "processor",
+        "evaluation"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "932f529b3e5ad0c007c3fcba36eb600244aecd968f40629204a8cc8f3c1e95eb",
+      "title": "LiberoEnv defaults to 360 px observations but the SmolVLA LIBERO checkpoints were trained at 256 px (0/20 vs 6/20 on two LIBERO-10 tasks)"
+    }
+  ],
+  "post_activation_issue_identities_observed": 429,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-31T22:48:49Z",
+  "schema_version": 1
+}
