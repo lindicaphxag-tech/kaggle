@@ -1,0 +1,13 @@
+{
+  "case_id": "Genesis-Embodied-AI/genesis-world#3652",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-10-31T15:42:02Z",
+  "expiry_sha256": "6b69422a398e03f005ca372c3833a137ad58ef6dd2b8e4f9f0fc21f6a62b842d",
+  "first_frozen_at": "2026-10-31T09:32:36Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-10-31T15:32:36Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "1b52ee3c7616b07ecef1424759a71a2e3f6c8cd3e1ce49b9212f0c9c8b8acdb7"
+}
