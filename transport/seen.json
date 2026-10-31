@@ -6285,46 +6285,62 @@
     },
     {
       "created_at": "2026-10-31T05:21:17Z",
+      "expiry_recorded_at": "2026-10-31T13:50:54Z",
+      "expiry_sha256": "d8d0a696566d9723e35d781d8898184aa8942466ab365239d6093dc912d33ce9",
+      "expiry_source": "expirations/Farama-Foundation__Minari__376.json",
       "first_frozen_at": "2026-10-31T07:29:39Z",
       "id": "Farama-Foundation/Minari#376",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 376,
       "prediction_deadline_at": "2026-10-31T13:29:39Z",
       "repository": "Farama-Foundation/Minari",
       "source": "inbox/FIRST_SEEN_20261031T072939Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "b24b6fa1e04982bcfbcb977fd00fdcce36aa14d92dfa96a4e7bd873ee1d54ead"
     },
     {
       "created_at": "2026-10-31T03:10:25Z",
+      "expiry_recorded_at": "2026-10-31T13:50:54Z",
+      "expiry_sha256": "2fa107087536811997f0438ed9c3b7eecf886851e5161d8e1995bb669ccbb564",
+      "expiry_source": "expirations/Genesis-Embodied-AI__genesis-world__3646.json",
       "first_frozen_at": "2026-10-31T07:29:39Z",
       "id": "Genesis-Embodied-AI/genesis-world#3646",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3646,
       "prediction_deadline_at": "2026-10-31T13:29:39Z",
       "repository": "Genesis-Embodied-AI/genesis-world",
       "source": "inbox/FIRST_SEEN_20261031T072939Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "00576a5f91f2fa549a45746a32cf572170465018ce78e1964724b6326a7b7e2c"
     },
     {
       "created_at": "2026-10-31T03:10:57Z",
+      "expiry_recorded_at": "2026-10-31T13:50:54Z",
+      "expiry_sha256": "af2ee365e2652ecb69213f2e7ea206a3d09f072e08d2a01ddfaa8a7e56fec964",
+      "expiry_source": "expirations/Genesis-Embodied-AI__genesis-world__3647.json",
       "first_frozen_at": "2026-10-31T07:29:39Z",
       "id": "Genesis-Embodied-AI/genesis-world#3647",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3647,
       "prediction_deadline_at": "2026-10-31T13:29:39Z",
       "repository": "Genesis-Embodied-AI/genesis-world",
       "source": "inbox/FIRST_SEEN_20261031T072939Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "4e607bbc29c32b89e96a1facd1e47f31199e19bfb090702f22991ab08cc122c6"
     },
     {
       "created_at": "2026-10-31T03:10:59Z",
+      "expiry_recorded_at": "2026-10-31T13:50:54Z",
+      "expiry_sha256": "2e1ffd3e485c5a06e0ee53380fb1c6900fe3735ac8a62c6ee491eaab6cfdbc80",
+      "expiry_source": "expirations/Genesis-Embodied-AI__genesis-world__3648.json",
       "first_frozen_at": "2026-10-31T07:29:39Z",
       "id": "Genesis-Embodied-AI/genesis-world#3648",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3648,
       "prediction_deadline_at": "2026-10-31T13:29:39Z",
       "repository": "Genesis-Embodied-AI/genesis-world",
       "source": "inbox/FIRST_SEEN_20261031T072939Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "8b439003cdf20c441d5ffda69347b55ae2ea7e7fadae7e46cf122d846436660c"
     },
     {
@@ -6337,6 +6353,28 @@
       "source": "inbox/FIRST_SEEN_20261031T093236Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "1b52ee3c7616b07ecef1424759a71a2e3f6c8cd3e1ce49b9212f0c9c8b8acdb7"
+    },
+    {
+      "created_at": "2026-10-31T12:23:04Z",
+      "first_frozen_at": "2026-10-31T13:52:12Z",
+      "id": "huggingface/lerobot#5176",
+      "issue_number": 5176,
+      "prediction_deadline_at": "2026-10-31T19:52:12Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261031T135212Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "117859cd7b5c0c116f953991e214938906509b8dbfa392958d8dc538b8362bd9"
+    },
+    {
+      "created_at": "2026-10-31T12:32:19Z",
+      "first_frozen_at": "2026-10-31T13:52:12Z",
+      "id": "ros-controls/ros2_controllers#2722",
+      "issue_number": 2722,
+      "prediction_deadline_at": "2026-10-31T19:52:12Z",
+      "repository": "ros-controls/ros2_controllers",
+      "source": "inbox/FIRST_SEEN_20261031T135212Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "a4364f07ab224c8101296fc2c6870bd305714ef109bbfd45b8e880b63924f23f"
     }
   ]
 }

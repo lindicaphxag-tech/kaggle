@@ -1,0 +1,13 @@
+{
+  "case_id": "Farama-Foundation/Minari#376",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-10-31T13:50:54Z",
+  "expiry_sha256": "d8d0a696566d9723e35d781d8898184aa8942466ab365239d6093dc912d33ce9",
+  "first_frozen_at": "2026-10-31T07:29:39Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-10-31T13:29:39Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "b24b6fa1e04982bcfbcb977fd00fdcce36aa14d92dfa96a4e7bd873ee1d54ead"
+}
