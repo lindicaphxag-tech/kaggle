@@ -6210,24 +6210,32 @@
     },
     {
       "created_at": "2026-10-30T17:04:46Z",
+      "expiry_recorded_at": "2026-10-31T01:03:13Z",
+      "expiry_sha256": "32c19e09a153cb7fb5e2dd6b5f4c73cfbc25e9da2e61834451f7d0086168e5cd",
+      "expiry_source": "expirations/moveit__moveit2__3953.json",
       "first_frozen_at": "2026-10-30T18:34:46Z",
       "id": "moveit/moveit2#3953",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3953,
       "prediction_deadline_at": "2026-10-31T00:34:46Z",
       "repository": "moveit/moveit2",
       "source": "inbox/FIRST_SEEN_20261030T183446Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "88b301fba2960b44f8018f7b55771e9f319b005000adfdc777cd4304a401ea70"
     },
     {
       "created_at": "2026-10-30T16:59:29Z",
+      "expiry_recorded_at": "2026-10-31T01:03:13Z",
+      "expiry_sha256": "691570bedddaf6ceabef21f8f7317fc2a31eb9406a8e171139053845d7370d06",
+      "expiry_source": "expirations/stack-of-tasks__pinocchio__2971.json",
       "first_frozen_at": "2026-10-30T18:34:46Z",
       "id": "stack-of-tasks/pinocchio#2971",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 2971,
       "prediction_deadline_at": "2026-10-31T00:34:46Z",
       "repository": "stack-of-tasks/pinocchio",
       "source": "inbox/FIRST_SEEN_20261030T183446Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "549781f672806acde280c5231f1527198654f9b9a8f84858579670918bbb5fda"
     },
     {
@@ -6251,6 +6259,17 @@
       "source": "inbox/FIRST_SEEN_20261030T225701Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "c5a068b95c45ed742aa2d32947d4bf758a4fa8f0c06533cab3b31df1b9156b75"
+    },
+    {
+      "created_at": "2026-10-31T00:43:17Z",
+      "first_frozen_at": "2026-10-31T01:04:42Z",
+      "id": "huggingface/lerobot#5173",
+      "issue_number": 5173,
+      "prediction_deadline_at": "2026-10-31T07:04:42Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261031T010442Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "b4be67ef1c29c588a16adb84ef5d2f6aa9cab5dc257450328d9560862789626b"
     }
   ]
 }

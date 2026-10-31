@@ -1,0 +1,33 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "Hadrien-Cornier",
+      "body": "# Gaussian Action Readout: opt-in pi0.5 path at 2.11 times the ten-step teacher speed on one L4 proof\n\n## Ticket Type\n\n\ud83d\udca1 Feature Request / Improvement\n\n## Description\n\npi0.5 samples actions with a ten-step Euler integrator. [Gaussian Distillation of Flow Policies](https://arxiv.org/abs/2610.40271) (Youssef Saied, Ziyad Sheebaelhamd, Claire Vernade, and Fran\u00e7ois Fleuret, 29 October 2026) proposes a Gaussian Action Readout. The readout replaces the final action sampling of a frozen flow policy with one Gaussian head. The paper says code will be released soon. This proposal does not import an unreleased official repository.\n\nProposal: an opt-in `gaussian_readout_path` on `PI05Config`. The default is `None`, and the ten-step Euler sampler stays in place. A set path loads a separate readout artifact and samples from it. The readout is a sibling module, `src/lerobot/policies/pi05/gaussian_readout.py`. The proof runner is `experiments/gar/proof.py`.\n\n### Speed test\n\nOne NVIDIA L4, `lerobot/pi05_libero_finetuned_v044` at revision `7152f13e34c6c115d808aea0e5d08aca74eac14b`, 8 held-out contexts, 20 passes, 160 samples per path. The job is https://huggingface.co/jobs/hadriencornier/6ae5343e0e0338d1bb7cfb64. It finished at 7:39 PM CDT on 30 October 2026.\n\n| Path | Median seconds | p95 seconds |\n| --- | ---: | ---: |\n| Ten-step teacher | 0.3119816809994518 | 0.32245491800131276 |\n| Gaussian readout | 0.14764849000130198 | 0.1528457519998483 |\n| One-step teacher, diagnostic | 0.1494976560024952 | 0.15267175000190036 |\n\nThe teacher median divided by the readout median is 2.1130028556113287. The prefix medians are 0.12027883799964911 seconds for the teacher and 0.12623716599773616 seconds for the readout. The action-network medians are 0.19028417899971828 seconds for the teacher and 0.019946808999520727 seconds for the readout. Held-out mean squared error on the same 8 contexts is 0.013512860052287579.\n\n### Simulation\n\nLIBERO-Long task \"put both the alphabet soup and the tomato sauce in the basket\". Initial states 0 and 1. Policy seeds 17, 18, 19, and 20. Sixteen episodes, eight pairs.\n\nThe teacher succeeded on 8 of 8 episodes. The readout succeeded on 8 of 8 episodes. Every success used the soup-then-sauce order. The two-mode label is inconclusive, because that label requires the teacher to succeed in both orders.\n\n### Limits\n\n- The timing sample is one L4 and 8 held-out contexts. It does not rank a controller. No real arm was used.\n- The simulation is one task, one checkpoint, two initial states, and four seeds.\n- The two-mode result is inconclusive on this slice. This proof does not show that the readout keeps both teacher orders.\n- The one-step teacher row is a diagnostic. The comparison in the proposal is the ten-step teacher.\n- The paper's larger fitting protocol, and its reported Xiaomi and GR00T results, are outside this proof.\n- An earlier L4 job, https://huggingface.co/jobs/hadriencornier/6ae52eaf0e0338d1bb7cf942, matched this held-out mean squared error and a speed ratio of 2.1006753076003957, then stopped before any episode.\n\n## Context & Reproduction\n\nImplementation and evidence: https://github.com/huggingface/lerobot/pull/5174\n\nThe branch is `Hadrien-Cornier:fm/lerobot-gaussian-readout`, based on `724b1b62ff41ed6ada55d5157b51101f52011cd6`. A merge with current `main` is clean.\n\n## Checklist\n\n- [x] I have searched existing tickets to ensure this isn't a duplicate.\n- [ ] I am using the latest version of the `main` branch.\n- [ ] I have verified this is not an environment-specific problem.\n\n## Additional Info / Workarounds\n\nThe branch pin is `724b1b62ff41ed6ada55d5157b51101f52011cd6`. The measured proof commit is `973b159ad2c20aaddba9983abef59dc3d845361f`. Commit `728cbfe49a3385aa1856f936472d848bc371ec92` only marks two bandit sites in the proof runner. `gaussian_readout_path` stays unset unless a caller supplies an artifact.\n",
+      "created_at": "2026-10-31T00:43:17Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5173",
+      "id": "huggingface/lerobot#5173",
+      "issue_number": 5173,
+      "labels": [
+        "bug",
+        "enhancement",
+        "policies",
+        "simulation",
+        "tests",
+        "performance",
+        "teleoperators",
+        "examples"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "b4be67ef1c29c588a16adb84ef5d2f6aa9cab5dc257450328d9560862789626b",
+      "title": "Gaussian Action Readout: opt-in pi0.5 path at 2.11 times the ten-step teacher speed on one L4 proof"
+    }
+  ],
+  "post_activation_issue_identities_observed": 418,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-31T01:04:42Z",
+  "schema_version": 1
+}
