@@ -1,0 +1,13 @@
+{
+  "case_id": "micro-ROS/micro_ros_setup#842",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-10-31T07:28:17Z",
+  "expiry_sha256": "8217d97100fbc63566f75adcb15026a6f282a5b69317e01199d4b007ef0796d6",
+  "first_frozen_at": "2026-10-30T22:57:01Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-10-31T04:57:01Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "c5a068b95c45ed742aa2d32947d4bf758a4fa8f0c06533cab3b31df1b9156b75"
+}

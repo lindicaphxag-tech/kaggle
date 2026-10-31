@@ -1,0 +1,60 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 4,
+  "new_candidates": [
+    {
+      "author_login": "salma2vec",
+      "body": "`DataCollector` retains references to mutable observations, actions and infos until it writes the episode. If an environment reuses a NumPy observation buffer, or a policy fills the same action array for each step, later writes change transitions that were already collected.\n\nI reproduced this on `main` at `d88d29db69a84375274ce8c266e0e5d5f3a77a3f`, using the public collector and reloading the resulting HDF5 dataset:\n\n```text\n                  expected        saved\nobservations      [0, 1, 3, 6]    [6, 6, 6, 6]\nactions           [1, 2, 3]       [3, 3, 3]\ninfos.position    [0, 1, 3, 6]    [6, 6, 6, 6]\nrewards           [1, 3, 6]       [1, 3, 6]\n```\n\nThe saved state/action/reward tuples therefore no longer describe the collected trajectory. This affects offline training data even though collection, serialization and loading all complete successfully. Fresh arrays at each step are an unaffected control.\n\n```python\nimport os\nimport tempfile\nimport gymnasium as gym\nimport numpy as np\nfrom minari import DataCollector, load_dataset\n\nclass ReusedObservationEnv(gym.Env):\n    observation_space = gym.spaces.Box(0, 10, (1,), np.float32)\n    action_space = gym.spaces.Box(0, 10, (1,), np.float32)\n    def __init__(self):\n        self.observation = np.zeros(1, dtype=np.float32)\n        self.info = {'position': self.observation}\n    def reset(self, *, seed=None, options=None):\n        super().reset(seed=seed)\n        self.observation[:] = 0\n        return self.observation, self.info\n    def step(self, action):\n        self.observation += action\n        return self.observation, float(self.observation[0]), bool(self.observation[0] >= 6), False, self.info\n\nwith tempfile.TemporaryDirectory() as tmp:\n    os.environ['MINARI_DATASETS_PATH'] = tmp\n    collector = DataCollector(ReusedObservationEnv(), record_infos=True, data_format='hdf5')\n    collector.reset(seed=0)\n    action = np.zeros(1, dtype=np.float32)\n    for value in (1, 2, 3):\n        action[:] = value\n        collector.step(action)\n    collector.create_dataset('reused-buffer-v0', ref_min_score=0, ref_max_score=10)\n    collector.close()\n    episode = load_dataset('reused-buffer-v0')[0]\n    print('observations:', episode.observations[:, 0].tolist())\n    print('actions:', episode.actions[:, 0].tolist())\n    print('infos:', episode.infos['position'][:, 0].tolist())\n    print('rewards:', episode.rewards.tolist())\n```\n\nThe initial observation is retained directly in `reset()`, and `EpisodeBuffer.add_step_data()` appends subsequent leaves without copying them. A callback that reuses output buffers has the same behavior. Mutating a returned observation or info before the episode is flushed can also alter earlier records.\n\nThe collector should snapshot the fields it actually records after the step callback, including the initial observation and recorded reset info. The public `reset()`/`step()` return objects should keep their existing behavior. Unrecorded infos and unused callback fields should remain outside this copy boundary.\n\nEnvironment: source checkout at the commit above, in the upstream Linux Docker test environment on Python 3.11 and 3.14. The reproduction uses no external dataset or model.\n\n- [x] I checked existing issues and pull requests for this collection-buffer defect.\n",
+      "created_at": "2026-10-31T05:21:17Z",
+      "html_url": "https://github.com/Farama-Foundation/Minari/issues/376",
+      "id": "Farama-Foundation/Minari#376",
+      "issue_number": 376,
+      "labels": [],
+      "repository": "Farama-Foundation/Minari",
+      "surface_sha256": "b24b6fa1e04982bcfbcb977fd00fdcce36aa14d92dfa96a4e7bd873ee1d54ead",
+      "title": "[Bug Report] Reused buffers silently overwrite previously collected transitions"
+    },
+    {
+      "author_login": "Afloat16",
+      "body": "## Bug Description\n\nQuaternion interpolation at coincident orientations returns NaN endpoint gradients in both float32 and float64. The interpolated value is finite. The equivalent orientation pair `q` and `-q` is also affected.\n\n## Steps to Reproduce\n\n```python\nimport torch\nimport genesis as gs\nimport genesis.utils.geom as gu\n\ngs.init(backend=gs.cpu, precision=\"64\")\nq = torch.tensor([0.5, -0.5, 0.5, 0.5], dtype=gs.tc_float, device=gs.device, requires_grad=True)\nt = torch.tensor(0.3, dtype=gs.tc_float, device=gs.device)\nvalue = gu.slerp(q, q.detach(), t)\nprint(value)\nprint(torch.autograd.grad(value[0], q)[0])\n```\n\nThe gradient contains NaNs. Repeating with `precision=\"32\"` also produces NaN endpoint gradients.\n\n## Expected Behavior\n\nInterpolation should return `q`. The derivative of the first output component with respect to the first endpoint should be `[0.525, 0.175, -0.175, -0.175]` at this normalized quaternion and interpolation ratio.\n\n## Environment\n\nLinux x86_64, Intel Xeon Platinum 8573C, CPU backend, Python 3.12.14, PyTorch 2.15.0+cpu, NumPy 2.3.5. GPU driver and CUDA: N/A.\n\n## Release version or Commit ID\n\n`1daee8d5210cdfdfb3e238c592bfabe7f7b11814`\n\n## Additional Context\n\nThe spherical expression still evaluates `acos(1)` and a zero denominator when the linear branch is selected. Its backward pass propagates NaNs through the unselected branch.",
+      "created_at": "2026-10-31T03:10:25Z",
+      "html_url": "https://github.com/Genesis-Embodied-AI/genesis-world/issues/3646",
+      "id": "Genesis-Embodied-AI/genesis-world#3646",
+      "issue_number": 3646,
+      "labels": [],
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "surface_sha256": "00576a5f91f2fa549a45746a32cf572170465018ce78e1964724b6326a7b7e2c",
+      "title": "[Bug]: Coincident quaternion interpolation produces NaN gradients"
+    },
+    {
+      "author_login": "Afloat16",
+      "body": "## Bug Description\n\nThe homogeneous-transform helpers leave values from an existing `out` buffer in entries that should be zero. A buffer filled with NaNs exposes invalid bottom rows and off-diagonal entries. `trans_quat_to_T` also fails when one optional pose component is omitted.\n\n## Steps to Reproduce\n\n```python\nimport numpy as np\nimport genesis as gs\nimport genesis.utils.geom as gu\n\ngs.init(backend=gs.cpu, precision=\"64\")\ntranslation = np.array([1.0, 2.0, 3.0])\nout = np.full((4, 4), np.nan)\nprint(gu.trans_to_T(translation, out=out))\n\nquaternions = gu.xyz_to_quat(np.zeros((2, 3)))\nprint(gu.trans_quat_to_T(quat=quaternions))\n```\n\nThe first result contains NaNs outside the translation column and diagonal. The rotation-only call raises an exception involving the omitted translation. Supplying only a translation also fails.\n\n## Expected Behavior\n\nSupplying `out` should produce the same complete matrix as allocation inside the helper. The translation example should return an identity rotation, translation `[1, 2, 3]`, and bottom row `[0, 0, 0, 1]`. Omitting a pose component should use zero translation or identity rotation, consistently with `trans_R_to_T`.\n\n## Environment\n\nLinux x86_64, Intel Xeon Platinum 8573C, CPU backend, Python 3.12.14, PyTorch 2.15.0+cpu, NumPy 2.3.5, Numba 0.68.1. GPU driver and CUDA: N/A.\n\n## Release version or Commit ID\n\n`1daee8d5210cdfdfb3e238c592bfabe7f7b11814`",
+      "created_at": "2026-10-31T03:10:57Z",
+      "html_url": "https://github.com/Genesis-Embodied-AI/genesis-world/issues/3647",
+      "id": "Genesis-Embodied-AI/genesis-world#3647",
+      "issue_number": 3647,
+      "labels": [],
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "surface_sha256": "4e607bbc29c32b89e96a1facd1e47f31199e19bfb090702f22991ab08cc122c6",
+      "title": "[Bug]: Homogeneous transforms retain stale output-buffer entries"
+    },
+    {
+      "author_login": "Afloat16",
+      "body": "## Bug Description\n\n`z_to_quat` can return an incorrect shortest-rotation frame for a direction close to negative z. Opposite signs in the transverse components expose a sign error in the special antipodal branch. The resulting rotation matrix can differ substantially from the rotation implied by the cross product of z and the target direction.\n\n## Steps to Reproduce\n\n```python\nimport numpy as np\nfrom scipy.spatial.transform import Rotation\nimport genesis as gs\nimport genesis.utils.geom as gu\n\ngs.init(backend=gs.cpu, precision=\"64\")\ndirection = np.array([-1e-8, 2e-8, -1.0])\nunit = direction / np.linalg.norm(direction)\naxis = np.cross([0.0, 0.0, 1.0], unit)\nangle = np.arctan2(np.linalg.norm(axis), unit[2])\nexpected = Rotation.from_rotvec(axis / np.linalg.norm(axis) * angle).as_matrix()\nactual = Rotation.from_quat(gu.z_to_quat(direction), scalar_first=True).as_matrix()\nprint(np.max(np.abs(actual - expected)))\n```\n\nThe maximum matrix-entry difference is approximately `1.6`.\n\n## Expected Behavior\n\nThe quaternion should represent the shortest rotation from positive z to the non-antipodal target. Its rotation axis should retain both signs as the target approaches negative z. Exactly negative z can retain the existing arbitrary y-axis choice.\n\n## Environment\n\nLinux x86_64, Intel Xeon Platinum 8573C, CPU backend, Python 3.12.14, NumPy 2.3.5, Numba 0.68.1, SciPy 1.17.0. GPU driver and CUDA: N/A.\n\n## Release version or Commit ID\n\n`1daee8d5210cdfdfb3e238c592bfabe7f7b11814`",
+      "created_at": "2026-10-31T03:10:59Z",
+      "html_url": "https://github.com/Genesis-Embodied-AI/genesis-world/issues/3648",
+      "id": "Genesis-Embodied-AI/genesis-world#3648",
+      "issue_number": 3648,
+      "labels": [],
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "surface_sha256": "8b439003cdf20c441d5ffda69347b55ae2ea7e7fadae7e46cf122d846436660c",
+      "title": "[Bug]: Near-antipodal directions produce incorrect quaternion frames"
+    }
+  ],
+  "post_activation_issue_identities_observed": 422,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-10-31T07:29:39Z",
+  "schema_version": 1
+}
