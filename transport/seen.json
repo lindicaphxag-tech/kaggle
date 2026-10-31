@@ -6360,24 +6360,32 @@
     },
     {
       "created_at": "2026-10-31T12:23:04Z",
+      "expiry_recorded_at": "2026-10-31T19:54:18Z",
+      "expiry_sha256": "5c906cad15fceee910a542fa87ccd40ee9548adc0b9596b407f7c8b16fc31192",
+      "expiry_source": "expirations/huggingface__lerobot__5176.json",
       "first_frozen_at": "2026-10-31T13:52:12Z",
       "id": "huggingface/lerobot#5176",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 5176,
       "prediction_deadline_at": "2026-10-31T19:52:12Z",
       "repository": "huggingface/lerobot",
       "source": "inbox/FIRST_SEEN_20261031T135212Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "117859cd7b5c0c116f953991e214938906509b8dbfa392958d8dc538b8362bd9"
     },
     {
       "created_at": "2026-10-31T12:32:19Z",
+      "expiry_recorded_at": "2026-10-31T19:54:18Z",
+      "expiry_sha256": "55454c155e37fa3c9516a6f41a91408ed86802acf62b672dae868a78c4fc3c68",
+      "expiry_source": "expirations/ros-controls__ros2_controllers__2722.json",
       "first_frozen_at": "2026-10-31T13:52:12Z",
       "id": "ros-controls/ros2_controllers#2722",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 2722,
       "prediction_deadline_at": "2026-10-31T19:52:12Z",
       "repository": "ros-controls/ros2_controllers",
       "source": "inbox/FIRST_SEEN_20261031T135212Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "a4364f07ab224c8101296fc2c6870bd305714ef109bbfd45b8e880b63924f23f"
     },
     {
@@ -6401,6 +6409,17 @@
       "source": "inbox/FIRST_SEEN_20261031T184528Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "133f17723d446b412e24bc376f2602499e24baf215a38111f1b2a36e4a81599e"
+    },
+    {
+      "created_at": "2026-10-31T19:33:38Z",
+      "first_frozen_at": "2026-10-31T19:55:31Z",
+      "id": "google-deepmind/mujoco#3748",
+      "issue_number": 3748,
+      "prediction_deadline_at": "2026-11-01T01:55:31Z",
+      "repository": "google-deepmind/mujoco",
+      "source": "inbox/FIRST_SEEN_20261031T195531Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "60dc9fca19a4d39e3a2e3fcf7aba37124b0de13b2f17440c535c94046839f8d1"
     }
   ]
 }
