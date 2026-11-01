@@ -6540,13 +6540,17 @@
     },
     {
       "created_at": "2026-11-01T12:00:30Z",
+      "expiry_recorded_at": "2026-11-01T20:48:45Z",
+      "expiry_sha256": "ea4b6ecf56db0323f0f7c8a220902ff9c053763d938a6f5f5beed4a132c4723a",
+      "expiry_source": "expirations/isaac-sim__IsaacLab__8895.json",
       "first_frozen_at": "2026-11-01T13:13:08Z",
       "id": "isaac-sim/IsaacLab#8895",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 8895,
       "prediction_deadline_at": "2026-11-01T19:13:08Z",
       "repository": "isaac-sim/IsaacLab",
       "source": "inbox/FIRST_SEEN_20261101T131308Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "8ebcd8c1f26af56172ea07aae53fef08437f630ea5adab28bcb0ef6e77aaeacf"
     },
     {
