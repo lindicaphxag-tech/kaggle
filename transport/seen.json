@@ -6450,35 +6450,47 @@
     },
     {
       "created_at": "2026-10-31T23:56:07Z",
+      "expiry_recorded_at": "2026-11-01T09:40:38Z",
+      "expiry_sha256": "76b235269278aea7efb0996960b1ef7e735df8b59a0576ea358e568cdb6ed27f",
+      "expiry_source": "expirations/NVlabs__alpasim__232.json",
       "first_frozen_at": "2026-11-01T02:33:24Z",
       "id": "NVlabs/alpasim#232",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 232,
       "prediction_deadline_at": "2026-11-01T08:33:24Z",
       "repository": "NVlabs/alpasim",
       "source": "inbox/FIRST_SEEN_20261101T023324Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "a78ed2dae4c1c972efa7e2463f94d1cff27feb91c95884e5f7ef72c5aa321390"
     },
     {
       "created_at": "2026-11-01T00:51:57Z",
+      "expiry_recorded_at": "2026-11-01T09:40:38Z",
+      "expiry_sha256": "1e7d6c6c46d6c41dff0c4eab1788f8ff069f935ee482a8253e036d22b5852f36",
+      "expiry_source": "expirations/huggingface__lerobot__5187.json",
       "first_frozen_at": "2026-11-01T02:33:24Z",
       "id": "huggingface/lerobot#5187",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 5187,
       "prediction_deadline_at": "2026-11-01T08:33:24Z",
       "repository": "huggingface/lerobot",
       "source": "inbox/FIRST_SEEN_20261101T023324Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "7a21ce2aab13c0606702bba90a82815f01357ab1edf70110c6eb79ec3ea5dd9d"
     },
     {
       "created_at": "2026-11-01T01:22:03Z",
+      "expiry_recorded_at": "2026-11-01T09:40:38Z",
+      "expiry_sha256": "911e328fe2745b0275dc7500914f87674dde1a2545d42f5a049baa9c7793af2d",
+      "expiry_source": "expirations/huggingface__lerobot__5189.json",
       "first_frozen_at": "2026-11-01T02:33:24Z",
       "id": "huggingface/lerobot#5189",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 5189,
       "prediction_deadline_at": "2026-11-01T08:33:24Z",
       "repository": "huggingface/lerobot",
       "source": "inbox/FIRST_SEEN_20261101T023324Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "3b411c0c54d67342f1a75a266263f4a791e2387fd20392b1aeb159e868f79672"
     },
     {
@@ -6491,6 +6503,28 @@
       "source": "inbox/FIRST_SEEN_20261101T055305Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "eaab67061beb578efb78a340cfbc3af2e2b5d84329e1620f1cbcc1c366af4f7a"
+    },
+    {
+      "created_at": "2026-11-01T09:51:28Z",
+      "first_frozen_at": "2026-11-01T09:42:00Z",
+      "id": "NVIDIA/Isaac-GR00T#800",
+      "issue_number": 800,
+      "prediction_deadline_at": "2026-11-01T15:42:00Z",
+      "repository": "NVIDIA/Isaac-GR00T",
+      "source": "inbox/FIRST_SEEN_20261101T094200Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "a4f50325754d12eed2994570a605df5043841a77bd678606c489a1e12207c8f3"
+    },
+    {
+      "created_at": "2026-11-01T06:07:50Z",
+      "first_frozen_at": "2026-11-01T09:42:00Z",
+      "id": "NVlabs/alpasim#233",
+      "issue_number": 233,
+      "prediction_deadline_at": "2026-11-01T15:42:00Z",
+      "repository": "NVlabs/alpasim",
+      "source": "inbox/FIRST_SEEN_20261101T094200Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "bb0182735cf40e444a1139cc844513e18af40202b2d4707987e6f634723c5bc2"
     }
   ]
 }

@@ -1,0 +1,38 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "rjnps",
+      "body": "I'm working on building better infrastructure for robot learning and was able to speed up training gr00t N1.7 by 3x by optimizing the dataloading pipeline to load shards faster. Would love to get your feedback on this and improve the pipeline even further.\n\ndetails: https://www.knonik.com/product/benchmarks/groot-bridge\nrepo: https://github.com/knonik/Isaac-GR00T/tree/main",
+      "created_at": "2026-11-01T09:51:28Z",
+      "html_url": "https://github.com/NVIDIA/Isaac-GR00T/issues/800",
+      "id": "NVIDIA/Isaac-GR00T#800",
+      "issue_number": 800,
+      "labels": [],
+      "repository": "NVIDIA/Isaac-GR00T",
+      "surface_sha256": "a4f50325754d12eed2994570a605df5043841a77bd678606c489a1e12207c8f3",
+      "title": "3x training speedup for GR00T N1.7 with optimized dataloading"
+    },
+    {
+      "author_login": "taotingchen",
+      "body": "Hi organizers,\n\nOur team's pai-warmup and pai submissions were both accepted before the deadline, but they are currently at queue positions 29 and 30 of 30.\n\nBased on the leaderboard timestamps, evaluations appear to run one at a time, so the queue is unlikely to clear before the deadline.\n\n1. Will submissions queued before the deadline still be evaluated after it passes?\n2. If so, will they count as final-container candidates?\n3. Is there an estimated time for when the queue will clear?\n\nThanks!",
+      "created_at": "2026-11-01T06:07:50Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/233",
+      "id": "NVlabs/alpasim#233",
+      "issue_number": 233,
+      "labels": [
+        "bug"
+      ],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "bb0182735cf40e444a1139cc844513e18af40202b2d4707987e6f634723c5bc2",
+      "title": "[E2E Challenge][PAI] Are submissions still queued at the deadline evaluated and eligible as final containers?"
+    }
+  ],
+  "post_activation_issue_identities_observed": 435,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-01T09:42:00Z",
+  "schema_version": 1
+}
