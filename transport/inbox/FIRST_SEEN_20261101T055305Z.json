@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "tesslerc",
+      "body": "## Describe the bug\n\nWhen an articulation is spawned with `MultiUsdFileCfg` (several USD variants of one asset) and the scene is replicated through the PhysX cloner, the per-environment variant that PhysX actually simulates does not follow `ClonePlan.topology.world_prototype_layout`. The engine places each variant's source prim in environments `0..N-1` (variant `k` in environment `k`) and the replicated copies after them in contiguous blocks, whatever `clone_strategy` produced the plan.\n\nConsequently, deriving \"which variant does environment i hold\" from the clone plan (`world_prototype_layout`, or `cloner.query.get_asset_prototype_unique_world_index` on the robot's prototypes) gives a different answer from what the simulation contains once `num_envs > N`.\n\n## Steps to reproduce\n\n1. Author N (e.g. 3) USD copies of the same articulation that differ only in one joint's limits, so each variant is identifiable from `Articulation.data.joint_pos_limits`.\n2. Spawn them as one `ArticulationCfg` with `spawn=sim_utils.MultiUsdFileCfg(usd_path=[...N paths...])` in an `InteractiveSceneCfg` with `num_envs = 3 * N` on the PhysX backend.\n3. Either keep the default `sequential` clone strategy, or pass `clone_cfg=CloneCfg(clone_strategy=lambda w, n: np.arange(n) % len(w))` (round robin).\n4. After `sim.reset()`, read `scene.clone_plan.topology.world_prototype_layout` and compare it with the variant identified per environment from the simulated joint limits.\n\nObserved (N = 3, 9 environments):\n- round-robin plan: layout `0,1,2,0,1,2,0,1,2`; engine `0,1,2,0,0,1,1,2,2`\n- sequential plan: layout `0,0,0,1,1,1,2,2,2`; engine `0,1,2,0,0,1,1,2,2`\n\nThe plan agrees with the engine only when `num_envs == N`.\n\nLooking at `isaaclab_physx/cloner/replicate.py` (`PhysxReplicateContext.replicate` \u2192 `_replicate_instances`), the per-prototype world ids are passed to the replicator, so the discrepancy appears to be in how the native PhysX replication assigns copies, or the plan's layout is not meant to describe the realised assignment. Either way it would help to document which one is authoritative, or to have `world_prototype_layout` reflect what was replicated.\n\n## System Info\n\n- IsaacLab: `main` at 81954d1 (3.0.0), PhysX backend\n- Isaac Sim 6.2.0 (`omni.physx` 110.4.4)\n- Linux, single GPU\n\n## Checklist\n\n- [x] I have checked that there is no similar issue in the repo\n- [x] I have checked that the issue is not in running Isaac Sim itself and is related to the repo\n",
+      "created_at": "2026-11-01T04:25:08Z",
+      "html_url": "https://github.com/isaac-sim/IsaacLab/issues/8894",
+      "id": "isaac-sim/IsaacLab#8894",
+      "issue_number": 8894,
+      "labels": [],
+      "repository": "isaac-sim/IsaacLab",
+      "surface_sha256": "eaab67061beb578efb78a340cfbc3af2e2b5d84329e1620f1cbcc1c366af4f7a",
+      "title": "[Bug] PhysX replication does not follow ClonePlan.world_prototype_layout for MultiUsdFileCfg variants (sources first, then blocks)"
+    }
+  ],
+  "post_activation_issue_identities_observed": 433,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-01T05:53:05Z",
+  "schema_version": 1
+}
