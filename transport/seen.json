@@ -6390,35 +6390,47 @@
     },
     {
       "created_at": "2026-10-31T16:23:31Z",
+      "expiry_recorded_at": "2026-11-01T02:32:05Z",
+      "expiry_sha256": "a0429b765210ab47f0713d425914f9727e0f44b4ec76da8e0aaed36580b806ec",
+      "expiry_source": "expirations/huggingface__lerobot__5184.json",
       "first_frozen_at": "2026-10-31T18:45:28Z",
       "id": "huggingface/lerobot#5184",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 5184,
       "prediction_deadline_at": "2026-11-01T00:45:28Z",
       "repository": "huggingface/lerobot",
       "source": "inbox/FIRST_SEEN_20261031T184528Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "fbddcfee543486f69552eaa49aaa846372f7844c51cc7bf1b69f196578666667"
     },
     {
       "created_at": "2026-10-31T18:09:06Z",
+      "expiry_recorded_at": "2026-11-01T02:32:05Z",
+      "expiry_sha256": "498a07beedf22c1551059018c1c1f9ae561700bb173b0dc1dafef9eb8ffd3d64",
+      "expiry_source": "expirations/isaac-sim__IsaacLab__8892.json",
       "first_frozen_at": "2026-10-31T18:45:28Z",
       "id": "isaac-sim/IsaacLab#8892",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 8892,
       "prediction_deadline_at": "2026-11-01T00:45:28Z",
       "repository": "isaac-sim/IsaacLab",
       "source": "inbox/FIRST_SEEN_20261031T184528Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "133f17723d446b412e24bc376f2602499e24baf215a38111f1b2a36e4a81599e"
     },
     {
       "created_at": "2026-10-31T19:33:38Z",
+      "expiry_recorded_at": "2026-11-01T02:32:05Z",
+      "expiry_sha256": "62d726806b4f09025c8329bd261019df93af17526c8d26f502b53c6a27efc48a",
+      "expiry_source": "expirations/google-deepmind__mujoco__3748.json",
       "first_frozen_at": "2026-10-31T19:55:31Z",
       "id": "google-deepmind/mujoco#3748",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3748,
       "prediction_deadline_at": "2026-11-01T01:55:31Z",
       "repository": "google-deepmind/mujoco",
       "source": "inbox/FIRST_SEEN_20261031T195531Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "60dc9fca19a4d39e3a2e3fcf7aba37124b0de13b2f17440c535c94046839f8d1"
     },
     {
@@ -6431,6 +6443,39 @@
       "source": "inbox/FIRST_SEEN_20261031T224849Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "932f529b3e5ad0c007c3fcba36eb600244aecd968f40629204a8cc8f3c1e95eb"
+    },
+    {
+      "created_at": "2026-10-31T23:56:07Z",
+      "first_frozen_at": "2026-11-01T02:33:24Z",
+      "id": "NVlabs/alpasim#232",
+      "issue_number": 232,
+      "prediction_deadline_at": "2026-11-01T08:33:24Z",
+      "repository": "NVlabs/alpasim",
+      "source": "inbox/FIRST_SEEN_20261101T023324Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "a78ed2dae4c1c972efa7e2463f94d1cff27feb91c95884e5f7ef72c5aa321390"
+    },
+    {
+      "created_at": "2026-11-01T00:51:57Z",
+      "first_frozen_at": "2026-11-01T02:33:24Z",
+      "id": "huggingface/lerobot#5187",
+      "issue_number": 5187,
+      "prediction_deadline_at": "2026-11-01T08:33:24Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261101T023324Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "7a21ce2aab13c0606702bba90a82815f01357ab1edf70110c6eb79ec3ea5dd9d"
+    },
+    {
+      "created_at": "2026-11-01T01:22:03Z",
+      "first_frozen_at": "2026-11-01T02:33:24Z",
+      "id": "huggingface/lerobot#5189",
+      "issue_number": 5189,
+      "prediction_deadline_at": "2026-11-01T08:33:24Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261101T023324Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "3b411c0c54d67342f1a75a266263f4a791e2387fd20392b1aeb159e868f79672"
     }
   ]
 }
