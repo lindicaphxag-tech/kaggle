@@ -6559,6 +6559,17 @@
       "source": "inbox/FIRST_SEEN_20261101T162427Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "914047d4bc85ebeb6fb3d1b5c204ff78eea6352904de2503d9810c5fc0d2e229"
+    },
+    {
+      "created_at": "2026-11-01T17:36:54Z",
+      "first_frozen_at": "2026-11-01T18:53:18Z",
+      "id": "huggingface/lerobot#5193",
+      "issue_number": 5193,
+      "prediction_deadline_at": "2026-11-02T00:53:18Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261101T185318Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "6cd70b4dc6f5b5acfb3523815c85e1fb198d88cef62ee83410db1145f6f888a8"
     }
   ]
 }
