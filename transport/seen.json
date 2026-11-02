@@ -6730,6 +6730,17 @@
       "source": "inbox/FIRST_SEEN_20261102T185004Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "85100a687b705b39d294b9e00e969d8925fd4ccf218ed725399ec89eb8d831df"
+    },
+    {
+      "created_at": "2026-11-02T18:58:34Z",
+      "first_frozen_at": "2026-11-02T20:45:14Z",
+      "id": "micro-ROS/rmw_microxrcedds#349",
+      "issue_number": 349,
+      "prediction_deadline_at": "2026-11-03T02:45:14Z",
+      "repository": "micro-ROS/rmw_microxrcedds",
+      "source": "inbox/FIRST_SEEN_20261102T204514Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "2f6279d4078bf3f6d46a121a29b04cc815f9f89a5be74b6ba2249733c5c4ed35"
     }
   ]
 }

@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "Steve-Li-1998",
+      "body": "**Describe the bug**\n\nWith a subscription history depth above 1, `rcl_take` can return samples of one topic out of order: N+1 before N. This happens when several samples are buffered within one clock tick.\n\n[`rmw_uxrce_find_static_input_buffer_by_owner`](https://github.com/micro-ROS/rmw_microxrcedds/blob/cbc4a1e60aeafd051a7c1636045653d5df425f98/rmw_microxrcedds_c/src/types.c#L286) picks the oldest buffer by timestamp with a strict comparison:\n\n```c\nif (data->owner == owner && data->timestamp < min_time) {\n```\n\nThree things combine:\n\n1. A reliable stream that receives a missing sample late delivers the held samples right after it. On my board they arrive about 50 \u00b5s apart, so several can get the same timestamp.\n2. `get_memory` inserts new items at the head of the list, so the walk sees the newest buffer first.\n3. With a strict `<`, a tie keeps the first buffer seen, which is the newest one.\n\n**To Reproduce**\n\n1. Use a reliable subscription with `RMW_UXRCE_MAX_HISTORY` above 1, and publish a sequence counter on its topic.\n2. Run on a link that reorders or delays datagrams, so the reliable stream has to hold samples back. I use an access point that adds 0-200 ms of random delay in each direction.\n3. Check that each taken value is one above the previous one. Occasionally two neighbouring values come back swapped.\n\nI do not have a hardware-free reproduction for this one. The list order and the comparison can be checked by reading `get_memory` and the function above.\n\n**Expected behaviour**\n\nSamples of one subscription are taken in arrival order, including when timestamps tie.\n\n**System information**\n\n- OS: Zephyr 4.1.0 on ESP32-C6, UDP over Wi-Fi\n- ROS 2: Jazzy\n- Version: `e64d79f`. The comparison is unchanged on `jazzy` (`cbc4a1e`) and `kilted` (`9d49b4d`).\n\n**Additional context**\n\nResults on the board:\n\n| Change | Result |\n|---|---|\n| Strictly increasing timestamps | No swaps |\n| `<` changed to `<=` | No swaps, with 22 ties seen during the run |\n| 10 kHz system tick | Fewer swaps, but they still occur |\n\nSwaps only happen within one topic. They also occur with the Client multithread profile off.\n\n**Proposed fix**\n\nI would give each buffer an arrival counter and compare that instead:\n\n```c\nif (data->owner == owner && (ret == NULL || (int32_t)(data->arrival_seq - min_seq) < 0)) {\n```\n\n`<=` also passes the test above, but it relies on the list being in newest-first order. A counter states the arrival order directly, and the signed difference handles wraparound. `timestamp` stays because the lifespan check needs it. I have not validated this form on the board yet, and can open a PR once I have.\n",
+      "created_at": "2026-11-02T18:58:34Z",
+      "html_url": "https://github.com/micro-ROS/rmw_microxrcedds/issues/349",
+      "id": "micro-ROS/rmw_microxrcedds#349",
+      "issue_number": 349,
+      "labels": [],
+      "repository": "micro-ROS/rmw_microxrcedds",
+      "surface_sha256": "2f6279d4078bf3f6d46a121a29b04cc815f9f89a5be74b6ba2249733c5c4ed35",
+      "title": "Samples can be taken out of order when static input buffers have equal timestamps"
+    }
+  ],
+  "post_activation_issue_identities_observed": 451,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-02T20:45:14Z",
+  "schema_version": 1
+}
