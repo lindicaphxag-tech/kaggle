@@ -1,0 +1,13 @@
+{
+  "case_id": "UniversalRobots/Universal_Robots_Client_Library#609",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-11-02T18:48:15Z",
+  "expiry_sha256": "47c9742b9a92347bfa445ad044dd0da15b64b0943d0e70348c25bb3b7ea7a1ee",
+  "first_frozen_at": "2026-11-02T10:55:34Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-11-02T16:55:34Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "a2074432a5f3f8132b0ed48033e128671336c2bcfcb5701389cf62197b06385c"
+}

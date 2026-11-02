@@ -1,0 +1,112 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 8,
+  "new_candidates": [
+    {
+      "author_login": "jren03",
+      "body": "\n**Version:** robosuite 1.5.1 (as vendored in gated-memory-policy, commit c23bb40), MuJoCo 3.3.5, `MUJOCO_GL=egl`, Ubuntu 24.04, NVIDIA RTX PRO 6000 Blackwell.\n\n**What happens**\n1. Every `env.reset()` with `hard_reset=True` builds a new `MjRenderContext` and EGL context and makes it\n   current (`environments/base.py` `_reset_internal` / `_initialize_sim`; `utils/binding_utils.py` around L81).\n2. The old `MjRenderContext` is not freed then: it and `MjSim` reference each other\n   (`sim.add_render_context`), so only Python's cyclic GC frees it, at an arbitrary later allocation.\n3. Its `__del__` calls `MjrContext.free()` and `EGLGLContext.free()` while the NEW context is current.\n   `MjrContext.free()` deletes GL objects by name in the current context (the new context's offscreen\n   framebuffer has the same names), and `EGLGLContext.free()` ends with `eglReleaseThread()`, which\n   unbinds the new context.\n4. `render()` / `read_pixels()` never re-bind a context, and `read_pixels` fills an `np.empty` buffer, so\n   every later frame until the next hard reset is uninitialized memory (it looks like uniform noise).\n\n**Minimal reproduction:** hard-reset twice, render, call `gc.collect()`, render again. The mean horizontal\nimage gradient of the agentview frame goes from 2.1 before the forced GC to 84.0 after it.\n\n**Impact we measured:** in a 100-episode policy evaluation, intermittent noise frames lowered success from\n96/100 to 83/100. Which episodes are hit depends on when the GC runs, so results are not reproducible.\n\n**Fix we use:** free a render context with its own GL context current, then restore the previously current\ncontext. Sketch:\n\n```python\ndef safe_del(self):\n    own = self.gl_ctx._context\n    display = egl_context.EGL_DISPLAY\n    prev = EGL.eglGetCurrentContext()\n    EGL.eglMakeCurrent(display, EGL.EGL_NO_SURFACE, EGL.EGL_NO_SURFACE, own)\n    self.con.free()\n    self.gl_ctx.free()\n    if prev not in (EGL.EGL_NO_CONTEXT, own):\n        EGL.eglMakeCurrent(display, EGL.EGL_NO_SURFACE, EGL.EGL_NO_SURFACE, prev)\n```\n\nWith it, 3 consecutive 100-episode runs had 0 noise frames out of 4618 checked. The same `__del__` code\nexists in robosuite 1.4.1.\n",
+      "created_at": "2026-11-02T16:53:49Z",
+      "html_url": "https://github.com/ARISE-Initiative/robosuite/issues/846",
+      "id": "ARISE-Initiative/robosuite#846",
+      "issue_number": 846,
+      "labels": [],
+      "repository": "ARISE-Initiative/robosuite",
+      "surface_sha256": "91075b7c7e2e6d82c766528377218a7609c46100a36aad32ed05e5054206f2e2",
+      "title": "EGL: MjRenderContext.__del__ frees GL objects in, and unbinds, the current context, so frames after a hard reset can be uninitialized memory"
+    },
+    {
+      "author_login": "damienen",
+      "body": "**Describe the bug**\n\n`_goal_distance` in `gymnasium_robotics/envs/shadow_dexterous_hand/manipulate.py` computes the rotation error as `2 * arccos(quat_diff[0])`. A quaternion q and its negative -q are the same orientation, but `quat_diff[0]` is then -1 instead of 1, so the error comes out as 2*pi instead of 0. For a goal at 180 degrees the object can sit exactly on the goal and `_is_success` is still 0 and the sparse reward is -1.\n\n**Code example**\n\n```python\nimport numpy as np, gymnasium as gym, gymnasium_robotics\ngym.register_envs(gymnasium_robotics)\nu = gym.make(\"HandManipulateBlockRotateZ-v1\").unwrapped\nq = np.array([0.0, 0, 0, 1.0])  # 180 degree yaw\ngoal = np.concatenate([np.zeros(3), q])\nobj = np.concatenate([np.zeros(3), -q])  # same orientation, opposite sign\n_, d = u._goal_distance(obj.copy(), goal.copy())\nprint(d, u._is_success(obj.copy(), goal.copy()), u.compute_reward(obj.copy(), goal.copy(), {}))\n```\n\nExpected: `0.0 1.0 0.0` (rotation error 0, success, sparse reward of a solved goal).\n\nActual: `6.283185307179586 0.0 -1.0`\n\n**System Info**\n\n* Installed with pip (`gymnasium-robotics==1.4.2`, `mujoco==3.4.0`); first seen at `42eae53b2b27`, and the same result on main at `b8da02a89191`\n* Linux (Docker container), x86_64\n* Python 3.13\n\n**Additional context**\n\nTaking `abs` of the scalar part before `arccos` gives the shorter angle.\n\n### Checklist\n\n- [x] I have checked that there is no similar [issue](https://github.com/Farama-Foundation/gymnasium-robotics/issues) in the repo (**required**)\n\n### Related\n\n#338 and #353 fix batching problems in the same rotation-distance path (pen z-axis indexing and quat_mul axis order). This issue is separate: for a single unbatched pair, q and -q give an angle of 2*pi instead of 0, so a solved goal is scored as a failure.\n",
+      "created_at": "2026-11-02T15:38:46Z",
+      "html_url": "https://github.com/Farama-Foundation/Gymnasium-Robotics/issues/359",
+      "id": "Farama-Foundation/Gymnasium-Robotics#359",
+      "issue_number": 359,
+      "labels": [],
+      "repository": "Farama-Foundation/Gymnasium-Robotics",
+      "surface_sha256": "41c71e03b6b4d82a6c647bd100dfd100b8ebdd7719a23cdcc1f5003017f0a5bc",
+      "title": "[Bug Report] Shadow-hand manipulate envs score a block on its goal as a failure when the quaternion sign differs"
+    },
+    {
+      "author_login": "damienen",
+      "body": "### Describe the bug\n\nIn `go_v5`, a game that ends with score 0 (a draw) pays black -1 and white +1, as if white had won. `_encode_rewards` in `pettingzoo/classic/go/go.py` returns `[1, -1] if result == 1 else [-1, 1]`, so `result == 0` falls into the white-wins branch. A draw needs a whole-number komi; the default 7.5 cannot tie, but `komi=0.0` (used in `test/all_parameter_combs_test.py`) can.\n\nExpected: both agents get 0 on a draw. Observed: `{'black_0': -1, 'white_0': 1}`.\n\n### Code example\n\n```shell\nfrom pettingzoo.classic import go_v5\n\nenv = go_v5.env(board_size=5, komi=0.0)\nenv.reset(seed=0)\nPASS = 5 * 5\nenv.step(PASS)  # black passes\nenv.step(PASS)  # white passes: empty board, score 0, a draw\nprint(\"score:\", env.unwrapped._go.score(), \"result:\", env.unwrapped._go.result())\nprint(\"rewards:\", env.rewards)\n\n# output:\n# score: 0.0 result: 0\n# rewards: {'black_0': -1, 'white_0': 1}\n```\n\n### System info\n\nPettingZoo installed from source at `b0fe02166d2106f8fcb6a6e0ca8125765699bdba` (current main, checked 2026-10-28) with `pip install -e \".[classic]\"`. Python 3.11, Linux (Docker container), CPU only.\n\n### Additional context\n\nBlack wins and white wins are rewarded correctly. A one-line fix is to return `[result, -result]` from `_encode_rewards`. Since this changes environment behaviour, it would need the `go_v5` to `go_v6` version bump and a docs update (the Rewards section in the `go.py` docstring has no draw case), as CONTRIBUTING asks, so I am filing the issue without a PR.\n\n### Checklist\n\n- [x] I have checked that there is no similar [issue](https://github.com/Farama-Foundation/PettingZoo/issues) in the repo\n",
+      "created_at": "2026-11-02T15:34:26Z",
+      "html_url": "https://github.com/Farama-Foundation/PettingZoo/issues/1535",
+      "id": "Farama-Foundation/PettingZoo#1535",
+      "issue_number": 1535,
+      "labels": [],
+      "repository": "Farama-Foundation/PettingZoo",
+      "surface_sha256": "0da4c2bc23819f858d4a25272d3fa2fa0d4dfc2160a354754b9d6f2d37bf4fc9",
+      "title": "[Bug Report] go_v5 gives white +1 and black -1 when the game is a draw"
+    },
+    {
+      "author_login": "tom-osika",
+      "body": "Follow [Semi-automated monthly upgrades](https://github.com/RobotLocomotion/drake/blob/master/tools/workspace/README.md#semi-automated-monthly-upgrades) documentation.\n\nPrior Issue (October): #25028 \n\nMore TBD",
+      "created_at": "2026-11-02T17:00:55Z",
+      "html_url": "https://github.com/RobotLocomotion/drake/issues/25180",
+      "id": "RobotLocomotion/drake#25180",
+      "issue_number": 25180,
+      "labels": [
+        "component: distribution"
+      ],
+      "repository": "RobotLocomotion/drake",
+      "surface_sha256": "bdc5b07fd32a1d7a6b19b064fb5653f097ee8a0841610eef8b0dc1b9a3609154",
+      "title": "Upgrade externals November 2026"
+    },
+    {
+      "author_login": "dgiebs",
+      "body": "### Describe the bug\n\nWith TF32 on (`torch.backends.cuda.matmul.allow_tf32 = True` / `fp32_precision = \"tf32\"`), `convert_camera_frame_orientation_convention(..., target=\"world\")` (and `origin=\"world\"`) returns NaN for most orientations on CUDA. `RayCasterCamera.set_world_poses` then stores a NaN offset and every ray reads max range, with no error. Isaac Lab's RSL-RL entrypoint enables TF32 (`train_rsl_rl.py`), so ordinary training hits this.\n\n### Root cause\n\n`utils/math.py` (~L1599, ~L1618 on `main`) applies the constant OpenGL\u2194world rotation via `torch.matmul`. TF32 rounds the copied entries (~2.4e-4 relative error), and `quat_from_matrix` (~L366, since #5609) NaNs any result with `| |q| - 1 | > 2e-5`. Isaac Lab 2.3.x has the same matmul but no check.\n\ncuBLAS only uses TF32 here for \u2265 8 quaternions per call on our GPU, so `_create_offset_buffers` (1 row) is fine, but per-env `set_world_poses` is not.\n\n### Steps to reproduce\n\n```python\nimport torch, isaaclab.utils.math as mu\ntorch.backends.cuda.matmul.fp32_precision = \"tf32\"\nq = torch.randn(100_000, 4); q = (q / q.norm(dim=-1, keepdim=True)).cuda()\nout = mu.convert_camera_frame_orientation_convention(q, origin=\"ros\", target=\"world\")\nprint(torch.isnan(out).any(-1).float().mean())  # ~0.62; 0.0 with \"ieee\" or on CPU\n```\n\nA 30\u00b0-pitched camera mount replicated to 64 rows gives 100 % NaN.\n\n### Suggested fix\n\nThe constant is a signed permutation, so apply it without a GEMM (exact under any precision; verified 0 % NaN):\n\n```python\n# opengl -> world (rotm @ M.T)\nrotm = torch.stack([-rotm[..., 2], -rotm[..., 0], rotm[..., 1]], dim=-1)\n# world -> opengl (rotm @ M)\nrotm = torch.stack([-rotm[..., 1], rotm[..., 2], -rotm[..., 0]], dim=-1)\n```\n\nAlternatively, `quat_from_matrix` could renormalize near-unit results instead of NaN-ing them, which would also cover other `quat_from_matrix(matmul(...))` call sites.\n\n### System Info\n\nIsaac Lab v3.0.0-EA (`ae37b028`), `isaaclab==3.0.0` (PyPI), and `main` @ `c498443e`; torch 2.11.0+cu128; RTX 5090; Ubuntu 24.04.\n\n### Checklist\n\n- [x] I have checked that there is no similar issue in the repo\n- [x] I have checked that the issue is not in running Isaac Sim itself and is related to the repo\n",
+      "created_at": "2026-11-02T18:04:43Z",
+      "html_url": "https://github.com/isaac-sim/IsaacLab/issues/8901",
+      "id": "isaac-sim/IsaacLab#8901",
+      "issue_number": 8901,
+      "labels": [],
+      "repository": "isaac-sim/IsaacLab",
+      "surface_sha256": "845db38cac4670d9bd64794df643be278849c6dc94568b1b2c2adbfc8780cf16",
+      "title": "[Bug Report] `convert_camera_frame_orientation_convention` returns NaN under TF32 (ray-caster camera reads max range)"
+    },
+    {
+      "author_login": "ChaerimMoon",
+      "body": "Hi! I found that the constructor might be missing in py-binding/control/planners/sst .\n\n`    planner = planners[planner_name](si)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^\nTypeError: ompl._ompl.control.SST: no constructor defined!\n`\n\nThe source file (https://github.com/ompl/ompl/blob/main/py-bindings/control/planners/sst/SST.cpp) looks like this, which does not have the lines for constructor:\n\n`#include <nanobind/nanobind.h>\n#include \"ompl/control/planners/sst/SST.h\"\n#include \"../../init.h\"\n\nnamespace nb = nanobind;\nnamespace oc = ompl::control;\nnamespace ob = ompl::base;\n\nvoid ompl::binding::control::initPlannersSst_SST(nb::module_ &m)\n{\n    nb::class_<oc::SST, ob::Planner>(m, \"SST\");\n}`\n\nWhen I downloaded the source file and added the lines found in (https://github.com/ompl/ompl/blob/main/py-bindings/control/planners/rrt/RRT.cpp) but swapped RRT for SST, it resolved the issue. \n\nI wonder if it is a bug and if this is the correct way to use it for now.\n\nThanks for your assistance!",
+      "created_at": "2026-11-02T14:56:36Z",
+      "html_url": "https://github.com/ompl/ompl/issues/1482",
+      "id": "ompl/ompl#1482",
+      "issue_number": 1482,
+      "labels": [],
+      "repository": "ompl/ompl",
+      "surface_sha256": "7740f542fce245a0316e2e7ebde119b2a21f81440f26ea5541b29cb7b0fac6b4",
+      "title": "Constructor is missing in py-binding/control/planners/sst"
+    },
+    {
+      "author_login": "atimin",
+      "body": "## Problem\n\n`ros2 bag play` rejects a remote-only bag URI before the selected storage plugin is loaded. This prevents storage backends such as [rosbag2_storage_reductstore](https://github.com/reductstore/rosbag2_storage_reductstore) from using a bucket name or remote URI without creating an unrelated local placeholder directory.\n\nThe positional `bag_path` validator in `ros2bag.api.check_path_exists()` requires a local filesystem path:\n\n```python\nif os.path.exists(value):\n    return value\nraise ArgumentTypeError(f\"Bag path {value!r} does not exist!\")\n```\n\nThe `--input` flow performs the same check in `input_bag_arg_to_storage_options()`. Consequently, this command fails before the `reductstore` storage plugin receives `StorageOptions`:\n\n```bash\nros2 bag play \\\n  --storage reductstore \\\n  --storage-config-file cfg.yml \\\n  rosbag2_2026_11_02-17_22_58\n```\n\n```text\nros2 bag play: error: argument bag_path: Bag path 'rosbag2_2026_11_02-17_22_58' does not exist!\\n```\\n\\n## Why this matters\\n\\nRemote storage backends keep both metadata and records in the remote service. Requiring a directory with the same name does not provide any data or configuration; it only works around CLI validation. It also makes remote-only playback impossible in read-only filesystems or automation environments.\\n\\n## Proposed behavior\\n\\nWhen a storage ID is explicitly supplied, allow the storage URI to be passed through without requiring `os.path.exists(uri)`. The selected plugin remains responsible for validating its URI in `open()`.\\n\\nPossible designs:\\n\\n- Skip the local existence check when `--storage <id>` is specified.\\n- Add a URI-aware input option that does not impose filesystem semantics.\\n- Add a plugin capability indicating whether its storage URI must be a local path.\\n\\nLocal storage plugins should retain the existing early path validation.",
+      "created_at": "2026-11-02T16:42:23Z",
+      "html_url": "https://github.com/ros2/rosbag2/issues/2550",
+      "id": "ros2/rosbag2#2550",
+      "issue_number": 2550,
+      "labels": [],
+      "repository": "ros2/rosbag2",
+      "surface_sha256": "6fdefb92495f690d165d1e9f88b78ae3b5e04a2c4ddbec3bf1f203262e863084",
+      "title": "Allow remote storage plugins to bypass local bag-path validation"
+    },
+    {
+      "author_login": "thomas-saigre",
+      "body": "### \ud83d\udc1e Bug\n\nThe gravity of the model created with `appendModel` is not kept.\n\nMaybe this is something intended in the library (especially if the gravity is different for the two models)\n\n### Reproduction steps\n\n```python\nimport numpy as np\nimport pinocchio as pin\n\ndef make_model(name, gravity):\n    model = pin.Model()\n    model.name = name\n    jid = model.addJoint(0, pin.JointModelRevoluteUnaligned(np.array([0.0, 1.0, 0.0])), pin.SE3.Identity(), f\"joint_{name}\")\n    model.appendBodyToJoint(jid, pin.Inertia.FromSphere(1.0, 0.1), pin.SE3.Identity())\n    model.addFrame(pin.Frame(f\"body_{name}\", jid, 0, pin.SE3.Identity(), pin.FrameType.BODY))\n    model.gravity = pin.Motion(np.array(gravity), np.zeros(3))\n    return model\n\n\ngravity = [0.0, -9.81, 0.0]                      # NOT the default [0, 0, -9.81]\nmodel_a = make_model(\"A\", gravity)\nmodel_b = make_model(\"B\", gravity)\n\nmodel_ab = pin.appendModel(model_a, model_b, model_a.getFrameId(\"body_A\"), pin.SE3.Identity())\n\nprint(\"gravity of A :\", model_a.gravity.linear)\nprint(\"gravity of B :\", model_b.gravity.linear)\nprint(\"gravity of AB:\", model_ab.gravity.linear)\n```\n\n\n### Relevant log output / Error message\n\n```shell\nOutput of the code :\n\ngravity of A : [ 0.   -9.81  0.  ]\ngravity of B : [ 0.   -9.81  0.  ]\ngravity of AB: [ 0.    0.   -9.81]\n```\n\n### System Info\n\n- Ubuntu 24.04\n- Pinocchio v4.1.0 installed from conda\n\n### Checklist\n\n- [x] I have read the [contributing guidelines](https://github.com/stack-of-tasks/pinocchio/blob/devel/CONTRIBUTING.md)\n- [x] I have checked that all my packages are installed from the same package manager (conda-forge, Nix, PyPI, robotpkg, ROS, ...)\n- [x] I have checked that there is no similar [issue](https://github.com/stack-of-tasks/pinocchio/issues)/[discussion](https://github.com/stack-of-tasks/pinocchio/discussions) in the repo\n- [x] I have provided a minimal and working example to reproduce the bug\n- [x] I have used [Markdown code blocks](https://help.github.com/en/articles/creating-and-highlighting-code-blocks) for code, stack traces and compiler errors\n- [ ] I have used an AI assistant",
+      "created_at": "2026-11-02T18:11:56Z",
+      "html_url": "https://github.com/stack-of-tasks/pinocchio/issues/2973",
+      "id": "stack-of-tasks/pinocchio#2973",
+      "issue_number": 2973,
+      "labels": [
+        "bug"
+      ],
+      "repository": "stack-of-tasks/pinocchio",
+      "surface_sha256": "85100a687b705b39d294b9e00e969d8925fd4ccf218ed725399ec89eb8d831df",
+      "title": "[Bug]: gravity not consistant with appendModel"
+    }
+  ],
+  "post_activation_issue_identities_observed": 450,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-02T18:50:04Z",
+  "schema_version": 1
+}
