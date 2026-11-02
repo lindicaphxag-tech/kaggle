@@ -6608,6 +6608,28 @@
       "source": "inbox/FIRST_SEEN_20261102T081446Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "fb235a79d91a6d3d14d3404d1db595ed357658370fcf7a85c5cb9922a36966f9"
+    },
+    {
+      "created_at": "2026-11-02T10:43:26Z",
+      "first_frozen_at": "2026-11-02T10:55:34Z",
+      "id": "UniversalRobots/Universal_Robots_Client_Library#609",
+      "issue_number": 609,
+      "prediction_deadline_at": "2026-11-02T16:55:34Z",
+      "repository": "UniversalRobots/Universal_Robots_Client_Library",
+      "source": "inbox/FIRST_SEEN_20261102T105534Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "a2074432a5f3f8132b0ed48033e128671336c2bcfcb5701389cf62197b06385c"
+    },
+    {
+      "created_at": "2026-11-02T08:34:16Z",
+      "first_frozen_at": "2026-11-02T10:55:34Z",
+      "id": "eProsima/Fast-DDS#6608",
+      "issue_number": 6608,
+      "prediction_deadline_at": "2026-11-02T16:55:34Z",
+      "repository": "eProsima/Fast-DDS",
+      "source": "inbox/FIRST_SEEN_20261102T105534Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "15a48171d21f55a3274b1e719b1f9492aacbddb5a4496dea94ac3a9d9c6d8868"
     }
   ]
 }

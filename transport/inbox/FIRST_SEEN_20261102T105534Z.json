@@ -1,0 +1,40 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "urfeex",
+      "body": "Originally posted in https://github.com/UniversalRobots/Universal_Robots_Client_Library/pull/604\n\n>The scoped timeout only uses TCPSocket's public API and has nothing to do with RTDE. I kept it in rtde_client.cpp to keep this fix small and the public API unchanged apart from the getter. The dashboard clients set and restore the receive timeout by hand. DashboardClientImplG5::connect() restores it in five places. In DashboardClientImplG5::commandGenerateFlightReport() and commandGenerateSupportFile() the restore runs only after the request returned or threw UnexpectedResponse. A TimeoutException from read() or a UrException from sendAndReceive() leaves the 180 s or 600 s timeout in place. DashboardClientImplX restores correctly, with a catch (...) and rethrow at each site. A follow-up PR could add a TCPSocket member that returns such a guard, use it here and in both dashboard implementations, and drop the manual restores.",
+      "created_at": "2026-11-02T10:43:26Z",
+      "html_url": "https://github.com/UniversalRobots/Universal_Robots_Client_Library/issues/609",
+      "id": "UniversalRobots/Universal_Robots_Client_Library#609",
+      "issue_number": 609,
+      "labels": [
+        "good first issue"
+      ],
+      "repository": "UniversalRobots/Universal_Robots_Client_Library",
+      "surface_sha256": "a2074432a5f3f8132b0ed48033e128671336c2bcfcb5701389cf62197b06385c",
+      "title": "Add temporary receive timeout increase to TCPSocket"
+    },
+    {
+      "author_login": "Stefan11111111",
+      "body": "### Is there an already existing issue for this?\n\n- [x] I have searched the existing issues\n\n### Expected behavior\n\nOn MinGW, RobustSharedLock behaves as on MSVC. The shared lock on an SHM port can be taken by several processes, and the exclusive lock is taken only when nobody holds the shared one.\n\n### Current behavior\n\nThe MinGW branch of src/cpp/utils/shared_memory/RobustSharedLock.hpp, added in #5600, passes 0x0010 as shflag to every _sopen_s call. 0x0010 is _SH_DENYRW. The MSVC branch passes _SH_DENYWR to the lock calls and _SH_DENYNO to the test-open in lock_status. As a result, the \"shared\" open is exclusive and a second process cannot open the port.\n\n### Steps to reproduce\n\nBuild Fast DDS with MinGW-w64 GCC on Windows.\nSet FASTDDS_BUILTIN_TRANSPORTS=SHM.\nStart two participants in the same domain, in separate processes.\n\n### Fast DDS version/commit\n\nv3.4.0. Still present on master and in v3.6.0.\n\n### Platform/Architecture\n\nOther. Please specify in Additional context section.\n\n### Transport layer\n\nShared Memory Transport (SHM)\n\n### Additional context\n\nPlatform/Architecture: Windows 11 x86_64, MinGW-w64 GCC 16.2.0\n\nUsing the same flags as the MSVC branch fixes it: 0x0020 (_SH_DENYWR) for the four lock calls and 0x0040 (_SH_DENYNO) for the test-open. We carry this as a patch on v3.4.0 and can open a PR. Alternatively, including <share.h> and using the _SH_* macros would work on both compilers, since MinGW-w64 also defines them.\n\n### XML configuration file\n\n```xml\n\n```\n\n### Relevant log output\n\n```shell\n\n```\n\n### Network traffic capture\n\n_No response_",
+      "created_at": "2026-11-02T08:34:16Z",
+      "html_url": "https://github.com/eProsima/Fast-DDS/issues/6608",
+      "id": "eProsima/Fast-DDS#6608",
+      "issue_number": 6608,
+      "labels": [
+        "triage"
+      ],
+      "repository": "eProsima/Fast-DDS",
+      "surface_sha256": "15a48171d21f55a3274b1e719b1f9492aacbddb5a4496dea94ac3a9d9c6d8868",
+      "title": "MinGW: RobustSharedLock uses _SH_DENYRW for every lock, so the shared SHM port lock is exclusive"
+    }
+  ],
+  "post_activation_issue_identities_observed": 442,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-02T10:55:34Z",
+  "schema_version": 1
+}
