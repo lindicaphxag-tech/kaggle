@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "quantova-inc",
+      "body": "I read src/cpp/security/authentication/PKIIdentityHandle.h. The authentication algorithm identifiers are RSASSA-PSS-SHA256 and ECDSA-SHA256 with the token forms RSA-2048 and EC-prime256v1 so the participant identity handshake is classical only.\n\nThe identifiers are already negotiated as strings in the handshake which makes this a clean place to add a post quantum option. ML DSA from FIPS 204 is the standardised lattice signature and it is the one CNSA 2.0 names for this class of identity. Adding an ML DSA identity token alongside the existing ones would let two participants authenticate with a post quantum identity where both support it. DDS Security is an OMG profile so this should align with any OMG post quantum work rather than a unilateral token.\n\nI can provide tooling rather than only raise it. I keep a public ML DSA conformance and reject corpus at https://github.com/quantova-inc/pq-sign-vectors produced with a stock OpenSSL that offers native ML DSA. The same corpus can check the authentication path here and in Cyclone DDS so the two implementations agree across an independent one. I am happy to open a draft that adds the ML DSA token and the vectors.\n\nFor a private discussion on securing robotics and communications I can be reached at partnerships@Quantova.org.\n",
+      "created_at": "2026-11-02T06:10:17Z",
+      "html_url": "https://github.com/eProsima/Fast-DDS/issues/6607",
+      "id": "eProsima/Fast-DDS#6607",
+      "issue_number": 6607,
+      "labels": [],
+      "repository": "eProsima/Fast-DDS",
+      "surface_sha256": "fb235a79d91a6d3d14d3404d1db595ed357658370fcf7a85c5cb9922a36966f9",
+      "title": "Post quantum agility and interop vectors for the DDS Security authentication algorithms"
+    }
+  ],
+  "post_activation_issue_identities_observed": 440,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-02T08:14:46Z",
+  "schema_version": 1
+}

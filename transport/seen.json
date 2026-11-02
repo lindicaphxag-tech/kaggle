@@ -6585,14 +6585,29 @@
     },
     {
       "created_at": "2026-11-01T22:30:05Z",
+      "expiry_recorded_at": "2026-11-02T08:13:37Z",
+      "expiry_sha256": "a229601e06b1a2f681ece6c216dab179e5b8daf9fe8b268eb8d392f9b65cee71",
+      "expiry_source": "expirations/isaac-sim__IsaacSim__920.json",
       "first_frozen_at": "2026-11-01T22:44:55Z",
       "id": "isaac-sim/IsaacSim#920",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 920,
       "prediction_deadline_at": "2026-11-02T04:44:55Z",
       "repository": "isaac-sim/IsaacSim",
       "source": "inbox/FIRST_SEEN_20261101T224455Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "3cef11c865b57936a9029a4de8c6ac3e284f5bb7f66ea80830737e20bd618924"
+    },
+    {
+      "created_at": "2026-11-02T06:10:17Z",
+      "first_frozen_at": "2026-11-02T08:14:46Z",
+      "id": "eProsima/Fast-DDS#6607",
+      "issue_number": 6607,
+      "prediction_deadline_at": "2026-11-02T14:14:46Z",
+      "repository": "eProsima/Fast-DDS",
+      "source": "inbox/FIRST_SEEN_20261102T081446Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "fb235a79d91a6d3d14d3404d1db595ed357658370fcf7a85c5cb9922a36966f9"
     }
   ]
 }
