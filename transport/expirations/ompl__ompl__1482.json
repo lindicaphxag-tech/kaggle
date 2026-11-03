@@ -1,0 +1,13 @@
+{
+  "case_id": "ompl/ompl#1482",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-11-03T01:46:27Z",
+  "expiry_sha256": "71265de02a2e61a3f84504ce8205da530eaf3ca0cb4edcebd5c47eb8bf14e738",
+  "first_frozen_at": "2026-11-02T18:50:04Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-11-03T00:50:04Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "7740f542fce245a0316e2e7ebde119b2a21f81440f26ea5541b29cb7b0fac6b4"
+}
