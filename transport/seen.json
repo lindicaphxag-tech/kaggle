@@ -6765,13 +6765,17 @@
     },
     {
       "created_at": "2026-11-02T18:58:34Z",
+      "expiry_recorded_at": "2026-11-03T02:52:16Z",
+      "expiry_sha256": "ca522b872773b4b8b14e45def6b4481a629a7254c3569a312e1a469c96f7a334",
+      "expiry_source": "expirations/micro-ROS__rmw_microxrcedds__349.json",
       "first_frozen_at": "2026-11-02T20:45:14Z",
       "id": "micro-ROS/rmw_microxrcedds#349",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 349,
       "prediction_deadline_at": "2026-11-03T02:45:14Z",
       "repository": "micro-ROS/rmw_microxrcedds",
       "source": "inbox/FIRST_SEEN_20261102T204514Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "2f6279d4078bf3f6d46a121a29b04cc815f9f89a5be74b6ba2249733c5c4ed35"
     },
     {
