@@ -1,0 +1,67 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 4,
+  "new_candidates": [
+    {
+      "author_login": "SeanCurtis-TRI",
+      "body": "### What happened?\n\n`CalcDistanceFallback()` (geometry/proximity/distance_to_shape_callback.cc) decides whether two shapes are \"touching\" with an absolute threshold on FCL's world-frame distance:\n\n```c++\nconst double kEps = 1e-14;\nif (std::abs(result.min_distance) < kEps) {\n  pair_data->nhat_BA_W = CalcGradientWhenTouching(...);\n} else {\n  pair_data->nhat_BA_W = (p_WCa - p_WCb) / result.min_distance;\n}\n```\n\nFCL computes `min_distance` and the witness points `p_WCa`, `p_WCb` in the world frame, so their rounding error grows with distance from the origin, roughly \u03b5\u00b7|p_W|. For geometries more than about 100 m from the origin, a touching pair's reported distance is rounding noise larger than 1e-14. Such pairs skip `CalcGradientWhenTouching()` and take the `(p_WCa - p_WCb) / min_distance` branch, which divides noise by noise. A [reviewer's sweep](https://reviewable.io/reviews/RobotLocomotion/drake/25182#-P5ShXHZ6NityfHRhJ9R:-P5ShXHZ6NityfHRhJ9S:mqkv7qq) of touching box-box pairs found about 40% of these gradients wrong at 100 m and about 60% at 1\u201310 km.\n\n### What needs to happen\n\n1. Make the touching test scale-aware. For example, scale `kEps` by `max(1, |p_WAo|, |p_WBo|)`, or decide \"touching\" from quantities computed in one geometry's frame instead of in the world frame.\n2. Decide what pairs newly routed to `CalcGradientWhenTouching()` should get when it doesn't support them. It currently returns NaN for those pairs (e.g., box-capsule, convex-convex), so a wider gate would turn some noisy but finite gradients into NaN. Options include keeping the old formula as a fallback for unsupported pairs, or extending support.\n3. Add regression tests with touching pairs far from the origin (\u2265 1 km) that go through the full `ComputeSignedDistancePairwiseClosestPoints()` path, not just the gradient helpers.\n\n### Context\n\nPR #25182 makes `BoxBoxGradient()` robust for whatever reaches it: it no longer demands coincident witness points, it computes the gradient in box A's frame, and it falls back to the smallest-overlap separating axis. That makes a wider gate safe for box-box, which previously would have hit a `DRAKE_DEMAND`. Changing the gate was left out of that PR because it changes which path every FCL-fallback shape pair takes.\n\n### Version\n\nmaster (after PR #25182)\n",
+      "created_at": "2026-11-03T16:48:31Z",
+      "html_url": "https://github.com/RobotLocomotion/drake/issues/25199",
+      "id": "RobotLocomotion/drake#25199",
+      "issue_number": 25199,
+      "labels": [
+        "component: geometry proximity"
+      ],
+      "repository": "RobotLocomotion/drake",
+      "surface_sha256": "c88e64c8130f84934dbdc25a8eaf0f5db837fdd30ff448f16b14cf852a05dc43",
+      "title": "Signed-distance gradient is wrong for touching shapes far from the origin (absolute 1e-14 gate in CalcDistanceFallback)"
+    },
+    {
+      "author_login": "urfeex",
+      "body": "As mentioned in #2047 and #2049, integration tests for CB7 / V2 tool flange features would be very beneficial.\nThis issue is meant as a follow-up on the mentioned PRs and should be tackled after #1910 is finished.",
+      "created_at": "2026-11-03T12:16:08Z",
+      "html_url": "https://github.com/UniversalRobots/Universal_Robots_ROS2_Driver/issues/2051",
+      "id": "UniversalRobots/Universal_Robots_ROS2_Driver#2051",
+      "issue_number": 2051,
+      "labels": [
+        "enhancement",
+        "blocked"
+      ],
+      "repository": "UniversalRobots/Universal_Robots_ROS2_Driver",
+      "surface_sha256": "7fed76544fc6cd65342343487199c2a3fc2784b1f192c21a1c516207c41c084e",
+      "title": "Create integration test for CB7 / V2 robots"
+    },
+    {
+      "author_login": "alexrestle",
+      "body": "## Environment\n\n- ROS 2 Lyrical, Ubuntu 26.04, `rmw_cyclonedds_cpp`, x86_64 and aarch64\n- `ros-lyrical-ros-gz-sim` 3.0.10 (binary) and `ros_gz` branch `lyrical` at 3.0.12 (built from source)\n\n## Description\n\nWhen `ros_gz_sim::GzServer` runs as a component in `component_container_mt`, the container exits with SIGSEGV in most runs after SIGINT (8 of 10 runs with 3.0.10; 4 of 5 with 3.0.12).\n\n`main()` returns 0. During `exit()`, the static rmw library handle in `rmw_implementation` unloads `librmw_cyclonedds_cpp`/`libddsc` while CycloneDDS threads are still running. One of them (`recv`, `tev` or `gc`) then returns into unmapped code, e.g. `ddsi_recv_thread+460` after `epoll_wait`.\n\nThe DDS threads still run because the default rclcpp context is never finalized (`rcl_context_fini`, `~Context` and `dds_delete_domain` are never called). The `use_count` of the default context at `exit()`:\n\n| Setup | use_count |\n|---|---|\n| container + `composition::Talker` | 1 (only the static reference) |\n| container + `GzServer`, empty world, 3.0.12 | 2 |\n| full simulation with `ros_gz_bridge` 3.0.10 | 6 |\n| full simulation with 3.0.12 | 2 |\n\nWith 3.0.12 the `RosGzBridge` cycle is gone (#952/#953, #977/#989), but `GzServer` still leaks one reference. `~GzServer` runs, but its `gz_server` node is never destroyed. We did not find which object holds the reference. Possible candidates (unverified): `GzSimulationInterfaces` (sub-node, detached thread with a `[&]` capture, handlers that hold a `shared_ptr<Node>`) and the executor of the TimeSource clock.\n\n## Steps to reproduce\n\n1. Load `ros_gz_sim::GzServer` into `component_container_mt` with an empty world.\n2. Stop it with SIGINT.\n3. In gdb, set a breakpoint on `exit` and print `rclcpp::contexts::get_global_default_context()` `use_count`: the result is 2, expected 1.\n\nThe crash itself is a race: with an empty world it shows up less often than in a full simulation.\n\n## Expected behavior\n\nAll nodes are destroyed, the context is shut down and finalized, and the process exits with 0.\n\n## Workaround\n\n`LD_PRELOAD=<prefix>/lib/librmw_cyclonedds_cpp.so` on the container keeps the library mapped: 10 of 10 runs exited cleanly.\n",
+      "created_at": "2026-11-03T17:07:41Z",
+      "html_url": "https://github.com/gazebosim/ros_gz/issues/1017",
+      "id": "gazebosim/ros_gz#1017",
+      "issue_number": 1017,
+      "labels": [
+        "bug"
+      ],
+      "repository": "gazebosim/ros_gz",
+      "surface_sha256": "8e32d240ebabfde8c538f6d35f5b8ec693dc2e3bde2cb3c3a4fca52d66b9d792",
+      "title": "ros_gz_sim: GzServer component keeps a reference to the rclcpp context, process segfaults at exit"
+    },
+    {
+      "author_login": "r3vpwnx",
+      "body": "Hello lerobot maintainers,\n\nThis is a courtesy note and intentionally contains no vulnerability details.\n\nA private security advisory for this repository has been submitted through GitHub's private vulnerability reporting and is awaiting maintainer review under Security > Advisories. Privately submitted reports do not always trigger a notification, so they can be easy to miss.\n\nCould you please review the pending advisory when you have a chance? I am glad to coordinate on remediation and a disclosure timeline privately in the advisory thread.\n\nThank you,\nDilanka Kaushal Hewage (r3vpwnx)",
+      "created_at": "2026-11-03T15:31:08Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5233",
+      "id": "huggingface/lerobot#5233",
+      "issue_number": 5233,
+      "labels": [],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "760dfbac3b2e4e90a038949b5833743d08ba2b51ca8ab7f2dc2f35d8604317a7",
+      "title": "Pending private security advisory awaiting maintainer review"
+    }
+  ],
+  "post_activation_issue_identities_observed": 461,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-03T18:02:03Z",
+  "schema_version": 1
+}
