@@ -6911,6 +6911,28 @@
       "source": "inbox/FIRST_SEEN_20261103T180203Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "760dfbac3b2e4e90a038949b5833743d08ba2b51ca8ab7f2dc2f35d8604317a7"
+    },
+    {
+      "created_at": "2026-11-03T22:42:00Z",
+      "first_frozen_at": "2026-11-03T23:40:33Z",
+      "id": "google-deepmind/mujoco#3752",
+      "issue_number": 3752,
+      "prediction_deadline_at": "2026-11-04T05:40:33Z",
+      "repository": "google-deepmind/mujoco",
+      "source": "inbox/FIRST_SEEN_20261103T234033Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "5c4bb1d7f821133a0992ec1a9354962c8844bdd5d618e06f576d2e812d363880"
+    },
+    {
+      "created_at": "2026-11-03T18:46:31Z",
+      "first_frozen_at": "2026-11-03T23:40:33Z",
+      "id": "isaac-sim/IsaacSim#922",
+      "issue_number": 922,
+      "prediction_deadline_at": "2026-11-04T05:40:33Z",
+      "repository": "isaac-sim/IsaacSim",
+      "source": "inbox/FIRST_SEEN_20261103T234033Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "d3b79f06cc7ab6cfc88de5fc5c35e323789e3b6f74bd02f463e5801836c135a7"
     }
   ]
 }
