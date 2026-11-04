@@ -1,0 +1,58 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 3,
+  "new_candidates": [
+    {
+      "author_login": "tom-osika",
+      "body": "### What happened?\n\nThe `EXPECTED_BAZELISK` version string is hardcoded in [install_prereqs_test.py](https://github.com/RobotLocomotion/drake/blob/v1.58.0/setup/test/install_prereqs_test.py#L21). This is easy to miss and causes the test to fail after upgrading bazelisk.\n\nSee the related discussion [here](https://github.com/RobotLocomotion/drake/pull/25189#pullrequestreview-5745550521)\n\n### Version\n\n_No response_\n\n### What operating system are you using?\n\n_No response_\n\n### What installation option are you using?\n\n_No response_\n\n### Relevant log output\n\n```shell\n\n=== Running install_prereqs_test.InstallPrereqsTest.test_user_environment_only === \nINFO: Running install_prereqs with ['--user-environment-only'] ...\nINFO:  [stdout] INFO: Writing /media/ephemeral0/ubuntu/workspace/azel-experimental-debug_PR-25189/build/_bazel_ubuntu/ad0b8030b376ee1e22c5cce0e39bb8ee/sandbox/processwrapper-sandbox/5006/execroot/_main/_tmp/f75acf8e676e592aa510406bc154e5db/tmpcwt_0cst/source/gen/python_version.txt ...\nINFO:  [stdout] INFO: Writing /media/ephemeral0/ubuntu/workspace/azel-experimental-debug_PR-25189/build/_bazel_ubuntu/ad0b8030b376ee1e22c5cce0e39bb8ee/sandbox/processwrapper-sandbox/5006/execroot/_main/_tmp/f75acf8e676e592aa510406bc154e5db/tmpcwt_0cst/source/gen/environment.bazelrc ...\n.\n======================================================================\nFAIL [0.414s]: test_developer_completed (install_prereqs_test.InstallPrereqsTest.test_developer_completed)\nChecks --developer when everything is already installed (as if a\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/media/ephemeral0/ubuntu/workspace/azel-experimental-debug_PR-25189/build/_bazel_ubuntu/ad0b8030b376ee1e22c5cce0e39bb8ee/sandbox/processwrapper-sandbox/5006/execroot/_main/bazel-out/k8-dbg/bin/setup/install_prereqs_test.runfiles/_main/setup/test/install_prereqs_test.py\", line 583, in test_developer_completed\n    dut.expect_dpkg_query(default_version=\"14.x.x\")\n  File \"/media/ephemeral0/ubuntu/workspace/azel-experimental-debug_PR-25189/build/_bazel_ubuntu/ad0b8030b376ee1e22c5cce0e39bb8ee/sandbox/processwrapper-sandbox/5006/execroot/_main/bazel-out/k8-dbg/bin/setup/install_prereqs_test.runfiles/_main/setup/test/install_prereqs_test.py\", line 326, in expect_dpkg_query\n    self.expect_call([\"dpkg-query\", \"--show\", \"...\"], stdout=_reply)\n  File \"/media/ephemeral0/ubuntu/workspace/azel-experimental-debug_PR-25189/build/_bazel_ubuntu/ad0b8030b376ee1e22c5cce0e39bb8ee/sandbox/processwrapper-sandbox/5006/execroot/_main/bazel-out/k8-dbg/bin/setup/install_prereqs_test.runfiles/_main/setup/test/install_prereqs_test.py\", line 308, in expect_call\n    self._test_case.assertEqual(actual_prefix, expected_prefix)\nAssertionError: Lists differ: ['dpkg', '--compare-versions'] != ['dpkg-query', '--show']\n\nFirst differing element 0:\n'dpkg'\n'dpkg-query'\n\n- ['dpkg', '--compare-versions']\n+ ['dpkg-query', '--show']\n\n----------------------------------------------------------------------\n\n```",
+      "created_at": "2026-11-04T19:12:52Z",
+      "html_url": "https://github.com/RobotLocomotion/drake/issues/25203",
+      "id": "RobotLocomotion/drake#25203",
+      "issue_number": 25203,
+      "labels": [
+        "type: bug",
+        "priority: low",
+        "component: build system"
+      ],
+      "repository": "RobotLocomotion/drake",
+      "surface_sha256": "cda9913f1611fc6cbd2c0b5da345af6e051b2f84556a06e19a61ef04df3f36ca",
+      "title": "Upgrading bazelisk with `new_release` skips `install_prereqs_test.py`"
+    },
+    {
+      "author_login": "azeey",
+      "body": "## Desired behavior\n\nSystem plugins under `src/systems/` are meant to be loaded dynamically via `gz-plugin` rather than linked against directly as public C++ libraries. However, because `gz_add_system` uses `gz_add_component`, every system is also installed into `${CMAKE_INSTALL_LIBDIR}` as a versioned library (`libgz-sim-<name>-system.so.<major>`) and added to the `gz-sim::all` CMake target.\n\nAny symbol marked `*_VISIBLE` in a system plugin is exported into the installed library's dynamic symbol table, exposing internal implementation details to downstream consumers (especially those linking `gz-sim::all`).\n\nWith `TEST_SOURCES` support in `gz_add_system` (#4162), system unit tests can reuse compiled system object files directly without exporting symbols from the plugin library. Existing systems that expose symbols solely for unit testing (or have stray visibility macros / `Export.hh` includes) should be cleaned up so system plugins only export their `gz-plugin` entry points.\n\n## Alternatives considered\n\nOnly use the `TEST_SOURCES` based approach for new tests and keep the existing visible symbols.\n\n## Implementation suggestion\n\n1. **Migrate `logical_audio_sensor_plugin` to `TEST_SOURCES`:**\n   - Update `src/systems/logical_audio_sensor_plugin/CMakeLists.txt` to pass `TEST_SOURCES LogicalAudio_TEST.cc` to `gz_add_system` instead of linking `${PROJECT_LIBRARY_TARGET_NAME}-logicalaudiosensorplugin-system` in a separate `gz_build_tests` call.\n   - Remove `#include <gz/sim/logicalaudiosensorplugin-system/Export.hh>` and the `GZ_SIM_LOGICALAUDIOSENSORPLUGIN_SYSTEM_VISIBLE` annotations from `src/systems/logical_audio_sensor_plugin/LogicalAudio.hh`.\n   - Remove the `LogicalAudioSensorSystemExport` (`gz_export_header`) rule and its header reference from `BUILD.bazel`.\n2. **Remove stray visibility macro in `elevator`:**\n   - Remove `GZ_SIM_VISIBLE` from `class GZ_SIM_VISIBLE Elevator` in `src/systems/elevator/Elevator.hh` \n3. **Remove unused `Export.hh` includes from private system headers:**\n   - `src/systems/python_system_loader/PythonSystemLoader.hh` (`\"gz/sim/python-system-loader-system/Export.hh\"`)\n   - `src/systems/kinetic_energy_monitor/KineticEnergyMonitor.hh` (`<gz/sim/Export.hh>`)\n   - `src/systems/thermal/ThermalSensor.hh` (`<gz/sim/Export.hh>`)\n\n## Additional context\n\n- Depends on #4162 (fixing #4160).\n- Strictly speaking, because removing `GZ_SIM_LOGICALAUDIOSENSORPLUGIN_SYSTEM_VISIBLE` and `GZ_SIM_VISIBLE` removes exported symbols from `libgz-sim-logicalaudiosensorplugin-system` and `libgz-sim-elevator-system`, this change should target `main` and not be backported. However, I highly doubt anything outside of tests is using these symbols and we've always treated systems as non public API, so I think backporting should be okay even if the ABI checker will fail. **I'd appreciate a second opinion on this.**\n",
+      "created_at": "2026-11-04T19:40:00Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4174",
+      "id": "gazebosim/gz-sim#4174",
+      "issue_number": 4174,
+      "labels": [
+        "enhancement",
+        "good first issue",
+        "help wanted"
+      ],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "673cbe75de3c811bdc25e3381fdaae6f5d5ffc5900367f39931026d904e5034f",
+      "title": "Stop exporting test-only and stray symbols from system plugins"
+    },
+    {
+      "author_login": "azeey",
+      "body": "## Desired behavior\n\nSystem plugins are loaded dynamically at runtime and are not meant to be linked against as C++ libraries. However, `gz_add_system` currently calls `gz_add_component`, which treats all ~80 system plugins as public CMake library components. This causes each system plugin to:\n\n- Be installed twice: once in the plugins directory and again in `lib/` (~36 MB of duplicate libraries).\n- Generate and install unused `Export.hh` headers, CMake package configs, and `pkg-config` files.\n- Be added to `gz-sim::all`, causing downstream projects using that target to find and link all ~80 plugins.\n\n`gz_add_system` should build system plugins directly as shared libraries (similar to how GUI plugins are built in `src/gui/plugins/CMakeLists.txt`) and install them only to the plugins directory. Only actual linkable libraries (`rendering` and `gui`) should remain CMake components.\n\n## Alternatives considered\n\n## Implementation suggestion\n\n1. Finish #4174 first so no system headers include generated per-system `Export.hh` files.\n2. Replace `gz_add_component` in `src/systems/CMakeLists.txt` with `add_library(<target> SHARED ...)` and install only the shared library/DLL to the plugins directory.\n3. Note the removal of per-system CMake/pkg-config components in `Migration.md`, and verify release packaging manifests (`gz-sim-release`) don't expect the removed files in `lib/`.\n\n## Additional context\n\n- Depends on #4162 and #4174.\n- Targets `main` and should not be backported since it changes installed files.\n",
+      "created_at": "2026-11-04T19:55:39Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4175",
+      "id": "gazebosim/gz-sim#4175",
+      "issue_number": 4175,
+      "labels": [
+        "enhancement"
+      ],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "2406b3a1b042506d77da88b75253866a4850f83cb6f243bf50193d06f1a1faba",
+      "title": "Remove gz_add_component from gz_add_system"
+    }
+  ],
+  "post_activation_issue_identities_observed": 479,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-04T21:16:33Z",
+  "schema_version": 1
+}
