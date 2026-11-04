@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "Aschenbath",
+      "body": "### Describe the bug\n\nThe MuJoCo `render_mode=\"human\"` viewer (`WindowViewer` in `gymnasium/envs/mujoco/mujoco_rendering.py`) saves the frame captured with the `T` key (\"Cap[t]ure frame\") to the hardcoded path `\"/tmp/frame_%07d.png\"`.\n\nOn Windows, that path is relative to the root of the current drive, which normally has no `tmp` folder, so `imageio.imwrite` raises `FileNotFoundError` inside the GLFW key callback. pyGLFW re-raises a callback's exception from the next GLFW call (`glfw.poll_events()` in `WindowViewer.render`). The MuJoCo environments render inside `step()` in human mode, so the exception ends the user's `env.step()` loop. If the current drive does have a `\\tmp` folder, the frame silently lands there instead of in the temporary directory.\n\nOn Linux and macOS the capture works because `/tmp` exists, but it ignores `TMPDIR` (on macOS, the per-user temporary directory).\n\n### Code example\n\nRun this from a directory on a drive without a `\\tmp` folder (typically `C:`), then press `T` in the viewer window:\n\n```python\nimport gymnasium as gym\n\nenv = gym.make(\"InvertedPendulum-v5\", render_mode=\"human\")\nenv.reset(seed=0)\nfor _ in range(1000):\n    env.step(env.action_space.sample())\n```\n\n```\nTraceback (most recent call last):\n  File \"capture_frame_loop.py\", line 12, in <module>\n    env.step(env.action_space.sample())\n  ...\n  File \"gymnasium\\envs\\mujoco\\inverted_pendulum_v5.py\", line 173, in step\n    self.render()\n  File \"gymnasium\\envs\\mujoco\\mujoco_env.py\", line 161, in render\n    return self.mujoco_renderer.render(self.render_mode)\n  File \"gymnasium\\envs\\mujoco\\mujoco_rendering.py\", line 795, in render\n    return viewer.render()\n  File \"gymnasium\\envs\\mujoco\\mujoco_rendering.py\", line 493, in render\n    update()\n  File \"gymnasium\\envs\\mujoco\\mujoco_rendering.py\", line 475, in update\n    glfw.poll_events()\n  File \"...\\site-packages\\glfw\\__init__.py\", line 1861, in poll_events\n    _glfw.glfwPollEvents()\n  File \"...\\site-packages\\glfw\\__init__.py\", line 692, in errcheck\n  ...\n  File \"...\\site-packages\\glfw\\__init__.py\", line 671, in callback_wrapper\n    return func(*args, **kwargs)\n  File \"gymnasium\\envs\\mujoco\\mujoco_rendering.py\", line 542, in _key_callback\n    imageio.imwrite(self._image_path % self._image_idx, np.flipud(img))\n  ...\n  File \"...\\site-packages\\imageio\\core\\request.py\", line 418, in _parse_uri\n    raise FileNotFoundError(\nFileNotFoundError: [Errno 2] The directory does not exist: 'X:\\\\tmp'\n```\n\nIn this run, the working directory was on a drive `X:` without `\\tmp`, and the key press was posted to the window with `PostMessageW` (`WM_KEYDOWN`/`WM_KEYUP` for `T`).\n\n### System info\n\n- Gymnasium 1.4.0, installed from source (`pip install -e \".[all,testing]\"`, commit c08564bb)\n- Windows 11 Pro 10.0.26300\n- Python 3.12.12, mujoco 3.17.0, glfw 2.11.0, imageio 2.38.1\n\n### Additional context\n\n`os.path.join(tempfile.gettempdir(), \"frame_%07d.png\")` fixes it, and it also honors `TMPDIR` on other platforms. I'll open a PR with a regression test.\n\n### Checklist\n\n- [x] I have checked that there is no similar [issue](https://github.com/Farama-Foundation/Gymnasium/issues) in the repo\n",
+      "created_at": "2026-11-04T15:50:36Z",
+      "html_url": "https://github.com/Farama-Foundation/Gymnasium/issues/1830",
+      "id": "Farama-Foundation/Gymnasium#1830",
+      "issue_number": 1830,
+      "labels": [],
+      "repository": "Farama-Foundation/Gymnasium",
+      "surface_sha256": "7f90f95b0293b0a4ca6a9b1547ead69e3a4ea218bea72184af9ef447835fc3b6",
+      "title": "[Bug Report] MuJoCo human viewer saves captured frames to a hardcoded /tmp, crashing on Windows"
+    }
+  ],
+  "post_activation_issue_identities_observed": 476,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-04T18:53:12Z",
+  "schema_version": 1
+}
