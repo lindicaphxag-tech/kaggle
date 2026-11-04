@@ -6870,46 +6870,62 @@
     },
     {
       "created_at": "2026-11-03T16:48:31Z",
+      "expiry_recorded_at": "2026-11-04T03:14:21Z",
+      "expiry_sha256": "a4d3c17aeadc4d95e33c5b79f2fcea5267fe56fdbb6395b0a0c1c39ba24e8faf",
+      "expiry_source": "expirations/RobotLocomotion__drake__25199.json",
       "first_frozen_at": "2026-11-03T18:02:03Z",
       "id": "RobotLocomotion/drake#25199",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 25199,
       "prediction_deadline_at": "2026-11-04T00:02:03Z",
       "repository": "RobotLocomotion/drake",
       "source": "inbox/FIRST_SEEN_20261103T180203Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "c88e64c8130f84934dbdc25a8eaf0f5db837fdd30ff448f16b14cf852a05dc43"
     },
     {
       "created_at": "2026-11-03T12:16:08Z",
+      "expiry_recorded_at": "2026-11-04T03:14:21Z",
+      "expiry_sha256": "7469102d00a46c1995ab7ee14b1950261bdd6e3d5e19e46f023b3678c5c13ae4",
+      "expiry_source": "expirations/UniversalRobots__Universal_Robots_ROS2_Driver__2051.json",
       "first_frozen_at": "2026-11-03T18:02:03Z",
       "id": "UniversalRobots/Universal_Robots_ROS2_Driver#2051",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 2051,
       "prediction_deadline_at": "2026-11-04T00:02:03Z",
       "repository": "UniversalRobots/Universal_Robots_ROS2_Driver",
       "source": "inbox/FIRST_SEEN_20261103T180203Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "7fed76544fc6cd65342343487199c2a3fc2784b1f192c21a1c516207c41c084e"
     },
     {
       "created_at": "2026-11-03T17:07:41Z",
+      "expiry_recorded_at": "2026-11-04T03:14:21Z",
+      "expiry_sha256": "2ba88fb812f623ca30edc5e6fbc3c5915a4bbf0da387578c890d384431ec8198",
+      "expiry_source": "expirations/gazebosim__ros_gz__1017.json",
       "first_frozen_at": "2026-11-03T18:02:03Z",
       "id": "gazebosim/ros_gz#1017",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 1017,
       "prediction_deadline_at": "2026-11-04T00:02:03Z",
       "repository": "gazebosim/ros_gz",
       "source": "inbox/FIRST_SEEN_20261103T180203Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "8e32d240ebabfde8c538f6d35f5b8ec693dc2e3bde2cb3c3a4fca52d66b9d792"
     },
     {
       "created_at": "2026-11-03T15:31:08Z",
+      "expiry_recorded_at": "2026-11-04T03:14:21Z",
+      "expiry_sha256": "7c5e65a40d167ec6605be74a6407f1caf9f289f2bd8df0adc851366ed8f7c3f3",
+      "expiry_source": "expirations/huggingface__lerobot__5233.json",
       "first_frozen_at": "2026-11-03T18:02:03Z",
       "id": "huggingface/lerobot#5233",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 5233,
       "prediction_deadline_at": "2026-11-04T00:02:03Z",
       "repository": "huggingface/lerobot",
       "source": "inbox/FIRST_SEEN_20261103T180203Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "760dfbac3b2e4e90a038949b5833743d08ba2b51ca8ab7f2dc2f35d8604317a7"
     },
     {
@@ -6933,6 +6949,28 @@
       "source": "inbox/FIRST_SEEN_20261103T234033Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "d3b79f06cc7ab6cfc88de5fc5c35e323789e3b6f74bd02f463e5801836c135a7"
+    },
+    {
+      "created_at": "2026-11-04T02:19:00Z",
+      "first_frozen_at": "2026-11-04T03:15:59Z",
+      "id": "google-deepmind/mujoco#3754",
+      "issue_number": 3754,
+      "prediction_deadline_at": "2026-11-04T09:15:59Z",
+      "repository": "google-deepmind/mujoco",
+      "source": "inbox/FIRST_SEEN_20261104T031559Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "adbf9ea5ff07c8532ca2aba97a9e33d903ac6895f8826a8dabbc110d498127ae"
+    },
+    {
+      "created_at": "2026-11-04T01:39:54Z",
+      "first_frozen_at": "2026-11-04T03:15:59Z",
+      "id": "isaac-sim/IsaacSim#923",
+      "issue_number": 923,
+      "prediction_deadline_at": "2026-11-04T09:15:59Z",
+      "repository": "isaac-sim/IsaacSim",
+      "source": "inbox/FIRST_SEEN_20261104T031559Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "b7596ae33ff7af5c152a51d58659aaaca2a28d58062fa37c0e5de3de95b650c7"
     }
   ]
 }
