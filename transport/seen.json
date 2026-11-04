@@ -6990,24 +6990,32 @@
     },
     {
       "created_at": "2026-11-04T03:40:44Z",
+      "expiry_recorded_at": "2026-11-04T14:21:53Z",
+      "expiry_sha256": "16c5e7cebb0ea7448d80594f0f7dd863f894df8d475e2f210263d228cc55a773",
+      "expiry_source": "expirations/DLR-RM__stable-baselines3__2296.json",
       "first_frozen_at": "2026-11-04T06:05:16Z",
       "id": "DLR-RM/stable-baselines3#2296",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 2296,
       "prediction_deadline_at": "2026-11-04T12:05:16Z",
       "repository": "DLR-RM/stable-baselines3",
       "source": "inbox/FIRST_SEEN_20261104T060516Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "973c0bf88fbd981657c25cfeef762d229d658a3c67cbd580be89e84c7cb08252"
     },
     {
       "created_at": "2026-11-04T03:58:09Z",
+      "expiry_recorded_at": "2026-11-04T14:21:53Z",
+      "expiry_sha256": "cd8748d60a4c2d96241c5870bcb61d6b69f774aecd26581f1ea0059ece796075",
+      "expiry_source": "expirations/isaac-sim__IsaacLab__8923.json",
       "first_frozen_at": "2026-11-04T06:05:16Z",
       "id": "isaac-sim/IsaacLab#8923",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 8923,
       "prediction_deadline_at": "2026-11-04T12:05:16Z",
       "repository": "isaac-sim/IsaacLab",
       "source": "inbox/FIRST_SEEN_20261104T060516Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "c5972fc3f9c32a3d01b5c9b5dc8d05fd76daed397bb4f60c86c6233c94ab9c32"
     },
     {
@@ -7075,6 +7083,28 @@
       "source": "inbox/FIRST_SEEN_20261104T113204Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "4704294e85fb2d03fa5c44f49492a6b5f8c68f242bfe011626570d54893a487b"
+    },
+    {
+      "created_at": "2026-11-04T12:37:02Z",
+      "first_frozen_at": "2026-11-04T14:23:21Z",
+      "id": "Genesis-Embodied-AI/genesis-world#3683",
+      "issue_number": 3683,
+      "prediction_deadline_at": "2026-11-04T20:23:21Z",
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "source": "inbox/FIRST_SEEN_20261104T142321Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "6583d07769a01b9126d7437345ad2290de2917be0b245224d29287f483ca43f4"
+    },
+    {
+      "created_at": "2026-11-04T12:24:25Z",
+      "first_frozen_at": "2026-11-04T14:23:21Z",
+      "id": "gazebosim/gz-sim#4173",
+      "issue_number": 4173,
+      "prediction_deadline_at": "2026-11-04T20:23:21Z",
+      "repository": "gazebosim/gz-sim",
+      "source": "inbox/FIRST_SEEN_20261104T142321Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "d35d5dbd09d11785f5bfd9e527e22af4511c9e3b79ac540beecc109317533afe"
     }
   ]
 }
