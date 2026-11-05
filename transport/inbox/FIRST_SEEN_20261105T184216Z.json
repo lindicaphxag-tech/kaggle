@@ -1,0 +1,43 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "lapid92",
+      "body": "Hello, thank you for releasing [lerobot/pi05_robocasa](https://huggingface.co/lerobot/pi05_robocasa). I am trying to establish its training provenance and reproduce its evaluation on RoboCasa Kitchen's original 24 tasks (not RoboCasa365).\n\nFor revision `3206f64542999b9c57b17df73e6f7729eb0849e8`, could you share:\n\n- The training dataset and revision, task list, and demonstration selection.\n- The training configuration: full fine-tuning or LoRA, batch size, training steps, learning rate, and checkpoint selection/EMA.\n- The original evaluation code/command and any measured per-task success rates, including simulator version, scene/seed selection, episode limits, denoising steps, and actions executed before replanning.\n- The intended camera/state/action ordering and conventions, and the provenance of the saved normalization statistics.\n\nThe config names `pepijn223/pi05_robocasa_full_mean` and `lerobot/pi05_base`. Is this checkpoint connected to the \u03c0\u2080.\u2085 RoboCasa Kitchen 62.1% baseline reported in RLDX-1, or is it a separate fine-tune? If another maintainer owns the original training run, a pointer would be appreciated. Thank you!\n",
+      "created_at": "2026-11-05T18:33:18Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5270",
+      "id": "huggingface/lerobot#5270",
+      "issue_number": 5270,
+      "labels": [
+        "question",
+        "dataset",
+        "configuration",
+        "sensors",
+        "training",
+        "evaluation"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "e13bc40e190b60711c95034463ffb875ddd5784c892632f1ba8c4c42a5800b70",
+      "title": "Question: training provenance and Kitchen24 evaluation recipe for pi05_robocasa"
+    },
+    {
+      "author_login": "pbarejko",
+      "body": "### Proposal\n\nRename the `isaaclab_physx` package and Python module to `isaaclab_isaacsim` to reflect its responsibility for Isaac Sim integration. Organize its simulation and rendering implementations into clearly separated submodules for Isaac Sim PhysX and Isaac RTX.\n\nKeep `isaaclab_ov` as the integration layer for standalone Omniverse libraries, including `ovphysx` and `ovrtx`, with corresponding physics and rendering submodules.\n\n### Motivation\n\nThe name `isaaclab_physx` suggests a package dedicated to the PhysX simulation engine, but it also contains Isaac RTX rendering, application launch, and other Isaac Sim integration code. This makes package responsibilities unclear and makes rendering functionality harder to discover.\n\nPhysX is also available through the separate `ovphysx` integration, so the current name does not clearly distinguish the Isaac Sim implementation from the standalone library integration.\n\nAligning package names with their integration runtime would help users understand dependencies, locate implementations, and contribute new functionality. It would also make it clearer that physics and rendering are independently selectable capabilities.\n\n### Alternatives\n\n- Keep `isaaclab_physx` and clarify its broader responsibilities in documentation. This avoids migration work but preserves the misleading package name.\n- Split Isaac Sim physics and rendering into separate top-level packages. This provides stronger separation but adds packaging overhead and complicates ownership of shared Isaac Sim lifecycle code.\n\n### Build Info\n\n- Isaac Lab Version: `3.0.0` in the current checkout.\n- Isaac Sim Version: `6.2.0.0`, as pinned by the repository; the installed runtime version was not verified.\n\n### Additional context\n\nThe current layout already illustrates the naming mismatch:\n\n- `isaaclab_physx/physics/physx_manager.py` implements Isaac Sim PhysX integration.\n- `isaaclab_physx/renderers/isaac_rtx_renderer.py` implements Isaac RTX rendering.\n- `isaaclab_ov/physics/ovphysx_manager.py` and `isaaclab_ov/renderers/ovrtx_renderer.py` provide the corresponding standalone Omniverse integrations.\n\nThe proposed organization can retain the existing `physics/` and `renderers/` structure under the renamed package. Shared application, asset, sensor, and simulation utilities should live alongside them according to their runtime dependencies.\n\nExisting backend selectors such as `isaacsim_physx` and `isaacsim_rtx` already express this distinction and should retain their behavior.\n\n### Checklist\n\n- [ ] I have checked that there is no similar issue in the repo (**required**)\n\n### Acceptance Criteria\n\n- [ ] Rename the source package, distribution metadata, and Python import namespace from `isaaclab_physx` to `isaaclab_isaacsim`.\n- [ ] Clearly separate Isaac Sim PhysX simulation and Isaac RTX rendering into their respective submodules.\n- [ ] Keep standalone `ovphysx` and `ovrtx` integrations in `isaaclab_ov`, without introducing an Isaac Sim runtime requirement for those workflows.\n- [ ] Update imports, dependency declarations, backend registrations, installation tooling, documentation, examples, and tests.\n- [ ] Provide a documented migration path and deprecation policy for existing `isaaclab_physx` imports.\n- [ ] Validate existing supported physics/rendering combinations and application lifecycle behavior after the reorganization.\n\n",
+      "created_at": "2026-11-05T16:33:59Z",
+      "html_url": "https://github.com/isaac-sim/IsaacLab/issues/8950",
+      "id": "isaac-sim/IsaacLab#8950",
+      "issue_number": 8950,
+      "labels": [],
+      "repository": "isaac-sim/IsaacLab",
+      "surface_sha256": "b7c2c3e07b192aeb111de4572ae50bdd7c8b65b8ec7b56a1a71eaa65ea1dfbca",
+      "title": "Rename isaaclab_physx to isaaclab_isaacsim and clarify package responsibilities"
+    }
+  ],
+  "post_activation_issue_identities_observed": 488,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-05T18:42:16Z",
+  "schema_version": 1
+}
