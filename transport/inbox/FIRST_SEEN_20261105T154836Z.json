@@ -1,0 +1,36 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "zhui064",
+      "body": "**1. Cosmos3-Nano on RoboDojo: our re-eval vs FluxVLA README**\nWe re-ran RoboDojo evaluation with [this checkpoint](http://xxx/) and observed numbers that do not match the FluxVLA README.\nCould you help clarify which setting / metric definition / checkpoint the README numbers correspond to, and whether our re-eval protocol is aligned?\n\n<img width=\"794\" height=\"292\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/40ac85c0-2e53-49c6-8e67-7e444c5bb155\" />\n\n\n**2. This repo: Cosmos3-Nano < \u03c00.5 on RoboCasa GR1 / RoboDojo (and slightly on LIBERO)**\nIn FluxVLA, CosmOS3-Nano underperforms \u03c00.5 on LIBERO, RoboCasa GR1, and RoboDojo. That sits oddly next to NVIDIA\u2019s public CosmOS results on RoboLab / RoboArena / MolmoSpaces, where CosmOS is reported above \u03c00.5:\n\nhttps://huggingface.co/nvidia/Cosmos3-Nano-Policy-DROID\nhttps://arxiv.org/html/2606.02800v4\n\nIs this gap expected or worth a closer look on the FluxVLA CosmOS RoboDojo / RoboCasa setup  (e.g. different post-train recipe, embodiment, training cycles) ?   Have you trained with the official Cosmos framework ?\n",
+      "created_at": "2026-11-05T11:37:46Z",
+      "html_url": "https://github.com/FluxVLA/FluxVLA/issues/150",
+      "id": "FluxVLA/FluxVLA#150",
+      "issue_number": 150,
+      "labels": [],
+      "repository": "FluxVLA/FluxVLA",
+      "surface_sha256": "9756a41ce8d2557493cda831e84b49e8e43d212512e1e320d87974bc51b39347",
+      "title": "Cosmos3-Nano on RoboDojo benchmark"
+    },
+    {
+      "author_login": "Klajdi00",
+      "body": "Hi, and thank you for releasing GR00T N1.7!\n\nWe list open robotics projects on Robotheca (https://robotheca.org) and show each one's licence exactly as its own files state it. For the N1.7 weights we found three statements that don't agree, and we'd like to show the right one:\n\n1. This repository's README: \"GR00T N1.7 is fully commercially licensable under Apache 2.0\", and, under \"License\": \"Model weights: NVIDIA Open Model License\".\n2. The model card on Hugging Face (nvidia/GR00T-N1.7-3B): \"This model is ready for commercial/non-commercial use\" and \"This model is released under the NVIDIA Open Model License Agreement\".\n3. The `LICENSE` file in that same Hugging Face repository is the \"NVIDIA License\", whose section 3.3 says: \"The Work and any derivative works thereof only may be used or intended for use non-commercially \u2026 'non- commercially' means for research or evaluation purposes only.\"\n\nCould you confirm which licence applies to the N1.7 weights? If it is the NVIDIA Open Model License, would you update the `LICENSE` file on Hugging Face to match? Until we know, our page shows the strictest reading (non-commercial).\n\nThanks a lot for your help, and for the work on GR00T.\n",
+      "created_at": "2026-11-05T13:25:16Z",
+      "html_url": "https://github.com/NVIDIA/Isaac-GR00T/issues/803",
+      "id": "NVIDIA/Isaac-GR00T#803",
+      "issue_number": 803,
+      "labels": [],
+      "repository": "NVIDIA/Isaac-GR00T",
+      "surface_sha256": "5dd6cb3656928c7c87d2c0ec65aacab7963adc432625a277f8e992ae230d248e",
+      "title": "Which licence applies to the GR00T N1.7 weights?"
+    }
+  ],
+  "post_activation_issue_identities_observed": 486,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-05T15:48:36Z",
+  "schema_version": 1
+}

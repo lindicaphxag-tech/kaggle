@@ -7230,24 +7230,32 @@
     },
     {
       "created_at": "2026-11-05T05:36:46Z",
+      "expiry_recorded_at": "2026-11-05T15:46:49Z",
+      "expiry_sha256": "74f8aadf21bf4f3cdc7b611290ee86acc8625937d4093ce94222a1bf11dbb292",
+      "expiry_source": "expirations/gazebosim__gz-sim__4178.json",
       "first_frozen_at": "2026-11-05T07:22:21Z",
       "id": "gazebosim/gz-sim#4178",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 4178,
       "prediction_deadline_at": "2026-11-05T13:22:21Z",
       "repository": "gazebosim/gz-sim",
       "source": "inbox/FIRST_SEEN_20261105T072221Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "7a6351e1aad49f21f4784955d1d84abb52553dd86af0bdd6c3ba51f9ae05daa0"
     },
     {
       "created_at": "2026-11-05T05:42:47Z",
+      "expiry_recorded_at": "2026-11-05T15:46:49Z",
+      "expiry_sha256": "9cde0375a83d73134a12e4cf621eab63161daff9181bba569bd60ff6933a5738",
+      "expiry_source": "expirations/isaac-sim__IsaacSim__928.json",
       "first_frozen_at": "2026-11-05T07:22:21Z",
       "id": "isaac-sim/IsaacSim#928",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 928,
       "prediction_deadline_at": "2026-11-05T13:22:21Z",
       "repository": "isaac-sim/IsaacSim",
       "source": "inbox/FIRST_SEEN_20261105T072221Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "e49503c17a781f97733501241ba02cc4a59112d20262031327ccd907d2943e6e"
     },
     {
@@ -7260,6 +7268,28 @@
       "source": "inbox/FIRST_SEEN_20261105T104527Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "92caa83a53d54b9ebb2ae4426f4516c0ac0ff46e68ee6f4dfce96d0ef8876b27"
+    },
+    {
+      "created_at": "2026-11-05T11:37:46Z",
+      "first_frozen_at": "2026-11-05T15:48:36Z",
+      "id": "FluxVLA/FluxVLA#150",
+      "issue_number": 150,
+      "prediction_deadline_at": "2026-11-05T21:48:36Z",
+      "repository": "FluxVLA/FluxVLA",
+      "source": "inbox/FIRST_SEEN_20261105T154836Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "9756a41ce8d2557493cda831e84b49e8e43d212512e1e320d87974bc51b39347"
+    },
+    {
+      "created_at": "2026-11-05T13:25:16Z",
+      "first_frozen_at": "2026-11-05T15:48:36Z",
+      "id": "NVIDIA/Isaac-GR00T#803",
+      "issue_number": 803,
+      "prediction_deadline_at": "2026-11-05T21:48:36Z",
+      "repository": "NVIDIA/Isaac-GR00T",
+      "source": "inbox/FIRST_SEEN_20261105T154836Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "5dd6cb3656928c7c87d2c0ec65aacab7963adc432625a277f8e992ae230d248e"
     }
   ]
 }
