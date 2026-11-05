@@ -1,0 +1,43 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "luca-della-vedova",
+      "body": "With https://github.com/gazebosim/gz-sim/pull/4171 we introduced a first test that, instead of using relay systems, uses the new `EcmScope` API to simplify the testing logic and make it cleaner.\n\nWe should go through the testing codebase and see where this pattern can be used to make tests more readable and cleaner.\n\n## Implementation suggestion\n\nTests that use relay systems to inspect the ECM could just use the new API and that should make the code shorter and more readable.\nNote that it will be tricky to backport these changes until the `EcmScope` API itself is backported, which didn't happen yet.\n\n## Additional context\n\nRefer to https://github.com/gazebosim/gz-sim/pull/4171 for context, as well as an example of integration test that used relay systems and was refactored to use `EcmScope` instead.",
+      "created_at": "2026-11-05T05:36:46Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4178",
+      "id": "gazebosim/gz-sim#4178",
+      "issue_number": 4178,
+      "labels": [
+        "enhancement",
+        "good first issue",
+        "help wanted"
+      ],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "7a6351e1aad49f21f4784955d1d84abb52553dd86af0bdd6c3ba51f9ae05daa0",
+      "title": "Refactor tests to use EcmScope"
+    },
+    {
+      "author_login": "garg-akash",
+      "body": "### Description\n\nOn the PhysX tensor API (`omni.physics.tensors`, GPU pipeline), `get_generalized_gravity_forces()` has two problems on a floating-base articulation:\n\n1. **Side effect on later reads.** After the call, `get_link_accelerations()` and `get_link_velocities()` no longer return the simulated state until the next `simulate()`. Accelerations change by up to 1830 m/s\u00b2 and velocities by up to 21.6 m/s in the repro below. Every link's linear acceleration then reads close to (0, 0, +9.81) m/s\u00b2, and link velocities look as if the joints were frozen to the root. Root state, DOF state, link transforms and the simulation itself are not affected. None of the other dynamics getters (`get_jacobians`, `get_mass_matrices`, `get_coriolis_and_centrifugal_compensation_forces`, `get_gravity_compensation_forces`) changes anything.\n2. **Wrong values.** The returned `(N, num_dofs)` torques do not match the gravity torques computed from the Jacobian, \u03a3\u1d62 J\u1d62\u1d40 m\u1d62 (0, 0, +g). They don't match with the joint columns aligned, or with them shifted by 6 (as in #730). `get_gravity_compensation_forces()` returns `(N, 6 + num_dofs)` and matches the Jacobian reference exactly, in both the root and the joint columns.\n\nThe call logs `DEPRECATED: Please use getGravityCompensationForces instead.`, but nothing says that the old getter changes other state. Problem 1 is easy to miss in Isaac Lab:\n- `ArticulationData.body_com_acc_w` / `body_com_vel_w` / `body_link_vel_w` are read lazily and cached per physics step.\n- So whether a term sees the true or the overwritten values depends on whether anything read them before the gravity call in that step.\n\nWe hit this through a training label that used `body_com_lin_acc_w` after a term that called `get_generalized_gravity_forces()`. The label silently received (0, 0, +9.81) for every body.\n\nOur guess at the cause (unconfirmed): the old getter runs inverse dynamics in the view's per-link acceleration and velocity buffers, with zero joint velocities and accelerations and the root accelerated by +g, and leaves its results there.\n\n### Steps to reproduce\n\nStandalone script (attached / below). It moves a floating-base humanoid with random joint targets, then:\n- after a fresh `sim.step()`, reads the link accelerations and velocities, calls one getter, and reads them again, with nothing else in between;\n- compares the old and new gravity getters with \u03a3\u1d62 J\u1d62\u1d40 m\u1d62 (0, 0, +g), built from `get_jacobians()` and `get_masses()`.\n\n```bash\n./isaaclab.sh -p repro_gravity_forces_side_effect.py --headless                       # Unitree H1 (Isaac Lab asset)\n./isaaclab.sh -p repro_gravity_forces_side_effect.py --headless --usd /path/robot.usd  # any floating-base robot\n```\n\n\n### Isaac Sim version\n\n5.1.0-rc.19\n\n### Operating System (OS)\n\nUbuntu 24.04.2, kernel 6.17\n\n### GPU Name\n\nNVIDIA GeForce RTX 5090\n\n### GPU Driver and CUDA versions\n\n580.178.04\n\n### Logs\n\nOutput with a Unitree G1 29-DOF USD (16 envs):\n\n```\n[repro] floating base: True, links 30, dofs 29\n[repro] --- 1. read link acc / vel, call a getter, read again (nothing else in between) ---\n[repro] get_jacobians                                      max change: link acc    0.000  link vel   0.000  dof vel 0.000\n[repro] get_mass_matrices                                  max change: link acc    0.000  link vel   0.000  dof vel 0.000\n[repro] get_coriolis_and_centrifugal_compensation_forces   max change: link acc    0.000  link vel   0.000  dof vel 0.000\n[repro] get_gravity_compensation_forces                    max change: link acc    0.000  link vel   0.000  dof vel 0.000\n[repro] get_generalized_gravity_forces                     max change: link acc 1829.881  link vel  21.596  dof vel 0.000\n[repro]   env 0, last link: lin acc before [-4.353386402130127, -10.793983459472656, 9.298742294311523]\n[repro]                       lin acc after  [3.8093366622924805, 5.2626872062683105, 5.816096305847168]\n[repro]   all links after: lin acc mean [0.08632272481918335, -0.06583241373300552, 9.732253074645996], ang acc max 28.8339\n[repro] --- 2. gravity torques: compare with sum_i J_i^T m_i (0, 0, +g) ---\n[repro] shapes: old (16, 29)  new (16, 35)  reference (16, 35)\n[repro] reference: root Fz 327.1 N (total mass 33.34 kg), max |joint torque| 23.06 N m\n[repro] new [:, 6:] vs reference joints          max diff 0.0000\n[repro] new [:, :6] vs reference root wrench     max diff 0.0000\n[repro] old         vs reference joints          max diff 32.0455\n[repro] old         vs reference first 29 (shift 6) max diff 327.6780\n[repro] max |old| 23.3783 N m\n```\n\nWe see the same with our own 25-DOF humanoid, walking under a trained policy. There, every link's acceleration after the call is (0.01, 0.00, 9.81) m/s\u00b2, the old getter's values are at most 2.5 N\u00b7m against reference values of up to 19 N\u00b7m, and `get_gravity_compensation_forces()` again matches the reference exactly.\n\n### Expected behaviour\n\n- A getter does not change what other getters return. In particular, `get_link_accelerations()` / `get_link_velocities()` return the simulated state until the next step.\n- `get_generalized_gravity_forces()` returns the joint gravity torques (it matches `get_gravity_compensation_forces()[:, 6:]`), or it is documented as unsupported for floating-base articulations.\n\n### Workaround\n\n- Use `get_gravity_compensation_forces()[:, 6:]` (floating base) instead.\n- If the old getter must be called, read every link quantity you need (in Isaac Lab, touch `body_com_vel_w` and `body_com_acc_w` so they are cached) before calling it.\n\n[repro_gravity_forces_side_effect.py](https://github.com/user-attachments/files/34409351/repro_gravity_forces_side_effect.py)\n\n### Additional information\n\n_No response_",
+      "created_at": "2026-11-05T05:42:47Z",
+      "html_url": "https://github.com/isaac-sim/IsaacSim/issues/928",
+      "id": "isaac-sim/IsaacSim#928",
+      "issue_number": 928,
+      "labels": [
+        "isaac-sim-v5-1-0",
+        "isaac-sim-physics"
+      ],
+      "repository": "isaac-sim/IsaacSim",
+      "surface_sha256": "e49503c17a781f97733501241ba02cc4a59112d20262031327ccd907d2943e6e",
+      "title": "ArticulationView.get_generalized_gravity_forces() overwrites link accelerations and velocities, and returns wrong torques for floating-base articulations"
+    }
+  ],
+  "post_activation_issue_identities_observed": 483,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-05T07:22:21Z",
+  "schema_version": 1
+}
