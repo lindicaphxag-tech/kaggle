@@ -1,0 +1,42 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "coldstone7",
+      "body": "This is Bongjae Moon from Arenne.\n\n**Describe the bug**\nIn `src/eval/src/eval/scorers/collision.py`, `CollisionScorer.calculate()` resets `front_collision`, `rear_collision` and `lateral_collision` **inside** the loop over intersecting actors (L47), and appends them **after** the loop (L54\u201356). When two or more actors overlap the ego in the same timestep, only the classification of the last actor returned by `srt_tree.query(...)` survives.\n\nThe iteration order follows the spatial layout and ego heading, not the input order. The same physical contact can therefore be scored differently: flipping the ego heading drops a front contact, and because `collision_at_fault = collision_front | collision_lateral` (`aggregation/processing.py`), at-fault changes from True to False.\n\n**Steps/Code to reproduce bug**\nStandalone snippet that mirrors the scorer's loop (shapely only):\n\n```python\nfrom shapely.geometry import box, LineString\n\nfront_bumper = LineString([(4, -1), (4, 1)])   # ego bbox (0,-1)-(4,1), heading +x\nrear_bumper = LineString([(0, -1), (0, 1)])\na_front = box(3.5, -0.5, 5.0, 0.5)             # touches front bumper\nb_rear = box(-1.0, -0.5, 0.5, 0.5)             # touches rear bumper\n\ndef current(actors):                           # same structure as collision.py L45-56\n    for p in actors:\n        f, r, l = False, False, False\n        if p.intersects(front_bumper): f = True\n        elif p.intersects(rear_bumper): r = True\n        else: l = True\n    return f, r, l\n\nprint(current([a_front, b_rear]))  # (False, True, False)  front contact lost\nprint(current([b_rear, a_front]))  # (True, False, False)  rear contact lost\n```\n\nWe also reproduced this with the real `CollisionScorer` and `eval.data` `ActorPolygons` using synthetic boxes. Mixed contacts keep a single class:\n\n| Contacts in the same timestep | Class kept |\n|---|---|\n| front + rear | front only |\n| front + lateral | lateral only |\n| rear + lateral | lateral only |\n| front + rear + lateral | lateral only |\n\nWith the same front+rear contact, mirroring the layout or flipping the ego heading changes which class survives.\n\n**Expected behavior**\nPer-timestep flags are the OR over all intersecting actors, and they do not depend on iteration order, spatial layout or ego heading. Single-actor results stay as they are.\n\nSuggested fix: initialise the three flags once before the loop, keep the per-actor `if front / elif rear / else lateral` rule, and append once per timestep. With this change, all the cases above return the union, `collision_any` does not change, and single-actor results are identical.\n\n**Environment overview (please complete the following information)**\n - Deployment: Docker Compose (single machine)\n - Renderer backend: NuRec (default)\n - Driving policy under test: custom (end-to-end student policy). The scorer bug is independent of the policy.\n - Scene / dataset used: NuRec scenes from the PhysicalAI-AV set. The bug is reproducible with synthetic boxes alone, without any scene.\n - Affected gRPC service(s), and image/tag if applicable: none. This is offline eval (`src/eval`, `CollisionScorer`). Image `alpasim-base:0.134.0`, commit `affc2ea`.\n\n**Environment details**\n - Hardware: NVIDIA GB10 (DGX Spark), 1 GPU, unified memory\n - Operating System: Ubuntu 24.04.4 LTS (aarch64)\n - CUDA / NVIDIA driver version: CUDA 13.0, driver 580.159.03\n - Docker / Docker Compose versions: Docker 29.2.1, Docker Compose v5.0.2\n\n**Additional context**\n- Open PR #234 (https://github.com/NVlabs/alpasim/pull/234) proposes the same fix. We confirm the issue and the fix independently.\n- A regression test that only permutes the actor list may not catch this, because the STRtree order does not follow list order. A mirrored-layout or flipped-heading case does catch it.\n- In our closed-loop runs, multi-actor overlaps were rare, but at least one rollout flipped its pass/fail outcome.",
+      "created_at": "2026-11-04T23:46:16Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/237",
+      "id": "NVlabs/alpasim#237",
+      "issue_number": 237,
+      "labels": [
+        "bug"
+      ],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "1a333295c2309ca605ec21d0afa36a6196c1d5ee76e79b6cf96f578f1f4840f3",
+      "title": "[BUG] CollisionScorer keeps only the last intersecting actor's class per timestep (result depends on STRtree order / ego heading)"
+    },
+    {
+      "author_login": "rpoyner-tri",
+      "body": "Follow-up to #25201, which added support for `refpos` and `refquat` on MuJoCo mesh assets (fixes #22488), as suggested by @SeanCurtis-TRI in review.\n\n**Background**\n\nMuJoCo \"compiles\" a mesh asset by transforming each file vertex `v` as\n\n```\nscale * R_GR\u207b\u00b9 * (v - refpos)\n```\n\n(see `mjCMesh::ApplyTransformations` in MuJoCo's `user_mesh.cc`): subtract `refpos`, rotate by the inverse of `refquat`, then apply `scale` last. So `refpos` is in unscaled file units.\n\nDrake's `geometry::Mesh` instead scales the file vertices when it loads them, and the MuJoCo parser accounts for `refpos`/`refquat` by adjusting the geom's pose. Since the pose is a rigid transform, this reproduces MuJoCo exactly only when `scale * R_GR\u207b\u00b9` commutes, which holds when:\n\n1. the scale is uniform, or\n2. `refquat` is the identity.\n\nFor other combinations (for example `scale=\"1 2 3\"` with `refquat=\"0.5 0.5 0.5 0.5\"`), Drake cannot represent the mapping with a rigid geom pose, so #25201 emits a warning and the vertex placement will not match MuJoCo.\n\n**Proposal**\n\nDo what MuJoCo does: when a mesh asset has a `refpos`, `refquat`, or non-identity `scale`, load the file and apply the full transform to the vertices ourselves, producing an in-memory mesh (`geometry::Mesh` can be constructed from an `InMemoryMesh`). The geom pose then needs no reference-frame adjustment at all, which would:\n\n- give exact parity with MuJoCo for every combination of `refpos`, `refquat`, and `scale`, including the non-commuting cases that currently only warn;\n- remove the pose-correction logic and the non-uniform-scale warning from the parser.\n\n**Things to check**\n\n- Normals, and any other per-vertex or per-face data in the source `.obj`, should be transformed consistently. MuJoCo transforms normals by the inverse scale.\n- Mesh spatial-inertia computation should keep using the transformed vertices, so the body inertia stays consistent.\n- Behavior and cost when the mesh has no `refpos`, `refquat`, or scale (we should keep using the file-backed mesh in that case).\n- Whether the resulting in-memory meshes affect hydroelastic or other geometry role handling compared to file-backed meshes.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)\n",
+      "created_at": "2026-11-04T22:48:49Z",
+      "html_url": "https://github.com/RobotLocomotion/drake/issues/25206",
+      "id": "RobotLocomotion/drake#25206",
+      "issue_number": 25206,
+      "labels": [
+        "type: feature request",
+        "priority: low",
+        "component: multibody parsing"
+      ],
+      "repository": "RobotLocomotion/drake",
+      "surface_sha256": "8ac09fd57276eb32f033cf3b2f26c821bc2cc49ad5dfcfc9d14f72c7ad382d8e",
+      "title": "[parsing] MuJoCo parser: bake mesh asset refpos/refquat/scale into an in-memory mesh for exact parity"
+    }
+  ],
+  "post_activation_issue_identities_observed": 481,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-05T00:32:38Z",
+  "schema_version": 1
+}

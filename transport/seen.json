@@ -7181,6 +7181,28 @@
       "source": "inbox/FIRST_SEEN_20261104T211633Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "2406b3a1b042506d77da88b75253866a4850f83cb6f243bf50193d06f1a1faba"
+    },
+    {
+      "created_at": "2026-11-04T23:46:16Z",
+      "first_frozen_at": "2026-11-05T00:32:38Z",
+      "id": "NVlabs/alpasim#237",
+      "issue_number": 237,
+      "prediction_deadline_at": "2026-11-05T06:32:38Z",
+      "repository": "NVlabs/alpasim",
+      "source": "inbox/FIRST_SEEN_20261105T003238Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "1a333295c2309ca605ec21d0afa36a6196c1d5ee76e79b6cf96f578f1f4840f3"
+    },
+    {
+      "created_at": "2026-11-04T22:48:49Z",
+      "first_frozen_at": "2026-11-05T00:32:38Z",
+      "id": "RobotLocomotion/drake#25206",
+      "issue_number": 25206,
+      "prediction_deadline_at": "2026-11-05T06:32:38Z",
+      "repository": "RobotLocomotion/drake",
+      "source": "inbox/FIRST_SEEN_20261105T003238Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "8ac09fd57276eb32f033cf3b2f26c821bc2cc49ad5dfcfc9d14f72c7ad382d8e"
     }
   ]
 }
