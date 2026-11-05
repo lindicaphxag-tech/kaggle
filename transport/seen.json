@@ -7275,24 +7275,32 @@
     },
     {
       "created_at": "2026-11-05T11:37:46Z",
+      "expiry_recorded_at": "2026-11-05T22:15:06Z",
+      "expiry_sha256": "abe21cdf07f492ffb69c37bdc364d43e0c1b5159b83933deacef20c54ed80e04",
+      "expiry_source": "expirations/FluxVLA__FluxVLA__150.json",
       "first_frozen_at": "2026-11-05T15:48:36Z",
       "id": "FluxVLA/FluxVLA#150",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 150,
       "prediction_deadline_at": "2026-11-05T21:48:36Z",
       "repository": "FluxVLA/FluxVLA",
       "source": "inbox/FIRST_SEEN_20261105T154836Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "9756a41ce8d2557493cda831e84b49e8e43d212512e1e320d87974bc51b39347"
     },
     {
       "created_at": "2026-11-05T13:25:16Z",
+      "expiry_recorded_at": "2026-11-05T22:15:06Z",
+      "expiry_sha256": "06d7702040d07dc6805cf3476ab077c7ee30db4fd667cca15d972a901f31f775",
+      "expiry_source": "expirations/NVIDIA__Isaac-GR00T__803.json",
       "first_frozen_at": "2026-11-05T15:48:36Z",
       "id": "NVIDIA/Isaac-GR00T#803",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 803,
       "prediction_deadline_at": "2026-11-05T21:48:36Z",
       "repository": "NVIDIA/Isaac-GR00T",
       "source": "inbox/FIRST_SEEN_20261105T154836Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "5dd6cb3656928c7c87d2c0ec65aacab7963adc432625a277f8e992ae230d248e"
     },
     {
@@ -7316,6 +7324,39 @@
       "source": "inbox/FIRST_SEEN_20261105T184216Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "b7c2c3e07b192aeb111de4572ae50bdd7c8b65b8ec7b56a1a71eaa65ea1dfbca"
+    },
+    {
+      "created_at": "2026-11-05T20:25:04Z",
+      "first_frozen_at": "2026-11-05T22:16:34Z",
+      "id": "Physical-Intelligence/openpi#1080",
+      "issue_number": 1080,
+      "prediction_deadline_at": "2026-11-06T04:16:34Z",
+      "repository": "Physical-Intelligence/openpi",
+      "source": "inbox/FIRST_SEEN_20261105T221634Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "a7ea736c57ea683d55ca106986aef9ed44216092093d14657fd394717fb666d8"
+    },
+    {
+      "created_at": "2026-11-05T19:07:05Z",
+      "first_frozen_at": "2026-11-05T22:16:34Z",
+      "id": "RobotLocomotion/drake#25217",
+      "issue_number": 25217,
+      "prediction_deadline_at": "2026-11-06T04:16:34Z",
+      "repository": "RobotLocomotion/drake",
+      "source": "inbox/FIRST_SEEN_20261105T221634Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "1331f509ecbe778214cf5f2eef6055167096116cc3c4996e26328ceea69a396e"
+    },
+    {
+      "created_at": "2026-11-05T20:03:49Z",
+      "first_frozen_at": "2026-11-05T22:16:34Z",
+      "id": "isaac-sim/IsaacSim#931",
+      "issue_number": 931,
+      "prediction_deadline_at": "2026-11-06T04:16:34Z",
+      "repository": "isaac-sim/IsaacSim",
+      "source": "inbox/FIRST_SEEN_20261105T221634Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "eb38d059cb8e8db5e1efa3a096d28cfa5e9d94c3f340c7dbaebed66a764acfdf"
     }
   ]
 }

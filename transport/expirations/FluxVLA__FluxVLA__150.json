@@ -1,0 +1,13 @@
+{
+  "case_id": "FluxVLA/FluxVLA#150",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-11-05T22:15:06Z",
+  "expiry_sha256": "abe21cdf07f492ffb69c37bdc364d43e0c1b5159b83933deacef20c54ed80e04",
+  "first_frozen_at": "2026-11-05T15:48:36Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-11-05T21:48:36Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "9756a41ce8d2557493cda831e84b49e8e43d212512e1e320d87974bc51b39347"
+}

@@ -1,0 +1,54 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 3,
+  "new_candidates": [
+    {
+      "author_login": "ax-anoop",
+      "body": "Hi \u03c0 team,\n\nI've been working with the SO-101 / LeRobot ecosystem and recently explored the Act-athon 2026 writeups (VineethSendilraj's pi07-dart-painting and others \u2014 impressive work!).\n\nI created an account on the Pi partner portal at partner.pi-fleet.com but I understand it needs an org invitation to get started. I'd love to test \u03c00.7 fine-tuning on my SO-101 arm for pick-and-place tasks.\n\nWhat's the recommended way to request partner API access? I've submitted the waitlist at pi.website/waitlist. Is there anything else I should do?\n\nI have:\n- SO-101 5-DOF arm with 2 cameras (front + wrist)\n- ~25 hours of teleoperation data collected\n- Experience with VLA fine-tuning (\u03c00.5, SmolVLA)\n\nThanks for any guidance!",
+      "created_at": "2026-11-05T20:25:04Z",
+      "html_url": "https://github.com/Physical-Intelligence/openpi/issues/1080",
+      "id": "Physical-Intelligence/openpi#1080",
+      "issue_number": 1080,
+      "labels": [],
+      "repository": "Physical-Intelligence/openpi",
+      "surface_sha256": "a7ea736c57ea683d55ca106986aef9ed44216092093d14657fd394717fb666d8",
+      "title": "Question: How to get access to the Pi Partner API / partner portal for fine-tuning?"
+    },
+    {
+      "author_login": "SeanCurtis-TRI",
+      "body": "## Summary\n\n`RenderEngineGl::Clone()` shares the vertex buffers of deformable geometries with the original. A deformable configuration update in one engine therefore changes what every other engine in the clone family renders.\n\n## Details\n\n- Clones are created with shared OpenGL contexts (`internal_opengl_context.cc`, `Impl(const Impl& other)`), so buffer objects belong to the whole clone family; only vertex array objects are per-context.\n- `DoClone()` copies `geometries_` and rebuilds the vertex arrays (`UpdateVertexArrays()`) on the *same* vertex buffers. Nothing distinguishes deformable geometries, so their `vertex_buffer` names are shared.\n- `DoUpdateDeformableConfigurations()` writes the new positions and normals with `glNamedBufferSubData(geometry.vertex_buffer, ...)`, i.e., into the shared buffer.\n\n## Consequences\n\n1. Two clones (e.g., the engines in two different SceneGraph contexts) can't hold different deformable configurations; the last update wins for all of them.\n2. Clones updating deformable configurations on different threads write the same buffer concurrently; a clone rendering on one thread can draw a partially updated mesh from another.\n\n## Possible fix\n\nOn clone, give each deformable geometry its own vertex buffer (copy the data, e.g., with `glCopyNamedBufferSubData`) and rebuild its vertex array on the new buffer. The index buffer can stay shared since it doesn't change.\n",
+      "created_at": "2026-11-05T19:07:05Z",
+      "html_url": "https://github.com/RobotLocomotion/drake/issues/25217",
+      "id": "RobotLocomotion/drake#25217",
+      "issue_number": 25217,
+      "labels": [
+        "type: bug",
+        "component: geometry perception"
+      ],
+      "repository": "RobotLocomotion/drake",
+      "surface_sha256": "1331f509ecbe778214cf5f2eef6055167096116cc3c4996e26328ceea69a396e",
+      "title": "RenderEngineGl clones share deformable vertex buffers"
+    },
+    {
+      "author_login": "TillBeemelmanns",
+      "body": "## Description\n\nA `ParticleField3DGaussianSplat` scene renders much blurrier (about 40% of the sharpness) when it's referenced into a stage\nthat's already open than when it's part of the stage when it opens. Rendering a few frames right after adding it, before\nanything else changes on the stage, avoids the blur.\n\nThis hits any app that builds its stage in code. Ours is a robot sim: `SimulationApp`, then\n`AddReference(scene)`, then robot and sensors.\n\n(Render Quality Below)\n\n*Top two rows: the same view of one scan, rendered by Isaac Sim RTX (stage opened from the file vs. scene added to an\nopen stage), by 3DGRUT (3DGRT, 3DGUT) and by our sim's ZED X camera before and after the workaround. Bottom two rows: zoomed\ncrops. Sharpness is the mean absolute Laplacian, with brightness matched across panels.*\n\n## Environment\n\n- Isaac Sim 6.2.0 container (`6.2.0-rc.14+release.52805.02189a84`), headless, `RealTimePathTracing`\n- `omni.hydra.rtx-1.0.5`, `omni.usd.schema.usd_particle_field-1.0.0`\n- NVIDIA RTX PRO 6000 Blackwell Max-Q, driver 580.178.04, Linux\n- Scene: 3DGS PLY (5.97M splats, SH degree 3; [superspl.at scene 38265403](https://superspl.at/scene/38265403), CC BY-NC),\n  converted with `usd_convert_gsplat` 0.1.26, and referenced by a small Z-up wrapper USD with an `xformOp:transform`.\n  3DGRUT `transcode --format lightfield` gives the same data and the same result.\n\n## Reproduction\n\n```python\n\"\"\"/isaac-sim/python.sh repro_particlefield_blur.py <scene.usd> <open|added|added_settled> <out.png>\"\"\"\nimport sys\n\nscene, mode, out = sys.argv[1:4]\nfrom isaacsim import SimulationApp\n\napp = SimulationApp({\"headless\": True, \"renderer\": \"RealTimePathTracing\"})\nimport numpy as np\nimport omni.replicator.core as rep\nimport omni.usd\nfrom PIL import Image\nfrom pxr import Gf, UsdGeom\n\nctx = omni.usd.get_context()\nif mode == \"open\":  # the splats are part of the stage as it opens: sharp\n    ctx.open_stage(scene)\nelse:  # the splats are referenced into an already open stage: blurred\n    ctx.new_stage()\n    app.update()\n    stage = ctx.get_stage()\n    UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)\n    UsdGeom.SetStageMetersPerUnit(stage, 1.0)\n    UsdGeom.Xform.Define(stage, \"/World/Scene\").GetPrim().GetReferences().AddReference(scene)\n    if mode == \"added_settled\":  # workaround: render a few frames before touching the stage again\n        for _ in range(5):\n            app.update()\napp.update()\nstage = ctx.get_stage()\n\n# Pinhole camera, 105 deg horizontal FOV, ~0.9 m above the ground. Adjust eye/target/up to your scene.\ncam = UsdGeom.Camera.Define(stage, \"/ReproCam\")\ncam.CreateFocalLengthAttr(1.1124)\ncam.CreateHorizontalApertureAttr(2.88)\ncam.CreateVerticalApertureAttr(1.8)\ncam.CreateClippingRangeAttr(Gf.Vec2f(0.05, 10000))\neye, target, up = Gf.Vec3d(-1.054, -0.297, 0.877), Gf.Vec3d(-2.032, -0.392, 0.723), Gf.Vec3d(-0.137, 0.044, 0.99)\nUsdGeom.Xformable(cam).AddTransformOp().Set(Gf.Matrix4d().SetLookAt(eye, target, up).GetInverse())\n\nrp = rep.create.render_product(\"/ReproCam\", (960, 600))\nrgb = rep.AnnotatorRegistry.get_annotator(\"rgb\")\nrgb.attach(rp)\nfor _ in range(90):\n    app.update()\nrep.orchestrator.step(rt_subframes=8, delta_time=0.0, pause_timeline=False)\nimg = np.asarray(rgb.get_data())[:, :, :3]\nImage.fromarray(img).save(out)\ng = img.astype(float).mean(2)\nlap = 4 * g[1:-1, 1:-1] - g[:-2, 1:-1] - g[2:, 1:-1] - g[1:-1, :-2] - g[1:-1, 2:]\nprint(f\"mode={mode} sharpness (mean |Laplacian|) = {np.abs(lap).mean():.2f}\")\napp.close()\n```\n\n| Mode | Sharpness |\n|---|---|\n| `open`: stage opened from the file | 11.47 |\n| `added`: scene referenced into a new stage | **4.73** |\n| `added_settled`: same, plus 5 `app.update()` right after the reference | 11.48 |\n\n## Observations\n\n- **Deterministic:** repeated runs give the same numbers to two decimals.\n- **Opening is fine:** opening a root file that references or sublayers the scene is sharp, and so is adding other prims\n  after the scene has rendered.\n- **Re-adding blurs again:** deactivating and reactivating the scene prim makes it blurry again. `Usd.Stage.Reload()`\n  keeps it sharp.\n- **Not the cause:**\n  - time code metadata\n  - `skipTonemapping`, `allHits`, `multiGpu`, `ecoMode`\n  - render resolution\n  - several render products, depth and motion vector annotators\n  - lights\n  - small camera motion\n- **3DGRUT reference:** rendering the same PLY from the same view with 3DGRUT's own renderers gives 15.7 (3DGRT) and\n  18.0 (3DGUT). Isaac Sim with the stage opened from the file gives 13.1, the blurred case 4.2 (same metric, see the image).\n\n## Workaround\n\nRender a few frames right after adding the ParticleField, before any other stage change:\n\n```python\nprim.GetReferences().AddReference(scene)\nfor _ in range(5):\n    simulation_app.update()\n```\n\nOpening the scene as the root stage also avoids the blur. In our app, though, `open_stage` after `SimulationApp`\nstartup broke other render products: `[carb.scenerenderer-rtx.plugin] Failed to add HDR to LDR Tonemap`, and corrupt\nHdrColor-based images in a third-party sensor extension.\n\n## Questions\n\n1. Is this expected? Is there a supported way to add a ParticleField to an open stage without the blur?\n2. Is the five-frame workaround safe to rely on?\n\n<img width=\"1440\" height=\"1200\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/ca667af5-2dae-41bc-a6e3-e4ef49ac7989\" />\n\n### Isaac Sim version\n\n6.2\n\n### Operating System (OS)\n\nUbuntu 24\n\n### GPU Name\n\nRTX Pro 6000\n\n### GPU Driver and CUDA versions\n\nDriver 580.178.04, CUDA: 13.0\n\n### Logs\n\n_No response_\n\n### Additional information\n\n_No response_",
+      "created_at": "2026-11-05T20:03:49Z",
+      "html_url": "https://github.com/isaac-sim/IsaacSim/issues/931",
+      "id": "isaac-sim/IsaacSim#931",
+      "issue_number": 931,
+      "labels": [
+        "isaac-sim-sdg",
+        "isaac-sim-v6-2-0"
+      ],
+      "repository": "isaac-sim/IsaacSim",
+      "surface_sha256": "eb38d059cb8e8db5e1efa3a096d28cfa5e9d94c3f340c7dbaebed66a764acfdf",
+      "title": "ParticleField (3DGS) renders blurred when added to an already open stage"
+    }
+  ],
+  "post_activation_issue_identities_observed": 491,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-05T22:16:34Z",
+  "schema_version": 1
+}
