@@ -7305,24 +7305,32 @@
     },
     {
       "created_at": "2026-11-05T18:33:18Z",
+      "expiry_recorded_at": "2026-11-06T02:48:09Z",
+      "expiry_sha256": "ee9a95e5619d7180b10f96bfec53b3c53f4b2958467772e911b9c00a5a101ada",
+      "expiry_source": "expirations/huggingface__lerobot__5270.json",
       "first_frozen_at": "2026-11-05T18:42:16Z",
       "id": "huggingface/lerobot#5270",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 5270,
       "prediction_deadline_at": "2026-11-06T00:42:16Z",
       "repository": "huggingface/lerobot",
       "source": "inbox/FIRST_SEEN_20261105T184216Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "e13bc40e190b60711c95034463ffb875ddd5784c892632f1ba8c4c42a5800b70"
     },
     {
       "created_at": "2026-11-05T16:33:59Z",
+      "expiry_recorded_at": "2026-11-06T02:48:09Z",
+      "expiry_sha256": "9b50664f2850e0eceeed3d2fc2f9739cfbb46f13d81014406dc5b0602ff3066d",
+      "expiry_source": "expirations/isaac-sim__IsaacLab__8950.json",
       "first_frozen_at": "2026-11-05T18:42:16Z",
       "id": "isaac-sim/IsaacLab#8950",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 8950,
       "prediction_deadline_at": "2026-11-06T00:42:16Z",
       "repository": "isaac-sim/IsaacLab",
       "source": "inbox/FIRST_SEEN_20261105T184216Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "b7c2c3e07b192aeb111de4572ae50bdd7c8b65b8ec7b56a1a71eaa65ea1dfbca"
     },
     {
@@ -7357,6 +7365,28 @@
       "source": "inbox/FIRST_SEEN_20261105T221634Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "eb38d059cb8e8db5e1efa3a096d28cfa5e9d94c3f340c7dbaebed66a764acfdf"
+    },
+    {
+      "created_at": "2026-11-06T01:18:58Z",
+      "first_frozen_at": "2026-11-06T02:49:30Z",
+      "id": "gazebosim/gz-transport#997",
+      "issue_number": 997,
+      "prediction_deadline_at": "2026-11-06T08:49:30Z",
+      "repository": "gazebosim/gz-transport",
+      "source": "inbox/FIRST_SEEN_20261106T024930Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "9f78b21eb231761d1d14c47cfaa3e38e850e5bbf9558e791d0baa73702ccf4a3"
+    },
+    {
+      "created_at": "2026-11-06T01:28:43Z",
+      "first_frozen_at": "2026-11-06T02:49:30Z",
+      "id": "ros-controls/ros2_controllers#2747",
+      "issue_number": 2747,
+      "prediction_deadline_at": "2026-11-06T08:49:30Z",
+      "repository": "ros-controls/ros2_controllers",
+      "source": "inbox/FIRST_SEEN_20261106T024930Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "b59090bc4d10a58af8f0c41b4862a093aa971bce5bddecd20b435f27b9b952cf"
     }
   ]
 }

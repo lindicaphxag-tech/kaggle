@@ -1,0 +1,38 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "MatNoble",
+      "body": "\nRepo: gazebosim/gz-transport, branch gz-transport13 (Harmonic)\n\n## Summary\n\nUDP discovery treats the two halves of the pub/sub rendezvous asymmetrically:\n\n- **ADVERTISE is self-healing**: re-broadcast every heartbeat cycle in `Discovery.hh UpdateHeartbeat()` (\"Re-advertise topics that are advertised inside this process\").\n- **Subscription registration is fire-and-forget**: when the subscriber's node discovers a new publisher, `NodeShared.cc OnNewConnection()` sends `msgDiscovery->Register(pub)` exactly once per local handler:\n\n  ```cpp\n  for (const std::string &nodeUuid : handlerNodeUuids)\n  {\n    pub.SetNUuid(nodeUuid);\n    // Send a message to the publisher notify it\n    // about all my remoteSubscribers.\n    this->dataPtr->msgDiscovery->Register(pub);\n  }\n  ```\n\n  There is no ACK, no retry loop, and heartbeats do not replay it.\n\n- **The publisher side has no recovery path**: `remoteSubscribers.AddPublisher(_pub)` happens only when a Register datagram arrives (`OnNewRegistration`). Entries are never aged out, and `OnNewConnection` is gated on a *new* connection \u2014 for an already-connected topic the heartbeat ADVERTISE never re-triggers the Register send.\n\nNet effect: if the single Register datagram is lost (discovery socket buffer overflow, receiver CPU starvation \u2014 classic during N-host concurrent boot), both sides look healthy afterwards (ZMQ TCP connected, publisher keeps publishing), but `Publish()` skips that subscriber **forever, silently**.\n\n## Real-world impact (PX4 SITL fleet, gz-transport13 / Harmonic)\n\nWe operate PX4 SITL + Gazebo with many vehicles sharing one network namespace (`net=host`), all booting concurrently. During an 8-vehicle concurrent boot, 50\u2013100% of vehicles randomly lost one sensor-topic family at the PX4 consumer side (accel / mag / baro / gps \u2014 a different family each time): the gz side kept publishing, the bridge's subscriber sockets stayed connected, and the topic simply never arrived. Single-vehicle starts never reproduced it.\n\nMitigations that made 8/8 boots clean \u2014 both consistent with \"the one-shot Register is the single point of failure\":\n\n1. Per-instance discovery plane: `GZ_DISCOVERY_MSG_PORT` / `GZ_DISCOVERY_SRV_PORT` offset per instance (removes cross-host beacon/Register flooding on the shared multicast channel).\n2. Deferring a local 3\u00d74 MB/s MAVLink injection burst until after the first seconds of boot (removes same-host CPU/socket pressure on the Register window).\n3. A watchdog that polls the consumer side (`listener`) and restarts the whole container on a missing family \u2014 because nothing in gz-transport itself ever retries or heals the lost registration.\n\n## Possible directions\n\n1. Replay SUBSCRIBE/Register alongside the ADVERTISE heartbeat (late/lost registrations self-heal within one cycle), or\n2. Publisher-side aging of `remoteSubscribers` + subscriber-side periodic re-Register, or\n3. An ACK-based registration handshake.\n\nHappy to provide more traces/details if useful.\n",
+      "created_at": "2026-11-06T01:18:58Z",
+      "html_url": "https://github.com/gazebosim/gz-transport/issues/997",
+      "id": "gazebosim/gz-transport#997",
+      "issue_number": 997,
+      "labels": [],
+      "repository": "gazebosim/gz-transport",
+      "surface_sha256": "9f78b21eb231761d1d14c47cfaa3e38e850e5bbf9558e791d0baa73702ccf4a3",
+      "title": "Subscription registration is fire-and-forget: one lost Register datagram during discovery churn permanently (and silently) starves the topic"
+    },
+    {
+      "author_login": "github-actions[bot]",
+      "body": "An automated scheduled build failed on `kilted`: https://github.com/ros-controls/ros2_controllers/actions/runs/42142351583\n",
+      "created_at": "2026-11-06T01:28:43Z",
+      "html_url": "https://github.com/ros-controls/ros2_controllers/issues/2747",
+      "id": "ros-controls/ros2_controllers#2747",
+      "issue_number": 2747,
+      "labels": [
+        "CI"
+      ],
+      "repository": "ros-controls/ros2_controllers",
+      "surface_sha256": "b59090bc4d10a58af8f0c41b4862a093aa971bce5bddecd20b435f27b9b952cf",
+      "title": "CI build job kilted/testing failed!"
+    }
+  ],
+  "post_activation_issue_identities_observed": 493,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-06T02:49:30Z",
+  "schema_version": 1
+}
