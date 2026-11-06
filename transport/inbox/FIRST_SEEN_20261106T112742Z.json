@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "mr3screen",
+      "body": "Hi,\nI'm reading the tutorial stumbled over possible values for the <box_type> tag.\n\nIt says the possible values are:\n```\nFor visible 2d boxes: 2d, visible_2d, \u201cvisible_box_2d\nFor full 2d boxes: full_2d, \u201cvisible_box_2d\nFor 3d boxes: 3d\n```\nI don't understand, what `\u201cvisible_box_2d` means here. I think that snuck in?\n\nhttps://github.com/gazebosim/gz-sensors/blame/8ddf4c17be8a434c51b51d5be7c866fb69aaa54f/tutorials/boundingbox_camera.md#L91-L92",
+      "created_at": "2026-11-06T09:21:57Z",
+      "html_url": "https://github.com/gazebosim/gz-sensors/issues/700",
+      "id": "gazebosim/gz-sensors#700",
+      "issue_number": 700,
+      "labels": [],
+      "repository": "gazebosim/gz-sensors",
+      "surface_sha256": "c0dfc130442b91926bc8e8590897057c3724fd0cef8dd8c031dccfb2c7157abb",
+      "title": "Bounding Box Camera Tutorial: Unclear keyword"
+    }
+  ],
+  "post_activation_issue_identities_observed": 495,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-06T11:27:42Z",
+  "schema_version": 1
+}

@@ -7380,24 +7380,32 @@
     },
     {
       "created_at": "2026-11-06T01:18:58Z",
+      "expiry_recorded_at": "2026-11-06T11:26:34Z",
+      "expiry_sha256": "4f000c3b7659d2301739a71f03913ebf0545e2d898efba095fa8f76c6a2ca877",
+      "expiry_source": "expirations/gazebosim__gz-transport__997.json",
       "first_frozen_at": "2026-11-06T02:49:30Z",
       "id": "gazebosim/gz-transport#997",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 997,
       "prediction_deadline_at": "2026-11-06T08:49:30Z",
       "repository": "gazebosim/gz-transport",
       "source": "inbox/FIRST_SEEN_20261106T024930Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "9f78b21eb231761d1d14c47cfaa3e38e850e5bbf9558e791d0baa73702ccf4a3"
     },
     {
       "created_at": "2026-11-06T01:28:43Z",
+      "expiry_recorded_at": "2026-11-06T11:26:34Z",
+      "expiry_sha256": "f75b257e732bd7088138bb381ce8410f3037de0d320f4849173cc46825f2084a",
+      "expiry_source": "expirations/ros-controls__ros2_controllers__2747.json",
       "first_frozen_at": "2026-11-06T02:49:30Z",
       "id": "ros-controls/ros2_controllers#2747",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 2747,
       "prediction_deadline_at": "2026-11-06T08:49:30Z",
       "repository": "ros-controls/ros2_controllers",
       "source": "inbox/FIRST_SEEN_20261106T024930Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "b59090bc4d10a58af8f0c41b4862a093aa971bce5bddecd20b435f27b9b952cf"
     },
     {
@@ -7410,6 +7418,17 @@
       "source": "inbox/FIRST_SEEN_20261106T063141Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "b5761cd9e967cd94b7294a1bfcc6c59b94b7b879451f1abd61a3aa35118bb3b7"
+    },
+    {
+      "created_at": "2026-11-06T09:21:57Z",
+      "first_frozen_at": "2026-11-06T11:27:42Z",
+      "id": "gazebosim/gz-sensors#700",
+      "issue_number": 700,
+      "prediction_deadline_at": "2026-11-06T17:27:42Z",
+      "repository": "gazebosim/gz-sensors",
+      "source": "inbox/FIRST_SEEN_20261106T112742Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "c0dfc130442b91926bc8e8590897057c3724fd0cef8dd8c031dccfb2c7157abb"
     }
   ]
 }
