@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "NeoZng",
+      "body": "### Describe the bug\n\nThe MJCF and URDF importers of Isaac Sim 6.2 author mesh colliders inside USD instances (`payloads/instances.usda`). `spawn_from_usd_file` then applies the cfg's schema properties, but the writers skip instance proxies, so properties that target colliders, such as `collision_props`, reach the primitive colliders only. `UsdFileCfg.make_uninstanceable` exists for this case, but `MjcfFileCfg` and `UrdfFileCfg` do not have it, and the converters' `make_instanceable` is not used by either importer.\n\n### Steps to reproduce\n\n```python\nfrom isaaclab.app import AppLauncher\n\napp = AppLauncher(headless=True).app\n\nimport tempfile\n\nfrom isaaclab_physx.sim.schemas import PhysxCollisionCfg\nfrom pxr import Usd, UsdPhysics\n\nimport isaaclab.sim as sim_utils\n\ntmp = tempfile.mkdtemp()\nwith open(f\"{tmp}/tetra.obj\", \"w\") as f:\n    f.write(\"v 0 0 0\\nv 0.1 0 0\\nv 0 0.1 0\\nv 0 0 0.1\\nf 1 3 2\\nf 1 2 4\\nf 1 4 3\\nf 2 3 4\\n\")\nwith open(f\"{tmp}/robot.xml\", \"w\") as f:\n    f.write(\n        '<mujoco><asset><mesh file=\"tetra.obj\"/></asset><worldbody><body name=\"base\"><freejoint/>'\n        '<geom name=\"box\" type=\"box\" size=\"0.05 0.05 0.05\"/><geom name=\"mesh\" type=\"mesh\" mesh=\"tetra\"/>'\n        \"</body></worldbody></mujoco>\"\n    )\n\nsim_utils.create_new_stage()\ncfg = sim_utils.MjcfFileCfg(\n    asset_path=f\"{tmp}/robot.xml\", usd_dir=f\"{tmp}/usd\", collision_props=PhysxCollisionCfg(contact_offset=0.0123)\n)\nprim = cfg.func(\"/World/Robot\", cfg)\nfor p in Usd.PrimRange(prim, Usd.TraverseInstanceProxies()):\n    if p.HasAPI(UsdPhysics.CollisionAPI):\n        print(p.GetPath(), \"instance proxy:\", p.IsInstanceProxy(), \"contact offset:\", p.GetAttribute(\"physxCollision:contactOffset\").Get())\n\napp.close()\n```\n\n```\n[Warning] [isaaclab.sim.schemas.schemas] Skipping fragment updates on instanced prims matched by '/World/Robot(/.*)?': ['/World/Robot/Geometry/base/mesh/mesh'].\n/World/Robot/Geometry/base/box instance proxy: False contact offset: 0.012299999594688416\n/World/Robot/Geometry/base/mesh/mesh instance proxy: True contact offset: None\n```\n\nA URDF with a mesh `<collision>` spawned through `UrdfFileCfg` gives the same result.\n\n### System Info\n\n- Commit: `main` @ `b3ef9ce18e`; `v3.0.0` has the same code\n- Isaac Sim Version: 6.2.0\n- OS: Ubuntu 24.04\n- GPU: NVIDIA RTX PRO 5000 Blackwell\n- CUDA: 13.0\n- GPU Driver: 580.126.20\n\n### Additional context\n\nMoving `make_uninstanceable` from `UsdFileCfg` to `FileCfg` and applying it for every file spawner before the property writes fixes both: with `make_uninstanceable=True` the mesh collider above gets the contact offset.\n\n### Checklist\n\n- [x] I have checked that there is no similar issue in the repo (**required**)\n- [x] I have checked that the issue is not in running Isaac Sim itself and is related to the repo\n\n### Acceptance Criteria\n\n- [ ] `MjcfFileCfg` and `UrdfFileCfg` can apply spawn-time properties to the colliders that the importers author inside instances.\n",
+      "created_at": "2026-11-06T05:07:40Z",
+      "html_url": "https://github.com/isaac-sim/IsaacLab/issues/8955",
+      "id": "isaac-sim/IsaacLab#8955",
+      "issue_number": 8955,
+      "labels": [],
+      "repository": "isaac-sim/IsaacLab",
+      "surface_sha256": "b5761cd9e967cd94b7294a1bfcc6c59b94b7b879451f1abd61a3aa35118bb3b7",
+      "title": "[Bug Report] `collision_props` on `MjcfFileCfg` / `UrdfFileCfg` skip the mesh colliders the importers author inside USD instances"
+    }
+  ],
+  "post_activation_issue_identities_observed": 494,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-06T06:31:41Z",
+  "schema_version": 1
+}
