@@ -1,0 +1,84 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 6,
+  "new_candidates": [
+    {
+      "author_login": "Afloat16",
+      "body": "### Bug Description\n\nIf the PNG destination becomes unwritable, both frame export methods return normally. The submitted `cv2.imwrite` result is never observed, so a caller recording a camera dataset cannot distinguish missing frames from completed writes.\n\n### Steps to Reproduce\n\n```python\nimport logging\nfrom pathlib import Path\nfrom tempfile import TemporaryDirectory\n\nimport genesis as gs\nimport numpy as np\nfrom genesis.utils.image_exporter import FrameImageExporter\n\n# The I/O utility only uses the Genesis logger; no scene or renderer is needed.\ngs.logger = logging.getLogger(__name__)\nwith TemporaryDirectory() as tmp:\n    path = Path(tmp) / \"frames\"\n    exporter = FrameImageExporter(str(path))\n    path.rmdir()\n    rgb = np.zeros((3, 4, 3), dtype=np.uint8)\n    exporter.export_frame_single_camera(1, 0, rgb=rgb)\n    exporter.export_frame_all_cameras(1, rgb=[rgb])\n    print(list(path.glob(\"*.png\")))  # []\n```\n\n### Expected Behavior\n\nA failed write should reach the caller as an error identifying the frame path.\n\n### Environment\n\nLinux x86_64, Python 3.12, OpenCV 4.11.0. CPU-only reproduction.\n\n### Release version or Commit ID\n\n`426345dcdfe95a122bd3a630075412261e2e11ab`",
+      "created_at": "2026-11-06T18:52:09Z",
+      "html_url": "https://github.com/Genesis-Embodied-AI/genesis-world/issues/3694",
+      "id": "Genesis-Embodied-AI/genesis-world#3694",
+      "issue_number": 3694,
+      "labels": [],
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "surface_sha256": "2735478e0c6dcf00bff76d371f9b7fd0c69f1b2a6f13dcafe7f48c2257ff2486",
+      "title": "[Bug]: Failed PNG writes are reported as successful frame exports"
+    },
+    {
+      "author_login": "Afloat16",
+      "body": "### Bug Description\n\nThe serializer keys a view by address, shape, strides and NumPy's `typestr`. For different structured dtypes with the same item size, `typestr` is identical (e.g. `|V12`). Exporting both views therefore assigns them the same slot in the archive. Reading that archive back silently assigns both arrays the first view's fields and scalar types.\n\n### Steps to Reproduce\n\n```python\nimport numpy as np\nfrom genesis.utils.serialization import export, load\n\npoints = np.array([(1., 2., 3.)], dtype=[(\"x\", \"f4\"), (\"y\", \"f4\"), (\"z\", \"f4\")])\nchannels = points.view([(\"r\", \"u4\"), (\"g\", \"u4\"), (\"b\", \"u4\")])\nexport(\"views.zip\", {\"points\": points, \"channels\": channels})\nrestored = load(\"views.zip\", {\"points\": np.ndarray, \"channels\": np.ndarray})\nprint(restored[\"channels\"].dtype.names)  # ('x', 'y', 'z')\n```\n\n### Expected Behavior\n\nThe channel view should load with fields `('r', 'g', 'b')` and unsigned integer values, as it was written.\n\n### Environment\n\nLinux x86_64, Python 3.12. No simulation or GPU is required.\n\n### Release version or Commit ID\n\n`426345dcdfe95a122bd3a630075412261e2e11ab`",
+      "created_at": "2026-11-06T18:55:59Z",
+      "html_url": "https://github.com/Genesis-Embodied-AI/genesis-world/issues/3696",
+      "id": "Genesis-Embodied-AI/genesis-world#3696",
+      "issue_number": 3696,
+      "labels": [],
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "surface_sha256": "b1645236acd9fda5ba09b85c87c66b036e9f9fa13baa69a88dce86c1c908f622",
+      "title": "[Bug]: Exporting views of one buffer can change structured array field names and types"
+    },
+    {
+      "author_login": "Afloat16",
+      "body": "### Bug Description\n\nA video writer accepts a frame with fewer rows than the first one. Only the leading rows of its reusable PyAV buffer are overwritten, mixing the latest input with an earlier simulation frame.\n\n### Steps to Reproduce\n\n```python\nimport logging\nimport av\nimport genesis as gs\nimport numpy as np\nfrom genesis.utils.video_encoder import VideoEncoder\n\ngs.logger = logging.getLogger(__name__)\nenc = VideoEncoder(\"frames.mp4\", 30, codec=\"libx264\")\nenc.write(np.full((32, 32), 255, dtype=np.uint8))\nenc.write(np.zeros((16, 32), dtype=np.uint8))\nenc.close()\nwith av.open(\"frames.mp4\") as container:\n    last = list(container.decode(video=0))[-1].to_ndarray(format=\"gray\")\n    print(last[0, 0], last[-1, 0])  # 0 255\n```\n\n### Expected Behavior\n\nReject a changed frame shape at the call to `write`, including when using the threaded encoder. No partial or mixed frame should be recorded.\n\n### Environment\n\nLinux x86_64, Python 3.12, CPU libx264 through PyAV.\n\n### Release version or Commit ID\n\n`426345dcdfe95a122bd3a630075412261e2e11ab`",
+      "created_at": "2026-11-06T18:59:11Z",
+      "html_url": "https://github.com/Genesis-Embodied-AI/genesis-world/issues/3698",
+      "id": "Genesis-Embodied-AI/genesis-world#3698",
+      "issue_number": 3698,
+      "labels": [],
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "surface_sha256": "e92d9153379f410937cdd0c40c5fc73cb94b3439d9baf334227a66216b9cfb91",
+      "title": "[Bug]: Shorter video frames silently retain rows from the preceding frame"
+    },
+    {
+      "author_login": "Afloat16",
+      "body": "### Bug Description\n\nThe first dictionary sample determines a CSV recording's header. Later rows follow each sample's insertion order. Returning the same keys in a different order swaps measurements between columns without an error.\n\n### Steps to Reproduce\n\n```python\nfrom pathlib import Path\nfrom genesis.options.recorders import CSVFile\nfrom genesis.recorders.file_writers import CSVFileWriter\n\npath = Path(\"sensors.csv\")\nwriter = CSVFileWriter(None, CSVFile(filename=str(path)), lambda: None)\nwriter._initialize_writer()\nwriter.process({\"left\": 1, \"right\": 2}, 0)\nwriter.process({\"right\": 20, \"left\": 10}, 1)\nwriter.cleanup()\nprint(path.read_text())\n```\n\nThe second row is `1,20,10` under `timestamp,left,right`. Using the underlying CSV writer isolates the problem from sensor timing and background scheduling.\n\n### Expected Behavior\n\nThe second row should be `1,10,20` under the existing header. A changed field name or width that cannot fit that header should be reported.\n\n### Environment\n\nLinux x86_64, Python 3.12, CPU.\n\n### Release version or Commit ID\n\n`426345dcdfe95a122bd3a630075412261e2e11ab`",
+      "created_at": "2026-11-06T19:00:50Z",
+      "html_url": "https://github.com/Genesis-Embodied-AI/genesis-world/issues/3700",
+      "id": "Genesis-Embodied-AI/genesis-world#3700",
+      "issue_number": 3700,
+      "labels": [],
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "surface_sha256": "83f470a6e3ccee36e9b9a5d094d2721e883e975ca4722bd0c9eb01d73d04e790",
+      "title": "[Bug]: CSV recorder writes reordered dictionary values under the wrong sensor fields"
+    },
+    {
+      "author_login": "Afloat16",
+      "body": "### Bug Description\n\n`NPZFileWriter` appends the simulation sampling time under `timestamp` and then appends every field returned by the data callback into the same dictionary. If sensor data also contains `timestamp`, the saved time axis has more entries than the measurement arrays.\n\n### Steps to Reproduce\n\n```python\nimport numpy as np\nfrom genesis.options.recorders import NPZFile\nfrom genesis.recorders.file_writers import NPZFileWriter\n\nwriter = NPZFileWriter(None, NPZFile(filename=\"readings.npz\"), lambda: None)\nwriter.build()\nwriter.process({\"force\": 2}, 0.0)\nwriter.process({\"timestamp\": 12.3, \"force\": 3}, 0.01)\nwriter.cleanup()\nwith np.load(\"readings.npz\") as archive:\n    print(archive[\"timestamp\"], archive[\"force\"])\n```\n\nOutput on main: times `[0.0, 0.01, 12.3]`, forces `[2, 3]`.\n\n### Expected Behavior\n\nEach accepted sample contributes one timestamp. A conflicting input key should be rejected before any component of that sample is appended.\n\n### Environment\n\nLinux x86_64, Python 3.12, no scene or GPU required.\n\n### Release version or Commit ID\n\n`426345dcdfe95a122bd3a630075412261e2e11ab`",
+      "created_at": "2026-11-06T19:02:13Z",
+      "html_url": "https://github.com/Genesis-Embodied-AI/genesis-world/issues/3702",
+      "id": "Genesis-Embodied-AI/genesis-world#3702",
+      "issue_number": 3702,
+      "labels": [],
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "surface_sha256": "24bc88c3ab0149c16fe1c6653975bbd3a0f7c6d9f2aca1d0f79e0325b52a0dca",
+      "title": "[Bug]: NPZ sensor data named timestamp corrupts the recording time series"
+    },
+    {
+      "author_login": "haidar996",
+      "body": "Hi @omichel,\n\nFollowing the Panda fixes (#7078, #7079), I compared the other robot arms in Webots with their manufacturers' published kinematics, and I looked at the URDF export, which the inverse kinematics demos rely on. Before preparing any PR, I would like to know which of these fixes you would welcome, and in which order.\n\n### 1. Robot models (PROTO-only changes)\n\n| Robot | Finding | Reference | Size |\n|---|---|---|---|\n| **ABB IRB 4600/40** | `handSlot` is 0.185 m from the wrist centre (joint F anchor 0.125 + `Pose` 0.06), but the flange face is at 0.134 m (`link_6.obj` ends at x = 0.0086), which matches ABB's 135 mm. A tool added to `handSlot` floats about 51 mm beyond the flange. The pen in `inverse_kinematics.wbt` hides this by being shifted backwards. | ABB product specification | **~51 mm** |\n| **ABB IRB 4600/40** | No `maxVelocity` is set, so the 10 rad/s default applies to all joints. ABB lists 175/175/175/250/250/360 \u00b0/s. Also, joint B is at x = 0.178445 while joint C is at x = 0.174998 (ABB: 0.175 for both), so the upper arm is slightly tilted. | ABB datasheet | speeds, ~3 mm |\n| **Niryo Ned** | Joint limits differ from Niryo's `niryo_ned.urdf.xacro`. In Webots' sign convention, the official ranges are: joint_1 \u00b1170\u00b0 (Webots \u00b12.8 rad), joint_2 \u221234.96\u00b0\u2026+109.44\u00b0 (Webots \u00b10.8 rad), joint_3 \u221289.96\u00b0\u2026+76.78\u00b0 (Webots \u22121.5\u20261.3 rad), joint_4 \u00b1119.75\u00b0 (Webots \u00b12 rad), joint_5 \u2212110.01\u00b0\u2026+60.17\u00b0 (Webots \u00b11.5 rad), joint_6 \u00b1144.96\u00b0 (Webots \u00b12.5 rad). The wrist position also differs by up to 6.7 mm (mean 4.7 mm) over 3,000 random configurations (the joint_4 offset is (0.032, 0.042) instead of (0.047, 0.0325)). | [NiryoRobotics/ned_ros](https://github.com/NiryoRobotics/ned_ros/tree/master/niryo_robot_description/urdf/ned) | limits, ~5 mm |\n| **PUMA 560** | The upper arm (joint 2 \u2192 joint 3) is 0.420 m, but the standard value is a2 = 0.4318 m (Craig; Corke's Robotics Toolbox). The other DH values match. All joints have `maxVelocity 99999`. | Standard PUMA 560 DH | ~12 mm |\n| **UR3e / UR5e / UR10e** | The link lengths are the rounded values of the old ROS1 description (e.g. UR5e: d1 0.163 vs 0.1625, d4 0.134 vs 0.1333, d5/d6 0.1 vs 0.0997/0.0996). Maximum flange error over 20,000 random configurations: 2.9 / 1.3 / 4.5 mm. Possibly related to #6337. | [UR DH parameters](https://www.universal-robots.com/articles/ur/application-installation/dh-parameters-for-calculations-of-kinematics-and-dynamics/) | 1\u20134.5 mm |\n| **TIAGo** | `arm_tool_joint` is missing (#2908). | PAL URDF | \u2014 |\n\nThe KUKA youBot arm matches KUKA's values.\n\nMethod: I computed the forward kinematics from the PROTO joint anchors and rotations, and compared it with the manufacturer's DH parameters or URDF after a rigid alignment of the base frames. This is the same approach I used for the Panda in #7078. I will confirm each finding in simulation before opening a PR.\n\n### 2. `getUrdf()` uses the current joint positions as the zero (#6504)\n\nReproduced on R2025a with a UR5e: I called `getUrdf()` at start, then again after moving the joints to `[0.5, -1.0, 1.2, -0.7, 0.9, 0.3]`. The second export bakes the joint angles into the joint origins:\n\n```diff\n-    <origin xyz=\"0 0 0.163\" rpy=\"0 0 0\"/>\n+    <origin xyz=\"0 0 0.163\" rpy=\"0 0 0.5\"/>\n-    <origin xyz=\"0 0.138 0\" rpy=\"0 1.570796 0\"/>\n+    <origin xyz=\"0 0.138 0\" rpy=\"0 0.570835 0\"/>\n-    <origin xyz=\"0 -0.131 0.425\" rpy=\"0 0 0\"/>\n+    <origin xyz=\"0 -0.131 0.425\" rpy=\"0 1.200016 0\"/>\n```\n\nAny library that builds a chain from this URDF (for example ikpy in the IRB 4600 demo, and #6887) gets a wrong model if the robot is not at its zero position when `getUrdf()` is called. I would propose exporting the joint origins at position 0. This is in the C++ core, so I would build Webots from source for it. I would also look at #6507.\n\n### 3. Regression test\n\nExtend `tests/api/worlds/robot_urdf.wbt` (or add a new test) so that, for each arm, the URDF is exported, the forward kinematics computed from it is compared with the poses Webots computes at random joint configurations, and key values are checked against the manufacturer data. This would prevent these errors from coming back.\n\n### Proposed order\n\n1. IRB 4600: `handSlot` position and speed limits (+ adapting the pen in `inverse_kinematics.wbt`)\n2. Ned joint limits and kinematics\n3. UR3e/UR5e/UR10e and PUMA 560\n4. `getUrdf()` fix (#6504) with a test\n5. Round-trip test for all arms, TIAGo `arm_tool_joint` (#2908)\n\n### Questions\n\n- Which of these would you like, and in which order?\n- Some fixes move tools or change link lengths in existing user worlds. Is that acceptable with a changelog entry, as for the Panda?\n- Do you prefer one PR per robot, or grouped PRs?\n\nThank you!\n",
+      "created_at": "2026-11-06T18:49:22Z",
+      "html_url": "https://github.com/cyberbotics/webots/issues/7090",
+      "id": "cyberbotics/webots#7090",
+      "issue_number": 7090,
+      "labels": [],
+      "repository": "cyberbotics/webots",
+      "surface_sha256": "158b4b4523a56edde6f5dd7a24790152197f019fc57b69b9a98b78e87424bbb4",
+      "title": "Accuracy audit of the robot arm models and of the URDF export"
+    }
+  ],
+  "post_activation_issue_identities_observed": 501,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-06T20:51:30Z",
+  "schema_version": 1
+}
