@@ -1,0 +1,13 @@
+{
+  "case_id": "gazebosim/gz-sensors#700",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-11-06T18:23:38Z",
+  "expiry_sha256": "f39457cc5be6b36f48f114295947f15dd2fdeb5954ac0390064e139b62e9d016",
+  "first_frozen_at": "2026-11-06T11:27:42Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-11-06T17:27:42Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "c0dfc130442b91926bc8e8590897057c3724fd0cef8dd8c031dccfb2c7157abb"
+}
