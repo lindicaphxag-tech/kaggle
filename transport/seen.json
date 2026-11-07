@@ -7560,14 +7560,40 @@
     },
     {
       "created_at": "2026-11-07T01:35:47Z",
+      "expiry_recorded_at": "2026-11-07T10:39:01Z",
+      "expiry_sha256": "2ca515ca27c2a0eef7572c306b4a51a6f95e1b8e8f2489c5d1d8206c6ed2e270",
+      "expiry_source": "expirations/isaac-sim__IsaacLab__8963.json",
       "first_frozen_at": "2026-11-07T03:11:45Z",
       "id": "isaac-sim/IsaacLab#8963",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 8963,
       "prediction_deadline_at": "2026-11-07T09:11:45Z",
       "repository": "isaac-sim/IsaacLab",
       "source": "inbox/FIRST_SEEN_20261107T031145Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "5735d4a8000eed029adffba21c75808e7d518be37eeffb81bcfd84e9d15ddbed"
+    },
+    {
+      "created_at": "2026-11-07T10:18:09Z",
+      "first_frozen_at": "2026-11-07T10:40:04Z",
+      "id": "Genesis-Embodied-AI/genesis-world#3716",
+      "issue_number": 3716,
+      "prediction_deadline_at": "2026-11-07T16:40:04Z",
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "source": "inbox/FIRST_SEEN_20261107T104004Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "f6676ec9c86f665c43ee8d34da2dc7e1ed02bfd2b7b524bbd66f8f66bd072513"
+    },
+    {
+      "created_at": "2026-11-07T08:02:24Z",
+      "first_frozen_at": "2026-11-07T10:40:04Z",
+      "id": "google-deepmind/mujoco#3769",
+      "issue_number": 3769,
+      "prediction_deadline_at": "2026-11-07T16:40:04Z",
+      "repository": "google-deepmind/mujoco",
+      "source": "inbox/FIRST_SEEN_20261107T104004Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "275f1207717adb036acbb4f74e4bb84bd1ae05814d73fd4d7d1fa9b959c3329d"
     }
   ]
 }
