@@ -7575,24 +7575,32 @@
     },
     {
       "created_at": "2026-11-07T10:18:09Z",
+      "expiry_recorded_at": "2026-11-07T18:41:10Z",
+      "expiry_sha256": "ffe868662a9d9af8be818c2458656e15de388dc1312666099183fc663f339f28",
+      "expiry_source": "expirations/Genesis-Embodied-AI__genesis-world__3716.json",
       "first_frozen_at": "2026-11-07T10:40:04Z",
       "id": "Genesis-Embodied-AI/genesis-world#3716",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3716,
       "prediction_deadline_at": "2026-11-07T16:40:04Z",
       "repository": "Genesis-Embodied-AI/genesis-world",
       "source": "inbox/FIRST_SEEN_20261107T104004Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "f6676ec9c86f665c43ee8d34da2dc7e1ed02bfd2b7b524bbd66f8f66bd072513"
     },
     {
       "created_at": "2026-11-07T08:02:24Z",
+      "expiry_recorded_at": "2026-11-07T18:41:10Z",
+      "expiry_sha256": "cffaaa56da796f4bdfbfa0056844000b4301f179d0e569e072a8c340016fbeec",
+      "expiry_source": "expirations/google-deepmind__mujoco__3769.json",
       "first_frozen_at": "2026-11-07T10:40:04Z",
       "id": "google-deepmind/mujoco#3769",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3769,
       "prediction_deadline_at": "2026-11-07T16:40:04Z",
       "repository": "google-deepmind/mujoco",
       "source": "inbox/FIRST_SEEN_20261107T104004Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "275f1207717adb036acbb4f74e4bb84bd1ae05814d73fd4d7d1fa9b959c3329d"
     },
     {
@@ -7649,6 +7657,39 @@
       "source": "inbox/FIRST_SEEN_20261107T163855Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "bc1033193aeb3ddf16c1e21e93092dd1167ab76da3247f9ba9a8d781568c9402"
+    },
+    {
+      "created_at": "2026-11-07T17:56:30Z",
+      "first_frozen_at": "2026-11-07T18:42:42Z",
+      "id": "BehaviorTree/BehaviorTree.CPP#1281",
+      "issue_number": 1281,
+      "prediction_deadline_at": "2026-11-08T00:42:42Z",
+      "repository": "BehaviorTree/BehaviorTree.CPP",
+      "source": "inbox/FIRST_SEEN_20261107T184242Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "f8769dc6889150357f2e67cc3fd18bbca6b7ad9b82a255b0f64cc145252383f6"
+    },
+    {
+      "created_at": "2026-11-07T17:56:31Z",
+      "first_frozen_at": "2026-11-07T18:42:42Z",
+      "id": "BehaviorTree/BehaviorTree.CPP#1282",
+      "issue_number": 1282,
+      "prediction_deadline_at": "2026-11-08T00:42:42Z",
+      "repository": "BehaviorTree/BehaviorTree.CPP",
+      "source": "inbox/FIRST_SEEN_20261107T184242Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "0860d20e57f9f05494682aed3b82e0c166d7a0989692ee05ce527977cd3d49ea"
+    },
+    {
+      "created_at": "2026-11-07T17:59:17Z",
+      "first_frozen_at": "2026-11-07T18:42:42Z",
+      "id": "tesseract-robotics/tesseract#1397",
+      "issue_number": 1397,
+      "prediction_deadline_at": "2026-11-08T00:42:42Z",
+      "repository": "tesseract-robotics/tesseract",
+      "source": "inbox/FIRST_SEEN_20261107T184242Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "ff1ca31727590c8d09f1e2740245941874b47b239287e436288467d4da34e5b1"
     }
   ]
 }
