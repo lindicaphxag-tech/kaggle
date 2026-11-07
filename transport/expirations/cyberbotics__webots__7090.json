@@ -1,0 +1,13 @@
+{
+  "case_id": "cyberbotics/webots#7090",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-11-07T03:10:40Z",
+  "expiry_sha256": "b3b81b46565a8c6593936404a5d9dfc488ff0210eb9fe1e030aa6b7a623dbce2",
+  "first_frozen_at": "2026-11-06T20:51:30Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-11-07T02:51:30Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "158b4b4523a56edde6f5dd7a24790152197f019fc57b69b9a98b78e87424bbb4"
+}
