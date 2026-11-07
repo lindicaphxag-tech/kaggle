@@ -7627,6 +7627,28 @@
       "source": "inbox/FIRST_SEEN_20261107T135632Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "330c0165bd278dd2510e016ae35dbdc5f7c92f4637086c76c5f768d9d229d497"
+    },
+    {
+      "created_at": "2026-11-07T16:20:21Z",
+      "first_frozen_at": "2026-11-07T16:38:55Z",
+      "id": "OpenMind/OM1#2706",
+      "issue_number": 2706,
+      "prediction_deadline_at": "2026-11-07T22:38:55Z",
+      "repository": "OpenMind/OM1",
+      "source": "inbox/FIRST_SEEN_20261107T163855Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "864a5dbe2fb6d040c6048229e6951efe9ada2916541c4a640a24ee6fa2ab65b6"
+    },
+    {
+      "created_at": "2026-11-07T14:24:24Z",
+      "first_frozen_at": "2026-11-07T16:38:55Z",
+      "id": "tesseract-robotics/tesseract#1393",
+      "issue_number": 1393,
+      "prediction_deadline_at": "2026-11-07T22:38:55Z",
+      "repository": "tesseract-robotics/tesseract",
+      "source": "inbox/FIRST_SEEN_20261107T163855Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "bc1033193aeb3ddf16c1e21e93092dd1167ab76da3247f9ba9a8d781568c9402"
     }
   ]
 }

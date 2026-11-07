@@ -1,0 +1,36 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "yousan514-hash",
+      "body": "## Where\n\n`docs/simulators/isaac-sim.md` (last changed in 84e00a1, 2025-09-15; also rendered at docs.openmind.com).\n\n## What looks off\n\n1. **Virtual environment name mismatch.** Step 4 creates the Isaac Sim environment as `env_isaacsim`:\n\n   ```bash\n   uv venv --python 3.11 --seed env_isaacsim\n   source env_isaacsim/bin/activate\n   ```\n\n   but the `LD_LIBRARY_PATH` example a few lines below points at `env_isaaclab`:\n\n   ```bash\n   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:PATH_TO_VENV/env_isaaclab/lib/python3.11/site-packages/isaacsim/exts/isaacsim.ros2.bridge/humble/lib\n   ```\n\n   The note right after it says \"We use `env_isaacsim` (Python 3.11) for Isaac Sim\", so I believe `env_isaaclab` is a leftover and should read `env_isaacsim`. As written, a reader who copies the line gets a path that does not exist, and the ROS 2 bridge libraries are not found.\n\n2. **\"Update your agent name depending on robot type\" does not say which name to use.** The launch example is\n\n   ```bash\n   CONFIG=unitree_go2_autonomy USE_SIM=true make dev\n   ```\n\n   followed by the note, but the G1 counterpart is not given. Listing the config name for G1 next to the Go2 one (or linking to the config directory) would make the step reproducible for G1 users.\n\n## Proposed fix\n\n- Replace `env_isaaclab` with `env_isaacsim` in the `LD_LIBRARY_PATH` line.\n- Add the G1 config name to the note (e.g. \"for G1 use `CONFIG=<name>`\"), or a short table Go2 / G1 \u2192 CONFIG.\n\nHappy to open a small docs PR for (1) right away, and for (2) once you confirm the G1 config name. Opening this issue first per CONTRIBUTING.md.\n",
+      "created_at": "2026-11-07T16:20:21Z",
+      "html_url": "https://github.com/OpenMind/OM1/issues/2706",
+      "id": "OpenMind/OM1#2706",
+      "issue_number": 2706,
+      "labels": [],
+      "repository": "OpenMind/OM1",
+      "surface_sha256": "864a5dbe2fb6d040c6048229e6951efe9ada2916541c4a640a24ee6fa2ab65b6",
+      "title": "docs(isaac-sim): LD_LIBRARY_PATH uses env_isaaclab while the venv is created as env_isaacsim; G1 CONFIG name missing"
+    },
+    {
+      "author_login": "jf---",
+      "body": "`calcManipulability(J).m.volume` returns exactly 0 for any Jacobian whose smallest singular value is below about 1e-3. `measure` and `condition` go to `DBL_MAX` at the same point. In that range the true Yoshikawa manipulability \u220f\u03c3\u1d62 is still well resolved in double precision, so near-singular configurations become indistinguishable from singular ones. That is exactly where a manipulability threshold gets used.\n\nReproduction: J = U\u00b7diag(3, 2, 1, 0.5, 0.2, \u03c3_min)\u00b7V\u1d40 with random orthogonal U and V. Measured through the Python bindings (`tesseract-robotics-nanobind` 0.35.0.9):\n\n| \u03c3_min | \u220f\u03c3 | `m.volume` | min `m.eigen_values` |\n|---|---|---|---|\n| 1e-2 | 6e-3 | 6e-3 | 1e-4 |\n| 1e-3 | 6e-4 | 6e-4 | 1e-6 |\n| 3e-4 | 1.8e-4 | 0 | 0 |\n| 1e-6 | 6e-7 | 0 | 0 |\n\nForming JJ\u1d40 squares the singular values, so \u03c3 = 3e-4 becomes an eigenvalue of 9e-8. That falls below the clipping added in #768, which addressed the negative-eigenvalue NaN from #766, and gets zeroed.\n\nProposed fix: compute from the SVD of J instead of the eigen-decomposition of JJ\u1d40 (`Eigen::JacobiSVD`). Singular values are non-negative by construction, so the NaN from #766 cannot occur and no clipping is needed. Then volume = \u220f\u03c3\u1d62, eigenvalues = \u03c3\u1d62\u00b2, and measure and condition follow from \u03c3_max/\u03c3_min. The force ellipsoid follows from the same decomposition. Happy to open a PR with a unit test that pins volume against \u220f\u03c3 for a constructed near-singular Jacobian.\n",
+      "created_at": "2026-11-07T14:24:24Z",
+      "html_url": "https://github.com/tesseract-robotics/tesseract/issues/1393",
+      "id": "tesseract-robotics/tesseract#1393",
+      "issue_number": 1393,
+      "labels": [],
+      "repository": "tesseract-robotics/tesseract",
+      "surface_sha256": "bc1033193aeb3ddf16c1e21e93092dd1167ab76da3247f9ba9a8d781568c9402",
+      "title": "calcManipulability reports exact singularity for \u03c3_min < ~1e-3 (eigenvalue clipping on JJ\u1d40)"
+    }
+  ],
+  "post_activation_issue_identities_observed": 511,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-07T16:38:55Z",
+  "schema_version": 1
+}
