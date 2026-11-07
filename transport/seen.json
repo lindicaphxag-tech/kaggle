@@ -7650,24 +7650,32 @@
     },
     {
       "created_at": "2026-11-07T16:20:21Z",
+      "expiry_recorded_at": "2026-11-07T22:40:08Z",
+      "expiry_sha256": "568d123c41085659186c7cb4041e734b0d4599c2693444f457dc51e2e4585a1d",
+      "expiry_source": "expirations/OpenMind__OM1__2706.json",
       "first_frozen_at": "2026-11-07T16:38:55Z",
       "id": "OpenMind/OM1#2706",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 2706,
       "prediction_deadline_at": "2026-11-07T22:38:55Z",
       "repository": "OpenMind/OM1",
       "source": "inbox/FIRST_SEEN_20261107T163855Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "864a5dbe2fb6d040c6048229e6951efe9ada2916541c4a640a24ee6fa2ab65b6"
     },
     {
       "created_at": "2026-11-07T14:24:24Z",
+      "expiry_recorded_at": "2026-11-07T22:40:08Z",
+      "expiry_sha256": "95fb2e07825ea28052b8c1dcf875c98a8db94f09b83f6cedfd1294e5aa973bc7",
+      "expiry_source": "expirations/tesseract-robotics__tesseract__1393.json",
       "first_frozen_at": "2026-11-07T16:38:55Z",
       "id": "tesseract-robotics/tesseract#1393",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 1393,
       "prediction_deadline_at": "2026-11-07T22:38:55Z",
       "repository": "tesseract-robotics/tesseract",
       "source": "inbox/FIRST_SEEN_20261107T163855Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "bc1033193aeb3ddf16c1e21e93092dd1167ab76da3247f9ba9a8d781568c9402"
     },
     {
@@ -7702,6 +7710,17 @@
       "source": "inbox/FIRST_SEEN_20261107T184242Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "ff1ca31727590c8d09f1e2740245941874b47b239287e436288467d4da34e5b1"
+    },
+    {
+      "created_at": "2026-11-07T20:31:37Z",
+      "first_frozen_at": "2026-11-07T22:41:42Z",
+      "id": "huggingface/lerobot#5284",
+      "issue_number": 5284,
+      "prediction_deadline_at": "2026-11-08T04:41:42Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261107T224142Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "8a93e683d3a8d716edf147d4eb10d751e856dbc76261449901ef29f671f74f3f"
     }
   ]
 }

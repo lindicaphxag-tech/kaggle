@@ -1,0 +1,27 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "SofianElmotiem",
+      "body": "With `optimize_memory=True`, `ReplayBuffer` ignores the `next_state` passed to `add()` and reads `states[i + 1]` when sampling. That only holds for consecutive transitions. The learner builds both of its buffers this way (`rl/learner.py`), and SAC only masks the bootstrap on `done`, so these cases produce a wrong TD target:\n\n- **Time-limit truncation** (`done=False, truncated=True`): `next_state` is the first frame of the next episode.\n- **Offline buffer:** the learner only adds intervention transitions, so the last step of an intervention gets the first frame of a later intervention.\n- **Skipped NaN transitions:** these should leave the same kind of gap (from reading the code, not tested).\n\nTo reproduce:\n\n```python\nimport torch\nfrom lerobot.rl.buffer import ReplayBuffer\n\nK = \"observation.state\"\nb = ReplayBuffer(capacity=100, device=\"cpu\", state_keys=[K], storage_device=\"cpu\",\n                 optimize_memory=True, use_drq=False)\n\ndef add(s, truncated=False):\n    b.add({K: torch.tensor([[s]])}, torch.zeros(1, 1), 0.0,\n          {K: torch.tensor([[s + 1]])}, False, truncated)\n\nadd(0.0); add(1.0, truncated=True)   # episode ends on the time limit\nadd(100.0); add(101.0)               # next episode\n\npairs = set()\nfor _ in range(50):\n    x = b.sample(4)\n    pairs |= set(zip(x[\"state\"][K].flatten().tolist(), x[\"next_state\"][K].flatten().tolist()))\nprint(sorted(pairs))\n# Contains (1.0, 100.0): state 1.0 comes back with next_state 100.0 instead of 2.0, and done=0\n```\n\nWith synthetic data, 0.38% of sampled transitions were wrong for 200-step truncated episodes, and 9.85% for 10-step intervention segments. With `optimize_memory=False` it was 0%. These rates depend on episode and segment length. I haven't measured the effect on training.\n\nRelated but separate: #4726 (newest slot after the ring wraps), #5228 (truncation flags in dataset conversion, leaves next-state reconstruction unchanged).\n",
+      "created_at": "2026-11-07T20:31:37Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5284",
+      "id": "huggingface/lerobot#5284",
+      "issue_number": 5284,
+      "labels": [
+        "dataset",
+        "training"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "8a93e683d3a8d716edf147d4eb10d751e856dbc76261449901ef29f671f74f3f",
+      "title": "ReplayBuffer(optimize_memory=True) returns the wrong next_state at episode and intervention boundaries"
+    }
+  ],
+  "post_activation_issue_identities_observed": 515,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-07T22:41:42Z",
+  "schema_version": 1
+}
