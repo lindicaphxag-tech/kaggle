@@ -7594,6 +7594,39 @@
       "source": "inbox/FIRST_SEEN_20261107T104004Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "275f1207717adb036acbb4f74e4bb84bd1ae05814d73fd4d7d1fa9b959c3329d"
+    },
+    {
+      "created_at": "2026-11-07T11:14:13Z",
+      "first_frozen_at": "2026-11-07T13:56:32Z",
+      "id": "isaac-sim/IsaacLab#8969",
+      "issue_number": 8969,
+      "prediction_deadline_at": "2026-11-07T19:56:32Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261107T135632Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "68858c73a4bce59cda27a8e7a13cbdf7e7729ec8bd9257c3c405c95f3fecca20"
+    },
+    {
+      "created_at": "2026-11-07T11:27:59Z",
+      "first_frozen_at": "2026-11-07T13:56:32Z",
+      "id": "ros2/launch#1060",
+      "issue_number": 1060,
+      "prediction_deadline_at": "2026-11-07T19:56:32Z",
+      "repository": "ros2/launch",
+      "source": "inbox/FIRST_SEEN_20261107T135632Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "7e2021df5dab3fab201b110ec4265636c387a09af83606a6cac1d4e66a4f1d58"
+    },
+    {
+      "created_at": "2026-11-07T11:05:50Z",
+      "first_frozen_at": "2026-11-07T13:56:32Z",
+      "id": "tesseract-robotics/tesseract#1392",
+      "issue_number": 1392,
+      "prediction_deadline_at": "2026-11-07T19:56:32Z",
+      "repository": "tesseract-robotics/tesseract",
+      "source": "inbox/FIRST_SEEN_20261107T135632Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "330c0165bd278dd2510e016ae35dbdc5f7c92f4637086c76c5f768d9d229d497"
     }
   ]
 }
