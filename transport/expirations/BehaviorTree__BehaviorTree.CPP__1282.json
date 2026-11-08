@@ -1,0 +1,13 @@
+{
+  "case_id": "BehaviorTree/BehaviorTree.CPP#1282",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-11-08T02:20:56Z",
+  "expiry_sha256": "f1deda3a34a58413c4d52bda6aae3421d47522bed2804b15e1c18c54ca511de7",
+  "first_frozen_at": "2026-11-07T18:42:42Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-11-08T00:42:42Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "0860d20e57f9f05494682aed3b82e0c166d7a0989692ee05ce527977cd3d49ea"
+}
