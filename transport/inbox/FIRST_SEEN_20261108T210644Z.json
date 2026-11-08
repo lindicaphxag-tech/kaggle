@@ -1,0 +1,42 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "sohailshk",
+      "body": "### What happened?\n\nA Python cost or constraint that returns integers is rejected with a `TypeError` when it is evaluated with float inputs:\n\n```python\nfrom pydrake.solvers import MathematicalProgram\n\nprog = MathematicalProgram()\nx = prog.NewContinuousVariables(1, \"x\")\ncost = prog.AddCost(lambda x: 1, vars=x)\nconstraint = prog.AddConstraint(lambda x: [2], lb=[0.0], ub=[3.0], vars=x)\ncost.evaluator().Eval([0.0])\nconstraint.evaluator().Eval([0.0])\n```\n\n```\nTypeError: When PyFunctionCost is called with an array of type float the return value must be a scalar (not array) of the same type, not a int (1).\nTypeError: When PyFunctionConstraint is called with an array of type float the return value must be the same type, not int64.\n```\n\nI expected `[1.]` and `[2.]`.\n\nThe check in `bindings/pydrake/solvers/_extra.py` (from #24712) looks meant to accept integer results:\n\n```python\nif y.dtype is float or y.dtype is int:\n    actual_type = float\n```\n\nbut a numpy dtype is never `is`-identical to `float` or `int`, so this branch never runs (the code it replaced compared with `==`). For scalar costs, `_scalar_types_match` only allows `np.float32` and `np.float64` when the expected type is `float`.\n\n### Version\n\n1.58.0 (pip wheel); also reproduced on master at 2fb8c56cc\n\n### What operating system are you using?\n\nmacOS 26 (Tahoe)\n\n### What installation option are you using?\n\npip install drake\n",
+      "created_at": "2026-11-08T19:32:55Z",
+      "html_url": "https://github.com/RobotLocomotion/drake/issues/25231",
+      "id": "RobotLocomotion/drake#25231",
+      "issue_number": 25231,
+      "labels": [],
+      "repository": "RobotLocomotion/drake",
+      "surface_sha256": "b6ef48835074a89a7c52abc21d2bbb6b145d824a84a06342de756e6ee00cbea6",
+      "title": "pydrake: Python costs and constraints that return ints are rejected"
+    },
+    {
+      "author_login": "SashaBajzek",
+      "body": "### Ticket Type\n\n\ud83d\udc1b Bug Report (Something isn't working)\n\n### Environment & System Info\n\n```Shell\n- LeRobot version: 0.6.2\n- Platform: Linux-7.0.0-42-generic-x86_64-with-glibc2.39\n- Python version: 3.12.13\n- Huggingface Hub version: 1.20.1\n- Transformers version: N/A\n- Datasets version: 4.8.5\n- Numpy version: 2.2.6\n- FFmpeg version: 8.1.2\n- PyTorch version: 2.11.0+cu130\n- Torchcodec version: 0.11.1+cpu\n- Is PyTorch built with CUDA support?: True\n- Cuda version: 13.0\n- GPU model: NVIDIA GeForce RTX 5090\n- Using GPU in script?: Yes\n- lerobot scripts: ['lerobot-annotate', 'lerobot-calibrate', 'lerobot-convert-dcp', 'lerobot-dataset-viz', 'lerobot-edit-dataset', 'lerobot-eval', 'lerobot-find-cameras', 'lerobot-find-joint-limits', 'lerobot-find-port', 'lerobot-imgtransform-viz', 'lerobot-info', 'lerobot-record', 'lerobot-replay', 'lerobot-rollout', 'lerobot-setup-can', 'lerobot-setup-motors', 'lerobot-teleoperate', 'lerobot-train', 'lerobot-train-tokenizer']\n\n Robot: XLeRobot (dual-arm).\n Policy: ACT.\n Dataset: 20 episodes.\n Checked normalize_processor.py on main (Nov 5): same code\n```\n\n### Description\n\nI have a robot that has 2 arms (the XLeRobot), and some tasks with my robot only need 1 arm (pick and place).  When I only use 1 arm when training a policy and the second arm just sits there, the training data has the joints always in the same place.  This creates a standard deviation that is near if not zero.\n\nLeRobot accounts for standard deviations that are exactly zero by adding a very tiny eps.  This fixes the divide by zero equals infinity problem, but it's still a problem for the robot as a whole.  If joints that in training did not move, see a tiny amount of jitter in rollout (like 0.2 degrees), the jitter gets divided by the super tiny std (like 1.48e-6), blowing it out of proportion (normalized value of ~135,000).  With tiny standard deviations, nothing crashes or warns, making it look like the policy was at fault.  This same problem happens for all of the normalizing guards, they only guard exactly zero (MIN_MAX would give ~40,000,000 for a joint that doesn't move).\n\nI looked for related issues like #4973, but that issue only addresses FP16 rounding to zero and producing NaN.  There's a fix to raise the eps above zero for FP16 (#4991), but that fix also admits in the docstring, that when inputs move away from a constant training value, it can still blow up.  This issue is about that case.\n\nI propose adding an option to set a minimum spread with a warning to remove silent failures for policies where some joints in the robot are static.  I am happy to open a PR for this if the maintainers agree with the approach.\n\n### Context & Reproduction\n\n1. Record a dataset where one joint never moves (here, the idle second arm).\n2. Compute stats: that joint's std is ~1e-6 (mine: 1.48e-06).\n3. Train a policy (ACT, MEAN_STD on observation.state).\n4. At rollout the idle joint reads slightly differently (0.2\u00b0), so its normalized value is ~135,000. There's no warning, and the policy's actions are wrong.\n\nSource: `denom = std + self.eps` in normalize_processor.py\nRelated: #4973, #4991, #3280, #4704\n\n### Relevant logs or stack trace\n\n```Shell\nNo error or stack trace, which is the problem. stats.json std for the idle joint: 1.48e-06. Normalized live value: ~135,000.\n```\n\n### Checklist\n\n- [x] I have searched existing tickets to ensure this isn't a duplicate.\n- [x] I am using the latest version of the `main` branch.\n- [x] I have verified this is not an environment-specific problem.\n\n### Additional Info / Workarounds\n\nWorkaround: I floored std at 1 for observation.state in stats.json before retraining, and the policy then worked properly and picked and placed.\n\nI used Claude to help check the source and tighten wording; the bug, diagnosis, and fix testing are mine.",
+      "created_at": "2026-11-08T20:07:59Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5289",
+      "id": "huggingface/lerobot#5289",
+      "issue_number": 5289,
+      "labels": [
+        "bug",
+        "documentation",
+        "policies",
+        "dataset",
+        "training"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "1c59d46e2893ccf3c11b0e435e3ec2f225dfb3c96f31228da9f8f9158b371d07",
+      "title": "Near-zero standard deviation on a constant joint silently blows up normalized values at rollout"
+    }
+  ],
+  "post_activation_issue_identities_observed": 526,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-08T21:06:44Z",
+  "schema_version": 1
+}

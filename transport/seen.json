@@ -7845,13 +7845,17 @@
     },
     {
       "created_at": "2026-11-08T10:18:10Z",
+      "expiry_recorded_at": "2026-11-08T21:05:21Z",
+      "expiry_sha256": "faae808a52488b99181ded36ec914b50f9098353af0950ad95684c763f10e2b7",
+      "expiry_source": "expirations/ros-navigation__navigation2__6756.json",
       "first_frozen_at": "2026-11-08T13:52:53Z",
       "id": "ros-navigation/navigation2#6756",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 6756,
       "prediction_deadline_at": "2026-11-08T19:52:53Z",
       "repository": "ros-navigation/navigation2",
       "source": "inbox/FIRST_SEEN_20261108T135253Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "e77d7b37ebc6b26a2bcde5b360a5dd71e07329e76668316fb63683975f761a3d"
     },
     {
@@ -7864,6 +7868,28 @@
       "source": "inbox/FIRST_SEEN_20261108T164004Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "c386a89534017b34b9268ecef556879dee56e91a55df497044f1eb415b325722"
+    },
+    {
+      "created_at": "2026-11-08T19:32:55Z",
+      "first_frozen_at": "2026-11-08T21:06:44Z",
+      "id": "RobotLocomotion/drake#25231",
+      "issue_number": 25231,
+      "prediction_deadline_at": "2026-11-09T03:06:44Z",
+      "repository": "RobotLocomotion/drake",
+      "source": "inbox/FIRST_SEEN_20261108T210644Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "b6ef48835074a89a7c52abc21d2bbb6b145d824a84a06342de756e6ee00cbea6"
+    },
+    {
+      "created_at": "2026-11-08T20:07:59Z",
+      "first_frozen_at": "2026-11-08T21:06:44Z",
+      "id": "huggingface/lerobot#5289",
+      "issue_number": 5289,
+      "prediction_deadline_at": "2026-11-09T03:06:44Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261108T210644Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "1c59d46e2893ccf3c11b0e435e3ec2f225dfb3c96f31228da9f8f9158b371d07"
     }
   ]
 }
