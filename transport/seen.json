@@ -7725,14 +7725,40 @@
     },
     {
       "created_at": "2026-11-07T20:31:37Z",
+      "expiry_recorded_at": "2026-11-08T06:39:53Z",
+      "expiry_sha256": "c470068353d00932f4a5378cf698dbfcf029a1409c139e3df918a4c4d477ac1f",
+      "expiry_source": "expirations/huggingface__lerobot__5284.json",
       "first_frozen_at": "2026-11-07T22:41:42Z",
       "id": "huggingface/lerobot#5284",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 5284,
       "prediction_deadline_at": "2026-11-08T04:41:42Z",
       "repository": "huggingface/lerobot",
       "source": "inbox/FIRST_SEEN_20261107T224142Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "8a93e683d3a8d716edf147d4eb10d751e856dbc76261449901ef29f671f74f3f"
+    },
+    {
+      "created_at": "2026-11-08T03:34:29Z",
+      "first_frozen_at": "2026-11-08T06:40:56Z",
+      "id": "NVIDIA/Isaac-GR00T#807",
+      "issue_number": 807,
+      "prediction_deadline_at": "2026-11-08T12:40:56Z",
+      "repository": "NVIDIA/Isaac-GR00T",
+      "source": "inbox/FIRST_SEEN_20261108T064056Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "d24fec0c456774e04176317f7b4471ba52474ce90f6efa5ee5450c0893681e5e"
+    },
+    {
+      "created_at": "2026-11-08T03:14:50Z",
+      "first_frozen_at": "2026-11-08T06:40:56Z",
+      "id": "ros-navigation/navigation2#6755",
+      "issue_number": 6755,
+      "prediction_deadline_at": "2026-11-08T12:40:56Z",
+      "repository": "ros-navigation/navigation2",
+      "source": "inbox/FIRST_SEEN_20261108T064056Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "46d50c2f89f57d5d432177fd7baf9074aeeb236347114137c0b7c6a737e74699"
     }
   ]
 }
