@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "odemirs",
+      "body": "<!--\nFor general questions, please ask on Robotics Stack Exchange: https://robotics.stackexchange.com/, make sure to include at least the `ros2` and `nav2` tags and the rosdistro version you are running, e.g. `ardent`.\nFor general design discussions, please post on discourse: https://discourse.ros.org/c/ng-ros\nNot sure if this is the right repository? Open an issue on https://github.com/ros-navigation/navigation2\nFor Bug report or feature requests, please fill out the relevant category below\n-->\n\n## Bug report\n\n**Required Info:**\n\n- Operating System:\n  - Ubuntu 24.04.5 LTS\n- Computer:\n  - Intel Core 7 240H (16 threads), 32 GB RAM\n- ROS2 Version:\n  - Jazzy and navigation2 built from source\n- Version or commit hash:\n  - main 20b9fa3e\n- DDS implementation:\n  - rmw_zenoh_cpp\n\n#### Steps to reproduce issue\n\nI added a gtest that produces the issue in [this branch](https://github.com/odemirs/navigation2/tree/bug-report-navigator-update-goal)\n\nAdditional test in the branch runs `bt_navigator` with a `NavigateThroughPoses` tree that only sleeps. A\n`NavigateThroughPosesAction` client sets `goal_updated_` while its goal is running, so\n`BtActionNode` sends the same goal again.\n\n#### Expected behavior\n\nNo NavigatorMuxer error print. Since, preempting a goal with the same navigator should be valid.\n\n#### Actual behavior\n\nOn goal update `bt_navigator` logs:\n\n```\n[NavigatorMutex]: Major error! Navigation requested while another navigation task is in progress!\nThis likely occurred from an incorrect implementation of a navigator plugin.\n```\n\nNavigation continues normally.\n\n#### Reproduction instructions\n\n```\ngit clone -b bug-report-navigator-update-goal --depth 1 https://github.com/odemirs/navigation2.git\ncd navigation2\ncolcon build --packages-select nav2_bt_navigator --cmake-args -DBUILD_TESTING=ON\n./build/nav2_bt_navigator/test/test_navigate_through_poses_goal_update\n```\n\n#### Additional information\n\nIs it the desired behavior? Since, it can be fixed simply by checking `current_navigator_ == navigator` in `NavigatorMuxer::startNavigating` of behavior_tree_navigator.hpp . If new goal started with the current navigator, it should not print the error log message mentioned above.\n\n",
+      "created_at": "2026-11-08T10:18:10Z",
+      "html_url": "https://github.com/ros-navigation/navigation2/issues/6756",
+      "id": "ros-navigation/navigation2#6756",
+      "issue_number": 6756,
+      "labels": [],
+      "repository": "ros-navigation/navigation2",
+      "surface_sha256": "e77d7b37ebc6b26a2bcde5b360a5dd71e07329e76668316fb63683975f761a3d",
+      "title": "False NavigatorMutex error on goal update with the same navigator"
+    }
+  ],
+  "post_activation_issue_identities_observed": 523,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-08T13:52:53Z",
+  "schema_version": 1
+}

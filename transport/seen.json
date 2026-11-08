@@ -7740,24 +7740,32 @@
     },
     {
       "created_at": "2026-11-08T03:34:29Z",
+      "expiry_recorded_at": "2026-11-08T13:51:36Z",
+      "expiry_sha256": "9e1bcdaf2508aac8cd19197b0bf306abb097180714c8170089fe55328e1a73fd",
+      "expiry_source": "expirations/NVIDIA__Isaac-GR00T__807.json",
       "first_frozen_at": "2026-11-08T06:40:56Z",
       "id": "NVIDIA/Isaac-GR00T#807",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 807,
       "prediction_deadline_at": "2026-11-08T12:40:56Z",
       "repository": "NVIDIA/Isaac-GR00T",
       "source": "inbox/FIRST_SEEN_20261108T064056Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "d24fec0c456774e04176317f7b4471ba52474ce90f6efa5ee5450c0893681e5e"
     },
     {
       "created_at": "2026-11-08T03:14:50Z",
+      "expiry_recorded_at": "2026-11-08T13:51:36Z",
+      "expiry_sha256": "6a2194588b88f2229b1e70f800e2f455fb5d05d9eedf0c2a648fe910385e2dc7",
+      "expiry_source": "expirations/ros-navigation__navigation2__6755.json",
       "first_frozen_at": "2026-11-08T06:40:56Z",
       "id": "ros-navigation/navigation2#6755",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 6755,
       "prediction_deadline_at": "2026-11-08T12:40:56Z",
       "repository": "ros-navigation/navigation2",
       "source": "inbox/FIRST_SEEN_20261108T064056Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "46d50c2f89f57d5d432177fd7baf9074aeeb236347114137c0b7c6a737e74699"
     },
     {
@@ -7814,6 +7822,17 @@
       "source": "inbox/FIRST_SEEN_20261108T101126Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "78753a6e7f7576963487665f512506f908cb1c8b62aee18a3d6cd54ab602f6b4"
+    },
+    {
+      "created_at": "2026-11-08T10:18:10Z",
+      "first_frozen_at": "2026-11-08T13:52:53Z",
+      "id": "ros-navigation/navigation2#6756",
+      "issue_number": 6756,
+      "prediction_deadline_at": "2026-11-08T19:52:53Z",
+      "repository": "ros-navigation/navigation2",
+      "source": "inbox/FIRST_SEEN_20261108T135253Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "e77d7b37ebc6b26a2bcde5b360a5dd71e07329e76668316fb63683975f761a3d"
     }
   ]
 }
