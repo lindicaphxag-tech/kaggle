@@ -7759,6 +7759,61 @@
       "source": "inbox/FIRST_SEEN_20261108T064056Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "46d50c2f89f57d5d432177fd7baf9074aeeb236347114137c0b7c6a737e74699"
+    },
+    {
+      "created_at": "2026-11-08T07:36:46Z",
+      "first_frozen_at": "2026-11-08T10:11:26Z",
+      "id": "Farama-Foundation/Gymnasium#1845",
+      "issue_number": 1845,
+      "prediction_deadline_at": "2026-11-08T16:11:26Z",
+      "repository": "Farama-Foundation/Gymnasium",
+      "source": "inbox/FIRST_SEEN_20261108T101126Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "f84ce67c54a9ffdfb77a890c99e3857ed60072e9f26cdc671ec5401b7c666ba4"
+    },
+    {
+      "created_at": "2026-11-08T09:27:17Z",
+      "first_frozen_at": "2026-11-08T10:11:26Z",
+      "id": "Farama-Foundation/Gymnasium#1847",
+      "issue_number": 1847,
+      "prediction_deadline_at": "2026-11-08T16:11:26Z",
+      "repository": "Farama-Foundation/Gymnasium",
+      "source": "inbox/FIRST_SEEN_20261108T101126Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "98d148304bbd298cd76a1baa8ec0fbd05403510dc3524c4d014772fe2360b984"
+    },
+    {
+      "created_at": "2026-11-08T07:30:46Z",
+      "first_frozen_at": "2026-11-08T10:11:26Z",
+      "id": "Farama-Foundation/Minari#378",
+      "issue_number": 378,
+      "prediction_deadline_at": "2026-11-08T16:11:26Z",
+      "repository": "Farama-Foundation/Minari",
+      "source": "inbox/FIRST_SEEN_20261108T101126Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "b5af095b7939d839f9c67f722c72911907f8b9adb11d6fcdd160c40b40fcdf0d"
+    },
+    {
+      "created_at": "2026-11-08T08:43:32Z",
+      "first_frozen_at": "2026-11-08T10:11:26Z",
+      "id": "StanfordVL/BEHAVIOR-1K#2386",
+      "issue_number": 2386,
+      "prediction_deadline_at": "2026-11-08T16:11:26Z",
+      "repository": "StanfordVL/BEHAVIOR-1K",
+      "source": "inbox/FIRST_SEEN_20261108T101126Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "154a6db42dd2f912f2ce54d1464b8812a37f0069cf2092f67370524f2fd74ca7"
+    },
+    {
+      "created_at": "2026-11-08T08:55:01Z",
+      "first_frozen_at": "2026-11-08T10:11:26Z",
+      "id": "isaac-sim/IsaacLab#8978",
+      "issue_number": 8978,
+      "prediction_deadline_at": "2026-11-08T16:11:26Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261108T101126Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "78753a6e7f7576963487665f512506f908cb1c8b62aee18a3d6cd54ab602f6b4"
     }
   ]
 }
