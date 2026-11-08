@@ -7860,13 +7860,17 @@
     },
     {
       "created_at": "2026-11-08T14:23:08Z",
+      "expiry_recorded_at": "2026-11-08T23:06:56Z",
+      "expiry_sha256": "6a2553e21ddc22129232259ec3cd982c52f13f968fbfdc8d238846c6bcf3f626",
+      "expiry_source": "expirations/google-deepmind__mujoco__3778.json",
       "first_frozen_at": "2026-11-08T16:40:04Z",
       "id": "google-deepmind/mujoco#3778",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3778,
       "prediction_deadline_at": "2026-11-08T22:40:04Z",
       "repository": "google-deepmind/mujoco",
       "source": "inbox/FIRST_SEEN_20261108T164004Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "c386a89534017b34b9268ecef556879dee56e91a55df497044f1eb415b325722"
     },
     {
@@ -7890,6 +7894,17 @@
       "source": "inbox/FIRST_SEEN_20261108T210644Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "1c59d46e2893ccf3c11b0e435e3ec2f225dfb3c96f31228da9f8f9158b371d07"
+    },
+    {
+      "created_at": "2026-11-08T22:15:57Z",
+      "first_frozen_at": "2026-11-08T23:07:57Z",
+      "id": "google-deepmind/mujoco#3779",
+      "issue_number": 3779,
+      "prediction_deadline_at": "2026-11-09T05:07:57Z",
+      "repository": "google-deepmind/mujoco",
+      "source": "inbox/FIRST_SEEN_20261108T230757Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "ddbbacde586cb08db59b0a9cc0bd81e7948e5f83f2c5bc9cda18041b57d3b859"
     }
   ]
 }

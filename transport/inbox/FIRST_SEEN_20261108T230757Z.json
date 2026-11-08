@@ -1,0 +1,26 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "andyabateagility",
+      "body": "### The feature, motivation and pitch\n\nMirror mesh, inertia, geom, and joint elements when a frame has negative scale. This allows mirror-symmetric subtrees to only be authored once.\n\nAlgorithm sketch: \n1) propagate frame transform to tree coordinate systems, leaving left-hand csys\n2) for each left-hand csys, apply a heuristic (e.g. flip y coordinate) to produce a right-hand csys, and apply the inverse to all data referencing that csys so that geometry and inertia keep the frame's mirror\n\nRotation joints need an additional heuristic to decide whether positive joint velocity produces mirrored motion, or if the axis vector is simply mirrored\n\n### Alternatives\n\n_No response_\n\n### Additional context\n\n_No response_",
+      "created_at": "2026-11-08T22:15:57Z",
+      "html_url": "https://github.com/google-deepmind/mujoco/issues/3779",
+      "id": "google-deepmind/mujoco#3779",
+      "issue_number": 3779,
+      "labels": [
+        "enhancement"
+      ],
+      "repository": "google-deepmind/mujoco",
+      "surface_sha256": "ddbbacde586cb08db59b0a9cc0bd81e7948e5f83f2c5bc9cda18041b57d3b859",
+      "title": "Subtree mirroring with negative scale on frames"
+    }
+  ],
+  "post_activation_issue_identities_observed": 527,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-08T23:07:57Z",
+  "schema_version": 1
+}
