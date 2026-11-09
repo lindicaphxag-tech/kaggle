@@ -7875,35 +7875,47 @@
     },
     {
       "created_at": "2026-11-08T19:32:55Z",
+      "expiry_recorded_at": "2026-11-09T07:52:41Z",
+      "expiry_sha256": "100239f85b994a42099eaca6fb7daeb54c1dfa2cfcd4ac3fbdf6f1b1f300b77e",
+      "expiry_source": "expirations/RobotLocomotion__drake__25231.json",
       "first_frozen_at": "2026-11-08T21:06:44Z",
       "id": "RobotLocomotion/drake#25231",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 25231,
       "prediction_deadline_at": "2026-11-09T03:06:44Z",
       "repository": "RobotLocomotion/drake",
       "source": "inbox/FIRST_SEEN_20261108T210644Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "b6ef48835074a89a7c52abc21d2bbb6b145d824a84a06342de756e6ee00cbea6"
     },
     {
       "created_at": "2026-11-08T20:07:59Z",
+      "expiry_recorded_at": "2026-11-09T07:52:41Z",
+      "expiry_sha256": "bacb409356a56147a92ec9935c58c9be50287281a416fca43ceb3051ae06de82",
+      "expiry_source": "expirations/huggingface__lerobot__5289.json",
       "first_frozen_at": "2026-11-08T21:06:44Z",
       "id": "huggingface/lerobot#5289",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 5289,
       "prediction_deadline_at": "2026-11-09T03:06:44Z",
       "repository": "huggingface/lerobot",
       "source": "inbox/FIRST_SEEN_20261108T210644Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "1c59d46e2893ccf3c11b0e435e3ec2f225dfb3c96f31228da9f8f9158b371d07"
     },
     {
       "created_at": "2026-11-08T22:15:57Z",
+      "expiry_recorded_at": "2026-11-09T07:52:41Z",
+      "expiry_sha256": "378f18efd3a4cfb2729899b9ecc1aeb42a1879ace6c749d99f4e647c0133e1df",
+      "expiry_source": "expirations/google-deepmind__mujoco__3779.json",
       "first_frozen_at": "2026-11-08T23:07:57Z",
       "id": "google-deepmind/mujoco#3779",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3779,
       "prediction_deadline_at": "2026-11-09T05:07:57Z",
       "repository": "google-deepmind/mujoco",
       "source": "inbox/FIRST_SEEN_20261108T230757Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "ddbbacde586cb08db59b0a9cc0bd81e7948e5f83f2c5bc9cda18041b57d3b859"
     },
     {
@@ -7916,6 +7928,17 @@
       "source": "inbox/FIRST_SEEN_20261109T025807Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "6740c63698679053d7271c4aed74ba619f830a1a3c463111dac97821ceb5f084"
+    },
+    {
+      "created_at": "2026-11-09T07:10:29Z",
+      "first_frozen_at": "2026-11-09T07:53:49Z",
+      "id": "isaac-sim/IsaacLab#8980",
+      "issue_number": 8980,
+      "prediction_deadline_at": "2026-11-09T13:53:49Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261109T075349Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "391d81cb4fea0874b8a4cfa008818f425ca850b724548befb41fc64e4201959d"
     }
   ]
 }

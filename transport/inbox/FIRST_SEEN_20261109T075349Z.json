@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "maxkra15",
+      "body": "Provide a thin Isaac Lab interface to Newton's proposed GPU particle sleeping and bounded evaluation pools, including optional original-ID pages.\n\nKeep activity classification and particle/cache algorithms in Newton. Expose typed runtime settings, preserve default behavior and current dependency pins, invalidate captures only when runtime buffers change, and allow explicit rollout-boundary validation instead of compulsory per-step status readbacks. Guard reset paths so a fault cannot be cleared before collected data is rejected.\n\nA compact moving-sphere-on-sand example demonstrates full-particle, compact, and paged evaluation. This is the Lab companion to [Warp #2267](https://github.com/NVIDIA/warp/pull/2267) and [Newton issue #5216](https://github.com/newton-physics/newton/issues/5216). Feature builds are required until those dependencies land. The draft deliberately excludes the older G1 terrain prototype, visualization mesh framework, and contact projection.\n",
+      "created_at": "2026-11-09T07:10:29Z",
+      "html_url": "https://github.com/isaac-sim/IsaacLab/issues/8980",
+      "id": "isaac-sim/IsaacLab#8980",
+      "issue_number": 8980,
+      "labels": [],
+      "repository": "isaac-sim/IsaacLab",
+      "surface_sha256": "391d81cb4fea0874b8a4cfa008818f425ca850b724548befb41fc64e4201959d",
+      "title": "Expose optional native MPM sleeping and bounded GPU evaluation"
+    }
+  ],
+  "post_activation_issue_identities_observed": 529,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-09T07:53:49Z",
+  "schema_version": 1
+}
