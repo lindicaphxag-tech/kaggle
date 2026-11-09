@@ -7905,6 +7905,17 @@
       "source": "inbox/FIRST_SEEN_20261108T230757Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "ddbbacde586cb08db59b0a9cc0bd81e7948e5f83f2c5bc9cda18041b57d3b859"
+    },
+    {
+      "created_at": "2026-11-09T02:12:16Z",
+      "first_frozen_at": "2026-11-09T02:58:07Z",
+      "id": "gazebosim/ros_gz#1028",
+      "issue_number": 1028,
+      "prediction_deadline_at": "2026-11-09T08:58:07Z",
+      "repository": "gazebosim/ros_gz",
+      "source": "inbox/FIRST_SEEN_20261109T025807Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "6740c63698679053d7271c4aed74ba619f830a1a3c463111dac97821ceb5f084"
     }
   ]
 }
