@@ -8047,6 +8047,39 @@
       "source": "inbox/FIRST_SEEN_20261109T184311Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "e2f2aaa8057d34da9b644b185310d2f73878eec795f7531e4272bd1405a6d47c"
+    },
+    {
+      "created_at": "2026-11-09T19:56:03Z",
+      "first_frozen_at": "2026-11-09T22:41:31Z",
+      "id": "gazebosim/gz-math#869",
+      "issue_number": 869,
+      "prediction_deadline_at": "2026-11-10T04:41:31Z",
+      "repository": "gazebosim/gz-math",
+      "source": "inbox/FIRST_SEEN_20261109T224131Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "d23fcccaf2657343f7b74313cca4c2e63fdfe7ca5fc1cabe42643e4d38b99146"
+    },
+    {
+      "created_at": "2026-11-09T19:24:40Z",
+      "first_frozen_at": "2026-11-09T22:41:31Z",
+      "id": "isaac-sim/IsaacSim#933",
+      "issue_number": 933,
+      "prediction_deadline_at": "2026-11-10T04:41:31Z",
+      "repository": "isaac-sim/IsaacSim",
+      "source": "inbox/FIRST_SEEN_20261109T224131Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "97162cfaeda286d32bb75fa2031459b2132349f302260786904a571e91b1be80"
+    },
+    {
+      "created_at": "2026-11-09T18:46:17Z",
+      "first_frozen_at": "2026-11-09T22:41:31Z",
+      "id": "ros2/rcl#1359",
+      "issue_number": 1359,
+      "prediction_deadline_at": "2026-11-10T04:41:31Z",
+      "repository": "ros2/rcl",
+      "source": "inbox/FIRST_SEEN_20261109T224131Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "36d2ce08bd411badae40e61aec522e814fafa4d2ddd40076b1cacba5e332cbbd"
     }
   ]
 }
