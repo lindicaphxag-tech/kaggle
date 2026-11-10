@@ -1,0 +1,13 @@
+{
+  "case_id": "real-stanford/diffusion_policy#186",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-11-10T20:35:31Z",
+  "expiry_sha256": "c5f47aff6fc429e8ab6b1aad00807d9ca7d8c53a2e4200cf5cbfc1d92a0d8a6a",
+  "first_frozen_at": "2026-11-10T12:58:40Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-11-10T18:58:40Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "596808157f868e70b4f98da02abdfbd8fbec2f2aaae86b8bd5b8309710be6ae7"
+}

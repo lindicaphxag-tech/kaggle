@@ -1,0 +1,38 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "SteveMacenski",
+      "body": "**Describe the bug**\n\nNav2\u2019s Rolling CI started failing with GCC 15 due to a -Wnull-dereference warning coming from `thread_safe_signal.h`. Since we build with `-Werror`, this breaks our BT node builds, and it should hit anyone else downstream compiling with the same flags.\n\n```\nIn member function 'std::__weak_ptr<_Tp, _Lp>& std::__weak_ptr<_Tp, _Lp>::operator=(const std::__weak_ptr<_Tp, _Lp>&) [with _Tp = BT::ThreadSafeSignal<>::Subscription; ...]',\n    ...\n    inlined from 'void BT::ThreadSafeSignal<CallableArgs>::notify(CallableArgs ...) [with CallableArgs = {}]' at /opt/ros/rolling/include/behaviortree_cpp/utils/thread_safe_signal.h:52:19:\n/usr/include/c++/15/bits/shared_ptr_base.h:2039:7: error: potential null pointer dereference [-Werror=null-dereference]\n```\n\n*How to Reproduce**\n\nCompile with `-O2 -Wnull-dereference -Werror`\n\n\n",
+      "created_at": "2026-11-10T18:49:37Z",
+      "html_url": "https://github.com/BehaviorTree/BehaviorTree.CPP/issues/1288",
+      "id": "BehaviorTree/BehaviorTree.CPP#1288",
+      "issue_number": 1288,
+      "labels": [],
+      "repository": "BehaviorTree/BehaviorTree.CPP",
+      "surface_sha256": "c45d144c53837afa1dc5be41b597c01d38e25ecf07763874779f75dbaee54cc2",
+      "title": "New BT.CPP Build Errors with -Werror"
+    },
+    {
+      "author_login": "davidhozic",
+      "body": "### The feature, motivation and pitch\n\nCurrently, users have to manually setup the environment when they want to upgrade or setup anew the MuJoCo library.\n\nI kindly request for the MuJoCo team to start providing official MuJoCo recipes, which can be discovered by pkg-config for automated linking.\n\nAdditionally, if possible, it would be nice to have pre-builts hosted in the APT repository and Fedora's DNF repository (a start would be RPM Fusion).\n\n### Alternatives\n\n_No response_\n\n### Additional context\n\n_No response_",
+      "created_at": "2026-11-10T20:13:46Z",
+      "html_url": "https://github.com/google-deepmind/mujoco/issues/3810",
+      "id": "google-deepmind/mujoco#3810",
+      "issue_number": 3810,
+      "labels": [
+        "enhancement"
+      ],
+      "repository": "google-deepmind/mujoco",
+      "surface_sha256": "30e5b3b55aab540e7ecc9bd2fa1facc238521459d5ecabbbe8fff1b78a645204",
+      "title": "Official pkg-config recipes on Linux (Ubuntu, Fedora, etc.) and macOS"
+    }
+  ],
+  "post_activation_issue_identities_observed": 564,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-10T20:36:53Z",
+  "schema_version": 1
+}
