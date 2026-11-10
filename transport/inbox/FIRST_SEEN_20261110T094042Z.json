@@ -1,0 +1,122 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 8,
+  "new_candidates": [
+    {
+      "author_login": "wep21",
+      "body": "### Intro\n\nHi! I maintain the `mujoco` module in the Bazel Central Registry (bazelbuild/bazel-central-registry#11661 adds 3.16.0, 3.17.0 and 4.0.0) and use MuJoCo from Bazel.\n\n### My setup\n\n- MuJoCo 4.0.0, used as a Bazel module dependency. `main` (4.0.1) has the same `MODULE.bazel` setup.\n- Bazel 9.3.2, rules_python 2.4.5 (the version `MODULE.bazel` pins) and 2.4.6\n- Linux x86_64\n\n### What's happening? What did you expect?\n\nIn a downstream module, evaluating the rules_python `pip` extension fails on MuJoCo's `pip.parse` for Python 3.15:\n\n```\nError in fail: Unable to find interpreter for pip hub 'mujoco_pip' for python_version=3.15: Make sure a corresponding `python.toolchain(python_version=\"3.15\")` call exists.\n```\n\nThis happens with the setup described in \"Building with Bazel\" in `doc/python.rst` (depending on `@mujoco//python/mujoco`). It also happens to downstream modules that only use the C library, as soon as they call `pip.parse` themselves.\n\n`MODULE.bazel` declares the `mujoco_pip` hub with a regular (non-dev) `pip.parse` for 3.11 to 3.15. Its `python.toolchain` calls are `dev_dependency = True`, so they are not registered when MuJoCo is not the root module. Host interpreters for 3.10 to 3.14 happen to be registered by `pybind11_bazel@3.0.3`, but nothing registers 3.15, and rules_python 2.4.x fails instead of skipping that version.\n\nbazel-contrib/rules_python#4184 changed `pip.parse` to skip a version that has no host interpreter. The fix is in rules_python 2.5.0 but not in 2.4.x. With rules_python 2.5.0-rc4, the reproduction below builds.\n\n**Request:** once rules_python 2.5.0 is released, bump `bazel_dep(name = \"rules_python\", version = \"2.5.0\")` in `MODULE.bazel`, so that downstream modules resolve a version that includes the fix.\n\nUntil then, a downstream module can work around it by adding `python.toolchain(python_version = \"3.15\")` to its root `MODULE.bazel`.\n\n### Steps for reproduction\n\n1. Create the files below in an empty directory.\n2. Run `bazel build --nobuild //:simulate_model`.\n3. The `pip` extension fails with the error above. With `rules_python` set to `2.5.0-rc4` in the same `MODULE.bazel`, the command succeeds.\n\n### Minimal model for reproduction\n\nNot applicable: the failure happens during Bazel module extension evaluation, before any model is loaded.\n\n### Code required for reproduction\n\n`MODULE.bazel`:\n\n```starlark\nmodule(name = \"repro\")\n\nbazel_dep(name = \"mujoco\", version = \"4.0.0\")\narchive_override(\n    module_name = \"mujoco\",\n    integrity = \"sha256-v4UwWvVkWKtbdSdnklo769cT2GppSDh3TtY0/6jngZc=\",\n    strip_prefix = \"mujoco-4.0.0\",\n    urls = [\"https://github.com/google-deepmind/mujoco/archive/refs/tags/4.0.0.tar.gz\"],\n)\n\nbazel_dep(name = \"rules_python\", version = \"2.4.6\")\n```\n\n`BUILD.bazel`:\n\n```starlark\nload(\"@rules_python//python:py_binary.bzl\", \"py_binary\")\n\npy_binary(\n    name = \"simulate_model\",\n    srcs = [\"simulate_model.py\"],\n    deps = [\"@mujoco//python/mujoco\"],\n)\n```\n\n`simulate_model.py`:\n\n```python\nimport mujoco\n```\n\n`.bazelversion`:\n\n```\n9.3.2\n```\n\n### Confirmations\n\n- [x] I searched the [latest documentation](https://mujoco.readthedocs.io/en/latest/overview.html) thoroughly before posting.\n- [x] I searched previous [Issues](https://github.com/google-deepmind/mujoco/issues) and [Discussions](https://github.com/google-deepmind/mujoco/discussions), I am certain this has not been raised before.\n",
+      "created_at": "2026-11-10T04:41:33Z",
+      "html_url": "https://github.com/google-deepmind/mujoco/issues/3798",
+      "id": "google-deepmind/mujoco#3798",
+      "issue_number": 3798,
+      "labels": [],
+      "repository": "google-deepmind/mujoco",
+      "surface_sha256": "920ce2d03055ef3841a9193aa413cc24f0eff29543ceb54d9b6f3dff8e428271",
+      "title": "Bazel: downstream modules fail on mujoco_pip for Python 3.15; please bump rules_python to 2.5.0"
+    },
+    {
+      "author_login": "zhengqiuyang",
+      "body": "### My setup\n\n- MuJoCo C: 4.0.0 (pip wheel, `mujoco.mjVERSION_HEADER == 4000000`)\n- MJX: `mujoco-mjx` from `main` at `a937a4f` (4.0.1)\n- Python 3.12, Windows 11, CPU only (JAX backend, no Warp)\n\n### What's happening\n\n`mjOption.disableactuator` is a runtime bitfield that disables actuators by group. C MuJoCo\nskips those actuators in `mj_fwdActuation` (force loop), in the DCMOTOR cogging loop, and in\n`mj_advance` (activation update), all through `mj_actuatorDisabled` (`src/engine/engine_support.c:769`).\n\nMJX copies the field into `OptionJAX.disableactuator` (`mjx/mujoco/mjx/_src/types.py`), but\n`fwd_actuation` and `_next_activation` never read it. A disabled group therefore still produces\nforce and its activation keeps integrating \u2014 silently, with no exception, unlike the other\nunsupported-feature paths which raise.\n\n### Minimal repro\n\n```python\nimport numpy as np, mujoco, jax, mujoco.mjx as mjx\n\nxml = \"\"\"\n<mujoco>\n  <worldbody><body><joint name=\"j\" type=\"hinge\"/><geom size=\".1\"/></body></worldbody>\n  <actuator><general joint=\"j\" group=\"0\" dyntype=\"filter\" dynprm=\"0.5\"\n            gaintype=\"fixed\" gainprm=\"1\" biastype=\"affine\" biasprm=\"0 -1 0\"/></actuator>\n</mujoco>\n\"\"\"\nm = mujoco.MjModel.from_xml_string(xml)\nm.opt.disableactuator = 1  # disable actuator group 0\n\nd = mujoco.MjData(m)\nd.ctrl[:] = 3.0\nmujoco.mj_step(m, d, 10)\nprint('C   :', d.act, d.qvel)\n\nmx = mjx.put_model(m)\ndx = mjx.make_data(mx).replace(ctrl=jax.numpy.ones(1) * 3.0)\nstep = jax.jit(mjx.step)\nfor _ in range(10):\n  dx = step(mx, dx)\nprint('MJX :', dx.act, dx.qvel)\n```\n\nOutput:\n\n```\nC   : [0.]      [0.]\nMJX : [0.117863] [0.063663]\n```\n\nA plain `motor` in a disabled group shows the same thing more directly: C keeps `qvel == 0`,\nMJX reaches `qvel ~ 1.19` after 10 steps.\n\n### Scope of the problem\n\n- The JAX forward path is affected (repro above).\n- `derivative.py` (`deriv_smooth_vel`, used by the implicitfast solver) also includes disabled\n  actuators in `qDeriv`; C skips them in `mjd_actuator_force`.\n- The Warp backend has no `disableactuator` field at all in its `Option`.\n\nI have a local fix for the JAX forward path plus a regression test (`_assert_attr_eq` against\nC for both a `motor` and a `filter` actuator, including the reported `act_dot`, which C keeps\ncomputing even while it holds the activation). I will open a PR referencing this issue; the\nderivative and Warp paths are called out above but not covered there.",
+      "created_at": "2026-11-10T08:37:27Z",
+      "html_url": "https://github.com/google-deepmind/mujoco/issues/3802",
+      "id": "google-deepmind/mujoco#3802",
+      "issue_number": 3802,
+      "labels": [],
+      "repository": "google-deepmind/mujoco",
+      "surface_sha256": "f64d9c1bff6077309bc37f71303e03ad897ded6c4c55683988330ded73423492",
+      "title": "[MJX] mjOption.disableactuator is ignored: actuators in a disabled group still produce force"
+    },
+    {
+      "author_login": "zhangyue19921010",
+      "body": "**Problem**\n\nDataset readers load all Parquet columns and download, index, and decode all cameras, even when a training run only needs a subset. This wastes bandwidth, I/O, and CPU time.\n\n**Proposed solution**\n\nAdd `features=` to the dataset readers and `--dataset.features` to training. Use the selection consistently for column reads, camera downloads, decoding, and sidecar reuse, while retaining bookkeeping fields and validating required training features.\n\n**Expected effect**\n\nFaster loading and sample access with less downloaded and processed data. Full-dataset loading remains the default; selected views are read-only.\n\nImplementation: #5296.",
+      "created_at": "2026-11-10T08:59:47Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5297",
+      "id": "huggingface/lerobot#5297",
+      "issue_number": 5297,
+      "labels": [
+        "dataset",
+        "performance",
+        "sensors",
+        "examples",
+        "training"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "e34925eb9f7f0d588aac604717efd319871d7da921e3522b47daed5bf48c2a46",
+      "title": "Dataset loading reads unused columns and cameras"
+    },
+    {
+      "author_login": "zhangyue19921010",
+      "body": "**Problem**\n\n`save_episode` writes data rows before encoding videos. A Ctrl-C during encoding can leave rows without committed episode metadata. Resuming recording can then silently pair those actions with a later episode's video.\n\n**Proposed solution**\n\nEncode and store videos first, then write data rows immediately before committing episode metadata.\n\n**Expected effect**\n\nAn interruption during encoding no longer leaves orphan data rows, preventing this source of action/video misalignment without extra I/O. This does not make the later data/metadata commit fully atomic.\n\nImplementation: #5262.",
+      "created_at": "2026-11-10T08:59:49Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5298",
+      "id": "huggingface/lerobot#5298",
+      "issue_number": 5298,
+      "labels": [],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "ddaf3f9b68a199f0e1319aaa6a8e433a531d82ed57e225141530889600904cbc",
+      "title": "Interrupting video encoding can misalign actions and videos after resume"
+    },
+    {
+      "author_login": "zhangyue19921010",
+      "body": "**Problem**\n\nMerging a dataset with multiple episode-metadata files, such as one recorded across resumed sessions, can assign incorrect `meta/episodes/{chunk,file}_index` values. Destination file rotation has the same problem. Subsequent `delete_episodes` or `split_dataset` calls can fail with `FileNotFoundError`.\n\n**Proposed solution**\n\nSet each episode's metadata pointer after choosing the actual destination Parquet file, including after rotation, instead of adding source-file offsets.\n\n**Expected effect**\n\nEvery merged episode points to the metadata file containing it, so deletion and splitting can locate its metadata correctly.\n\nImplementation: #5243.",
+      "created_at": "2026-11-10T08:59:51Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5299",
+      "id": "huggingface/lerobot#5299",
+      "issue_number": 5299,
+      "labels": [
+        "dataset"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "bc335e451771b2a1121434ca224764c2fc0f7b21439779b189627faced6ae55a",
+      "title": "Merged datasets can contain invalid episode metadata pointers"
+    },
+    {
+      "author_login": "zhangyue19921010",
+      "body": "**Problem**\n\nWithout `--root`, `recompute_stats` and `reencode_videos` try to copy from `$HF_LEROBOT_HOME/<repo_id>`. Hub downloads live in the snapshot cache instead, so these operations fail with `FileNotFoundError` when no local dataset exists at the assumed path.\n\n**Proposed solution**\n\nResolve the source through `LeRobotDataset` when the default local directory is absent, and copy from its actual root. Reject output paths inside the Hub cache.\n\n**Expected effect**\n\nBoth operations work on Hub datasets without requiring an explicit `--root`, while keeping shared Hub cache files unchanged.\n\nImplementation: #5240.",
+      "created_at": "2026-11-10T08:59:53Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5300",
+      "id": "huggingface/lerobot#5300",
+      "issue_number": 5300,
+      "labels": [
+        "dataset"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "c0d9c7000931a26f93f84a95c2256f3f1e2c42af7e3110f9628a8adcba4cb42c",
+      "title": "recompute_stats and reencode_videos fail on Hub snapshot datasets"
+    },
+    {
+      "author_login": "zhangyue19921010",
+      "body": "**Problem**\n\n`embed_images` performs a row-by-row map even when no feature requires storage embedding. This adds avoidable overhead to `save_episode` for tabular data and video datasets whose videos are stored separately.\n\n**Proposed solution**\n\nUse Hugging Face Datasets' `require_storage_embed` predicate and return the dataset unchanged when none of its features need embedding. Keep the existing path for embedded media, including nested images.\n\n**Expected effect**\n\nFaster episode saves while preserving Arrow data, schema, selections, and formatting. The single-run 9,000-frame tabular benchmark reported in #5239 decreased from 5.06 s to 0.35 s.\n\nImplementation: #5239.",
+      "created_at": "2026-11-10T08:59:55Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5301",
+      "id": "huggingface/lerobot#5301",
+      "issue_number": 5301,
+      "labels": [
+        "dataset",
+        "performance",
+        "evaluation"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "35d8d647567d335b58f700da26572c16e1ccb3016a8f093335994628fcec046f",
+      "title": "Episode saving performs unnecessary storage embedding for datasets without media"
+    },
+    {
+      "author_login": "zhiygotthatsauce",
+      "body": "<!--\nFor general questions, please ask on Robotics Stack Exchange: https://robotics.stackexchange.com/, make sure to include at least the `ros2` and `nav2` tags and the rosdistro version you are running, e.g. `ardent`.\nFor general design discussions, please post on discourse: https://discourse.ros.org/c/ng-ros\nNot sure if this is the right repository? Open an issue on https://github.com/ros-navigation/navigation2\nFor Bug report or feature requests, please fill out the relevant category below\n-->\n\n## Bug report\n\n**Required Info:**\n\n- Operating System:\n  - Ubuntu 24.04.4 LTS\n- Computer:\n  - AMD EPYC 9554 64-Core Processor (x86_64)\n- ROS2 Version:\n  - ROS 2 Jazzy (binary installation), Nav2 built from source with AddressSanitizer\n- Version or commit hash:\n  - `2b3d62218a62a746d9b6ff676974b02c10a352d6` \n- DDS implementation:\n  - Fast DDS (`rmw_fastrtps_cpp`)\n\n#### Steps to reproduce issue\n\n1. Start `planner_server` with `RangeSensorLayer` enabled in the global costmap.\n2. Configure and activate `planner_server`.\n3. Continuously publish `sensor_msgs/msg/Range` messages to `/range` at a target rate of 1000 Hz.\n4. While publishing messages, repeatedly deactivate and reactivate `planner_server` through its lifecycle service.\n\nWith AddressSanitizer enabled, a heap-use-after-free was triggered during the fourth test round.\n\n#### Expected behavior\n\nThe message buffer should be safely cleared during lifecycle deactivation without interfering with ongoing costmap updates.\n\n#### Actual behavior\n\nAddressSanitizer reports a `heap-use-after-free` in `RangeSensorLayer::updateCostmap()`.\n\nThe issue occurs because `updateCostmap()` copies `range_msgs_buffer_` while holding `range_message_mutex_`, but `RangeSensorLayer::deactivate()` clears the same list without acquiring the mutex.\n\nAs a result, the map update thread may still be copying messages when the lifecycle thread frees the underlying list nodes.\n\n#### Reproduction instructions\n\nStart `planner_server` with the attached `planner_params.yaml`, which enables `RangeSensorLayer` in the global costmap with an update frequency of 100 Hz.\n\n```bash\nros2 run nav2_planner planner_server --ros-args \\\n  -r __node:=planner_server \\\n  -p use_sim_time:=false \\\n  --params-file ./planner_params.yaml\n```\n\n[planner_params.yaml](https://github.com/user-attachments/files/34616759/planner_params.yaml)\n\nEnsure the `map` to `base_link` TF transform is available.\n\nConfigure and activate the planner server:\n\n```bash\nros2 service call /planner_server/change_state \\\n  lifecycle_msgs/srv/ChangeState \\\n  '{transition: {id: 1, label: configure}}'\n\nros2 service call /planner_server/change_state \\\n  lifecycle_msgs/srv/ChangeState \\\n  '{transition: {id: 3, label: activate}}'\n```\n\nIn another terminal, continuously publish Range messages:\n\n```bash\nros2 topic pub /range sensor_msgs/msg/Range \\\n  '{header: {frame_id: base_link}, radiation_type: 0, field_of_view: 0.174533, min_range: 0.1, max_range: 4.0, range: 2.0, variance: 0.0}' \\\n  -r 1000\n```\n\nWhile the publisher is running, repeatedly deactivate and reactivate the planner server:\n\n```bash\nfor n in {1..8}; do\n  ros2 service call /planner_server/change_state \\\n    lifecycle_msgs/srv/ChangeState \\\n    '{transition: {id: 4, label: deactivate}}' &\n  DEACT_PID=$!\n\n  sleep 0.01\n  wait \"$DEACT_PID\"\n  sleep 0.5\n\n  ros2 service call /planner_server/change_state \\\n    lifecycle_msgs/srv/ChangeState \\\n    '{transition: {id: 3, label: activate}}'\n  sleep 0.5\ndone\n```\n\nThe issue was reproduced during the fourth round with a 100 Hz costmap update frequency and continuous 1 kHz Range message publishing.\n\n#### Additional information\n\n[asan.log](https://github.com/user-attachments/files/34616785/asan.log)\n\nThe ASan report identifies the following accesses to `range_msgs_buffer_`.\n\n**1. Invalid read (T23, map update thread):**\n\n```text\nERROR: AddressSanitizer: heap-use-after-free\nREAD of size 9 at 0x5070000f9bf8 thread T23\n\n#0  memcpy\n#8  sensor_msgs::msg::Range_::Range_(...)\n#15 std::list<sensor_msgs::msg::Range>::list(...)\n#16 nav2_costmap_2d::RangeSensorLayer::updateCostmap()\n    range_sensor_layer.cpp:225\n#17 nav2_costmap_2d::RangeSensorLayer::updateBounds()\n    range_sensor_layer.cpp:447\n#18 nav2_costmap_2d::LayeredCostmap::updateMap()\n    layered_costmap.cpp:174\n#19 nav2_costmap_2d::Costmap2DROS::updateMap()\n    costmap_2d_ros.cpp:595\n#20 nav2_costmap_2d::Costmap2DROS::mapUpdateLoop()\n    costmap_2d_ros.cpp:538\n```\n\n**2. Memory freed (T0, lifecycle thread):**\n\n```text\nfreed by thread T0 here:\n\n#0  operator delete(void*, unsigned long)\n#5  std::list<sensor_msgs::msg::Range>::clear()\n#6  nav2_costmap_2d::RangeSensorLayer::deactivate()\n    range_sensor_layer.cpp:534\n#7  nav2_costmap_2d::Costmap2DROS::stop()\n    costmap_2d_ros.cpp:656\n#8  nav2_costmap_2d::Costmap2DROS::on_deactivate()\n    costmap_2d_ros.cpp:347\n#13 nav2_planner::PlannerServer::on_deactivate()\n    planner_server.cpp:233\n```\n\n**3. Memory previously allocated (T17, Range subscription thread):**\n\n```text\npreviously allocated by thread T17 here:\n\n#0  operator new(unsigned long)\n#6  std::list<sensor_msgs::msg::Range>::push_back(...)\n#7  nav2_costmap_2d::RangeSensorLayer::bufferIncomingRangeMsg(...)\n    range_sensor_layer.cpp:216\n```\n\nThe relevant code is in `nav2_costmap_2d/plugins/range_sensor_layer.cpp`.\n\n`updateCostmap()` protects the buffer access with `range_message_mutex_`:\n\n```cpp\nrange_message_mutex_.lock();\n\nrange_msgs_buffer_copy =\n  std::list<sensor_msgs::msg::Range>(range_msgs_buffer_);\n\nrange_msgs_buffer_.clear();\n\nrange_message_mutex_.unlock();\n```\n\nHowever, `deactivate()` clears the same buffer without acquiring the mutex:\n\n```cpp\nvoid RangeSensorLayer::deactivate()\n{\n  range_msgs_buffer_.clear();\n}\n```\n\nThis allows the lifecycle thread to free list nodes while the map update thread is still copying them, resulting in a heap-use-after-free.\n\n`RangeSensorLayer::activate()` also contains an unprotected `range_msgs_buffer_.clear()` call, although the observed UAF occurred during deactivation.\n\nThe source line numbers above are from the ASan-instrumented build.\n",
+      "created_at": "2026-11-10T07:05:47Z",
+      "html_url": "https://github.com/ros-navigation/navigation2/issues/6766",
+      "id": "ros-navigation/navigation2#6766",
+      "issue_number": 6766,
+      "labels": [],
+      "repository": "ros-navigation/navigation2",
+      "surface_sha256": "9580d3b7711e413447340a002914f476de0b02ed8d691b80d015dee207b4f6cf",
+      "title": "Heap-use-after-free in RangeSensorLayer during lifecycle deactivation"
+    }
+  ],
+  "post_activation_issue_identities_observed": 548,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-10T09:40:42Z",
+  "schema_version": 1
+}
