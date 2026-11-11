@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "SteveMacenski",
+      "body": "Revert the following from nav2_package.cmake once BT.CPP is fixed\n\n```\n    if(CMAKE_CXX_COMPILER_ID STREQUAL \"GNU\" AND\n        CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 15 AND\n        CMAKE_CXX_COMPILER_VERSION VERSION_LESS 16)\n      # GCC 15 false positive: warns in BehaviorTree.CPP's ThreadSafeSignal subscriber vector copy.\n      list(APPEND NAV2_COMPILE_OPTIONS -Wno-error=null-dereference)\n    endif()\n```\n\nhttps://github.com/BehaviorTree/BehaviorTree.CPP/issues/1288 issue with fix https://github.com/BehaviorTree/BehaviorTree.CPP/pull/1287\n\nOriginal Ci failure which is temporary workaround was required for https://app.circleci.com/pipelines/github/ros-navigation/navigation2/20894/workflows/59d58163-6fb9-445d-b8cf-393fce4225e8/jobs/67662",
+      "created_at": "2026-11-11T00:36:17Z",
+      "html_url": "https://github.com/ros-navigation/navigation2/issues/6771",
+      "id": "ros-navigation/navigation2#6771",
+      "issue_number": 6771,
+      "labels": [],
+      "repository": "ros-navigation/navigation2",
+      "surface_sha256": "52b1543fca8c040b489ffe75a41467aaae7e63a9ebb371621eaf67d198eb8736",
+      "title": "Revert nav2_package.cmake null deference exclusion after BT.CPP is fixed"
+    }
+  ],
+  "post_activation_issue_identities_observed": 566,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-11T00:53:32Z",
+  "schema_version": 1
+}
