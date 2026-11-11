@@ -8700,13 +8700,17 @@
     },
     {
       "created_at": "2026-11-11T14:46:02Z",
+      "expiry_recorded_at": "2026-11-11T23:00:12Z",
+      "expiry_sha256": "34ab78f94bd6b4df89fc02685108ccbc2376bdfb9943dd24138f82bdad058bd0",
+      "expiry_source": "expirations/huggingface__lerobot__5324.json",
       "first_frozen_at": "2026-11-11T16:35:27Z",
       "id": "huggingface/lerobot#5324",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 5324,
       "prediction_deadline_at": "2026-11-11T22:35:27Z",
       "repository": "huggingface/lerobot",
       "source": "inbox/FIRST_SEEN_20261111T163527Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "4859f14a2f02c139952bfc8cf73a2b0ca759ea087172a89ab7fef00ed7ebba25"
     },
     {
@@ -8741,6 +8745,17 @@
       "source": "inbox/FIRST_SEEN_20261111T211912Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "43112c62e4e9614c3e19036a7674a5b57d95ca85656790aa79de5e30ea2bfe39"
+    },
+    {
+      "created_at": "2026-11-11T21:45:07Z",
+      "first_frozen_at": "2026-11-11T23:01:23Z",
+      "id": "tesseract-robotics/tesseract#1403",
+      "issue_number": 1403,
+      "prediction_deadline_at": "2026-11-12T05:01:23Z",
+      "repository": "tesseract-robotics/tesseract",
+      "source": "inbox/FIRST_SEEN_20261111T230123Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "3e8691c17f6973693aa3e3816e48f4b9846733dcb7565e898e2396aad3087fd7"
     }
   ]
 }
