@@ -1,0 +1,28 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "zhangyue19921010",
+      "body": "### Ticket Type\n\nBug Report\n\n### Environment & System Info\n\nLinux, Python 3.12.14, CPU; main at `45a0756df`. PyTorch 2.11.0, datasets 4.8.5, NumPy 2.2.6, PyArrow 25.0.1, Pillow 12.3.0.\n\n### Description\n\nReading a depth dataset on the same instance after `create()` or `resume()` and `finalize()` returns frames in the default millimetres, but leaves statistics for float32 depth in their recorded metres. A reopened `LeRobotDataset` converts both. Consumers using the finalized instance's statistics therefore see a 1000-fold unit mismatch.\n\n### Context & Reproduction\n\nRun in a fresh local directory:\n\n```python\nfrom pathlib import Path\nimport numpy as np\nfrom lerobot.datasets import LeRobotDataset\n\nkey = \"observation.images.depth\"\nroot = Path(\"depth-finalize-repro\")\ndataset = LeRobotDataset.create(\n    \"local/depth-finalize\", fps=10, root=root, use_videos=False,\n    features={key: {\"dtype\": \"image\", \"shape\": (8, 10, 1),\n                    \"names\": [\"height\", \"width\", \"channels\"],\n                    \"info\": {\"is_depth_map\": True}}},\n)\nfor value in (1.0, 3.0):\n    dataset.add_frame({key: np.full((8, 10, 1), value, dtype=np.float32), \"task\": \"test\"})\ndataset.save_episode()\ndataset.finalize()\nprint(dataset[0][key].mean().item())  # 1000.0 mm\nprint(dataset.meta.stats[key][\"mean\"].item())  # 2.0, still metres\nreopened = LeRobotDataset(\"local/depth-finalize\", root=root)\nprint(reopened.meta.stats[key][\"mean\"].item())  # 2000.0 mm\n```\n\nThe same mismatch occurs after appending an episode with `resume()`. Raw statistics on disk should remain in the recorded unit; only the read-mode view needs conversion. Integer millimetre recordings are unaffected.\n\n### Relevant logs\n\nThe regression fails for both create/finalize and resume/append/finalize with float32 depth; both uint16 controls pass. The lazy reader path calls `ensure_readable()` but omits the `rescale_depth_stats()` call used by the regular constructor.\n\n### Checklist\n\n- [x] I have searched existing tickets to ensure this isn't a duplicate.\n- [x] I am using the latest version of the main branch at investigation time.\n- [x] I have verified the mismatch against both read paths in the same environment.\n\n### Additional Info / Workarounds\n\nReopen the finalized dataset before consuming its statistics. Related merged work: #3899 (depth unit conversion) and #3305 (same-instance metadata loading).\n",
+      "created_at": "2026-11-11T07:37:31Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5313",
+      "id": "huggingface/lerobot#5313",
+      "issue_number": 5313,
+      "labels": [
+        "bug",
+        "policies",
+        "dataset"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "021a720946f878bb31163d51c06fa27cf81dbcd8098fc3f53d220c024a3099cd",
+      "title": "fix(datasets): depth statistics keep native units after finalized writer reads"
+    }
+  ],
+  "post_activation_issue_identities_observed": 574,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-11T08:21:58Z",
+  "schema_version": 1
+}
