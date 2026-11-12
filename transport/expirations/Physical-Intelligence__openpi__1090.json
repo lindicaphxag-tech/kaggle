@@ -1,0 +1,13 @@
+{
+  "case_id": "Physical-Intelligence/openpi#1090",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-11-12T18:50:30Z",
+  "expiry_sha256": "a6968cf9595df9fcb51ae79cf24032cfc5e1130c54420ed4ec7aeae750d06dac",
+  "first_frozen_at": "2026-11-12T10:56:32Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-11-12T16:56:32Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "ee934aef7aead22085ca0c519e49b79f2bb34aceceadaa63db28b6be9101981f"
+}

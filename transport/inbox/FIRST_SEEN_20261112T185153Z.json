@@ -1,0 +1,159 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 10,
+  "new_candidates": [
+    {
+      "author_login": "duburcqa",
+      "body": "### Bug Description\n\nWith the default coupler (`LegacyCouplerOptions`), an implicit FEM body resting on the ground or on a rigid body gets crushed: it sinks into the ground and many of its elements turn inside out. The same scene with `SAPCouplerOptions` rests correctly.\n\nThe legacy coupler handles rigid-FEM contact as a velocity correction applied to the FEM surface vertices after the implicit FEM solve (`kernel_fem_surface_force`): their velocity into the rigid geom is removed, scaled by `coup_restitution`, with friction from `coup_friction`. This cannot hold an implicit body:\n- the solve has already moved every vertex as if there were no contact, so the interior vertices keep sinking while only the surface is stopped, which inverts elements;\n- only the inward velocity is removed, so the penetration accumulated so far is never pushed back out.\n\nExplicit FEM and the FEM-MPM / FEM-SPH couplings use the same after-solve correction.\n\n### Steps to Reproduce\n\n```python\nimport sys\n\nimport torch\n\nimport genesis as gs\n\ngs.init(backend=gs.cpu, precision=\"64\", logging_level=\"warning\")\n\nuse_sap = len(sys.argv) > 1 and sys.argv[1] == \"sap\"\nscene = gs.Scene(\n    sim_options=gs.options.SimOptions(\n        dt=1.0 / 60.0,\n        substeps=2,\n    ),\n    fem_options=gs.options.FEMOptions(\n        use_implicit_solver=True,\n    ),\n    coupler_options=gs.options.SAPCouplerOptions() if use_sap else gs.options.LegacyCouplerOptions(),\n    show_viewer=False,\n)\nscene.add_entity(\n    morph=gs.morphs.Plane(),\n)\nsphere = scene.add_entity(\n    morph=gs.morphs.Sphere(\n        pos=(0.0, 0.0, 0.1),\n        radius=0.1,\n    ),\n    material=gs.materials.FEM.Elastic(\n        E=5e4,\n        nu=0.45,\n        rho=1000.0,\n        model=\"linear_corotated\",\n    ),\n)\nscene.build()\n\nelems = torch.as_tensor(sphere.elems, device=gs.device)\n\n\ndef volumes():\n    pos = sphere.get_verts_pos()[elems]\n    return torch.linalg.det(torch.stack([pos[:, i] - pos[:, 3] for i in range(3)], dim=-1))\n\n\nvol_0 = volumes()\nfor i in range(120):\n    scene.step()\nratio = volumes() / vol_0\nprint(f\"coupler: {'SAP' if use_sap else 'legacy'}\")\nprint(f\"center z after 2 s: {float(sphere.get_verts_pos()[:, 2].mean()):.4f} (radius 0.1)\")\nprint(f\"lowest vertex z: {float(sphere.get_verts_pos()[:, 2].min()):.4f}\")\nprint(f\"element volume ratio J/J0: min {float(ratio.min()):.3g}, inverted elements {int((ratio < 0).sum())} of {len(ratio)}\")\n```\n\nRun it with no argument for the legacy coupler, and with `sap` for the SAP coupler.\n\n### Expected Behavior\n\nThe sphere rests on the ground with its center slightly below 0.1, no penetration beyond a fraction of a millimeter and no inverted element, as with the SAP coupler.\n\n### Relevant log output\n\n```\ncoupler: legacy\ncenter z after 2 s: 0.0567 (radius 0.1)\nlowest vertex z: -0.0512\nelement volume ratio J/J0: min -41.3, inverted elements 357 of 3915\n\ncoupler: SAP\ncenter z after 2 s: 0.0895 (radius 0.1)\nlowest vertex z: -0.0003\nelement volume ratio J/J0: min 0.88, inverted elements 0 of 3915\n```\n\n### Environment\n\n- macOS, CPU backend, fp64. Also observed on CUDA (RTX 5090), fp32.\n\n### Release version or Commit ID\n\nmain, after release 1.4.6.\n\n### Additional Context\n\nAlternatives investigated:\n- A second implicit solve with the contacting surface vertices pinned fixes it, at 5 to 8x the step time of main.\n- Pinning predicted contacts before a single solve still inverts elements.\n- A one-sided penalty contact term inside the implicit FEM solve fixes it (rest height within 0.1 mm of SAP, no inversion) at about 2x the step time. The rigid side stays staggered, though: the solve sees the rigid bodies frozen at the start of the substep and they receive the reaction afterwards, so dynamic rigid-FEM interaction (a heavy rigid body pressing on soft FEM, grasping) remains weakly coupled.\n\nThe legacy coupler is inherently a weak, staggered coupling. The long-term plan is a principled strong two-way coupler, which will replace it. Until then, `SAPCouplerOptions` is the coupler to use for rigid-FEM contact with the implicit FEM solver.\n",
+      "created_at": "2026-11-12T17:47:21Z",
+      "html_url": "https://github.com/Genesis-Embodied-AI/genesis-world/issues/3808",
+      "id": "Genesis-Embodied-AI/genesis-world#3808",
+      "issue_number": 3808,
+      "labels": [
+        "bug"
+      ],
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "surface_sha256": "de7bd8a992346b22866422751053b63928599ad4f04baefa8a3f81041d4b8259",
+      "title": "[Bug]: Implicit FEM bodies sink into the ground and invert with the default coupler"
+    },
+    {
+      "author_login": "HayaAlzahim",
+      "body": "I'm running GR00T N1.7 with the pretrained REAL_G1 embodiment on a physical Unitree G1.\n\nCould you confirm the exact joint ordering of the seven-dimensional left_arm and right_arm state/action vectors?\n\nDoes this ordering match Unitree SDK2 motor indices 15\u201321 (left arm) and 22\u201328 (right arm)?\n\nIs the original REAL_G1 dataset schema or preprocessing implementation publicly available?",
+      "created_at": "2026-11-12T14:24:21Z",
+      "html_url": "https://github.com/NVIDIA/Isaac-GR00T/issues/816",
+      "id": "NVIDIA/Isaac-GR00T#816",
+      "issue_number": 816,
+      "labels": [],
+      "repository": "NVIDIA/Isaac-GR00T",
+      "surface_sha256": "915e9d2233f980e99cfd4c836e6102798b89016af95fced7a939bc3c4d1dfb17",
+      "title": "[Question] Joint Ordering for REAL_G1 in GR00T N1.7"
+    },
+    {
+      "author_login": "cohnt",
+      "body": "### What happened?\n\nHPolyhedron throws for non-finite entries in the `b` vector, but not the `A` matrix. I can't think of any instances where this is a useful feature, and you get weird downstream behavior if you do add inf or nan into `A`.\n\n```python\nimport numpy as np\nfrom pydrake.geometry.optimization import HPolyhedron\n\nA = np.array([[np.inf, 0], [-1, 0], [0, 1], [0, -1]])\nh = HPolyhedron(A, np.ones(4))   # No error.\nprint(h.PointInSet([0.0, 0.0]))  # False, since inf * 0 = NaN.\nh.IsEmpty()                      # Aborts the process.\n```\n\nActual output:\n\n```\nFalse\nFailure at solvers/constraint.cc:540 in LinearConstraint(): condition 'A.array().allFinite()' failed.\n```\n\nHappy to PR the fix myself, but want to make sure there's no intended behavior here to watch out for.\n\n### Version\n\n_No response_\n\n### What operating system are you using?\n\n_No response_\n\n### What installation option are you using?\n\n_No response_\n\n### Relevant log output\n\n```shell\n\n```",
+      "created_at": "2026-11-12T15:20:34Z",
+      "html_url": "https://github.com/RobotLocomotion/drake/issues/25246",
+      "id": "RobotLocomotion/drake#25246",
+      "issue_number": 25246,
+      "labels": [
+        "type: bug"
+      ],
+      "repository": "RobotLocomotion/drake",
+      "surface_sha256": "5307377726e4f0536ff6e471ad2b27d6dabe3c033398ceafc1c5ddfca1257085",
+      "title": "HPolyhedron Allows Non-Finite Entries in A Matrix"
+    },
+    {
+      "author_login": "mr3screen",
+      "body": "The [class reference](https://gazebosim.org/api/sim/10/classgz_1_1sim_1_1systems_1_1PosePublisher.html#details) does not mention the default values for the recognized tags.\n\nI believe they should. Or is there some other place where one should look them up?",
+      "created_at": "2026-11-12T16:35:08Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4198",
+      "id": "gazebosim/gz-sim#4198",
+      "issue_number": 4198,
+      "labels": [],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "3625a8d71d7924b803eec5c4ca4bd0f9cf78e7c71972e937fcc2deb49f43b5a9",
+      "title": "PosePublisher: mention default values in the documentation."
+    },
+    {
+      "author_login": "Altainia",
+      "body": "### Summary\n\nSince 409f981 (\"Fix cylinder multicontact bugs in nativeccd\", in 4.0.1), a box edge resting along a cylinder's\nside, parallel to its axis, gets only **one** contact, though the contact is along a line. With `multiccd` on, 4.0.0\ngave two contacts at the ends of the line. Their normal was wrong: it was horizontal, (-1, 0, 0).\n\n4.0.1 fixes the normal and the depth, but the second point is gone. Where the one point lands along the axis\ndepends on the order of the box's vertices: the same box listed as a mesh in different vertex orders gives\ny = 0.0064 or y = 0.0149. #3752 set out to remove that dependence.\n\nThe face-on case is unchanged: a box face on a cylinder's top still gets two points, at both ends, in both versions.\n409f981's own `CylinderEdgeWitnessAngle` and `CylinderOnBoxAtRest` tests also expect two contacts along the\ncylinder's length.\n\nIn our application, a box pressed edge-first between two rollers gets one off-center point per roller. It then\nrolls about the feed direction: 17\u00b0 at the exit, where symmetry says about 0\u00b0. With the rollers as 64-sided mesh\nprisms instead of cylinders, it leaves at 1.2\u00b0.\n\n### Repro 1: the contacts (box geom)\n\n```python\nimport mujoco\n\nXML = \"\"\"\n<mujoco>\n  <option gravity=\"0 0 0\"><flag multiccd=\"enable\"/></option>\n  <worldbody>\n    <geom name=\"cyl\" type=\"cylinder\" size=\"0.03 0.04\" pos=\"0 0 -0.045\" zaxis=\"0 1 0\"/>\n    <body pos=\"{x} 0 0\">\n      <freejoint/>\n      <geom name=\"box\" type=\"box\" size=\"0.05 0.03 0.02\"/>\n    </body>\n  </worldbody>\n</mujoco>\n\"\"\"\n\nprint(\"mujoco\", mujoco.__version__)\n# x = 0: the box's face on the cylinder's top; x = -0.06 and -0.065: its bottom edge on the cylinder's side\nfor x in (0.0, -0.06, -0.065):\n    m = mujoco.MjModel.from_xml_string(XML.format(x=x))\n    d = mujoco.MjData(m)\n    mujoco.mj_forward(m, d)\n    print(f\"x={x}: ncon={d.ncon}\")\n    for c in d.contact[:d.ncon]:\n        print(f\"    pos ({c.pos[0]:+.4f}, {c.pos[1]:+.4f}, {c.pos[2]:+.4f})\"\n              f\"  normal ({c.frame[0]:+.3f}, {c.frame[1]:+.3f}, {c.frame[2]:+.3f})  dist {c.dist:+.5f}\")\n```\n\nOutput:\n\n```\nmujoco 4.0.0\nx=0.0: ncon=2\n    pos (+0.0000, +0.0300, -0.0175)  normal (+0.000, +0.000, +1.000)  dist -0.00500\n    pos (+0.0000, -0.0300, -0.0175)  normal (+0.000, +0.000, +1.000)  dist -0.00500\nx=-0.06: ncon=2\n    pos (-0.0106, -0.0300, -0.0172)  normal (-1.000, +0.000, +0.000)  dist -0.00124\n    pos (-0.0106, +0.0300, -0.0172)  normal (-1.000, +0.000, +0.000)  dist -0.00124\nx=-0.065: ncon=2\n    pos (-0.0153, +0.0300, -0.0193)  normal (-1.000, +0.000, +0.000)  dist -0.00051\n    pos (-0.0153, -0.0300, -0.0193)  normal (-1.000, +0.000, +0.000)  dist -0.00051\n\nmujoco 4.0.1\nx=0.0: ncon=2\n    pos (+0.0000, -0.0300, -0.0175)  normal (+0.000, +0.000, +1.000)  dist -0.00500\n    pos (+0.0000, +0.0300, -0.0175)  normal (+0.000, +0.000, +1.000)  dist -0.00500\nx=-0.06: ncon=1\n    pos (-0.0106, -0.0000, -0.0186)  normal (-0.371, -0.000, +0.929)  dist -0.00307\nx=-0.065: ncon=1\n    pos (-0.0152, +0.0149, -0.0196)  normal (-0.514, +0.000, +0.858)  dist -0.00085\n```\n\nExpected on 4.0.1 at x = -0.06 and -0.065: two contacts, at y = \u00b10.03, with the corrected normal and depth.\n\n### Repro 2: the single point depends on vertex order\n\n```python\nimport itertools, mujoco\n\nV = [(sx * 0.05, sy * 0.03, sz * 0.02) for sx in (-1, 1) for sy in (-1, 1) for sz in (-1, 1)]\nXML = \"\"\"\n<mujoco>\n  <option gravity=\"0 0 0\"><flag multiccd=\"enable\"/></option>\n  <asset><mesh name=\"b\" vertex=\"{v}\"/></asset>\n  <worldbody>\n    <geom type=\"cylinder\" size=\"0.03 0.04\" pos=\"0 0 -0.045\" zaxis=\"0 1 0\"/>\n    <body pos=\"-0.065 0 0\"><freejoint/><geom type=\"mesh\" mesh=\"b\"/></body>\n  </worldbody>\n</mujoco>\n\"\"\"\nprint(\"mujoco\", mujoco.__version__)\nseen = set()\nfor perm in itertools.islice(itertools.permutations(range(8)), 0, 40320, 997):\n    v = \" \".join(f\"{c:.4f}\" for i in perm for c in V[i])\n    m = mujoco.MjModel.from_xml_string(XML.format(v=v)); d = mujoco.MjData(m); mujoco.mj_forward(m, d)\n    seen.add((d.ncon, tuple(sorted(round(float(c.pos[1]), 4) for c in d.contact[:d.ncon]))))\nfor s in sorted(seen):\n    print(\"ncon\", s[0], \"contact y:\", s[1])\n```\n\nOutput:\n\n```\nmujoco 4.0.0\nncon 2 contact y: (-0.03, 0.03)\n\nmujoco 4.0.1\nncon 1 contact y: (0.0064,)\nncon 1 contact y: (0.0149,)\n```\n\n### Environment\n\n- MuJoCo 4.0.0 and 4.0.1 from PyPI (`mujoco`), Python 3.14, Linux x86_64.\n- Default options except `multiccd`, which is enabled.\n\n### Workaround\n\nWe collide the cylinder as a 64-sided convex mesh prism. It gives two contacts along the edge in both versions.\n",
+      "created_at": "2026-11-12T18:32:57Z",
+      "html_url": "https://github.com/google-deepmind/mujoco/issues/3877",
+      "id": "google-deepmind/mujoco#3877",
+      "issue_number": 3877,
+      "labels": [],
+      "repository": "google-deepmind/mujoco",
+      "surface_sha256": "cd758f1166ec042585a8865b4836be6e77fa34242252e340b339d81c6e310839",
+      "title": "4.0.1: a box edge along a cylinder's side gets one multiccd contact, placed by vertex order (since 409f981)"
+    },
+    {
+      "author_login": "zhangyue19921010",
+      "body": "### Ticket Type\n\nBug report\n\n### Environment & System Info\n\nReproduced on main `1ef599dc5a7fd6aca6ad2ded8cf710e4d0e3f1be`, Linux, Python 3.12.14, NumPy 2.2.6, datasets 4.8.5 and PyArrow 25.0.1. CPU, local data; no downloaded dataset or hardware needed.\n\n### Description\n\n`recompute_stats()` fails on valid datasets with sparse language events. A frame with no event followed by a frame with one event raises `ValueError: all input arrays must have the same shape`. This prevents refreshing numeric normalization statistics after annotation.\n\n`compute_episode_stats()` intentionally skips `dtype=\"language\"`, but `recompute_stats()` first includes language columns among its numeric features and calls `np.stack()` on the variable-length event lists. The failure occurs with either value of `skip_image_video`. Persistent annotations broadcast across each episode serve as passing controls.\n\n### Context & Reproduction\n\nThis follows the post-recording annotation pattern in `tests/datasets/test_language.py`. The temporary directory is retained.\n\n```python\nfrom pathlib import Path\nfrom tempfile import mkdtemp\n\nimport numpy as np\nimport pandas as pd\n\nfrom lerobot.datasets import LeRobotDataset\nfrom lerobot.datasets.dataset_tools import recompute_stats\nfrom lerobot.datasets.io_utils import write_info\nfrom lerobot.datasets.language import language_feature_info\n\nroot = Path(mkdtemp()) / \"dataset\"\ndataset = LeRobotDataset.create(\n    \"local/language-stats\", root=root, fps=10, use_videos=False,\n    features={\"state\": {\"dtype\": \"float32\", \"shape\": (2,), \"names\": None}},\n)\nfor value in (0, 2):\n    dataset.add_frame({\"state\": np.array([value, value + 1], dtype=np.float32), \"task\": \"tidy\"})\ndataset.save_episode()\ndataset.finalize()\n\npath = next((root / \"data\").glob(\"*/*.parquet\"))\ndata = pd.read_parquet(path)\ndata[\"language_events\"] = [[], [{\n    \"role\": \"user\", \"content\": \"stop\", \"style\": \"interjection\",\n    \"camera\": None, \"tool_calls\": None,\n}]]\ndata.to_parquet(path)\ndataset.meta.info.features[\"language_events\"] = language_feature_info()[\"language_events\"]\nwrite_info(dataset.meta.info, root)\n\ndataset = LeRobotDataset(dataset.repo_id, root=root)\nassert dataset[1][\"language_events\"][0][\"content\"] == \"stop\"\nrecompute_stats(dataset)\n```\n\n### Expected behavior\n\nRecompute numeric statistics, leave annotations unchanged, and do not create language statistics.\n\n### Relevant logs\n\n```text\ndataset_tools.py, in recompute_stats\n    episode_data[key] = np.stack(values)\nValueError: all input arrays must have the same shape\n```\n\n### Checklist\n\n- [x] Searched existing Issues and PRs for this failure and its root cause.\n- [x] Reproduced against current main.\n- [ ] Verified on a second environment.\n\n### Additional Info\n\nAI assisted with investigation, reproduction and writing.\n",
+      "created_at": "2026-11-12T14:36:12Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5342",
+      "id": "huggingface/lerobot#5342",
+      "issue_number": 5342,
+      "labels": [
+        "bug",
+        "dataset",
+        "tests"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "b025f69d3485d9d18b7668ea59000ecfa11da16829abd09a370a2754f795d180",
+      "title": "recompute_stats fails on sparse language events"
+    },
+    {
+      "author_login": "peterdays",
+      "body": "Opened by mistake and withdrawn.",
+      "created_at": "2026-11-12T18:22:50Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5345",
+      "id": "huggingface/lerobot#5345",
+      "issue_number": 5345,
+      "labels": [
+        "question",
+        "dataset",
+        "simulation",
+        "tests",
+        "performance",
+        "configuration",
+        "sensors",
+        "examples"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "a4ed827bc86e752da31ea10e2fe12c4960151a9115732f9570d08e41fab4932d",
+      "title": "Withdrawn"
+    },
+    {
+      "author_login": "peterdays",
+      "body": "Opened by mistake and withdrawn.",
+      "created_at": "2026-11-12T18:22:52Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5346",
+      "id": "huggingface/lerobot#5346",
+      "issue_number": 5346,
+      "labels": [
+        "dataset",
+        "simulation",
+        "tests",
+        "training",
+        "evaluation"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "a4ed827bc86e752da31ea10e2fe12c4960151a9115732f9570d08e41fab4932d",
+      "title": "Withdrawn"
+    },
+    {
+      "author_login": "zhangyue19921010",
+      "body": "### Ticket Type\n\nBug report\n\n### Environment & System Info\n\nReproduced on main `e6ffde60312365c5452c46189a26872483943154`, Linux, Python 3.12.14, NumPy 2.2.6, datasets 4.8.5 and PyArrow 25.0.1. Local synthetic datasets, CPU.\n\n### Description\n\nSplitting a dataset, adding a feature or converting image storage to video silently drops its custom tool catalog from `meta/info.json`. The output then returns the default `say` schema from `meta.tools` instead of the declared schemas. This changes the tools supplied to chat templates when preparing annotated data.\n\nThese operations create new metadata and copy features and episode information, but omit `info.tools`. The same catalog should remain available after an edit that does not change the language/tool schema. Undeclared catalogs should keep their existing default behavior.\n\n### Context & Reproduction\n\nThe following local example retains its temporary files:\n\n```python\nfrom pathlib import Path\nfrom tempfile import mkdtemp\n\nimport numpy as np\n\nfrom lerobot.datasets import LeRobotDataset\nfrom lerobot.datasets.dataset_tools import split_dataset\n\nroot = Path(mkdtemp())\ndataset = LeRobotDataset.create(\n    \"local/tool-catalog\", root=root / \"source\", fps=10, use_videos=False,\n    features={\"state\": {\"dtype\": \"float32\", \"shape\": (1,), \"names\": None}},\n)\nfor episode in range(2):\n    for frame in range(2):\n        dataset.add_frame({\"state\": np.array([frame], dtype=np.float32), \"task\": \"pick\"})\n    dataset.save_episode()\ndataset.finalize()\ndataset.meta.tools = [{\n    \"type\": \"function\",\n    \"function\": {\"name\": \"grasp\", \"parameters\": {\n        \"type\": \"object\", \"properties\": {\"object\": {\"type\": \"string\"}},\n        \"required\": [\"object\"],\n    }},\n}]\n\nsplits = split_dataset(dataset, {\"train\": [0], \"val\": [1]}, output_dir=root / \"splits\")\nprint(\"source:\", dataset.meta.tools[0][\"function\"][\"name\"])\nprint(\"train:\", splits[\"train\"].meta.tools[0][\"function\"][\"name\"])\nassert splits[\"train\"].meta.tools == dataset.meta.tools\n```\n\n### Relevant logs\n\n```text\nsource: grasp\ntrain: say\nAssertionError\n```\n\nThe same loss is reproduced with `add_features()` and full `convert_image_to_video_dataset()` using H.264. The three corresponding cases without a custom catalog pass.\n\n### Checklist\n\n- [x] Searched existing Issues and PRs for this failure and its root cause.\n- [x] Reproduced against current main.\n- [ ] Verified on a second environment.\n\n### Additional Info\n\nAI assisted with investigation, reproduction and writing.\n",
+      "created_at": "2026-11-12T18:32:34Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5347",
+      "id": "huggingface/lerobot#5347",
+      "issue_number": 5347,
+      "labels": [
+        "bug",
+        "dataset",
+        "examples"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "519b6f8cc35d56a04d9541fcc500fd956ac522248a9d9830f6ccaaf32dbd934c",
+      "title": "fix(datasets): dataset edits discard custom tool catalogs"
+    },
+    {
+      "author_login": "tobdub",
+      "body": "### Generated by Generative AI\nDrafted with Claude Code (Claude Opus 5.5); reproduced and reviewed by me.\n\n### Operating System:\nUbuntu 24.04 (aarch64, NVIDIA Jetson Orin NX)\n\n### ROS version or commit hash:\nLyrical: rclpy 10.0.10, rcl 10.4.4. The same code is on rolling (5cc4d94).\n\n### RMW implementation (if applicable):\nrmw_fastrtps_cpp 9.4.9, Fast DDS 3.6.2\n\n### Client library (if applicable):\nrclpy\n\n### Steps to reproduce issue\n\n```python\nimport time\n\nimport rclpy\nfrom rclpy.node import Node\n\nrclpy.init()\nprobe = Node('probe')\nwatcher = Node('watcher')\ntime.sleep(1.0)\nprobe.destroy_node()\ntime.sleep(2.0)\nprint(sorted(n for n, _ in watcher.get_service_names_and_types() if n.startswith('/probe/')))\n```\n\n### Expected behavior\n`[]`: none of the destroyed node's services are left.\n\n### Actual behavior\n`['/probe/get_type_description']`.\n\nWhile the node object stays referenced, the participant's DDS threads also outlive `destroy_node()` and `rclpy.shutdown()`. In our app they then segfault at exit, inside `libfastdds.so` after it has been unloaded.\n\n### Additional information\n\n`rcl_node_type_description_service_init()` requires the caller to call `rcl_service_fini()`, but rclpy's `TypeDescriptionService` (`type_description_service.cpp`) holds the service with the default deleter, so it is never finalized.\n\nFix with a regression test: https://github.com/tobdub/rclpy/tree/rolling-fix-type-description-service-fini\n\nWorkaround: `start_type_description_service: false`.\n",
+      "created_at": "2026-11-12T14:56:27Z",
+      "html_url": "https://github.com/ros2/rclpy/issues/1759",
+      "id": "ros2/rclpy#1759",
+      "issue_number": 1759,
+      "labels": [],
+      "repository": "ros2/rclpy",
+      "surface_sha256": "d836b759beda53d65cb2e9b359504392c433e595b2f53650d85dddebe183b16c",
+      "title": "The type description service is never finalized, so it outlives destroy_node()"
+    }
+  ],
+  "post_activation_issue_identities_observed": 607,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-12T18:51:53Z",
+  "schema_version": 1
+}

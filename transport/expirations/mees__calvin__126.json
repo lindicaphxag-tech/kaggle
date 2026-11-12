@@ -1,0 +1,13 @@
+{
+  "case_id": "mees/calvin#126",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-11-12T18:50:30Z",
+  "expiry_sha256": "e621f513771d534136b22c1d2489f637dd60b4f674b2e3ebdc83149213f44f28",
+  "first_frozen_at": "2026-11-12T10:56:32Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-11-12T16:56:32Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "aabcfa5042cf1040b6ebdcb064f883e502c16063daa50b3e95e606a034ea51a8"
+}
