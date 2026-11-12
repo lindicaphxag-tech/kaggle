@@ -1,0 +1,13 @@
+{
+  "case_id": "tesseract-robotics/tesseract#1403",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-11-12T10:55:11Z",
+  "expiry_sha256": "9dd56b9a4859798f8779d52b95878e6504a4393cc9067a03003a15538d2de715",
+  "first_frozen_at": "2026-11-11T23:01:23Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-11-12T05:01:23Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "3e8691c17f6973693aa3e3816e48f4b9846733dcb7565e898e2396aad3087fd7"
+}
