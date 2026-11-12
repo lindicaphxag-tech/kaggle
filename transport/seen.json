@@ -8715,35 +8715,47 @@
     },
     {
       "created_at": "2026-11-11T21:15:55Z",
+      "expiry_recorded_at": "2026-11-12T04:09:33Z",
+      "expiry_sha256": "df70b5d3e92cd41d1afc1a297cde62514b54f509f65ad766e53a63b526a513d0",
+      "expiry_source": "expirations/gazebosim__gz-sim__4195.json",
       "first_frozen_at": "2026-11-11T21:19:12Z",
       "id": "gazebosim/gz-sim#4195",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 4195,
       "prediction_deadline_at": "2026-11-12T03:19:12Z",
       "repository": "gazebosim/gz-sim",
       "source": "inbox/FIRST_SEEN_20261111T211912Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "2b82ba068cc5fa8485a3b8cd8668671ef72b846802103ff29b69d220807267c4"
     },
     {
       "created_at": "2026-11-11T19:27:27Z",
+      "expiry_recorded_at": "2026-11-12T04:09:33Z",
+      "expiry_sha256": "0d4b0adb7caa43b78476b74347a9faba469a4e9c7d69bb664ff56cb53cb62943",
+      "expiry_source": "expirations/google-deepmind__mujoco__3862.json",
       "first_frozen_at": "2026-11-11T21:19:12Z",
       "id": "google-deepmind/mujoco#3862",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3862,
       "prediction_deadline_at": "2026-11-12T03:19:12Z",
       "repository": "google-deepmind/mujoco",
       "source": "inbox/FIRST_SEEN_20261111T211912Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "6099cf30fb08e700dbd717e6af55d7c4aaa9f2c8bb9a801e3138da2209c62cb7"
     },
     {
       "created_at": "2026-11-11T21:00:02Z",
+      "expiry_recorded_at": "2026-11-12T04:09:33Z",
+      "expiry_sha256": "727adcbda9725c63005fea5fbf72f1abe0c239566f788f34346691b1a2ae4dad",
+      "expiry_source": "expirations/tesseract-robotics__tesseract__1401.json",
       "first_frozen_at": "2026-11-11T21:19:12Z",
       "id": "tesseract-robotics/tesseract#1401",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 1401,
       "prediction_deadline_at": "2026-11-12T03:19:12Z",
       "repository": "tesseract-robotics/tesseract",
       "source": "inbox/FIRST_SEEN_20261111T211912Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "43112c62e4e9614c3e19036a7674a5b57d95ca85656790aa79de5e30ea2bfe39"
     },
     {
@@ -8778,6 +8790,28 @@
       "source": "inbox/FIRST_SEEN_20261112T025347Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "c02a2185e26770997e811a8bec3ed1f7d6cfb261e8798a270e41b564e0d6aa19"
+    },
+    {
+      "created_at": "2026-11-12T03:24:25Z",
+      "first_frozen_at": "2026-11-12T04:10:38Z",
+      "id": "isaac-sim/IsaacLab#9017",
+      "issue_number": 9017,
+      "prediction_deadline_at": "2026-11-12T10:10:38Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261112T041038Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "f7eae5f250c761521baf5ef5b5a2cb0281883a1dad9ef96b0fcbe9e8b02e1fae"
+    },
+    {
+      "created_at": "2026-11-12T03:26:50Z",
+      "first_frozen_at": "2026-11-12T04:10:38Z",
+      "id": "isaac-sim/IsaacLab#9019",
+      "issue_number": 9019,
+      "prediction_deadline_at": "2026-11-12T10:10:38Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261112T041038Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "bb0ab2eb36151b806e164881585716a1f89029ff6424e051cdba61124ec2c052"
     }
   ]
 }

@@ -1,0 +1,36 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "dundysm",
+      "body": "### Describe the bug\n\n`OccupancyMap.buffered()` in `source/isaaclab_mimic/isaaclab_mimic/locomanipulation_sdg/occupancy_map_utils.py` dilates the occupied region with a `2r x 2r` kernel and draws the disk centered at `(r, r)`. With an even kernel size the `cv2.dilate` anchor sits at `(r, r)`, so the kernel covers offsets `-r .. r - 1`: obstacles grow by `r` pixels toward the bottom and right of the map image but only `r - 1` pixels toward the top and left (world `-x` and `+y`), and the disk is clipped on one side.\n\nWhen the radius rounds down to zero pixels (for example `buffered_meters(0.02)` at 0.05 m/px), the kernel is empty, and `cv2.dilate` falls back to a 3x3 rectangle, so the map still grows by one pixel in every direction.\n\nThe locomanipulation SDG script uses this for the navigation map (`occupancy_map.buffered_meters(0.15)`, 3 px at the default 0.05 m cell size) and for fixture placement (`buffered_meters(0.7)`), so the planned base path and the spawn checks keep 0.10 m instead of 0.15 m of clearance from obstacles on two sides.\n\n### Steps to reproduce\n\nNeeds only numpy, opencv-python, pillow and usd-core (for the module's `pxr` import); no simulator:\n\n```python\nimport numpy as np\nfrom isaaclab_mimic.locomanipulation_sdg.occupancy_map_utils import OccupancyMap\n\nfor r in [0, 1, 2, 3]:\n    occ = np.zeros((21, 21), bool)\n    occ[10, 10] = True\n    omap = OccupancyMap.from_masks(~occ, occ, 0.05, (0.0, 0.0, 0.0))\n    rows, cols = np.nonzero(omap.buffered(r).occupied_mask())\n    print(r, \"rows\", rows.min() - 10, rows.max() - 10, \"cols\", cols.min() - 10, cols.max() - 10)\n```\n\nOutput on `main` (52ab68e):\n\n```\n0 rows -1 1 cols -1 1\n1 rows 0 1 cols 0 1\n2 rows -1 2 cols -1 2\n3 rows -2 3 cols -2 3\n```\n\nExpected `-r r` on both axes for every radius, and an unchanged map for `r = 0`.\n\n### System Info\n\n- Commit: 52ab68e (`main`)\n- Isaac Sim Version: not needed (pure numpy / OpenCV code, reproduced without the simulator)\n- OS: Debian 13 (Linux)\n- GPU / CUDA / GPU Driver: not needed\n\n### Additional context\n\nThe fix is to use an odd `2r + 1` kernel so the disk is centered on the anchor, and to return the map unchanged when the radius is zero. I have it ready with a regression test and will open a PR referencing this issue.\n\n### Checklist\n\n- [x] I have checked that there is no similar issue in the repo (**required**)\n- [x] I have checked that the issue is not in running Isaac Sim itself and is related to the repo\n\n### Acceptance Criteria\n\n- [ ] `buffered(r)` grows obstacles by `r` pixels on every side\n- [ ] `buffered(0)` and sub-pixel `buffered_meters()` leave the map unchanged\n",
+      "created_at": "2026-11-12T03:24:25Z",
+      "html_url": "https://github.com/isaac-sim/IsaacLab/issues/9017",
+      "id": "isaac-sim/IsaacLab#9017",
+      "issue_number": 9017,
+      "labels": [],
+      "repository": "isaac-sim/IsaacLab",
+      "surface_sha256": "f7eae5f250c761521baf5ef5b5a2cb0281883a1dad9ef96b0fcbe9e8b02e1fae",
+      "title": "[Bug Report] OccupancyMap.buffered() dilates obstacles one pixel short on the top and left, and by one pixel at radius 0"
+    },
+    {
+      "author_login": "dundysm",
+      "body": "### Describe the bug\n\n`nearest_point_on_segment()` in `source/isaaclab_mimic/isaaclab_mimic/locomanipulation_sdg/path_utils.py` clamps the nearest point to the segment endpoint when the projection of the query falls outside the segment, but still returns the unclamped projection as the distance along the segment:\n\n```python\nif dist < 0:\n    return a, dist\nelif dist > a2b_mag:\n    return b, dist\n```\n\n`ParameterizedPath.find_nearest()` adds that value to the segment's start arc length, so the returned distance along the path no longer belongs to the returned nearest point: it overshoots past a corner and goes negative behind the path start.\n\n`generate_data.py` uses this for pure pursuit in the NAVIGATE state (`find_nearest(current_pose[:2])`, then `get_point_by_distance(nearest_path_length + following_offset)`). When the base drifts past the outside of a corner, the target jumps ahead along the next segment by the overshoot (cutting the corner), and when it is behind the start, the target is pulled back toward the start point.\n\n### Steps to reproduce\n\nNo simulator needed:\n\n```python\nimport torch\nfrom isaaclab_mimic.locomanipulation_sdg.path_utils import ParameterizedPath\n\npath = ParameterizedPath(torch.tensor([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0]]))\nfor q in ([1.5, -0.1], [-0.5, 0.0]):\n    pt, along, seg, _ = path.find_nearest(torch.tensor(q))\n    print(q, \"nearest\", pt.tolist(), \"along\", float(along), \"target\", path.get_point_by_distance(along + 0.5).tolist())\n```\n\nOutput on `main` (52ab68e):\n\n```\n[1.5, -0.1] nearest [1.0, 0.0] along 1.4999985694885254 target [1.0, 0.999997615814209]\n[-0.5, 0.0] nearest [0.0, 0.0] along -0.4999995231628418 target [4.768367034557741e-07, 0.0]\n```\n\nExpected: the nearest point is the corner `(1, 0)` with distance `1.0` (target `(1, 0.5)`), and the start `(0, 0)` with distance `0.0` (target `(0.5, 0)`).\n\n### System Info\n\n- Commit: 52ab68e (`main`)\n- Isaac Sim Version: not needed (pure torch code, reproduced without the simulator)\n- OS: Debian 13 (Linux)\n- GPU / CUDA / GPU Driver: not needed\n\n### Additional context\n\nThe fix is to return `0` and the segment length together with the clamped endpoints. I have it ready with a regression test and will open a PR referencing this issue.\n\n### Checklist\n\n- [x] I have checked that there is no similar issue in the repo (**required**)\n- [x] I have checked that the issue is not in running Isaac Sim itself and is related to the repo\n\n### Acceptance Criteria\n\n- [ ] `find_nearest()` returns the arc length of the nearest point it returns, including at segment endpoints\n",
+      "created_at": "2026-11-12T03:26:50Z",
+      "html_url": "https://github.com/isaac-sim/IsaacLab/issues/9019",
+      "id": "isaac-sim/IsaacLab#9019",
+      "issue_number": 9019,
+      "labels": [],
+      "repository": "isaac-sim/IsaacLab",
+      "surface_sha256": "bb0ab2eb36151b806e164881585716a1f89029ff6424e051cdba61124ec2c052",
+      "title": "[Bug Report] ParameterizedPath.find_nearest returns a distance past the corner or before the start when the nearest point is a segment endpoint"
+    }
+  ],
+  "post_activation_issue_identities_observed": 588,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-12T04:10:38Z",
+  "schema_version": 1
+}
