@@ -1,0 +1,47 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "AUTHENSOR",
+      "body": "**What happens**\n\n`_collect_rollout_episodes` (`gr00t/eval/rollout_policy.py`) steps `n_envs` auto-resetting environments and stops as soon as `completed_episodes >= n_episodes`:\n\n```python\nwhile completed_episodes < n_episodes:\n    ...\n    if terminations[env_idx] or truncations[env_idx]:\n        episode_successes.append(current_successes[env_idx])\n        ...\n        completed_episodes += 1\n```\n\nWhatever is still running when the loop stops is discarded. The eval entry point sets `terminate_on_success=True`, so a successful episode ends early while a failed one runs to `max_episode_steps`. Each env that finishes early immediately starts another episode, so short (successful) episodes complete at a higher rate, and the episodes in flight at the cutoff are disproportionately the long (failing) ones. The first `n_episodes` completions are therefore not a fair sample of the episodes that were started.\n\nThe size of the effect grows with `n_envs / n_episodes` and with how much shorter successes are than failures. The CLI defaults are `n_episodes=50`, `n_envs=8`.\n\n**Measurement**\n\nI called the real `_collect_rollout_episodes` at `3b49067` with a stub vector env whose episodes succeed with a fixed probability (successes end after 15 macro-steps, failures after 45), 400 runs per setting:\n\n| setting | true rate | reported (mean of 400 runs) |\n|---|---|---|\n| `n_envs=1, n_episodes=50` | 0.500 | 0.501 |\n| `n_envs=8, n_episodes=50` | 0.500 | 0.534 |\n\nThat is a stub environment with a 1:3 success-to-failure length ratio, not a GR00T checkpoint in a simulator, so treat the 3.4 points as an illustration of the mechanism rather than a number for any benchmark. A wider length ratio, more envs or fewer episodes makes it larger.\n\n**Suggested direction**\n\nFix the number of episodes each env contributes before the run, so every started episode is counted: give env `i` a quota of `n_episodes // n_envs` (plus one for the first `n_episodes % n_envs`), stop counting an env once its quota is met, and run until all quotas are met. Stable-Baselines3's `evaluate_policy` does this for the same reason. Happy to send a PR.\n",
+      "created_at": "2026-11-12T02:23:01Z",
+      "html_url": "https://github.com/NVIDIA/Isaac-GR00T/issues/814",
+      "id": "NVIDIA/Isaac-GR00T#814",
+      "issue_number": 814,
+      "labels": [],
+      "repository": "NVIDIA/Isaac-GR00T",
+      "surface_sha256": "880eddcb32b958340ee592029f7c90b5fcb31ad148b0283fb86a56a7f7a35ae9",
+      "title": "rollout_policy.py: stopping at the first n_episodes completions biases success rate upward when n_envs > 1"
+    },
+    {
+      "author_login": "Hadrien-Cornier",
+      "body": "Ticket type: Feature request\n\n## Answer\n\n`lerobot-record` should store two facts about the follower that made a dataset: its calibration (the joint zeros) and the P/I/D gains read back from the motors. The record is one optional key in `meta/info.json`. Old datasets load unchanged.\n\n## Problem\n\nA LeRobot dataset does not say how its arm was set up. It does not record the joint zeros, and it does not record the servo gains that turned those actions into motion.\n\nNo two arms are the same. A person sets each joint zero by hand, so the zeros differ between arms by a few degrees. The gains can differ too. A policy or a controller trained on one arm can then miss on another. The model is fine. The hardware is slightly different. This is a real-to-real gap, and it matters more as people run several robots, or two arms on one robot.\n\n## Why the gains matter\n\nLeRobot writes default servo gains at connect. For the SO-101 the defaults are P 16, I 0, D 32. Any user can change them. The gain sets how fast and how stiffly the arm moves: the camera motion, the reaction speed, the shaking. A VLA trained at one gain can see different motion at another, because the same action meets a different controller.\n\n## Evidence\n\nThe arm numbers below come from our own study of one SO-101 arm. It is not yet published. The method and data are available on request.\n\n| What | Number | Source |\n|---|---|---|\n| No public dataset records it | 0 of 7,855 SO-100/SO-101 datasets (2,687 h) declare a calibration, a gain, a temperature or a voltage | scan of public Hub datasets |\n| The zeros differ by hand | public elbow rest poses spread by 3.4\u00b0 (robust standard deviation; interquartile range 4.6\u00b0 across 104 users) | scan of public rest poses |\n| A 2\u00b0 elbow zero offset | camera tool error rose from 3.2 mm to 9.5 mm (about 3\u00d7). Encoder error stayed at 0.8 mm to 1.0 mm | our study of one SO-101 arm, camera ground truth |\n| The gains change the motion | a model that uses the gain and the calibration reached 3.3 mm, against 9.0 mm for the spec sheet (about 2.7\u00d7) | our study of one SO-101 arm, camera ground truth |\n| Ignoring the gain register | at a held-out gain, joint error was 10.9 mrad without the P register and 2.2 mrad when the model scaled by P (about 5\u00d7) | our study of one SO-101 arm |\n| Heat changes torque | torque loss is 0.4% per \u00b0C, a fixed model value, not a fit | our study of one SO-101 arm |\n| Storing it costs almost nothing | images are 99.6% of the bytes. This record is about 1.8 KB | scan of 8 public SO-101 datasets, and the JSON this change writes |\n\nThe 3.4\u00b0 figure is indirect. It includes how people pose the arm at rest, and gear slack. The encoders cannot show a zero error, because they read angles from the zeros themselves. A controller that follows them closely puts the tool where the error sends it.\n\nLimit of the arm measurements: one arm, six days, a fixed program, not a learned policy. A policy might compensate. An offset shared by collection and deployment is consistent with itself. The study did not test a second arm.\n\n## Degree mode does not replace this\n\nDegree mode (`use_degrees=True`, the SO-101 default) fixes the scale. Joint values are degrees, so they no longer stretch with how far each joint was moved during calibration. It leaves the joint zero as the middle of the hand-recorded range, `(range_min + range_max) / 2`. Two arms calibrated by hand can still disagree by a few degrees at the same physical pose.\n\n## What to add\n\nOne optional `calibration` key in `meta/info.json`, written once after connect, for the follower only:\n\n```json\n\"calibration\": {\n  \"motors\": {\n    \"elbow_flex\": {\n      \"id\": 3, \"drive_mode\": 0, \"homing_offset\": 12, \"range_min\": 100, \"range_max\": 4000\n    }\n  },\n  \"gains\": {\n    \"P_Coefficient\": {\"elbow_flex\": 16},\n    \"I_Coefficient\": {\"elbow_flex\": 0},\n    \"D_Coefficient\": {\"elbow_flex\": 32}\n  }\n}\n```\n\n`homing_offset`, `range_min` and `range_max` are the hand-set zero and the recorded limits. The gains are read back from the motors, not copied from the config. If the robot has no bus, or a read fails, the motors are stored and `gains` is absent. A robot with no calibration dict, including a bimanual robot whose calibration lives on each arm, records nothing.\n\nNo new argument. No format version bump. Readers use `dataset.meta.info.calibration`.\n\nTemperature, load and voltage are not in this change. They are a follow-up. The images already dominate the file size, so those scalars are cheap to keep.\n\n## Why this is worth it\n\n- Reproducibility. The dataset names the arm setup that produced it.\n- Retargeting. A later user can see the zero and the gain before moving a policy to another arm.\n- Several robots. The differences between arms are in the file.\n- The cost is tiny. Images are 99.6% of the bytes. The record is about 1.8 KB.\n\n## Related\n\nIssue #3758 proposes a tool to detect calibration drift from recorded data. That tool infers the offset. Storing the calibration gives the value directly. The two are complementary.\n\n## Checklist\n\n- [x] I have searched existing tickets to ensure this isn't a duplicate.\n- [x] I am using the latest version of the `main` branch.\n- [x] I have verified this is not an environment-specific problem.\n",
+      "created_at": "2026-11-11T23:35:43Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5329",
+      "id": "huggingface/lerobot#5329",
+      "issue_number": 5329,
+      "labels": [
+        "bug",
+        "enhancement",
+        "policies",
+        "dataset",
+        "tests",
+        "performance",
+        "configuration",
+        "robots",
+        "teleoperators",
+        "sensors"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "c02a2185e26770997e811a8bec3ed1f7d6cfb261e8798a270e41b564e0d6aa19",
+      "title": "Datasets should record the calibration and servo gains of the robot that made them"
+    }
+  ],
+  "post_activation_issue_identities_observed": 586,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-12T02:53:47Z",
+  "schema_version": 1
+}
