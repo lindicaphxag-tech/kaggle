@@ -8955,13 +8955,17 @@
     },
     {
       "created_at": "2026-11-12T13:10:44Z",
+      "expiry_recorded_at": "2026-11-12T21:03:52Z",
+      "expiry_sha256": "ed9b7de73151e28fab917cbf5088ca611f472663fd7c2cf1d0a9cdd5565b5fce",
+      "expiry_source": "expirations/eProsima__Fast-DDS__6624.json",
       "first_frozen_at": "2026-11-12T13:13:35Z",
       "id": "eProsima/Fast-DDS#6624",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 6624,
       "prediction_deadline_at": "2026-11-12T19:13:35Z",
       "repository": "eProsima/Fast-DDS",
       "source": "inbox/FIRST_SEEN_20261112T131335Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "2be3c3ddd29e94f324a5aff05288724f695379a77a095665ad9c9a982dbd2d0c"
     },
     {
@@ -9073,6 +9077,17 @@
       "source": "inbox/FIRST_SEEN_20261112T185153Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "d836b759beda53d65cb2e9b359504392c433e595b2f53650d85dddebe183b16c"
+    },
+    {
+      "created_at": "2026-11-12T19:36:37Z",
+      "first_frozen_at": "2026-11-12T21:05:05Z",
+      "id": "RobotLocomotion/drake#25249",
+      "issue_number": 25249,
+      "prediction_deadline_at": "2026-11-13T03:05:05Z",
+      "repository": "RobotLocomotion/drake",
+      "source": "inbox/FIRST_SEEN_20261112T210505Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "866fa98e8822cc44ddebb526c48279d58a1d4d8cf98931a2ad27cd19ef44d318"
     }
   ]
 }
