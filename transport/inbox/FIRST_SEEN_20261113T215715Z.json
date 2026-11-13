@@ -1,0 +1,38 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "andyabateagility",
+      "body": "### The feature, motivation and pitch\n\nUSD has the benefit of custom APIs, whereas mjSpec/mjcf needs text blobs or sidecar files to approximate the same function.\n\nAs an example for discussion, consider a python interface similar to h5py's `attrs`. Supporting any number of named \"custom specs\", which are flat dicts of key/value pairs, add-able to other mjSpec elements (bodies, sites, joints, actuators, etc):\n\n```python\nsite # site(name=\"fid-site\")\n\nc = site.add_custom(\"fiducial\")\nc[\"label\"] = \"fid3\"\nc[\"id\"] = 3\nc[\"size\"] = 0.01\n\nc = site.get_custom(\"lidar\")\nc[\"model\"] # \"VLP-16\"\nc[\"range-m\"] # numpy.array([0.5, 30])\n```\n\nWhich serializes as\n\n```xml\n<site name=\"fid-site\" pos...>\n    <custom>\n        <fiducial label=\"fid3\" id=\"3\" size=\"0.01\"/>\n        <lidar model=\"VLP-16\" rotation-hz=\"10\" elevations-deg=\"-10 -5 0 5 10\" range-m=\"0.5 30\"/>\n    </custom>\n</site>\n```\n\nTo avoid silently-misspelled custom elements, let the spec also hold a section declaring the available custom specs. Perhaps this section could also be used to declare the attribute types to be used for those specs, so they are not lost in serialization nor inferred in deserialization.\n\n### Alternatives\n\nUsing a `custom/text` block to hold a json blob with arbitrary data. This data does not follow `attach` calls, nor can it be used as part of a `default` class.\n\n### Additional context\n\n_No response_",
+      "created_at": "2026-11-13T20:12:35Z",
+      "html_url": "https://github.com/google-deepmind/mujoco/issues/3897",
+      "id": "google-deepmind/mujoco#3897",
+      "issue_number": 3897,
+      "labels": [
+        "enhancement"
+      ],
+      "repository": "google-deepmind/mujoco",
+      "surface_sha256": "9039036ed1a8e471ef245d32abbc6a6c46bbf2eaa5639e69c6fba2ef245c6f07",
+      "title": "mjSpec: allow custom elements outside of the `custom` section"
+    },
+    {
+      "author_login": "130s",
+      "body": "In downstream building on Ubuntu 24.04 might have been failing since September, see the detail https://github.com/moveit/moveit2_tutorials/issues/1128.\n\nIn the ticket above, I also listed a few options to work this around on that specific downstream project.\nIdeally if upstream MTC providing a solution that might be easier for downstream. Is there a room to address this in MTC?",
+      "created_at": "2026-11-13T18:27:09Z",
+      "html_url": "https://github.com/moveit/moveit_task_constructor/issues/763",
+      "id": "moveit/moveit_task_constructor#763",
+      "issue_number": 763,
+      "labels": [],
+      "repository": "moveit/moveit_task_constructor",
+      "surface_sha256": "8690ef3a4fd294c57efe12c7c2ab06bd0d257ede90384bd069f3f50111e8fedf",
+      "title": "MTC fails to build on Ubuntu 24.04 after pybind11 switch happend in 202609"
+    }
+  ],
+  "post_activation_issue_identities_observed": 624,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-13T21:57:15Z",
+  "schema_version": 1
+}

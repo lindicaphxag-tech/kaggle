@@ -9195,46 +9195,62 @@
     },
     {
       "created_at": "2026-11-13T13:34:58Z",
+      "expiry_recorded_at": "2026-11-13T21:55:45Z",
+      "expiry_sha256": "f6fb2152ea5e9f2c5814f6bd4dc2c8386ef7d614d4ea65f29f57084d819360ca",
+      "expiry_source": "expirations/BehaviorTree__BehaviorTree.CPP__1292.json",
       "first_frozen_at": "2026-11-13T15:19:46Z",
       "id": "BehaviorTree/BehaviorTree.CPP#1292",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 1292,
       "prediction_deadline_at": "2026-11-13T21:19:46Z",
       "repository": "BehaviorTree/BehaviorTree.CPP",
       "source": "inbox/FIRST_SEEN_20261113T151946Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "de5b05e3e5e6f79068ee7e50f96d9b04a9708661a5157905546da7e3c666641c"
     },
     {
       "created_at": "2026-11-13T11:03:49Z",
+      "expiry_recorded_at": "2026-11-13T21:55:45Z",
+      "expiry_sha256": "2aa294c183439131612cb57b6d3a00edba3260457fc7d833477f19bffecf3afd",
+      "expiry_source": "expirations/UniversalRobots__Universal_Robots_Client_Library__623.json",
       "first_frozen_at": "2026-11-13T15:19:46Z",
       "id": "UniversalRobots/Universal_Robots_Client_Library#623",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 623,
       "prediction_deadline_at": "2026-11-13T21:19:46Z",
       "repository": "UniversalRobots/Universal_Robots_Client_Library",
       "source": "inbox/FIRST_SEEN_20261113T151946Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "fec3eca1f5803762de91255a03a0cc08e97114ee3951703c066e679259605345"
     },
     {
       "created_at": "2026-11-13T15:12:30Z",
+      "expiry_recorded_at": "2026-11-13T21:55:45Z",
+      "expiry_sha256": "a4c40efc37c01e98f22d8e83b9830b24ecdf24149350ed432380303b93832959",
+      "expiry_source": "expirations/isaac-sim__IsaacLab__9032.json",
       "first_frozen_at": "2026-11-13T15:19:46Z",
       "id": "isaac-sim/IsaacLab#9032",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 9032,
       "prediction_deadline_at": "2026-11-13T21:19:46Z",
       "repository": "isaac-sim/IsaacLab",
       "source": "inbox/FIRST_SEEN_20261113T151946Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "12265e7cb7997636c170f21e854cde86fa4c59d75f2ec23f555bc0573c04a9ff"
     },
     {
       "created_at": "2026-11-13T14:10:07Z",
+      "expiry_recorded_at": "2026-11-13T21:55:45Z",
+      "expiry_sha256": "03e3677614bb08e82a56474833b5fba546fd3941dfd9226c5e1a1a8e1ddcc880",
+      "expiry_source": "expirations/ros-controls__ros2_control__3780.json",
       "first_frozen_at": "2026-11-13T15:19:46Z",
       "id": "ros-controls/ros2_control#3780",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3780,
       "prediction_deadline_at": "2026-11-13T21:19:46Z",
       "repository": "ros-controls/ros2_control",
       "source": "inbox/FIRST_SEEN_20261113T151946Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "1de3bac5e31c9e0638bb026e277e57c99a951a05a58ec31d06bda38feb07256c"
     },
     {
@@ -9302,6 +9318,28 @@
       "source": "inbox/FIRST_SEEN_20261113T180308Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "0ac248af47eed76f45a86dbbdb7ba3c5bf4ffbcbcd0f57824f4787a793a2329c"
+    },
+    {
+      "created_at": "2026-11-13T20:12:35Z",
+      "first_frozen_at": "2026-11-13T21:57:15Z",
+      "id": "google-deepmind/mujoco#3897",
+      "issue_number": 3897,
+      "prediction_deadline_at": "2026-11-14T03:57:15Z",
+      "repository": "google-deepmind/mujoco",
+      "source": "inbox/FIRST_SEEN_20261113T215715Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "9039036ed1a8e471ef245d32abbc6a6c46bbf2eaa5639e69c6fba2ef245c6f07"
+    },
+    {
+      "created_at": "2026-11-13T18:27:09Z",
+      "first_frozen_at": "2026-11-13T21:57:15Z",
+      "id": "moveit/moveit_task_constructor#763",
+      "issue_number": 763,
+      "prediction_deadline_at": "2026-11-14T03:57:15Z",
+      "repository": "moveit/moveit_task_constructor",
+      "source": "inbox/FIRST_SEEN_20261113T215715Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "8690ef3a4fd294c57efe12c7c2ab06bd0d257ede90384bd069f3f50111e8fedf"
     }
   ]
 }
