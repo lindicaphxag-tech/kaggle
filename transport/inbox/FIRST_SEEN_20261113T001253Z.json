@@ -1,0 +1,52 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 3,
+  "new_candidates": [
+    {
+      "author_login": "rdesc",
+      "body": "What does the alpasim score mean in this screenshot `1.50 \u00b1 0.13` from [here](https://developer.nvidia.com/blog/generate-trajectories-reasoning-traces-and-auto-labels-with-nvidia-alpamayo-2-super/) ?\n\nThis seems to be different than the alpasim score convention used in this repo.\n\n<img width=\"926\" height=\"562\" alt=\"image\" src=\"https://github.com/user-attachments/assets/d67bfbde-a457-475e-81b7-7accbf3bd558\" />",
+      "created_at": "2026-11-12T23:31:20Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/243",
+      "id": "NVlabs/alpasim#243",
+      "issue_number": 243,
+      "labels": [],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "f23dcd2da615b4cfb8ce013f96ed6b2f08fde69768dcef8a0bd6c076f51c2e6f",
+      "title": "[DOC] alpasim score convention seems different in nvidia blog"
+    },
+    {
+      "author_login": "zhangyue19921010",
+      "body": "### Ticket Type\n\nBug report\n\n### Environment & System Info\n\nMain `e6ffde60312365c5452c46189a26872483943154`, Linux, Python 3.12.14, NumPy 2.2.6, datasets 4.8.5, PyArrow 25.0.1; CPU, local synthetic TIFF/Parquet data.\n\n### Description\n\nAfter loading depth in a unit different from its recorded unit, `recompute_stats()` or `add_features()` writes the reader-scaled depth statistics to `meta/stats.json` without changing the native `depth_unit` marker. Reopening applies the conversion again. For metre data loaded with the default millimetre output, the saved statistics are off by a factor of 1000, corrupting subsequent normalization, although the depth frames are unchanged.\n\n### Context & Reproduction\n\nThis local example retains its dataset directory:\n\n```python\nfrom pathlib import Path\nfrom tempfile import mkdtemp\n\nimport numpy as np\n\nfrom lerobot.datasets import LeRobotDataset\nfrom lerobot.datasets.dataset_tools import recompute_stats\nfrom lerobot.datasets.io_utils import load_stats\n\nroot = Path(mkdtemp()) / \"dataset\"\nkey = \"observation.images.depth\"\ndataset = LeRobotDataset.create(\n    \"local/depth-stats\", root=root, fps=10, use_videos=False,\n    features={\n        \"state\": {\"dtype\": \"float32\", \"shape\": (1,), \"names\": None},\n        key: {\"dtype\": \"image\", \"shape\": (6, 8, 1), \"names\": None,\n              \"info\": {\"is_depth_map\": True}},\n    },\n)\nfor value in (1, 2, 3):\n    dataset.add_frame({\n        \"state\": np.array([value], dtype=np.float32),\n        key: np.full((6, 8, 1), value, dtype=np.float32), \"task\": \"pick\",\n    })\ndataset.save_episode()\ndataset.finalize()\ndataset = LeRobotDataset(dataset.repo_id, root=root)\nprint(\"stored before:\", load_stats(root)[key][\"mean\"].item())\nrecompute_stats(dataset)\nprint(\"stored after:\", load_stats(root)[key][\"mean\"].item())\nreopened = LeRobotDataset(dataset.repo_id, root=root)\nprint(\"reopened mean:\", reopened.meta.stats[key][\"mean\"].item())\n```\n\n### Relevant logs\n\n```text\nstored before: 2.0\nstored after: 2000.0\nreopened mean: 2000000.0\n```\n\nThe expected stored mean is still 2 metres, and the reopened mean should be 2000 millimetres. The reverse conversion (recorded millimetres, requested metres) corrupts statistics in the opposite direction. Same-unit controls pass. Splitting uses episode statistics and is unaffected in the tested case.\n\n### Checklist\n\n- [x] Searched existing Issues and PRs for the symptom and root cause.\n- [x] Reproduced on current main.\n- [ ] Verified on a second environment.\n\n### Additional Info\n\nThis concerns persistence by editing tools, separate from finalized-writer reader initialization in #5314 and converted visual-stat retention in #5057. AI assisted with investigation, testing and writing.\n",
+      "created_at": "2026-11-12T22:29:48Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5349",
+      "id": "huggingface/lerobot#5349",
+      "issue_number": 5349,
+      "labels": [
+        "bug",
+        "dataset",
+        "examples"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "c7146bfad27652e8d261c7ee108195423fdead320a7281635265ffd07684b930",
+      "title": "fix(datasets): editing loaded depth data corrupts stored statistics"
+    },
+    {
+      "author_login": "SteveMacenski",
+      "body": "The following is not backported to Jazzy:\n\n```\n            Node(\n                condition=IfCondition(use_composition),\n                name=container_name,\n                namespace=namespace,\n                package='rclcpp_components',\n                executable='component_container',\n                parameters=[configured_params, {'autostart': autostart}],\n                arguments=['--isolated', '--executor-type', 'single-threaded',\n                           '--ros-args', '--log-level', log_level],\n                remappings=remappings,\n                output='screen',\n            ),\n```\n\nWhile requires:\n\n```\n            Node(\n                ...\n                executable='component_container_isolated',\n                arguments=['--ros-args', '--log-level', log_level],\n            ),\n```\n\nWe should check on the ROS distro and launch the appropriate one so that `nav2_bringup` works on Jazzy from the main branch. This works on Lyrical already. \n",
+      "created_at": "2026-11-12T23:57:51Z",
+      "html_url": "https://github.com/ros-navigation/navigation2/issues/6785",
+      "id": "ros-navigation/navigation2#6785",
+      "issue_number": 6785,
+      "labels": [],
+      "repository": "ros-navigation/navigation2",
+      "surface_sha256": "691a07d870fdad92c71ca1392ed4b751d41582302b9cb1cc5b0614702c78bcb7",
+      "title": "Rolling Bringup Support on Jazzy"
+    }
+  ],
+  "post_activation_issue_identities_observed": 611,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-13T00:12:53Z",
+  "schema_version": 1
+}
