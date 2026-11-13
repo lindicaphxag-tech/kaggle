@@ -9180,14 +9180,62 @@
     },
     {
       "created_at": "2026-11-13T05:32:13Z",
+      "expiry_recorded_at": "2026-11-13T15:18:28Z",
+      "expiry_sha256": "5cb8d92e2432a419623a602516e5f04ba114fd0ee6fbcad3c4f05266393236f3",
+      "expiry_source": "expirations/google-deepmind__mujoco__3887.json",
       "first_frozen_at": "2026-11-13T06:36:38Z",
       "id": "google-deepmind/mujoco#3887",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3887,
       "prediction_deadline_at": "2026-11-13T12:36:38Z",
       "repository": "google-deepmind/mujoco",
       "source": "inbox/FIRST_SEEN_20261113T063638Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "4425b5ff03d209daf5dd32c61a7dfee32255625c75699e71fa550e02a083be8e"
+    },
+    {
+      "created_at": "2026-11-13T13:34:58Z",
+      "first_frozen_at": "2026-11-13T15:19:46Z",
+      "id": "BehaviorTree/BehaviorTree.CPP#1292",
+      "issue_number": 1292,
+      "prediction_deadline_at": "2026-11-13T21:19:46Z",
+      "repository": "BehaviorTree/BehaviorTree.CPP",
+      "source": "inbox/FIRST_SEEN_20261113T151946Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "de5b05e3e5e6f79068ee7e50f96d9b04a9708661a5157905546da7e3c666641c"
+    },
+    {
+      "created_at": "2026-11-13T11:03:49Z",
+      "first_frozen_at": "2026-11-13T15:19:46Z",
+      "id": "UniversalRobots/Universal_Robots_Client_Library#623",
+      "issue_number": 623,
+      "prediction_deadline_at": "2026-11-13T21:19:46Z",
+      "repository": "UniversalRobots/Universal_Robots_Client_Library",
+      "source": "inbox/FIRST_SEEN_20261113T151946Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "fec3eca1f5803762de91255a03a0cc08e97114ee3951703c066e679259605345"
+    },
+    {
+      "created_at": "2026-11-13T15:12:30Z",
+      "first_frozen_at": "2026-11-13T15:19:46Z",
+      "id": "isaac-sim/IsaacLab#9032",
+      "issue_number": 9032,
+      "prediction_deadline_at": "2026-11-13T21:19:46Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261113T151946Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "12265e7cb7997636c170f21e854cde86fa4c59d75f2ec23f555bc0573c04a9ff"
+    },
+    {
+      "created_at": "2026-11-13T14:10:07Z",
+      "first_frozen_at": "2026-11-13T15:19:46Z",
+      "id": "ros-controls/ros2_control#3780",
+      "issue_number": 3780,
+      "prediction_deadline_at": "2026-11-13T21:19:46Z",
+      "repository": "ros-controls/ros2_control",
+      "source": "inbox/FIRST_SEEN_20261113T151946Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "1de3bac5e31c9e0638bb026e277e57c99a951a05a58ec31d06bda38feb07256c"
     }
   ]
 }
