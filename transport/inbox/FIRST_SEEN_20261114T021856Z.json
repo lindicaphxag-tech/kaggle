@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "arthurwolf",
+      "body": "Hey.\n\nI'm Arthur, the guy behind the Smoothieware project (it's like a controller board designed to be usable in CNC mills, 3D printers, laser cutters, pick and place machines, lathes, robot arms, and more. It's got a big focus on modularity, ease of use/configuration, and documentation, and we've had a lot of interest from education over the years, including some requests for ROS support)\n\nI'm looking into implementing micro-ros into the smoothieboard v2's firmware, so people can go beyond the classic Gcode interfaces (over network or serial or usb), and instead control it using ROS2/the micro-ros stuff/the protocol (I'm very new at ROS...).\n\nI looked into this quite a bit, got to the point where I had a port of micro-ros running on my v2-prime that can turn a LED on/off through the protocol, and I guess I have two paths in front of me:\n\n`1.` I\u00a0extend my port of micro-ros's code beyond just turning a led on and off to also be able to control and configure the stepper drivers, read temperatures, read endstops/switches, control heaters, etc. That sounds like a lot of code to write, a lot of code that I\u00a0already have in the main smoothie firmware.\n\nor...\n\n`2.` I take the existing smoothie firmware, that already has network support and all those peripherals supported, and I just \"wire in\"/implement the micro-ros protocol in there with endpoints (however you call them) to read and write to those peripherals/modules.\n\nWhich do you think is best? Which makes most sense? I could do either really, but I'm looking at which is you guy's preference, which you think would be preferred by end users, and which is technically best I guess too.\n\nAlso, if we did implement full support of micro-ros on the smoothieboard v2 (using either 1 or 2 or whatever), would that eventually get us added to lists like the \"Supported Hardware\" list in https://github.com/micro-ROS/micro_ros_setup#supported-platforms ? ( if we do this work, we want people who are potentially interested in it to find it... ).\n\nLooking for any kind of advice or guidance, I'll probably do the implementation no matter what, and document it on our site, but if I can be pointed into the \"most useful\"/technically-most-correct direction that would be very appreciated. I\u00a0guess part of the problem here is my lack of knowledge of ROS, I\u00a0just don't have any project going on right now that it would make sense to use it for, but I'll keep trying to learn.\n\nCheers.\n",
+      "created_at": "2026-11-14T01:27:12Z",
+      "html_url": "https://github.com/micro-ROS/micro_ros_setup/issues/843",
+      "id": "micro-ROS/micro_ros_setup#843",
+      "issue_number": 843,
+      "labels": [],
+      "repository": "micro-ROS/micro_ros_setup",
+      "surface_sha256": "c31c36c9eb113918adf6a090a995f610c51812f4c4842cb1eb6f3b06b2c5749c",
+      "title": "Smoothieboard v2-prime support"
+    }
+  ],
+  "post_activation_issue_identities_observed": 625,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-14T02:18:56Z",
+  "schema_version": 1
+}

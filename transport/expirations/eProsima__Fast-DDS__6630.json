@@ -1,0 +1,13 @@
+{
+  "case_id": "eProsima/Fast-DDS#6630",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-11-14T02:17:48Z",
+  "expiry_sha256": "58076a95447875ab81bcadf4136205f005956774664a0eac171e148989422a24",
+  "first_frozen_at": "2026-11-13T18:03:08Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-11-14T00:03:08Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "7b2ec54f31bb670bdbab3282b78a1f1cfd7756c2977ec4a19d83f1915d2cbb39"
+}
