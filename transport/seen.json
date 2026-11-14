@@ -9398,6 +9398,17 @@
       "source": "inbox/FIRST_SEEN_20261114T101145Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "97767c35366bc93b5a42256024041079f399d949b6d99ba056e89a8e9125f710"
+    },
+    {
+      "created_at": "2026-11-14T11:48:12Z",
+      "first_frozen_at": "2026-11-14T14:29:13Z",
+      "id": "isaac-sim/IsaacLab#9033",
+      "issue_number": 9033,
+      "prediction_deadline_at": "2026-11-14T20:29:13Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261114T142913Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "feb7d3169ee93fd1542ed77235c3638ff9898455cd16325c45666c55f3caad2e"
     }
   ]
 }
