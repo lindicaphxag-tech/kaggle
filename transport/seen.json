@@ -9375,14 +9375,29 @@
     },
     {
       "created_at": "2026-11-14T01:27:12Z",
+      "expiry_recorded_at": "2026-11-14T10:10:30Z",
+      "expiry_sha256": "8bb36cfeb5c407c55ac0db3af9490f5925c9df8857916423e028198fb3618392",
+      "expiry_source": "expirations/micro-ROS__micro_ros_setup__843.json",
       "first_frozen_at": "2026-11-14T02:18:56Z",
       "id": "micro-ROS/micro_ros_setup#843",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 843,
       "prediction_deadline_at": "2026-11-14T08:18:56Z",
       "repository": "micro-ROS/micro_ros_setup",
       "source": "inbox/FIRST_SEEN_20261114T021856Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "c31c36c9eb113918adf6a090a995f610c51812f4c4842cb1eb6f3b06b2c5749c"
+    },
+    {
+      "created_at": "2026-11-14T09:30:25Z",
+      "first_frozen_at": "2026-11-14T10:11:45Z",
+      "id": "gazebosim/gz-sensors#709",
+      "issue_number": 709,
+      "prediction_deadline_at": "2026-11-14T16:11:45Z",
+      "repository": "gazebosim/gz-sensors",
+      "source": "inbox/FIRST_SEEN_20261114T101145Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "97767c35366bc93b5a42256024041079f399d949b6d99ba056e89a8e9125f710"
     }
   ]
 }

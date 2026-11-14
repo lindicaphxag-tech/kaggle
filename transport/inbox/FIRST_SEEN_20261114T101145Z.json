@@ -1,0 +1,26 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "peakyquest",
+      "body": "## Desired behavior\nAdd a simulated marine radar sensor for Gazebo Harmonic with ROS 2 support, designed to be mounted on a USV (unmanned surface vehicle). Most Gazebo sensor setups are built around land and aerial robots, so marine-specific sensors such as radar are largely missing. A radar plugin that publishes standard ROS 2 messages would let users test USV perception, collision avoidance, and sensor fusion in simulation without hardware.\n\nThe sensor should expose configurable parameters for:\n- Maximum range, beam geometry, and update rate\n- Noise and clutter assumptions\n- Mounting pose on the vessel\n\n## Alternatives considered\n- Using existing LiDAR or camera sensors as stand-ins for radar. These do not reproduce radar's range, resolution, or noise characteristics.\n- Writing one-off radar models inside individual projects. This duplicates effort and does not give the community a shared, documented implementation.\n- Reusing marine simulation packages such as Stonefish or the UUV Simulator. I have not yet confirmed whether they provide a radar sensor, so this comparison is still open.\n\n## Implementation suggestion\n- Implement as a Gazebo sensor plugin that publishes ROS 2 messages.\n- Document the model's range, beam, noise, and clutter parameters so users can judge whether it fits their use case.\n- Provide a sample world, launch file, and a short README showing a radar mounted on a USV.\n- Release under a permissive license.\n- If possible, validate the simulated output against a small recording from a real radar.\n\n## Additional context\nI am developing this as part of my own work and would welcome feedback on the model design and on whether it would be useful to others.\n",
+      "created_at": "2026-11-14T09:30:25Z",
+      "html_url": "https://github.com/gazebosim/gz-sensors/issues/709",
+      "id": "gazebosim/gz-sensors#709",
+      "issue_number": 709,
+      "labels": [
+        "enhancement"
+      ],
+      "repository": "gazebosim/gz-sensors",
+      "surface_sha256": "97767c35366bc93b5a42256024041079f399d949b6d99ba056e89a8e9125f710",
+      "title": "Marine Radar for Gazebo"
+    }
+  ],
+  "post_activation_issue_identities_observed": 626,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-14T10:11:45Z",
+  "schema_version": 1
+}
