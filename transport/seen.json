@@ -9405,13 +9405,17 @@
     },
     {
       "created_at": "2026-11-14T11:48:12Z",
+      "expiry_recorded_at": "2026-11-14T21:23:38Z",
+      "expiry_sha256": "11f99a0595acf094df40d3a435188fc3020d3a96516e3c068a7eef29bf827522",
+      "expiry_source": "expirations/isaac-sim__IsaacLab__9033.json",
       "first_frozen_at": "2026-11-14T14:29:13Z",
       "id": "isaac-sim/IsaacLab#9033",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 9033,
       "prediction_deadline_at": "2026-11-14T20:29:13Z",
       "repository": "isaac-sim/IsaacLab",
       "source": "inbox/FIRST_SEEN_20261114T142913Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "feb7d3169ee93fd1542ed77235c3638ff9898455cd16325c45666c55f3caad2e"
     },
     {
@@ -9468,6 +9472,17 @@
       "source": "inbox/FIRST_SEEN_20261114T192839Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "9f6a19a71448864843418a38cabab5ccc4c5ee075dfdd26fa7e8f022b354341f"
+    },
+    {
+      "created_at": "2026-11-14T19:41:20Z",
+      "first_frozen_at": "2026-11-14T21:24:51Z",
+      "id": "huggingface/lerobot#5372",
+      "issue_number": 5372,
+      "prediction_deadline_at": "2026-11-15T03:24:51Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261114T212451Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "cb5690fd6581f1adfe0b45b942fd49a29cdd93a41e008e43da9afee80e291047"
     }
   ]
 }

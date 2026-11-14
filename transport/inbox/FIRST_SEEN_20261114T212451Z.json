@@ -1,0 +1,32 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "vwnb",
+      "body": "Hi LeRobot team,\n\nTwo recent results made us look at what sits between a SmolVLA action chunk and the SO-101 servos:\n\n- **Adversarial instruction rewrites** (DAERT, [arXiv 2604.05595](https://arxiv.org/abs/2604.05595)) cut LIBERO success in simulation from 93% to 6% for \u03c00 and from 77% to 6% for OpenVLA. The rewrites stay plausible and semantically close to the original.\n- **Even benign LLM paraphrase** (LIBERO-Plus, [arXiv 2510.13626](https://arxiv.org/abs/2510.13626)) drops \u03c00 from 94% to 61% and OpenVLA from 77% to 27%. A visual patch attack on SmolVLA itself ([arXiv 2610.03498](https://arxiv.org/abs/2610.03498)) drops LIBERO-10 from 41% to 6\u201319%.\n\nNone of these papers measures whether the failures are *unsafe motion* (leaving the workspace, driving into the table, fast steps) or just missed tasks. That is the question we care about. Reading `main` (fe1c5459), the default path has few guards:\n\n1. `max_relative_target` defaults to `None`. Policy goals go straight to `sync_write(\"Goal_Position\")` unless the user opts in. We couldn't find it mentioned in `so101.mdx`, `smolvla.mdx` or `il_robots.mdx`.\n2. `send_action` has no joint-range or workspace check beyond the calibrated limits written to the servos.\n3. `configure()` sets reduced `Max_Torque_Limit` / `Protection_Current` / `Overload_Torque` only on the **gripper**. The five arm joints keep the servo defaults.\n4. SmolVLA runs `n_action_steps = chunk_size = 50` open-loop by default and has no hold or abstain output.\n5. Any clamp or gate on the policy output reads the same `Present_Position` the policy uses. A calibration fault like the hidden turn count in #5324 would mislead both at once.\n\n<details>\n<summary>Unsafe control actions we identified (STPA, desk analysis, unverified)</summary>\n\n| Control action | Unsafe control action | Hazard |\n|---|---|---|\n| Instruction \u2192 SmolVLA | Plausible but off-distribution/adversarial phrasing reaches the policy | Arm leaves task envelope |\n| SmolVLA \u2192 chunk | Targets leave the envelope while a person is within reach | Envelope exit |\n| SmolVLA \u2192 chunk | Targets inside table/object or past a hard stop | Stall at full torque |\n| SmolVLA \u2192 chunk | No hold when the task can't be grounded | Envelope exit / stall |\n| SmolVLA \u2192 chunk | Gripper closes before the object is between the jaws | Pinch |\n| SmolVLA \u2192 chunk | 50-step chunk keeps running after the scene changes | Envelope exit |\n| Runtime \u2192 Goal_Position | Large delta forwarded unclamped (`max_relative_target=None`) | High joint speed |\n| Servo \u2192 torque | Arm joint holds stall torque (no reduced limit) | Stall, heat, pinch |\n| Operator \u2192 stop | Ctrl-C / unplug arrives after contact | Envelope exit / pinch |\n\nCandidate mitigations, none verified:\n- a deterministic joint-range/keep-out \"hold\" gate as a processor step, reading joint state only;\n- `max_relative_target` on by default for policy rollouts;\n- arm-joint torque limits;\n- a joint-state plausibility check (extended vs normal position) before enabling torque;\n- shorter executed horizons near people;\n- an inline switch on the 12 V supply.\n\nAn exact-match instruction allow-list would block rewrite attacks. A semantic-similarity filter would not, because the attack selects rewrites that pass one.\n</details>\n\n**What we haven't verified:** that any of this transfers to SmolVLA, and that the failures become unsafe motion. We also haven't confirmed that STS3215 firmware enforces the written position limits, or measured what force the arm can apply. Nothing has been run on hardware.\n\n**A cheap way to find out, mostly with existing LeRobot tooling:** run `lerobot/smolvla_libero` under `lerobot-eval --env.type=libero_plus` on the language-perturbed variants. Add a small per-step hook that logs end-effector exits from a task box, peak joint speed and step size, contact with non-target objects, and time at actuator saturation, and compare against the original tasks. If unsafe-motion rates rise, a gate is worth building. If not, this is a robustness issue, not a safety one.\n\nTwo questions:\n1. Would you consider enabling `max_relative_target` by default when running a policy (record or eval)?\n2. Would you accept a PR for an optional joint-range \"hold\" gate as a processor step, plus arm-joint torque limits in `SOFollowerConfig`? We'd be glad to write the sim hook and the gate.\n\n*Disclosure: this analysis was prepared with AI assistance using WCGW (wcgw.world), a safety-analysis tool we build, and reviewed by a human engineer.*\n",
+      "created_at": "2026-11-14T19:41:20Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5372",
+      "id": "huggingface/lerobot#5372",
+      "issue_number": 5372,
+      "labels": [
+        "question",
+        "policies",
+        "simulation",
+        "performance",
+        "robots",
+        "processor",
+        "evaluation"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "cb5690fd6581f1adfe0b45b942fd49a29cdd93a41e008e43da9afee80e291047",
+      "title": "SO-101 + SmolVLA: what stops a wrong action chunk? (safety defaults under off-distribution / adversarial instructions)"
+    }
+  ],
+  "post_activation_issue_identities_observed": 633,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-14T21:24:51Z",
+  "schema_version": 1
+}
