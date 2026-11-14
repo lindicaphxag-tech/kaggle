@@ -9390,13 +9390,17 @@
     },
     {
       "created_at": "2026-11-14T09:30:25Z",
+      "expiry_recorded_at": "2026-11-14T16:34:59Z",
+      "expiry_sha256": "30b1ac380f7f04d85337b1e93c7e18b5d9cd7961623a6910c6076d980dbe4047",
+      "expiry_source": "expirations/gazebosim__gz-sensors__709.json",
       "first_frozen_at": "2026-11-14T10:11:45Z",
       "id": "gazebosim/gz-sensors#709",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 709,
       "prediction_deadline_at": "2026-11-14T16:11:45Z",
       "repository": "gazebosim/gz-sensors",
       "source": "inbox/FIRST_SEEN_20261114T101145Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "97767c35366bc93b5a42256024041079f399d949b6d99ba056e89a8e9125f710"
     },
     {
@@ -9409,6 +9413,39 @@
       "source": "inbox/FIRST_SEEN_20261114T142913Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "feb7d3169ee93fd1542ed77235c3638ff9898455cd16325c45666c55f3caad2e"
+    },
+    {
+      "created_at": "2026-11-14T14:51:39Z",
+      "first_frozen_at": "2026-11-14T16:36:26Z",
+      "id": "gazebosim/gz-sim#4210",
+      "issue_number": 4210,
+      "prediction_deadline_at": "2026-11-14T22:36:26Z",
+      "repository": "gazebosim/gz-sim",
+      "source": "inbox/FIRST_SEEN_20261114T163626Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "68d9c26bf99439ab8218c30f9acfe4c8f61c62e2ef587667c0e0c8e52c9a9bd4"
+    },
+    {
+      "created_at": "2026-11-14T16:16:34Z",
+      "first_frozen_at": "2026-11-14T16:36:26Z",
+      "id": "google-deepmind/mujoco#3901",
+      "issue_number": 3901,
+      "prediction_deadline_at": "2026-11-14T22:36:26Z",
+      "repository": "google-deepmind/mujoco",
+      "source": "inbox/FIRST_SEEN_20261114T163626Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "3ec8eb76fe219e24f41eef319a312b0689eddfce156d75d98137ae5938e71b0f"
+    },
+    {
+      "created_at": "2026-11-14T16:22:01Z",
+      "first_frozen_at": "2026-11-14T16:36:26Z",
+      "id": "google-deepmind/mujoco#3902",
+      "issue_number": 3902,
+      "prediction_deadline_at": "2026-11-14T22:36:26Z",
+      "repository": "google-deepmind/mujoco",
+      "source": "inbox/FIRST_SEEN_20261114T163626Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "6593c09d1e3431751116dfcac815a2a5c3a5ffd0d82b0d80c23172982dbd2ca5"
     }
   ]
 }
