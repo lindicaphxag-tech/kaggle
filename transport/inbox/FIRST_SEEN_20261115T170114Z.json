@@ -1,0 +1,67 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 3,
+  "new_candidates": [
+    {
+      "author_login": "stock-code",
+      "body": "## Summary\nWith lerobot 0.7.0, evaluating a language-conditioned policy (SmolVLA) on `aloha` sends the gym\nid (`\"AlohaTransferCube-v0\"`) as `task` / `task_description`. The policy was trained on the\ndataset's instruction (\"Pick up the cube with the right arm and transfer it to the left arm.\"), so\nit is conditioned on a meaningless prompt and looks completely broken. PushT does the same: its\nenv reports `\"PushT-v0\"` instead of the `lerobot/pusht` instruction (\"Push the T-shaped block onto\nthe T-shaped target.\").\n\n## Reproduce\n```bash\nlerobot-eval --policy.path=AleksanderWojsz/smolvla_aloha_sim --env.type=aloha \\\n  --env.task=AlohaTransferCube-v0 --eval.n_episodes=50 --eval.batch_size=10 \\\n  --eval.use_async_envs=false --policy.device=mps --seed=1000 --output_dir=out\ncat out/task_descriptions.json   # {\"AlohaTransferCube-v0_0\": \"AlohaTransferCube-v0\"}\n```\n\n## Observed vs expected\n| Instruction sent | Success (50 episodes, seeds 1000\u20131049) | Episodes touching the cube |\n|---|---|---|\n| `\"AlohaTransferCube-v0\"` (current) | 0/50, reward 0 in every episode | 0 |\n| Dataset instruction from `lerobot/aloha_sim_transfer_cube_human` `meta/tasks.parquet` | 3/50 (6%, 95% CI 2\u201316%) | 32 |\n\nThe same rollout loop gives identical per-episode results for a non-language policy (ACT, 38/50\nin both), so the difference is the instruction alone.\n\n## Suggested fix\nGive the ALOHA and PushT env configs a default `task_description` equal to the instruction of\ntheir reference datasets, and allow overriding it from the CLI (e.g. `--env.instruction`). At\nminimum, warn when a language-conditioned policy receives a `task_description` equal to the gym\nid.\n\n## Environment\nlerobot 0.7.0, Python 3.12, macOS 26 (M1 Pro, MPS), gym-aloha via `lerobot[aloha]`.\n\n## Related\n#4045 is the same class of mismatch for RoboCasa (training task strings vs evaluation prompts). On current `main`, `lerobot_eval.py` still reads the instruction from the env's `task_description`, so this looks unfixed after 0.7.0.\n",
+      "created_at": "2026-11-15T13:26:42Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5373",
+      "id": "huggingface/lerobot#5373",
+      "issue_number": 5373,
+      "labels": [
+        "policies",
+        "dataset",
+        "simulation",
+        "CI",
+        "training",
+        "evaluation"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "d8e485a0568918c45b3365385c3ed5905f20079e2e589b10ad1ee57ac7fdb940",
+      "title": "ALOHA and PushT sim envs pass the gym id as the language instruction, so VLAs evaluated with `lerobot-eval` score 0"
+    },
+    {
+      "author_login": "oracle9i88",
+      "body": "### Ticket Type\n\ud83d\udc1b Bug Report (Something isn't working)\n\n### Environment & System Info\n- lerobot 0.7.0 (PyPI), Python 3.12, torch 2.15.0, transformers 5.22.2\n- macOS 27.2.1, Apple M4 Max, 64 GB\n- Checkpoint: `lerobot/MolmoAct2-SO100_101-LeRobot` @ `a4ab68081b84bb0659d96f454edbce6abbe8a1cd`\n\nI ran the 0.7.0 release, not `main`. I did read `configuration_molmoact2.py` on `main` and the fields below are absent there too, so I expect the same failure.\n\n### Description\nThe `config.json` published in `lerobot/MolmoAct2-SO100_101-LeRobot` cannot be parsed by the current `MolmoAct2Config`. It still contains four fields that no longer exist:\n\n- `enable_lora_vlm`\n- `enable_lora_action_expert`\n- `train_action_expert_only`\n- `model_dtype`\n\nSo `PreTrainedConfig.from_pretrained(...)` / `MolmoAct2Policy.from_pretrained(...)` stops before any weights are read.\n\n### Context & Reproduction\n```python\nfrom lerobot.configs.policies import PreTrainedConfig\nPreTrainedConfig.from_pretrained(\"lerobot/MolmoAct2-SO100_101-LeRobot\")\n```\n\n### Relevant logs or stack trace\n```\ndraccus.utils.DecodingError: The fields `enable_lora_vlm`, `enable_lora_action_expert`, `train_action_expert_only`, `model_dtype` are not valid for MolmoAct2Config\n```\n\n### Additional Info / Workarounds\nRemoving the four fields and adding `\"train_mode_vlm\": \"fft\"` (the checkpoint stores full weights, `enable_lora_vlm` was `false`) makes it load, and the policy then reproduces recorded actions well (open-loop replay on `Beegbrain/pick_lemon_and_drop_in_bowl`: 2.1\u00b0 mean abs error vs 11.0\u00b0 for a hold-position baseline).\n\nNote that the old file had `\"model_dtype\": \"float32\"`. After dropping it, the new default `dtype=bfloat16` applies, which changes inference precision compared with what the checkpoint author set. Either re-uploading the config with the current field names (including `dtype`) or a small migration for the old names would fix this.\n\nSmall script that applies the workaround: https://github.com/oracle9i88/molmoact2-mac/blob/main/prepare.py\n",
+      "created_at": "2026-11-15T15:37:38Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5374",
+      "id": "huggingface/lerobot#5374",
+      "issue_number": 5374,
+      "labels": [
+        "bug",
+        "policies",
+        "CI",
+        "configuration"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "83e90d32b912eea0046917809a566fe430327f46ce33f95ad5134ea730e9e5e9",
+      "title": "MolmoAct2: lerobot/MolmoAct2-SO100_101-LeRobot config.json fails to load (fields removed from MolmoAct2Config)"
+    },
+    {
+      "author_login": "oracle9i88",
+      "body": "### Ticket Type\n\ud83d\udc1b Bug Report (Something isn't working)\n\n### Environment & System Info\n- lerobot 0.7.0 (PyPI), Python 3.12, torch 2.15.0, transformers 5.22.2\n- macOS 27.2.1, Apple M4 Max, 64 GB, device `mps`\n- Checkpoint: `lerobot/MolmoAct2-SO100_101-LeRobot` (config patched as described in #5374 so that it loads)\n\nTested on the 0.7.0 release, not `main`.\n\n### Description\nMolmoAct2 runs on Apple Silicon through MPS without code changes, and with `dtype=float32` the output is identical to CPU float32. With `dtype=bfloat16` \u2014 the default in `MolmoAct2Config` \u2014 it runs without any error or warning on MPS but returns clearly different actions for the same input and the same flow-matching start noise.\n\nOne 30-step chunk, fixed synthetic input, actions in degrees, compared with CPU float32:\n\n| device / dtype | latency (warm) | max abs diff | mean abs diff |\n|---|---|---|---|\n| MPS float32 | 0.82 s | 0.0000 | 0.0000 |\n| MPS bfloat16 | 0.80 s | 26.5 | 9.8 |\n| CPU float32 | 3.1 s | reference | reference |\n| CPU bfloat16 | 15.5 s | 0.30 | 0.06 |\n\nCPU bfloat16 stays within 0.06\u00b0 of the reference, so this is not ordinary bf16 rounding; something in the bf16 autocast path misbehaves on MPS. I have not isolated which op, and it may well be a PyTorch MPS issue rather than a LeRobot one.\n\nWhy I am reporting it here: `_autocast_context` only checks `is_autocast_available(\"mps\")`, which is true, so a Mac user gets the bf16 default and silently wrong joint targets. On a real arm that is hard to tell apart from a weak policy.\n\n### Context & Reproduction\n```python\nimport torch\nfrom lerobot.configs.policies import PreTrainedConfig\nfrom lerobot.policies.molmoact2 import MolmoAct2Policy\nfrom lerobot.policies.molmoact2.processor_molmoact2 import make_molmoact2_pre_post_processors_from_pretrained\n\ndef run(device, dtype, ckpt):\n    cfg = PreTrainedConfig.from_pretrained(ckpt)\n    cfg.device, cfg.dtype, cfg.enable_inference_cuda_graph = device, dtype, False\n    policy = MolmoAct2Policy.from_pretrained(ckpt, config=cfg).eval()\n    pre, post = make_molmoact2_pre_post_processors_from_pretrained(\n        cfg, ckpt, preprocessor_overrides={\"device_processor\": {\"device\": device}})\n    g = torch.Generator().manual_seed(0)\n    obs = {\"observation.images.cam0\": torch.rand(3, 224, 224, generator=g),\n           \"observation.images.cam1\": torch.rand(3, 224, 224, generator=g),\n           \"observation.state\": torch.tensor([5.0, -60.0, 70.0, 40.0, 0.0, 20.0]),\n           \"task\": \"pick up the red cube and put it in the box\"}\n    noise = torch.randn(1, cfg.chunk_size, cfg.expected_max_action_dim, generator=g).to(device)\n    return post(policy.predict_action_chunk(pre(obs), noise=noise)).float().cpu()\n\nref = run(\"cpu\", torch.float32, CKPT)\nprint((run(\"mps\", torch.float32, CKPT) - ref).abs().mean())    # 0.0\nprint((run(\"mps\", torch.bfloat16, CKPT) - ref).abs().mean())   # ~9.8\n```\nComplete script with `--save/--ref` comparison: https://github.com/oracle9i88/molmoact2-mac/blob/main/smoke_test.py\n\n### Relevant logs or stack trace\nNone \u2014 that is the problem. No exception, no NaN, no warning.\n\n### Additional Info / Workarounds\nUse `dtype=float32` on MPS (20.5 GiB GPU memory for this checkpoint, 0.82 s per chunk on M4 Max).\n\nSuggestion: until the cause is found, raise or warn when `dtype=bfloat16` is combined with an `mps` device, and/or mention in the MolmoAct2 docs that Apple Silicon works with float32 (the docs currently say an NVIDIA GPU is required).\n",
+      "created_at": "2026-11-15T15:37:40Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5375",
+      "id": "huggingface/lerobot#5375",
+      "issue_number": 5375,
+      "labels": [
+        "bug",
+        "documentation",
+        "policies",
+        "CI",
+        "performance",
+        "configuration"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "0a7414d162fb762f5edac2143fff63e7811fc635541c38544c56e13b0d73ad6b",
+      "title": "MolmoAct2 on MPS: default dtype bfloat16 silently returns wrong actions (float32 matches CPU exactly)"
+    }
+  ],
+  "post_activation_issue_identities_observed": 638,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-15T17:01:14Z",
+  "schema_version": 1
+}
