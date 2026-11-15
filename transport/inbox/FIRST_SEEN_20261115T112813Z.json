@@ -1,0 +1,39 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "patelshivani2283-lab",
+      "body": "### Description\n1. In `tutorials/global_illumination.md` and `tutorials/particle_tutorial.md`, several markdown links are split across multiple lines between the link label and target URL (e.g. `[text](\\nhttps://...)`), which breaks markdown/Doxygen hyperlink rendering. Additionally, the links in `global_illumination.md` point to `/tree/main/...` rather than `/blob/main/...` for SDF files.\n2. In `README.md` (under `# Versioning`) and `test/integration/wind_effects.cc`, `complimentary` is used instead of `complementary` (`complementary libraries` and `complementary filter`).\n3. In `src/systems/joint_position_controller/JointPositionController.cc`, `initialise` should be standardized to `initialize` to follow project conventions.\n\n### Expected Behavior\nLinks should render correctly as hyperlinks on a single line and documentation comments should use consistent terminology and spelling.\n\n### Proposed Solution\n- Format links on a single line with proper `/blob/main/...` paths.\n- Correct `complimentary` to `complementary`.\n- Standardize `initialise` to `initialize` in `JointPositionController.cc`.",
+      "created_at": "2026-11-15T09:45:18Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4212",
+      "id": "gazebosim/gz-sim#4212",
+      "issue_number": 4212,
+      "labels": [],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "c837fcad41c6fe28b668d1f7c649971493e1fe913b89e331ce8dd51b6dd104e6",
+      "title": "Fix broken multiline markdown links in tutorials and documentation typos"
+    },
+    {
+      "author_login": "vgerber",
+      "body": "### Description\n\nEach `ui.Workspace.restore_workspace()` that includes the Viewport window rebuilds the viewport, and about 150 MiB of VRAM is never freed afterwards. It also happens when the restored layout is identical to the current one. Showing, hiding or resizing other windows does not leak.\n\nWe switch layouts from an extension, so this adds up: after a day the app sat at 31 of 32 GB and RTX started failing with `ERROR_OUT_OF_DEVICE_MEMORY`. Only a restart gets the memory back.\n\nThe log shows `destroyViewport` before every `createViewport`, so the old viewport does get destroyed.\n\nRepro in the Script Editor, empty stage, default layout:\n\n```python\nimport asyncio, os, subprocess\nimport omni.kit.app\nimport omni.ui as ui\n\ndef vram_mib():\n    out = subprocess.run(\n        [\"nvidia-smi\", \"--query-compute-apps=pid,used_memory\", \"--format=csv,noheader,nounits\"],\n        capture_output=True, text=True).stdout\n    for line in out.splitlines():\n        pid, used = line.split(\", \")\n        if pid == str(os.getpid()):\n            return int(used)\n\nasync def run(repeats=20):\n    app = omni.kit.app.get_app()\n    layout = ui.Workspace.dump_workspace()\n    start = vram_mib()\n    for i in range(repeats):\n        ui.Workspace.restore_workspace(layout, False)\n        for _ in range(30):\n            await app.next_update_async()\n        print(i + 1, vram_mib() - start, \"MiB\")\n    await asyncio.sleep(10)\n    print(\"after 10 s:\", vram_mib() - start, \"MiB\")\n\nasyncio.ensure_future(run())\n```\n\nOn our scene VRAM goes up by roughly 150 MiB per restore and stays there after the 10 s wait. We expected it to return to where it started.\n\n### Isaac Sim version\n\n6.1.0-rc.26+release.49347.2d230af4.gl (Kit 110.3.0+feature.371399.00c488ae.gl)\n\n### Operating System (OS)\n\nUbuntu 24.04.5 LTS\n\n### GPU Name\n\nRTX 5090\n\n### GPU Driver and CUDA versions\n\nDriver 580.173.02, CUDA 13.0\n\n### Logs\n\n```txt\n[omni.rtx] Insufficient VRAM, skipping TextureLoader post-processing\n[omni.rtx] Out of GPU memory allocating resource 'MemoryManager chunk' [size: unknown]\n[omni.rtx] VkResult: ERROR_OUT_OF_DEVICE_MEMORY\n[omni.rtx] vkAllocateMemory failed for flags: N.\n[omni.usd.multitick.render] multiTickRateRender() returned null\n```\n\n### Additional information\n\nThis build already has the Kit 110.3 fixes for OMPE-97839 (VRAM growing while resizing the viewport with Fill Viewport on) and OMPE-57854 (descriptor pool leak when recreating scene widgets), so it looks like a different path. Is there a way to release the old viewport's resources without restarting? For now we avoid restore_workspace after startup and only toggle window visibility.\n",
+      "created_at": "2026-11-15T10:42:07Z",
+      "html_url": "https://github.com/isaac-sim/IsaacSim/issues/939",
+      "id": "isaac-sim/IsaacSim#939",
+      "issue_number": 939,
+      "labels": [
+        "isaac-sim-perf",
+        "isaac-sim-v6-1-0"
+      ],
+      "repository": "isaac-sim/IsaacSim",
+      "surface_sha256": "666bb4dca841d94c4112fb86c6a77859b064ecd420f77f47a50e392eb946aae3",
+      "title": "restore_workspace leaks ~150 MiB VRAM each time it rebuilds the viewport"
+    }
+  ],
+  "post_activation_issue_identities_observed": 635,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-15T11:28:13Z",
+  "schema_version": 1
+}

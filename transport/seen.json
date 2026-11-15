@@ -9507,6 +9507,28 @@
       "source": "inbox/FIRST_SEEN_20261114T212451Z.json",
       "status": "deadline_missed_unadjudicated",
       "surface_sha256": "cb5690fd6581f1adfe0b45b942fd49a29cdd93a41e008e43da9afee80e291047"
+    },
+    {
+      "created_at": "2026-11-15T09:45:18Z",
+      "first_frozen_at": "2026-11-15T11:28:13Z",
+      "id": "gazebosim/gz-sim#4212",
+      "issue_number": 4212,
+      "prediction_deadline_at": "2026-11-15T17:28:13Z",
+      "repository": "gazebosim/gz-sim",
+      "source": "inbox/FIRST_SEEN_20261115T112813Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "c837fcad41c6fe28b668d1f7c649971493e1fe913b89e331ce8dd51b6dd104e6"
+    },
+    {
+      "created_at": "2026-11-15T10:42:07Z",
+      "first_frozen_at": "2026-11-15T11:28:13Z",
+      "id": "isaac-sim/IsaacSim#939",
+      "issue_number": 939,
+      "prediction_deadline_at": "2026-11-15T17:28:13Z",
+      "repository": "isaac-sim/IsaacSim",
+      "source": "inbox/FIRST_SEEN_20261115T112813Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "666bb4dca841d94c4112fb86c6a77859b064ecd420f77f47a50e392eb946aae3"
     }
   ]
 }
