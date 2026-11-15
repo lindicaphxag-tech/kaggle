@@ -9581,6 +9581,39 @@
       "source": "inbox/FIRST_SEEN_20261115T175859Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "2b911d7287dba76c7fde200efdac892351a7a04aa2637b1be5d009efe59fa813"
+    },
+    {
+      "created_at": "2026-11-15T18:03:40Z",
+      "first_frozen_at": "2026-11-15T21:42:53Z",
+      "id": "Genesis-Embodied-AI/genesis-world#3835",
+      "issue_number": 3835,
+      "prediction_deadline_at": "2026-11-16T03:42:53Z",
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "source": "inbox/FIRST_SEEN_20261115T214253Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "1e3f2a3d15e17179330690095d0df85b2e602858de68398ec0554f21261d4c1f"
+    },
+    {
+      "created_at": "2026-11-15T18:20:28Z",
+      "first_frozen_at": "2026-11-15T21:42:53Z",
+      "id": "Genesis-Embodied-AI/genesis-world#3836",
+      "issue_number": 3836,
+      "prediction_deadline_at": "2026-11-16T03:42:53Z",
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "source": "inbox/FIRST_SEEN_20261115T214253Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "f52be768c63e0be7b6d33de5a1394d4fb357d8ac5bb500738f3acdc5b3113187"
+    },
+    {
+      "created_at": "2026-11-15T21:31:38Z",
+      "first_frozen_at": "2026-11-15T21:42:53Z",
+      "id": "Genesis-Embodied-AI/genesis-world#3838",
+      "issue_number": 3838,
+      "prediction_deadline_at": "2026-11-16T03:42:53Z",
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "source": "inbox/FIRST_SEEN_20261115T214253Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "7f1e2106927c07f5e04c84db250ec2b9d252a33e5866e289bbde29513ef54e54"
     }
   ]
 }
