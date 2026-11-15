@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "pefribeiro",
+      "body": "## Bug report\n\n**Required Info:**\n\n- Operating System:\n  - Ubuntu 26.04.1 LTS (resolute) on Docker\n- Computer:\n  - N/A\n- ROS2 Version:\n  - Lyrical Luth\n- Version or commit hash:\n  - ros-lyrical-nav2-simple-commander                  1.5.1-1resolute.20260813.024902\n- DDS implementation:\n  - FastDDS (default)\n\n#### Steps to reproduce issue\n```\nros2 launch nav2_simple_commander  security_demo_launch.py\n```\n\n#### Expected behavior\nA demo that works.\n\n#### Actual behavior\n```\n[demo_security-9] [INFO] [1794782448.518771036] [basic_navigator]: Nav2 is ready for use!\n[demo_security-9] Traceback (most recent call last):\n[demo_security-9]   File \"/opt/ros/lyrical/lib/nav2_simple_commander/demo_security\", line 33, in <module>\n[demo_security-9]     sys.exit(load_entry_point('nav2-simple-commander==1.0.0', 'console_scripts', 'demo_security')())\n[demo_security-9]              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n[demo_security-9]   File \"/opt/ros/lyrical/lib/python3.14/site-packages/nav2_simple_commander/demo_security.py\", line 70, in main\n[demo_security-9]     go_through_poses_task = navigator.goThroughPoses(route_poses)\n[demo_security-9]   File \"/opt/ros/lyrical/lib/python3.14/site-packages/nav2_simple_commander/robot_navigator.py\", line 227, in goThroughPoses\n[demo_security-9]     self.info(f'Navigating with {len(poses.goals)} goals....')\n[demo_security-9]                                      ^^^^^^^^^^^\n[demo_security-9] AttributeError: 'list' object has no attribute 'goals'\n```\n\n#### Reproduction instructions\n\n#### Additional information\nI understand that goThroughPoses now expects a nav_msgs/Goals message, but the installed demo still passes a plain list of poses. I'm not entirely sure what motivated the change. I would suggest some basic CI check on these perhaps could help prevent unnoticed breaks in the future. \n\nRelated, in the [demo section](https://github.com/ros-navigation/navigation2/tree/main/nav2_simple_commander#usage-of-demos-and-examples), there are references to https://github.com/aws-robotics/aws-robomaker-small-warehouse-world, but that seems to be unmaintained (indeed, I can't find a package for Lyrical Luth).\n",
+      "created_at": "2026-11-15T22:51:06Z",
+      "html_url": "https://github.com/ros-navigation/navigation2/issues/6790",
+      "id": "ros-navigation/navigation2#6790",
+      "issue_number": 6790,
+      "labels": [],
+      "repository": "ros-navigation/navigation2",
+      "surface_sha256": "b008f055670880787fc9162024d1727af1618ff8fb3b4a5ba06ac31f72d22c9f",
+      "title": "security_demo broken on Lyrical Luth"
+    }
+  ],
+  "post_activation_issue_identities_observed": 643,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-15T23:10:02Z",
+  "schema_version": 1
+}
