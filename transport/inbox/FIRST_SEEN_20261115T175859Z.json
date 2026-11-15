@@ -1,0 +1,29 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "zhangyue19921010",
+      "body": "### Ticket Type\n\nBug report\n\n### Description\n\nDepth videos recorded with the default encoder can return incorrect pixels at valid timestamps after separately encoded episodes are concatenated. A seek starting at an HEVC CRA/open-GOP point can also miss the next episode's first frame. Streaming episode slices use the same unsafe random-entry points.\n\nA 3/5/4-frame recording with default depth settings reproduces this: requesting timestamps 0.2 and 0.4 seconds returns successfully, but the second frame differs from sequential decoding by up to 486 depth codes. Sequential decoding matches all original quantized input frames. Increasing timestamp tolerance would not detect this silent error.\n\n### Environment\n\nMain `fe1c54594f6ba275fccf210b9f7b11f0e2324b89`, Linux CPU, Python 3.12.14, PyAV 15.1.0, libavcodec 61.19.101, x265 4.1+1. Local generated float-metre depth frames; no hardware or downloaded dataset.\n\n### Context & Reproduction\n\n```python\nfrom pathlib import Path\nfrom tempfile import mkdtemp\n\nimport av\nimport numpy as np\n\nfrom lerobot.datasets.lerobot_dataset import LeRobotDataset\nfrom lerobot.datasets.video_utils import decode_video_frames_pyav\n\nroot = Path(mkdtemp()) / \"dataset\"  # retained for inspection\nkey = \"observation.images.depth\"\ndataset = LeRobotDataset.create(\n    \"local/depth-seek\", root=root, fps=10, encoder_threads=1,\n    features={key: {\"dtype\": \"video\", \"shape\": (32, 48, 1),\n                    \"names\": [\"height\", \"width\", \"channels\"],\n                    \"info\": {\"is_depth_map\": True}}},\n)\nfor episode, length in enumerate((3, 5, 4)):\n    for frame in range(length):\n        depth = np.linspace(0.5, 1.5, 32 * 48, dtype=np.float32).reshape(32, 48, 1)\n        dataset.add_frame({key: depth + episode + frame / 10, \"task\": \"move\"})\n    dataset.save_episode()\ndataset.finalize()\ndataset = LeRobotDataset(dataset.repo_id, root=root, video_backend=\"pyav\")\npath = root / dataset.meta.get_video_file_path(0, key)\nwith av.open(str(path)) as container:\n    sequential = [frame.to_ndarray(format=\"gray12le\") for frame in container.decode(video=0)]\nactual = decode_video_frames_pyav(path, [0.2, 0.4], 1e-4, is_depth=True)\nerrors = [int(np.abs(actual[n, 0].numpy().astype(int) - sequential[i]).max())\n          for n, i in enumerate((2, 4))]\nprint(\"Retained dataset:\", root)\nprint(\"Maximum depth-code errors:\", errors)\n```\n\nObserved: `Maximum depth-code errors: [0, 486]`. Expected: `[0, 0]`.\n\n### Additional Info / Workaround\n\nRecording with `DepthEncoderConfig(extra_options={\"x265-params\": \"lossless=1:open-gop=0:bframes=0\"})` prevents the demonstrated failure. Both ordinary and streaming recording reproduce it with the original defaults. A separate raw PyAV encode/concat reproduction also fails; the exact dependency component responsible has not been isolated. The existing stream-copy cut-point checks in #4498 do not fix ordinary random access to recorded files.\n\nChanging encoder defaults only protects future recordings using those defaults. Existing open-GOP files and explicit or restored old `extra_options` are not repaired. Closed GOPs can increase file size. Disabling B frames also avoids inconsistent decode delays when very short and longer independently encoded episodes are concatenated.\n\n- [x] Searched matching Issues, PRs and discussions.\n- [x] Reproduced on current main.\n- [ ] Verified on a second environment.\n\nAI assisted with investigation, testing and writing.\n",
+      "created_at": "2026-11-15T17:42:07Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5376",
+      "id": "huggingface/lerobot#5376",
+      "issue_number": 5376,
+      "labels": [
+        "bug",
+        "dataset",
+        "dependencies",
+        "sensors"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "2b911d7287dba76c7fde200efdac892351a7a04aa2637b1be5d009efe59fa813",
+      "title": "fix(datasets): default depth videos return wrong pixels after seeking"
+    }
+  ],
+  "post_activation_issue_identities_observed": 639,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-15T17:58:59Z",
+  "schema_version": 1
+}
