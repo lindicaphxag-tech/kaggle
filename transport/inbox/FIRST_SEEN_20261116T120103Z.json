@@ -1,0 +1,52 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 3,
+  "new_candidates": [
+    {
+      "author_login": "duburcqa",
+      "body": "### What feature or enhancement are you proposing?\n\nReconstruct the surface of particle entities (SPH, MPM with `vis_mode=\"recon\"`) on the GPU, in Quadrants, as part of the rendering context.\n\n- Splat the particles into a density field and turn it into a signed distance field (SDF) on sparse bricks.\n- Use temporal coherence: recompute a brick only when a particle in its support moved more than a tolerance since that brick was last rebuilt, and grow the active set of bricks from the previous one by the measured maximum displacement, falling back to a full rebuild past a threshold. Nothing assumes a bound on the time step, so implicit integrators and long gaps between requests stay correct.\n- The tolerance is an internal constant, a fraction of the cell size: the surface is an approximation, so matching a full rebuild exactly is no goal.\n- Size the brick pool from the particle count.\n- Ray casting on visual targets marches the field directly.\n- Extract the mesh with marching cubes on the GPU (count, prefix sum, emit) for drawn entities only, re-extracting dirty bricks only. Its buffer follows the contacts pattern: a capacity with a default derived from the brick pool, and an overflow reported through errno.\n- Whether the update runs every step when a consumer needs it, or lazily per request, is decided by measuring both on an SPH dam break and the MPM cutting dragon.\n- One implementation for every backend.\n\n### Motivation\n\nReconstruction runs splashsurf or a level set on the CPU, per entity and per environment, on every frame, which is too slow to be usable. It lives in the rasterizer and is duplicated in the Nyx plugin, and ray casting cannot hit a reconstructed surface.\n\n### Potential Benefit\n\nSolid rendering of fluids and of MPM bodies whose topology changes (cutting, fracture) at interactive speed, shared by every rendering backend and by ray casting.\n\n### What is the expected outcome of the implementation work?\n\n- The CPU reconstruction path is removed.\n- A first prototype on a dense grid is compared with splashsurf for quality and speed before committing to sparse bricks.\n\n### Additional information\n\nLow priority.\n",
+      "created_at": "2026-11-16T11:59:05Z",
+      "html_url": "https://github.com/Genesis-Embodied-AI/genesis-world/issues/3841",
+      "id": "Genesis-Embodied-AI/genesis-world#3841",
+      "issue_number": 3841,
+      "labels": [],
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "surface_sha256": "b5935fefcdc4bd1b51f22c252ad17c437f419e29a0346f4b703dcdfdaba4ab14",
+      "title": "[Feature]: GPU surface reconstruction of particle entities."
+    },
+    {
+      "author_login": "KLYSxc616",
+      "body": "Hi AlpaSim team,\n\nOur nuPlan submission has completed successfully, but it has not appeared on the public leaderboard after repeated checks.\n\n### Observed behavior\n\nAs of November 16, 2026, 07:42 UTC:\n\n- The submission status API reports that evaluation completed successfully.\n- The public nuPlan leaderboard API still returns 258 entries and does not include this submission.\n- Repeated direct API requests, including requests with caching disabled, return the same result.\n- The competition API still reports `OPEN`.\n\nWe checked the competition announcements but could not find a notice about a leaderboard freeze or a publication delay.\n\n### Expected behavior\n\nA successfully evaluated official submission should appear on the public leaderboard with its ranking, PCS, and other published metrics.\n\nCould you please confirm whether leaderboard updates are currently delayed or temporarily paused, and when completed submissions are expected to appear?\n\nWith the nuPlan deadline approaching, we would appreciate any clarification. Please let us know if additional diagnostic information would help.\n\nThank you!\n",
+      "created_at": "2026-11-16T09:30:32Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/244",
+      "id": "NVlabs/alpasim#244",
+      "issue_number": 244,
+      "labels": [
+        "bug"
+      ],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "3b638e6036ee6ccefbc9b722462c5338588ad0a4e092be7ce282cf2ddfc72531",
+      "title": "[E2E Challenge][nuPlan] Successful submission not appearing on the public leaderboard"
+    },
+    {
+      "author_login": "dearlucaszhou",
+      "body": "### Intro\n\nI use the standalone MuJoCo Studio application on Windows to inspect and edit a local MJCF model. The model loads successfully and the simulation can run, but I encountered a failure to open the native save dialog after loading the model.\n\n\n### My setup\n\nMuJoCo Studio 4.0.1, official Windows x86_64 binary distribution.\nStandalone mujoco_studio.exe, not the Python or browser viewer.\nWindows x86_64; the exact Windows version/build was not recorded.\nModel stored in a local, ASCII-only path: C:\\generated_robot-mjcf\\robot.xml, with a sibling meshes directory.\nThe same issue has not been independently verified on current main.\n\n### What's happening? What did you expect?\n\nSettinAfter loading the MJCF model, clicking File \u2192 Save XML produces no visible save dialog and no visible error. Save MJB was also tried with the same visible result. Moving the model to an ASCII-only local path did not resolve it.\n\nAs a control, launching a second, fresh Studio window and selecting File \u2192 Save XML before loading a model does show a save dialog; it can be cancelled normally.\n\nExpected: the native save dialog should open after a model has been loaded, allowing a new output filename, or Studio should show a useful error explaining why it cannot open the dialog.\n\nSaving subsequently became possible in a later session, but the specific change that made it work was not isolated. This report documents the earlier observed failure; the exact triggering conditions and a reliable workaround are not yet established.g `rgba=\"1 0 0 1\"` renders as **green**, I expected it to render as **red**.\n\nHere is a screen-shot showing a green sphere:\n\n\n### Steps for reproduction\n\nThese are the steps under which the failure was observed, rather than a confirmed minimal reproducer for every installation:\n1. Extract the official MuJoCo 4.0.1 Windows x86_64 distribution.\n2. Launch bin\\mujoco_studio.exe.\n3. Load the local MJCF at C:\\generated_robot-mjcf\\robot.xml. Confirm that the model is visible and can simulate.\n4. Select File \u2192 Save XML. Observe that no native save dialog appears.\n5. Try File \u2192 Save MJB; the dialog also did not appear in the affected session.\n6. For comparison, launch another fresh Studio window, do not load a model, and select File \u2192 Save XML. The save dialog appears in that case.\n\n### Minimal model for reproduction\n\nIf you encountered the issue in a complex model, please simplify it as much as possible (while still reproducing the issue).\n\n<details>\n<summary>minimal XML</summary>\n\n```XML\n\n<mujoco>\n  <worldbody>\n    <light pos=\"0 0 1\"/>\n    <geom type=\"sphere\" size=\"1\" rgba=\"1 0 0 1\"/>\n  </worldbody>\n</mujoco>\n\n```\n</details>\n\n\n### Code required for reproduction\n\n```python\nimport mujoco\nimport mediapy as media\nmodel = mujoco.MjModel.from_xml_string(xml)\ndata = mujoco.MjData(model)\n\nwith mujoco.Renderer(model) as renderer:\n  mujoco.mj_forward(model, data)\n  renderer.update_scene(data)\n\n  media.show_image(renderer.render())\n```\n\n\n### Confirmations\n\n- [x] I searched the [latest documentation](https://mujoco.readthedocs.io/en/latest/overview.html) thoroughly before posting.\n- [x] I searched previous [Issues](https://github.com/google-deepmind/mujoco/issues) and [Discussions](https://github.com/google-deepmind/mujoco/discussions), I am certain this has not been raised before.",
+      "created_at": "2026-11-16T10:52:22Z",
+      "html_url": "https://github.com/google-deepmind/mujoco/issues/3910",
+      "id": "google-deepmind/mujoco#3910",
+      "issue_number": 3910,
+      "labels": [
+        "bug"
+      ],
+      "repository": "google-deepmind/mujoco",
+      "surface_sha256": "c77734248092c1544adeb0bc1c09dc1c63a67c8d955238f06e7fa5a9f76bf3e4",
+      "title": "Studio on Windows: Save XML / Save MJB silently fail to open a dialog after loading a model"
+    }
+  ],
+  "post_activation_issue_identities_observed": 650,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-16T12:01:03Z",
+  "schema_version": 1
+}

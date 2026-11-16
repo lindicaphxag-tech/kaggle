@@ -9701,6 +9701,39 @@
       "source": "inbox/FIRST_SEEN_20261116T093111Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "a8b4df2459c7672c159f07a35630cad1bebeb231012e633b3ec762c3a7e6fbec"
+    },
+    {
+      "created_at": "2026-11-16T11:59:05Z",
+      "first_frozen_at": "2026-11-16T12:01:03Z",
+      "id": "Genesis-Embodied-AI/genesis-world#3841",
+      "issue_number": 3841,
+      "prediction_deadline_at": "2026-11-16T18:01:03Z",
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "source": "inbox/FIRST_SEEN_20261116T120103Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "b5935fefcdc4bd1b51f22c252ad17c437f419e29a0346f4b703dcdfdaba4ab14"
+    },
+    {
+      "created_at": "2026-11-16T09:30:32Z",
+      "first_frozen_at": "2026-11-16T12:01:03Z",
+      "id": "NVlabs/alpasim#244",
+      "issue_number": 244,
+      "prediction_deadline_at": "2026-11-16T18:01:03Z",
+      "repository": "NVlabs/alpasim",
+      "source": "inbox/FIRST_SEEN_20261116T120103Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "3b638e6036ee6ccefbc9b722462c5338588ad0a4e092be7ce282cf2ddfc72531"
+    },
+    {
+      "created_at": "2026-11-16T10:52:22Z",
+      "first_frozen_at": "2026-11-16T12:01:03Z",
+      "id": "google-deepmind/mujoco#3910",
+      "issue_number": 3910,
+      "prediction_deadline_at": "2026-11-16T18:01:03Z",
+      "repository": "google-deepmind/mujoco",
+      "source": "inbox/FIRST_SEEN_20261116T120103Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "c77734248092c1544adeb0bc1c09dc1c63a67c8d955238f06e7fa5a9f76bf3e4"
     }
   ]
 }
