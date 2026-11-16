@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "Revinand",
+      "body": "### Bug Description\n\n`gs.Mesh.sample_point_cloud()` and `genesis.utils.point_cloud.sample_mesh_point_cloud()` default to `seed=None` and `use_cache=True`. With no seed, `sample_mesh_point_cloud` generates a random seed (`int(np.random.SeedSequence().entropy)`) and uses it in the cache key, but never returns it. No later call can ask for that seed, which means every unseeded call writes a cache entry that is never read again, and the `fps_pc` cache directory keeps growing. `MeshCache` documents its key parameters as \"Must be exactly reproducible across runs\", which a random seed is not. The tactile sensor passes `seed=0` and is not affected.\n\n### Steps to Reproduce\n\nSave this as `fps_cache.py` and run it with an empty directory, e.g. `python fps_cache.py /tmp/gs_cache`:\n\n```python\nimport os\nimport sys\nfrom pathlib import Path\n\nimport trimesh\n\ncache_root = Path(sys.argv[1])\nos.environ[\"GS_CACHE_FILE_PATH\"] = str(cache_root)\n\nimport genesis as gs\n\ngs.init(backend=gs.cpu, logging_level=\"warning\")\nmesh = gs.Mesh.from_trimesh(trimesh.creation.icosphere(subdivisions=4))\nprint(\"verts\", len(mesh.verts))\nfor i in range(5):\n    points = mesh.sample_point_cloud(64)\n    files = [p for p in (cache_root / \"fps_pc\").rglob(\"*\") if p.is_file()]\n    print(f\"call {i + 1}: points {points.shape}, cache files {len(files)}, bytes {sum(p.stat().st_size for p in files)}\")\ngs.destroy()\n```\n\n### Expected Behavior\n\nCalls without a seed do not add cache entries that no later call can read. Each call here adds about 62 KB, which adds up in a loop that resamples a point cloud every episode.\n\n### Relevant log output\n\n```shell\nverts 2562\ncall 1: points (64, 3), cache files 1, bytes 62515\ncall 2: points (64, 3), cache files 2, bytes 125030\ncall 3: points (64, 3), cache files 3, bytes 187545\ncall 4: points (64, 3), cache files 4, bytes 250060\ncall 5: points (64, 3), cache files 5, bytes 312575\n```\n\n### Environment\n\n- OS: Ubuntu 24.04.5 LTS\n- GPU/CPU: Intel Core i7-9700, CPU backend (`gs.cpu`)\n- GPU-driver version: N/A\n- CUDA / CUDA-toolkit version: N/A\n\n### Release version or Commit ID\n\n6c4ffdd4dae18b2593553e646fd01e3a3bfc4bc4 (main, installed from source)\n\n### Additional Context\n\nSkipping the cache when the seed was generated keeps seeded calls cached as before. I have a fix with a test and will open a PR.\n",
+      "created_at": "2026-11-16T22:12:02Z",
+      "html_url": "https://github.com/Genesis-Embodied-AI/genesis-world/issues/3847",
+      "id": "Genesis-Embodied-AI/genesis-world#3847",
+      "issue_number": 3847,
+      "labels": [],
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "surface_sha256": "f2b2df3dbf0c62822e3cd5d192a3918fed9f80760582ee44e2cec5cdecd23d93",
+      "title": "[Bug]: sample_point_cloud without a seed writes a cache entry that is never read"
+    }
+  ],
+  "post_activation_issue_identities_observed": 654,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-16T22:30:34Z",
+  "schema_version": 1
+}
