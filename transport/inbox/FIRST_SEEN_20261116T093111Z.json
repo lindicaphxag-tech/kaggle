@@ -1,0 +1,62 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 4,
+  "new_candidates": [
+    {
+      "author_login": "shoumikhin",
+      "body": "### \ud83d\udcda Documentation\n\nThe export guide uses TorchScript for C++, and TorchScript is deprecated in PyTorch. Users still ask how to run a policy from C++ (#2188, #1925).\n\nI would like to add an \"Export to ExecuTorch\" section. ExecuTorch is PyTorch's solution for deploying models on devices. It uses `torch.export` and writes one `.pte` file that runs from Python, or from C++ without PyTorch. The section would show a CPU export (XNNPACK), a GPU export (TensorRT), a check against `model.predict`, and a small C++ example. Docs only, no new dependency.\n\n### Checklist\n- [x] I have checked that there is no similar issue in the repo\n- [x] I have read the documentation\n",
+      "created_at": "2026-11-16T09:18:49Z",
+      "html_url": "https://github.com/DLR-RM/stable-baselines3/issues/2297",
+      "id": "DLR-RM/stable-baselines3#2297",
+      "issue_number": 2297,
+      "labels": [],
+      "repository": "DLR-RM/stable-baselines3",
+      "surface_sha256": "c53f20e631c2c006a0897173d3d3cb36069fad58a1ea4f336cc1057efc82ba25",
+      "title": "[Documentation] Add an ExecuTorch export example to the export guide"
+    },
+    {
+      "author_login": "xiaohai-AI",
+      "body": "### Environment\n\n- OS: Ubuntu 22.04 (Jammy), binary install from packages.osrfoundation.org\n- Gazebo Sim: Ignition Gazebo 6.18.0 (Fortress), `ign gazebo --versions`\n- Physics: libignition-physics5 **5.4.1-1~jammy** (broken) vs **5.4.0-1~jammy** (works)\n- ROS 2 Humble is present on the system but not involved (pure Gazebo Transport / JointTrajectoryController path)\n\n### Description\n\nAfter an `apt` upgrade of the whole libignition-physics5 family from 5.4.0 to 5.4.1 (2026-11-10 09:24 local time), joint actuation through the dartsim plugin stopped working entirely, **silently**:\n\n- The JointTrajectoryController system loads, subscribes to the trajectory topic, and publishes progress normally (progress reaches 1).\n- No errors or warnings appear in the logs.\n- However, no force is applied to the joints at all: the arm simply droops under gravity, as if the joint force commands were dropped.\n\nThe same setup had passed full evaluations (9/9, 8/9, 8/9 task scores) on 5.4.0 earlier the same day, before the upgrade.\n\n### Steps to reproduce\n\n1. On Ubuntu 22.04, install Fortress from the OSRF apt repository with libignition-physics5-dartsim at version 5.4.1-1~jammy.\n2. Launch any world containing a revolute-joint model actuated by the JointTrajectoryController system (or a JointPositionController using force/PID mode) with the default dartsim physics engine.\n3. Send a joint trajectory that lifts a link against gravity.\n\n### Expected behavior\n\nThe joints apply force and follow the commanded trajectory, as they did with 5.4.0.\n\n### Actual behavior\n\nThe controller accepts the trajectory and reports progress, but the joints never move; the links hang/droop under gravity. Gravity, collision, and rendering all keep working \u2014 only joint force application is dead.\n\n### Isolation (A/B tests, same world + same SDF + same PID gains)\n\n| Configuration | Result |\n|---|---|\n| 5.4.1 + dartsim | No joint motion at all |\n| 5.4.1 + bullet | Joint forces applied (joints react strongly) |\n| 5.4.0 + dartsim | Works correctly (pre-upgrade baseline) |\n\nThis isolates the regression to the dartsim plugin's joint-force path in the 5.4.1 build, below the controller layer.\n\n### Regression window\n\n- Last known good: 5.4.0-1~jammy\n- First known bad: 5.4.1-1~jammy\n\nThe 5.4.1 changelog lists no intentional change to dartsim joint-force handling. One item that may be worth a look is the build/code modernization using fold expressions and `std::void_t` (PR #916), since the physics feature-selection machinery relies on `std::void_t`-based SFINAE selectors \u2014 if the joint-force feature were silently deselected for the dartsim plugin, the resulting behavior (calls becoming no-ops, no error anywhere) would match what is observed. This is only a guess; a packaging/build difference in the jammy binaries could equally be responsible.\n\n### Workaround\n\nDowngrade the libignition-physics5 family to 5.4.0-1~jammy and `apt-mark hold` the packages.\n\n### Additional observation\n\nThe world SDF requested `<physics type=\"ode\">`, but the ODE plugin was never installed, and the simulator silently fell back to dartsim without any warning. That silent fallback made this regression much harder to diagnose (the engine actually in use was not the one named in the SDF). A warning when the requested physics engine is unavailable would help.",
+      "created_at": "2026-11-16T05:47:42Z",
+      "html_url": "https://github.com/gazebosim/gz-physics/issues/1189",
+      "id": "gazebosim/gz-physics#1189",
+      "issue_number": 1189,
+      "labels": [],
+      "repository": "gazebosim/gz-physics",
+      "surface_sha256": "39ed4662574e5cf8837ff9a0f7141032d98e2d0cad851228df33c74595555542",
+      "title": "Regression in 5.4.1 (jammy binaries): dartsim plugin no longer applies joint forces \u2014 JointTrajectoryController runs and reports progress, but joints droop under gravity"
+    },
+    {
+      "author_login": "patelshivani2283-lab",
+      "body": "### Description\n1. In `tutorials/detachable_joints.md`:\n   - An example world link references the legacy `ign-gazebo2` branch (`https://github.com/gazebosim/gz-sim/blob/ign-gazebo2/examples/worlds/detachable_joint.sdf`) instead of `main`.\n   - Parameter list items for `detach_topic`, `attach_topic`, and `output_topic` lack SDF element markup (`<` and `>` inside backticks), unlike the other parameters in the list (`<parent_link>`, `<child_model>`, `<child_link>`).\n   - The phrasing `If multiple detachable plugin is used in one model` contains a pluralization typo (`plugin is` instead of `plugins are`), repeated 3 times.\n2. In `tutorials/model_command.md`:\n   - The command usage notes for `--link` and `--joint` are phrased and formatted inconsistently compared to the `--pose` and general model query instructions earlier in the tutorial.\n\n### Expected Behavior\n- Links should point to the active `main` branch.\n- Documentation parameter markup and grammar should be consistent and accurate.\n\n### Proposed Solution\n- Update the `detachable_joint.sdf` link to `main`.\n- Format parameter list items with consistent `<` and `>` markup.\n- Fix `plugin is` to `plugins are`.\n- Harmonize `--link` and `--joint` descriptions with the established pattern in `model_command.md`.",
+      "created_at": "2026-11-16T05:26:17Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4215",
+      "id": "gazebosim/gz-sim#4215",
+      "issue_number": 4215,
+      "labels": [],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "52471a26e18be9733e8bc940ae7d649b4b1217a6098b5dfd11fb364c646baca1",
+      "title": "Documentation: Fix parameter markup, legacy branch link, and phrasing in Detachable Joints and Model Command tutorials"
+    },
+    {
+      "author_login": "ttktjmt",
+      "body": "### The feature, motivation and pitch\n\nHi! I build [mjswan](https://github.com/ttktjmt/mjswan) on top of `@mujoco/mujoco`.\n\nMore than half of the current `mujoco.wasm` in `@mujoco/mujoco@4.0.1` is debug info: 3.88 MiB of DWARF and 1.81 MiB of function names out of 10.68 MiB (single-threaded). It comes from `-gsource-map -g` in `wasm/CMakeLists.txt`.\n\n`-g` is only a link flag, so the DWARF covers only emscripten's bundled libraries (libc, libc++), not mujoco. Yet it still limits Binaryen's optimizations.\n\nI'd propose to replace `-gsource-map -g` with `--profiling-funcs`. Function names stay, so stack traces remain readable.\n\n| Build | wasm (ST / MT) | brotli (ST) | JS glue |\n| --- | --- | --- | --- |\n| Current (`-gsource-map -g`) | 10.68 / 10.78 MiB | 1.98 MiB | 288 KiB |\n| `--profiling-funcs` | 5.37 / 5.35 MiB | 1.11 MiB | 167 KiB |\n\nI rebuilt tag `4.0.1` with emsdk 4.0.10, changing only these flags. All 178 tests in `wasm/` pass, and stepping `22_humanoids.xml` gives identical results at the same speed.\n\nWere `-g` and `-gsource-map` added for a particular workflow (e.g. the internal one mentioned under \"Debugging\" in the README)? If so, I could keep them behind a CMake option that stays off for the npm build.\n\nHappy to send a PR.\n\n### Alternatives\n\n- **Drop only `-g`:** same wasm size and keeps `mujoco.wasm.map`, but that map also covers only emscripten's libraries, and the JS glue stays unminified.\n- **Drop function names too:** 4.58 MiB (1.04 MiB brotli), but stack traces only show function indices.\n\n### Additional context\n\n_No response_",
+      "created_at": "2026-11-16T05:20:11Z",
+      "html_url": "https://github.com/google-deepmind/mujoco/issues/3909",
+      "id": "google-deepmind/mujoco#3909",
+      "issue_number": 3909,
+      "labels": [
+        "enhancement"
+      ],
+      "repository": "google-deepmind/mujoco",
+      "surface_sha256": "a8b4df2459c7672c159f07a35630cad1bebeb231012e633b3ec762c3a7e6fbec",
+      "title": "WASM: More than half of mujoco.wasm is debug info"
+    }
+  ],
+  "post_activation_issue_identities_observed": 647,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-16T09:31:11Z",
+  "schema_version": 1
+}
