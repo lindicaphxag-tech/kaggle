@@ -1,0 +1,13 @@
+{
+  "case_id": "open-rmf/rmf#738",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-11-17T13:10:15Z",
+  "expiry_sha256": "1a24c2150affb8c3f7f60daf556a70166019bf333f07cd8568857a4e273a4514",
+  "first_frozen_at": "2026-11-17T03:44:33Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-11-17T09:44:33Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "db91513252302ff6f234d907b34912dd291300c3a79a3b41b3076d276dc075b7"
+}

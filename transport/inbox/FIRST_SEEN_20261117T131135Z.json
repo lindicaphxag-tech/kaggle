@@ -1,0 +1,112 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 8,
+  "new_candidates": [
+    {
+      "author_login": "hiteshK03",
+      "body": "## Summary\n\nWith stock genesis-world 1.4.6 + quadrants 1.4.0 on an AMD Instinct MI355X (gfx950, `gs.gpu` -> AMDGPU backend), throughput in the stock speed benchmarks drops at large `n_envs`. Two of the three scenes we measured are slower at their largest N than at a smaller one:\n\n- anymal_c at 65536 envs is about **3x slower** than at 16384.\n- go2 at 131072 envs is about **2x slower** than at 16384.\n\nThe same shape is present on 1.4.5 + quadrants 1.3.3, so this is not a 1.4.6 regression.\n\n## Numbers\n\nUnits: M env-steps/s. Each value is the median of 3 timed windows of 300 `scene.step()` calls, with a device sync around each window, after 200 warm-up steps. Each scene ran on one card, with the same card for all N of a scene. The table shows the median of 2 rounds.\n\n| scene | N 4096 | N 8192 | N 16384 | large N |\n|---|---|---|---|---|\n| `examples/speed_benchmark/anymal_c.py` | 5.26 | 6.46 | 8.28 | **2.73** (65536) |\n| `examples/speed_benchmark/franka.py` | 6.82 | 9.74 | 15.52 | 17.09 (65536, flat) |\n| `examples/locomotion` Go2Env (go2_train.py cfgs, random actions) | 1.24 | 1.94 | 2.94 | **1.34** (131072) |\n\nFor comparison, genesis-world 1.4.5 + quadrants 1.3.3 on the same cards:\n\n| scene | N 16384 | large N |\n|---|---|---|\n| anymal_c | 6.06 | 3.43 (65536) |\n| go2 | 2.98 | 1.74 (131072) |\n\nA separate Go2 velocity-tracking task with PD gains and solver iterations pinned shows the same drop. Physics-only throughput is 3.78M at 16384 envs and 1.29M at 65536.\n\n## What we checked\n\n- **Collision / constraint buffer sizes.** Six buffer configurations at 65536 envs (including `max_collision_pairs` and the constraint buffer sizes) all gave about 1.11M env-steps/s on the Go2 task. Buffer sizing does not cause the drop.\n- **Toolchain.** A plain source build of quadrants v1.4.0 behaves the same as the PyPI wheel (within 0.96-1.01x at every point).\n- **Where the cost sits.** Experimental changes confined to the AMDGPU code generation in Quadrants (atomic memory ordering and launch-bound / block-size hints) raise anymal_c at 65536 from 2.73M to 19.1M and go2 at 131072 from 1.34M to 9.1M, with trajectories bitwise identical to stock on anymal_c and franka (go2 within stock run-to-run noise). This suggests the drop is in Quadrants' AMDGPU code generation or launch configuration rather than in Genesis' solver logic, but we have not isolated a single kernel.\n\n## Repro\n\n```bash\npip install genesis-world==1.4.6   # pulls quadrants 1.4.0\n# examples/speed_benchmark/anymal_c.py at tag v1.4.6: change only the n_envs literal (16384 vs 65536)\npython examples/speed_benchmark/anymal_c.py\n```\n\nTime `scene.step()` after warm-up, with a device sync around the timed window.\n\n## Environment\n\n- AMD Instinct MI355X (gfx950), Linux\n- Python 3.12, torch 2.11 (ROCm build)\n- genesis-world 1.4.6, quadrants 1.4.0 (also 1.4.5 / 1.3.3)\n- `gs.init(backend=gs.gpu, performance_mode=True)`, precision 32\n\nWe haven't tested whether the same happens on other GPU backends at these sizes. If useful, we can run a rocprof breakdown of the 16384 vs 65536 points.\n",
+      "created_at": "2026-11-17T06:18:47Z",
+      "html_url": "https://github.com/Genesis-Embodied-AI/genesis-world/issues/3850",
+      "id": "Genesis-Embodied-AI/genesis-world#3850",
+      "issue_number": 3850,
+      "labels": [],
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "surface_sha256": "9c95a210c66ed5cbae0546d7307f1303734ad760160bd149ceed670a6444e439",
+      "title": "AMDGPU: speed benchmarks get slower at large n_envs (anymal_c 65536 ~3x slower than 16384) on 1.4.6 / quadrants 1.4.0"
+    },
+    {
+      "author_login": "Gaochengzhi",
+      "body": "Hi AlpaSim team,\n\nThanks for organizing the challenge. We noticed on the HF Space updates page that the PAI-AV results have been finalized and the DGX Spark prizes have been decided. We have two questions:\n\n1. When and where will the final leaderboard (after the re-runs of the top teams with Harmonizer enabled) be published? Will it replace the current public leaderboard on the HF Space, or be released separately (e.g., an announcement or the NeurIPS workshop)?\n2. When and where will the Innovation Award (paper/report-based) results be announced? Will participants be notified by email, or will it only be announced at the NeurIPS World Models in Physical AI workshop?\n\nWe haven't received any results email yet, so we'd appreciate any clarification.\n\nThanks!",
+      "created_at": "2026-11-17T12:54:11Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/245",
+      "id": "NVlabs/alpasim#245",
+      "issue_number": 245,
+      "labels": [],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "6a93c04da8ef83e080f580ad0d6590c736b7b58ea6f79324b405f2dd69a55310",
+      "title": "Question about final leaderboard release and Innovation Award announcement"
+    },
+    {
+      "author_login": "patelshivani2283-lab",
+      "body": "### Description\nWhile reviewing Doxygen warnings and system docstrings:\n1. In `tutorials/using_components.md`, the heading `## Related Resources` generates an anchor ID `resources`, which collides with `\\page resources` in `tutorials/resources.md`, emitting:\n   `warning: multiple use of section label 'resources'`\n2. In `tutorials/component_jointforcecmd.md` and `tutorials/component_pose.md`, the syntax `extract a \\ref gz::sim::Model \"Model\":` has a colon directly contacting the quote, which causes Doxygen to fail resolving the identifier and emit:\n   `warning: unable to resolve reference to 'gz::sim::Model:' for \\ref command`\n3. In `src/systems/environmental_sensor_system/EnvironmentalSensorSystem.hh`, the `Tags:` block lacks standard Markdown list formatting, resulting in unsupported HTML/XML warnings for the parameter tags.\n4. In `src/systems/touch_plugin/TouchPlugin.hh`, there is a grammatical typo (`a contact sensors is placed` instead of `a contact sensor is placed`) and missing backtick markup for the scoped collision name pattern.\n\n### Expected Behavior\n- Section labels should be unique across tutorials without collisions.\n- `\\ref` commands should resolve cleanly to the intended class.\n- Parameter documentation should follow standard Markdown list conventions.\n\n### Proposed Solution\n- Rename heading in `using_components.md` to `## Additional References`.\n- Add space before colon in the `\\ref` targets in `component_jointforcecmd.md` and `component_pose.md`.\n- Standardize `## System Parameters` markdown list in `EnvironmentalSensorSystem.hh`.\n- Correct typo and markup in `TouchPlugin.hh`.",
+      "created_at": "2026-11-17T05:27:58Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4229",
+      "id": "gazebosim/gz-sim#4229",
+      "issue_number": 4229,
+      "labels": [],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "a4ef898ac614e865e5c0f73dc1ddda52435817b9f5060e8e735574ef66931ac9",
+      "title": "Documentation: Resolve Doxygen section label collision, ref parsing, and parameter warnings"
+    },
+    {
+      "author_login": "almightychang",
+      "body": "### Intro\n\nI contribute to MuJoCo Warp, which runs MuJoCo's GJK/EPA in float32 with the constants of the `mjUSESINGLE` build, so I compare against MuJoCo C built with `mjUSESINGLE`.\n\n### My setup\n\nMuJoCo C at main (aa9a0eaef), built with CMake and `-DmjUSESINGLE` in `CMAKE_C_FLAGS` and `CMAKE_CXX_FLAGS`. Linux x86_64, GCC. Double precision builds of the same commit for comparison.\n\n### What's happening? What did you expect?\n\nSince 3bbf510d4 (\"Improve NativeCCD numerical precision\"), a stack of thin box-shaped mesh plates resting exactly aligned on a mesh slab no longer settles in the single precision build. The four corner contacts of a face pair, which should have the same depth and the normal (0, 0, 1), get normals tilted by 3e-4 to 5e-4 rad and depths that differ by up to about 100 \u00b5m (for example -172, -209, -286, -249 \u00b5m on the top pair at step 999). The plates rock, and CG needs 10 to 20 times more iterations.\n\nMean CG iterations over the second half of 2000 steps, and max z drift of any plate over that half:\n\n| plates (8 mm thick) | double, main | single, 3bbf510d4^ | single, main |\n| --- | --- | --- | --- |\n| 3 | 1.3, 0.000 mm | 1.3, 0.000 mm | 16.8, 0.018 mm |\n| 4 | 1.8, 0.001 mm | 1.8, 0.001 mm | 26.4, 0.074 mm |\n| 5 | 2.0, 0.001 mm | 2.0, 0.001 mm | 19.9, 0.156 mm |\n\nWithin 3bbf510d4, the change comes from the single precision `mjMINDIST2` and `mjMINDIST3`, lowered from 1e-10f to 1e-17f: setting them back to 1e-10f restores equal depths, the (0, 0, 1) normal and 1 to 2 iterations. Reverting them is not a fix, though, because the lower values are what made shallow penetration work in single precision: with 1e-10f, `mj_geomDistance` returns 0 for aligned boxes or mesh boxes overlapping by 2 to 12 \u00b5m.\n\nI have a candidate fix in `engine_collision_gjk.c` that keeps both and leaves double precision results unchanged, and can send it as a PR.\n\n### Steps for reproduction\n\n1. Build MuJoCo with `-DmjUSESINGLE`.\n2. Compile the program below against it (with `-DmjUSESINGLE`) and run it on the model.\n3. Compare with a double precision build, or with single precision at 3bbf510d4^.\n\n### Minimal model for reproduction\n\n```xml\n<mujoco>\n  <option timestep=\"0.002\" solver=\"CG\" cone=\"elliptic\" impratio=\"10\" integrator=\"implicitfast\"\n          iterations=\"100\" ls_iterations=\"15\" tolerance=\"1e-6\"/>\n  <asset>\n    <mesh name=\"plate\" vertex=\"-0.105 -0.148 -0.004  -0.105 -0.148 0.004  -0.105 0.148 -0.004  -0.105 0.148 0.004\n                               0.105 -0.148 -0.004  0.105 -0.148 0.004  0.105 0.148 -0.004  0.105 0.148 0.004\"/>\n    <mesh name=\"slab\" vertex=\"-0.3 -0.3 -0.02  -0.3 -0.3 0.02  -0.3 0.3 -0.02  -0.3 0.3 0.02\n                              0.3 -0.3 -0.02  0.3 -0.3 0.02  0.3 0.3 -0.02  0.3 0.3 0.02\"/>\n  </asset>\n  <worldbody>\n    <body pos=\"0 0 0.02\"><geom type=\"mesh\" mesh=\"slab\"/></body>\n    <body pos=\"0 0 0.044\"><freejoint/><geom type=\"mesh\" mesh=\"plate\" mass=\"0.05\"/></body>\n    <body pos=\"0 0 0.052\"><freejoint/><geom type=\"mesh\" mesh=\"plate\" mass=\"0.05\"/></body>\n    <body pos=\"0 0 0.060\"><freejoint/><geom type=\"mesh\" mesh=\"plate\" mass=\"0.05\"/></body>\n  </worldbody>\n</mujoco>\n```\n\n### Code required for reproduction\n\n```c\n#include <math.h>\n#include <stdio.h>\n#include <mujoco/mujoco.h>\n\nint main(int argc, char** argv) {\n  char err[1000];\n  mjModel* m = mj_loadXML(argv[1], NULL, err, sizeof(err));\n  mjData* d = mj_makeData(m);\n  double iters = 0, drift = 0, z0[3];\n  for (int step = 0; step < 2000; step++) {\n    mj_step(m, d);\n    if (step == 999) {\n      for (int c = 0; c < d->ncon; c++) {\n        printf(\"geoms %d-%d dist %+.1f um normal (%.4f %.4f %.4f)\\n\", d->contact[c].geom[0], d->contact[c].geom[1],\n               1e6 * d->contact[c].dist, d->contact[c].frame[0], d->contact[c].frame[1], d->contact[c].frame[2]);\n      }\n    }\n    if (step >= 1000) {\n      iters += d->solver_niter[0];\n      for (int p = 0; p < 3; p++) {\n        double z = d->qpos[7 * p + 2];\n        if (step == 1000) z0[p] = z;\n        drift = fmax(drift, fabs(z - z0[p]));\n      }\n    }\n  }\n  printf(\"mean CG iterations %.1f, max z drift %.3f mm\\n\", iters / 1000, 1e3 * drift);\n  return 0;\n}\n```\n\n### Confirmations\n\n- [x] I searched the latest documentation thoroughly before posting.\n- [x] I searched previous Issues and Discussions, I am certain this has not been raised before.\n",
+      "created_at": "2026-11-17T07:55:18Z",
+      "html_url": "https://github.com/google-deepmind/mujoco/issues/3914",
+      "id": "google-deepmind/mujoco#3914",
+      "issue_number": 3914,
+      "labels": [],
+      "repository": "google-deepmind/mujoco",
+      "surface_sha256": "7df07a77e8e1dbe85a61a6bf00fd454baab53a3cda55462ee947725cda5ce96e",
+      "title": "Single precision: EPA face normals tilt on exactly aligned face pairs since mjMINDIST2/3 were lowered to 1e-17"
+    },
+    {
+      "author_login": "DanielWang123321",
+      "body": "### Ticket Type\n\n\ud83d\udca1 Feature Request / Improvement\n\n### Environment & System Info\n\n```Shell\n\n```\n\n### Description\n\nHi Team,\nI'm from a robot company named UFACTORY. We tested a policy named RL-100(https://github.com/Lei-Kun/RL-100) on the xArm7 robot with a Realsense D555 depth camera, and it achieves a near-100% success rate on the pick&place task. \nIs there any chance the RL-100 policy could be integrated into lerobot?\n\n### Context & Reproduction\n\n_No response_\n\n### Relevant logs or stack trace\n\n```Shell\n\n```\n\n### Checklist\n\n- [x] I have searched existing tickets to ensure this isn't a duplicate.\n- [x] I am using the latest version of the `main` branch.\n- [x] I have verified this is not an environment-specific problem.\n\n### Additional Info / Workarounds\n\n_No response_",
+      "created_at": "2026-11-17T08:54:48Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5391",
+      "id": "huggingface/lerobot#5391",
+      "issue_number": 5391,
+      "labels": [
+        "enhancement",
+        "policies",
+        "sensors"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "b000c66aa7214c7a77cf1e9aab8a2d5bea57ad724f3bb74497f86a99e02a8932",
+      "title": "Request add new policy RL-100"
+    },
+    {
+      "author_login": "termvato",
+      "body": "### Proposal\n\nAdd an opt-in `SO101_STS3215_CFG` next to `SO101_HIGH_PD_CFG`: the existing `DCMotorCfg` on the five arm joints with\nper-joint values for the STS3215 servos under LeRobot's default registers (P 16, Acceleration 254, 12 V). Only\nparameter values for stock Isaac Lab classes; `SO101_CFG` and the gripper stay as they are.\n\n### Motivation\n\nWe replayed logged goals from 6 real SO-101 arms open loop (real start pose, tip error while moving, same metric for\nevery model):\n\n| data | `SO101_CFG` (physx variant) | proposed `DCMotorCfg` |\n|---|---|---|\n| arm 1, 3 held-out loaded logs | 18.1 mm | **8.2 mm** |\n| arm 2, [akoniti/dlsj-canonical](https://huggingface.co/datasets/akoniti/dlsj-canonical), 45 episodes | 15.0 mm | **6.1 mm** |\n| 4 public LeRobot SO-101 datasets, 40 episodes | 22.5 mm | **14.5 mm** (better on all 4 arms) |\n| lag behind the goal stream (real: 110 ms arm 2, 137 ms public) | 72 / 55 ms | **111 / 119 ms** |\n\nThe real follower runs 110-140 ms behind its targets; with these values the simulated arm does too, which matters for\npolicies that move between sim and the real arm.\n\nValues (per joint: shoulder_pan, shoulder_lift, elbow_flex, wrist_flex, wrist_roll):\n\n| | pan | lift | elbow | wrist_flex | wrist_roll |\n|---|---|---|---|---|---|\n| stiffness [N m/rad] | 18.20 | 20.79 | 20.56 | 20.23 | 12.31 |\n| damping [N m s/rad] | 1.651 | 1.874 | 1.846 | 1.843 | 1.129 |\n| saturation_effort [N m] | 7.152 | 6.891 | 7.138 | 7.152 | 7.152 |\n| armature [kg m^2] | 0.0487 | 0.05775 | 0.05319 | 0.05468 | 0.0351 |\n| friction = dynamic_friction [N m] | 0.1569 | 0.2969 | 0.2809 | 0.2056 | 0.105 |\n\n`actuator_velocity_limit = saturation_effort / damping`, so the DC motor curve gives the servo's law\n`clip(kp e, -sat, sat) - kd v` (duty limit on the P term, back-EMF outside it).\n\n### Alternatives\n\n`DelayedPDActuatorCfg` with a 16-20 ms delay scores the same (8.4 / 6.1 / 14.5 mm); the DC motor needs no delay\nbuffer. The 4 public datasets: lerobot/svla_so101_pickplace, ewinchell07/so101-spinning-table-all,\ndongyoonkim/so101-eraser-90ep-wrist, DecisionFacts/Physical_AI_SO101_Test_Tube_Nesting_Task.\n\n### Build Info\n\n- Isaac Lab Version: 2.3.2 actuator classes (the `DCMotor` law is unchanged on main)\n- Isaac Sim Version: 5.1.0 (PhysX, GPU, dt 0.5 ms)\n\n### Additional context\n\nLimit: one servo's values on all arms (registers on the public arms not logged, assumed LeRobot defaults); run on\nIsaac Sim 5.1 PhysX, not yet on Isaac Lab 3.0 / Newton.\n\nMuJoCo counterpart (same servos, same data): google-deepmind/mujoco_menagerie#368.\n\n### Checklist\n\n- [x] I have checked that there is no similar issue in the repo (**required**)\n\n### Acceptance Criteria\n\n- [ ] `SO101_STS3215_CFG` in `so101.py` with a changelog fragment; `SO101_CFG` unchanged\n- [ ] Loads and steps on PhysX and Newton\n\nHappy to open the PR if this is welcome.\n",
+      "created_at": "2026-11-17T10:21:00Z",
+      "html_url": "https://github.com/isaac-sim/IsaacLab/issues/9064",
+      "id": "isaac-sim/IsaacLab#9064",
+      "issue_number": 9064,
+      "labels": [],
+      "repository": "isaac-sim/IsaacLab",
+      "surface_sha256": "e1bbc5491a2e8d0c338e77daa91106bb11448f60a9acd976eca0f4c7068e40d9",
+      "title": "[Proposal] SO-101: DC motor actuator values that track real arms 1.5-2.4x closer than SO101_CFG"
+    },
+    {
+      "author_login": "Pirate-tek",
+      "body": "The **ConcatenatePaths BT node** directly appends the poses of input_path2 to input_path1 without explicitly validating coordinate-frame compatibility or transforming poses into a common frame.\n\nHowever, nav_msgs::msg::Path contains:\nA message-level header defining the path's reference frame.\nIndividual PoseStamped headers associated with each pose.\n\nIn my case, I used\nFirst mile: ComputePathToPose + ComputeRoute\nLast mile: ComputeRoute + ComputePathToPose\n\nBut, if the input paths originate from different coordinate frames (e.g., map and odom), directly appending their poses could produce an invalid path. **The current BT's implementation  preserves the header of input_path1 (falling back to input_path2 if necessary), but does not modify the individual PoseStamped headers of the appended poses.**\n\nConsequently, if the two input paths use different coordinate frames, the resulting Path could contain poses expressed in different frames while having only one path-level header.\n\nQuestions:\n- Should ConcatenatePaths validate that both input paths use compatible frames?\n- Should the node transform poses into a common frame when the input frames differ?\n- Should individual pose headers also be validated against the resulting Path header?\n\nExpected Behaviour:\nThe node should either enforce a common-frame contract or transform the input poses into a common coordinate frame before concatenation. This would prevent potentially invalid paths from being passed to downstream navigation components.",
+      "created_at": "2026-11-17T11:58:00Z",
+      "html_url": "https://github.com/ros-navigation/navigation2/issues/6802",
+      "id": "ros-navigation/navigation2#6802",
+      "issue_number": 6802,
+      "labels": [],
+      "repository": "ros-navigation/navigation2",
+      "surface_sha256": "a20163ce92d5c747ee4d33e4ed02297086213f92eb0bd6a9592608f511643e4d",
+      "title": "Potential Coordinate Frame Inconsistency in ConcatenatedPaths"
+    },
+    {
+      "author_login": "jf---",
+      "body": "The collision test suite has no ConvexMesh contact check near the contact-distance threshold, so a broadphase AABB that is too small would go unnoticed.\n\nThe convex cases in `collision_sphere_sphere_unit` and `collision_box_box_unit` (built with `makeConvexMesh`) expect contacts 20\u2013150 mm inside the contact distance (e.g. distance 0.5 at margin 0.52, 0.1 at margin 0.25). A ConvexMesh AABB 10 mm too small per side would drop real contacts and still pass all of them.\n\nUntil now the Bullet hull AABB carried 40 mm of slack per side (the stale `CONVEX_DISTANCE_MARGIN`), which hid this. #1413 makes it exact, which is correct but leaves no slack between the AABB and the contact distance. The broadphase is then only right if the AABB is never too small, and nothing tests that.\n\nProposed test: two ConvexMesh unit cubes face to face, at contact distances 10, 30 and 100 mm, along each axis. Expect one contact at the exact distance 0.1 mm inside the threshold and none 0.1 mm outside, for the Bullet simple, Bullet BVH and FCL discrete managers.\n",
+      "created_at": "2026-11-17T08:41:10Z",
+      "html_url": "https://github.com/tesseract-robotics/tesseract/issues/1414",
+      "id": "tesseract-robotics/tesseract#1414",
+      "issue_number": 1414,
+      "labels": [],
+      "repository": "tesseract-robotics/tesseract",
+      "surface_sha256": "e5fc1e350c64d299d00948444c099ae6ae12557963b8051bda539dfc6f60114a",
+      "title": "Collision test suite has no ConvexMesh contact check near the contact-distance threshold"
+    }
+  ],
+  "post_activation_issue_identities_observed": 665,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-17T13:11:35Z",
+  "schema_version": 1
+}
