@@ -9955,6 +9955,28 @@
       "source": "inbox/FIRST_SEEN_20261117T131135Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "e5fc1e350c64d299d00948444c099ae6ae12557963b8051bda539dfc6f60114a"
+    },
+    {
+      "created_at": "2026-11-17T14:49:00Z",
+      "first_frozen_at": "2026-11-17T14:52:54Z",
+      "id": "gazebosim/gz-sim#4236",
+      "issue_number": 4236,
+      "prediction_deadline_at": "2026-11-17T20:52:54Z",
+      "repository": "gazebosim/gz-sim",
+      "source": "inbox/FIRST_SEEN_20261117T145254Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "c3f60d4db78e2ca7d73214ea8d1bf548fbf8f749df82c1f64327f5b0a17a8cdc"
+    },
+    {
+      "created_at": "2026-11-17T14:29:43Z",
+      "first_frozen_at": "2026-11-17T14:52:54Z",
+      "id": "ros2/rcl#1363",
+      "issue_number": 1363,
+      "prediction_deadline_at": "2026-11-17T20:52:54Z",
+      "repository": "ros2/rcl",
+      "source": "inbox/FIRST_SEEN_20261117T145254Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "f8f789f564ba45fc0db362faba37195663d63fee5b2d788f8c52f94f9c050dfe"
     }
   ]
 }
