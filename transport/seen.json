@@ -9765,35 +9765,47 @@
     },
     {
       "created_at": "2026-11-16T20:06:03Z",
+      "expiry_recorded_at": "2026-11-17T03:43:23Z",
+      "expiry_sha256": "d68239242ac9ff38313271b5a96bb670fb9862dfe3440636e01bd507bb83ea8b",
+      "expiry_source": "expirations/RobotLocomotion__drake__25262.json",
       "first_frozen_at": "2026-11-16T20:21:54Z",
       "id": "RobotLocomotion/drake#25262",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 25262,
       "prediction_deadline_at": "2026-11-17T02:21:54Z",
       "repository": "RobotLocomotion/drake",
       "source": "inbox/FIRST_SEEN_20261116T202154Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "282b42f8657acf7314418bac0764c5d6345fff59e41891579f73e9604d1358bc"
     },
     {
       "created_at": "2026-11-16T16:38:36Z",
+      "expiry_recorded_at": "2026-11-17T03:43:23Z",
+      "expiry_sha256": "da40674d9e36adb1ecab379eb0e94c9a25a1193381ae1785ae09beacfcb4d8b4",
+      "expiry_source": "expirations/ros2__rclcpp__3414.json",
       "first_frozen_at": "2026-11-16T20:21:54Z",
       "id": "ros2/rclcpp#3414",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3414,
       "prediction_deadline_at": "2026-11-17T02:21:54Z",
       "repository": "ros2/rclcpp",
       "source": "inbox/FIRST_SEEN_20261116T202154Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "700b7b48f304c3d9d587454e5792610b6cfb906a388bbdeebbfc2280e0e431bd"
     },
     {
       "created_at": "2026-11-16T18:12:51Z",
+      "expiry_recorded_at": "2026-11-17T03:43:23Z",
+      "expiry_sha256": "99968bd133cff8802ff1b801bc903a52403987ff7bc06ae817e6315367677904",
+      "expiry_source": "expirations/ros2__rclpy__1769.json",
       "first_frozen_at": "2026-11-16T20:21:54Z",
       "id": "ros2/rclpy#1769",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 1769,
       "prediction_deadline_at": "2026-11-17T02:21:54Z",
       "repository": "ros2/rclpy",
       "source": "inbox/FIRST_SEEN_20261116T202154Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "0b7d45ed827538108db97dedd56485cb3373807cf5fa4a9d0080bed544062309"
     },
     {
@@ -9806,6 +9818,39 @@
       "source": "inbox/FIRST_SEEN_20261116T223034Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "f2b2df3dbf0c62822e3cd5d192a3918fed9f80760582ee44e2cec5cdecd23d93"
+    },
+    {
+      "created_at": "2026-11-17T00:09:41Z",
+      "first_frozen_at": "2026-11-17T03:44:33Z",
+      "id": "moveit/moveit2#3978",
+      "issue_number": 3978,
+      "prediction_deadline_at": "2026-11-17T09:44:33Z",
+      "repository": "moveit/moveit2",
+      "source": "inbox/FIRST_SEEN_20261117T034433Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "f80c24195f9bc40ae6aa7e1e7457f502433b528efec09dd4cadc45d1cc73da07"
+    },
+    {
+      "created_at": "2026-11-17T01:06:20Z",
+      "first_frozen_at": "2026-11-17T03:44:33Z",
+      "id": "open-rmf/rmf#738",
+      "issue_number": 738,
+      "prediction_deadline_at": "2026-11-17T09:44:33Z",
+      "repository": "open-rmf/rmf",
+      "source": "inbox/FIRST_SEEN_20261117T034433Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "db91513252302ff6f234d907b34912dd291300c3a79a3b41b3076d276dc075b7"
+    },
+    {
+      "created_at": "2026-11-17T00:36:03Z",
+      "first_frozen_at": "2026-11-17T03:44:33Z",
+      "id": "ros2/rclcpp#3418",
+      "issue_number": 3418,
+      "prediction_deadline_at": "2026-11-17T09:44:33Z",
+      "repository": "ros2/rclcpp",
+      "source": "inbox/FIRST_SEEN_20261117T034433Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "3dc53dd85c048a1af9bc71a76ced91ee2d3005fa25edd424f69729214928cfd5"
     }
   ]
 }
