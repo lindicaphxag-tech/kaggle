@@ -9810,13 +9810,17 @@
     },
     {
       "created_at": "2026-11-16T22:12:02Z",
+      "expiry_recorded_at": "2026-11-17T04:45:16Z",
+      "expiry_sha256": "714efd352222bb59bf02952f2168eb49ece2edac6a2a87da8e0d59a15dfb64d2",
+      "expiry_source": "expirations/Genesis-Embodied-AI__genesis-world__3847.json",
       "first_frozen_at": "2026-11-16T22:30:34Z",
       "id": "Genesis-Embodied-AI/genesis-world#3847",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3847,
       "prediction_deadline_at": "2026-11-17T04:30:34Z",
       "repository": "Genesis-Embodied-AI/genesis-world",
       "source": "inbox/FIRST_SEEN_20261116T223034Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "f2b2df3dbf0c62822e3cd5d192a3918fed9f80760582ee44e2cec5cdecd23d93"
     },
     {
