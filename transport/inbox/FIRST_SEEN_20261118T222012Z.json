@@ -1,0 +1,26 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "christophfroehlich",
+      "body": "## Describe the bug\n\nWhen the joint is beyond a soft limit, `JointSoftLimiter` lets a position command jump straight to the soft limit within a single update, which breaks the hard velocity limit.\n\nIn `JointSoftLimiter::on_enforce()` ([joint_soft_limiter.cpp](https://github.com/ros-controls/ros2_control/blob/master/joint_limits/src/joint_soft_limiter.cpp)), the position command is clamped to the soft interval, which is narrowed by the spring velocity bounds. That result is then intersected with the saturation limiter's interval `previous_command \u00b1 max_velocity * dt`. If the two intervals don't overlap, the saturation interval is **dropped** and only the soft interval is used. This fallback was added in #3275 to avoid the `std::clamp(lo > hi)` assertion with GCC 15.\n\nBeyond a soft limit the two intervals never overlap, so the command is set to the soft limit regardless of `max_velocity`. Example: hard limits \u00b11.57 rad, soft limits \u00b11.40 rad, `k_position` 10, `max_velocity` 1.0 rad/s, dt 0.01 s, actual position 1.45 rad:\n\n- soft interval: `[1.40, 1.40]`\n- saturation interval: `[1.44, 1.46]`\n- result: **1.40 rad**, a jump of 0.05 rad in 10 ms (5 rad/s) even though the command was to *hold* 1.45 rad\n\nVelocity commands behave as intended in the same situation: they bring the joint back at \u22481\u00b0/s.\n\nThis can happen when the joint is pushed beyond a soft limit (e.g., gravity, external forces, an effort-controlled phase) or when switching to a position controller there.\n\n## To Reproduce\n\nFailing test for `joint_limits/test/test_joint_soft_limiter.cpp`:\n\n```cpp\n// Beyond a soft limit, the soft interval and the velocity-reachable interval of the saturation\n// limiter do not overlap. The position command must still respect the hard velocity limit.\nTEST_F(JointSoftLimiterTest, position_beyond_soft_limit_respects_velocity_limit)\n{\n  SetupNode(\"soft_joint_limiter\");\n  ASSERT_TRUE(Load());\n\n  joint_limits::JointLimits limits;\n  limits.has_position_limits = true;\n  limits.min_position = -1.57;\n  limits.max_position = 1.57;\n  limits.has_velocity_limits = true;\n  limits.max_velocity = 1.0;\n  joint_limits::SoftJointLimits soft_limits;\n  soft_limits.min_position = -1.40;\n  soft_limits.max_position = 1.40;\n  soft_limits.k_position = 10.0;\n  ASSERT_TRUE(Init(limits, soft_limits));\n\n  const rclcpp::Duration period = rclcpp::Duration::from_seconds(0.01);\n  desired_state_ = {};\n  actual_state_ = {};\n  // the previous command is seeded with the actual position, the joint is commanded to hold it\n  actual_state_.position = 1.45;\n  desired_state_.position = 1.45;\n  joint_limiter_->enforce(actual_state_, desired_state_, period);\n  EXPECT_LE(\n    std::abs(desired_state_.position.value() - 1.45),\n    limits.max_velocity * period.seconds() + COMMON_THRESHOLD);\n}\n```\n\nOutput on current master:\n\n```\nExpected: (std::abs(desired_state_.position.value() - 1.45)) <= (limits.max_velocity * period.seconds() + COMMON_THRESHOLD), actual: 0.050000000000000044 vs 0.010001\n```\n\n## Expected behavior\n\nThe hard velocity limit should take precedence. If the intervals don't overlap, use the bound of the saturation interval that is closest to the soft interval: the joint then moves back toward the soft limit at no more than `max_velocity` (or at the spring/1\u00b0/s rate, to match velocity commands).\n\nNote that the existing test `position_soft_limits_no_overlap_with_velocity_reachable_range` (from #3275) currently asserts the jump (2.0 \u2192 0.75 within one period with `max_velocity` 1.0) and would need to be adapted. Any fix must still never call `std::clamp` with `lo > hi`.\n\n## Environment\n\n- ros2_control master (rolling)\n- Found while documenting the limiters in #3166 (review comment https://github.com/ros-controls/ros2_control/pull/3166#discussion_r4620982317)\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)\n",
+      "created_at": "2026-11-18T21:23:42Z",
+      "html_url": "https://github.com/ros-controls/ros2_control/issues/3796",
+      "id": "ros-controls/ros2_control#3796",
+      "issue_number": 3796,
+      "labels": [
+        "bug"
+      ],
+      "repository": "ros-controls/ros2_control",
+      "surface_sha256": "42b15380557f00c6d76933860e6cbbed80446eeec7087c1264a66fbd34406778",
+      "title": "JointSoftLimiter: position commands beyond a soft limit violate the velocity limit"
+    }
+  ],
+  "post_activation_issue_identities_observed": 691,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-18T22:20:12Z",
+  "schema_version": 1
+}

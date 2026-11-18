@@ -10346,6 +10346,17 @@
       "source": "inbox/FIRST_SEEN_20261118T212237Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "25fd71056802f323e6e159a798c366c640ff59ee3259b5eb7c6031c4b68ce61d"
+    },
+    {
+      "created_at": "2026-11-18T21:23:42Z",
+      "first_frozen_at": "2026-11-18T22:20:12Z",
+      "id": "ros-controls/ros2_control#3796",
+      "issue_number": 3796,
+      "prediction_deadline_at": "2026-11-19T04:20:12Z",
+      "repository": "ros-controls/ros2_control",
+      "source": "inbox/FIRST_SEEN_20261118T222012Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "42b15380557f00c6d76933860e6cbbed80446eeec7087c1264a66fbd34406778"
     }
   ]
 }
