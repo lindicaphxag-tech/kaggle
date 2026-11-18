@@ -1,0 +1,13 @@
+{
+  "case_id": "stack-of-tasks/pinocchio#2980",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-11-18T04:42:01Z",
+  "expiry_sha256": "360d2658ef1b810215d8808a9d4dd24163aa808d690e4b8ce0413b6968e06170",
+  "first_frozen_at": "2026-11-17T21:45:25Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-11-18T03:45:25Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "4b1653a476cad66874dda242b55b8e9d2035a0c20aca64a576b7e758c139defb"
+}

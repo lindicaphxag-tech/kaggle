@@ -1,0 +1,13 @@
+{
+  "case_id": "ros-perception/image_common#466",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-11-18T04:42:01Z",
+  "expiry_sha256": "9d8dbce97d341eec7cd557e185706d36f9f511375da4b265de451e6e5a9f0319",
+  "first_frozen_at": "2026-11-17T21:45:25Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-11-18T03:45:25Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "52607cb8b50dd68523b7fbc769b11017c617ab4fe23e0b6070f6307fda089cd7"
+}
