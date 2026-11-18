@@ -10170,14 +10170,62 @@
     },
     {
       "created_at": "2026-11-17T23:21:54Z",
+      "expiry_recorded_at": "2026-11-18T12:57:40Z",
+      "expiry_sha256": "310ce4821eaf3226aa425908104aa3d1bb16e179d52528b6ef9a8ebac16deb05",
+      "expiry_source": "expirations/google-deepmind__mujoco__3917.json",
       "first_frozen_at": "2026-11-18T03:40:24Z",
       "id": "google-deepmind/mujoco#3917",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3917,
       "prediction_deadline_at": "2026-11-18T09:40:24Z",
       "repository": "google-deepmind/mujoco",
       "source": "inbox/FIRST_SEEN_20261118T034024Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "7303f72dd5b76ef11e4edb24724071fdcace27f13dd7d6bb14527a32ac17c3de"
+    },
+    {
+      "created_at": "2026-11-18T06:19:00Z",
+      "first_frozen_at": "2026-11-18T12:58:55Z",
+      "id": "google-deepmind/mujoco#3919",
+      "issue_number": 3919,
+      "prediction_deadline_at": "2026-11-18T18:58:55Z",
+      "repository": "google-deepmind/mujoco",
+      "source": "inbox/FIRST_SEEN_20261118T125855Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "805ececc07bf26de360f4fe28228fb284b1ca1c3b98991d0c3e4999e254923f9"
+    },
+    {
+      "created_at": "2026-11-18T11:32:38Z",
+      "first_frozen_at": "2026-11-18T12:58:55Z",
+      "id": "huggingface/lerobot#5411",
+      "issue_number": 5411,
+      "prediction_deadline_at": "2026-11-18T18:58:55Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261118T125855Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "7cf1f24b7bd300319dff8988384b50f8a6b7271b2fbe0b6d35c5f11c4dcb7bc0"
+    },
+    {
+      "created_at": "2026-11-18T10:57:14Z",
+      "first_frozen_at": "2026-11-18T12:58:55Z",
+      "id": "robocasa/robocasa#235",
+      "issue_number": 235,
+      "prediction_deadline_at": "2026-11-18T18:58:55Z",
+      "repository": "robocasa/robocasa",
+      "source": "inbox/FIRST_SEEN_20261118T125855Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "bcea89be8bbd087095197d96096501b73c082bfcd6d11143ad08467c5558293b"
+    },
+    {
+      "created_at": "2026-11-18T12:43:25Z",
+      "first_frozen_at": "2026-11-18T12:58:55Z",
+      "id": "ros-controls/ros2_control#3788",
+      "issue_number": 3788,
+      "prediction_deadline_at": "2026-11-18T18:58:55Z",
+      "repository": "ros-controls/ros2_control",
+      "source": "inbox/FIRST_SEEN_20261118T125855Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "edd12ae96694c6e186017567ffce65484efd1de11c9ec7e92087f5f6a5835921"
     }
   ]
 }
