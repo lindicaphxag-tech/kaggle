@@ -10305,46 +10305,62 @@
     },
     {
       "created_at": "2026-11-18T19:54:46Z",
+      "expiry_recorded_at": "2026-11-19T03:49:21Z",
+      "expiry_sha256": "36569473df6ba974bea99957aad5227da43b4cd136b00a457d5336e4f3e91858",
+      "expiry_source": "expirations/RobotLocomotion__drake__25274.json",
       "first_frozen_at": "2026-11-18T21:22:37Z",
       "id": "RobotLocomotion/drake#25274",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 25274,
       "prediction_deadline_at": "2026-11-19T03:22:37Z",
       "repository": "RobotLocomotion/drake",
       "source": "inbox/FIRST_SEEN_20261118T212237Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "f8c9754682ed41a7f413361f83203d485b02826a883860fe8c4c6f91babbe0f2"
     },
     {
       "created_at": "2026-11-18T17:36:13Z",
+      "expiry_recorded_at": "2026-11-19T03:49:21Z",
+      "expiry_sha256": "0ea40282e84f5f20318cdbf6a4b8066f60894364f1d85a7c183f11039b2089fb",
+      "expiry_source": "expirations/UniversalRobots__Universal_Robots_ROS2_Driver__2095.json",
       "first_frozen_at": "2026-11-18T21:22:37Z",
       "id": "UniversalRobots/Universal_Robots_ROS2_Driver#2095",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 2095,
       "prediction_deadline_at": "2026-11-19T03:22:37Z",
       "repository": "UniversalRobots/Universal_Robots_ROS2_Driver",
       "source": "inbox/FIRST_SEEN_20261118T212237Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "dd16c5b0596482cdd602b90679f2786a14ac171dff3390a4d07b800b2535f7c7"
     },
     {
       "created_at": "2026-11-18T21:12:11Z",
+      "expiry_recorded_at": "2026-11-19T03:49:21Z",
+      "expiry_sha256": "254673b58691a08e35c1c5d8b3a52c50e4cea2c4acb29d00583933b4738c0932",
+      "expiry_source": "expirations/ros-controls__ros2_control__3794.json",
       "first_frozen_at": "2026-11-18T21:22:37Z",
       "id": "ros-controls/ros2_control#3794",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3794,
       "prediction_deadline_at": "2026-11-19T03:22:37Z",
       "repository": "ros-controls/ros2_control",
       "source": "inbox/FIRST_SEEN_20261118T212237Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "f8a65d9e40d2ecbea0976e0c9c05be586275a45bf7cbfcd9c4c867a8a6483020"
     },
     {
       "created_at": "2026-11-18T21:12:34Z",
+      "expiry_recorded_at": "2026-11-19T03:49:21Z",
+      "expiry_sha256": "66f561b6e539af626631ddb246072cd087c8dce311d6f1310b0739a67850d79f",
+      "expiry_source": "expirations/ros-controls__ros2_control__3795.json",
       "first_frozen_at": "2026-11-18T21:22:37Z",
       "id": "ros-controls/ros2_control#3795",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3795,
       "prediction_deadline_at": "2026-11-19T03:22:37Z",
       "repository": "ros-controls/ros2_control",
       "source": "inbox/FIRST_SEEN_20261118T212237Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "25fd71056802f323e6e159a798c366c640ff59ee3259b5eb7c6031c4b68ce61d"
     },
     {
@@ -10379,6 +10395,17 @@
       "source": "inbox/FIRST_SEEN_20261119T031644Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "1cdae78bb7e1d3fbb3da082b9dfbd196be514ac9da36938022bb5dbdbf140249"
+    },
+    {
+      "created_at": "2026-11-19T03:29:25Z",
+      "first_frozen_at": "2026-11-19T03:50:27Z",
+      "id": "Genesis-Embodied-AI/genesis-world#3865",
+      "issue_number": 3865,
+      "prediction_deadline_at": "2026-11-19T09:50:27Z",
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "source": "inbox/FIRST_SEEN_20261119T035027Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "0364d05b5fb7b19f8ae4cb194c9e7efb6534a48a6a60e5d5ae2025c714035aee"
     }
   ]
 }

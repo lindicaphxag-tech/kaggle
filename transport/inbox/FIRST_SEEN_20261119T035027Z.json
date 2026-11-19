@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "MohammadHijjawi97",
+      "body": "### Bug Description\n`genesis.utils.geom.inv_T` inverts a single 4x4 transform but raises on a batch of shape `(..., 4, 4)`, for numpy arrays and torch tensors alike. It transposes the rotation with `R.T`, which reverses every axis of a batched array.\n\n### Steps to Reproduce\n```python\nimport numpy as np, torch\nimport genesis as gs\ngs.init(backend=gs.cpu, precision=\"64\")\nimport genesis.utils.geom as gu\nfrom scipy.spatial.transform import Rotation\nT = np.tile(np.eye(4), (3, 1, 1))\nT[:, :3, :3] = Rotation.random(3, random_state=0).as_matrix()\nT[:, :3, 3] = np.random.default_rng(0).normal(size=(3, 3))\ngu.inv_T(T)                # ValueError: could not broadcast input array from shape (3,3,3) into shape (3,3)\ngu.inv_T(torch.tensor(T))  # RuntimeError: expand(torch.DoubleTensor{[3, 3, 3]}, size=[3, 3]) ...\n```\n\n### Expected Behavior\n`inv_T` returns the inverse of each transform, like `np.linalg.inv(T)`, as the other batched helpers of `genesis.utils.geom` do.\n\n### Environment\n- OS: Windows 11\n- CPU backend, torch CPU\n\n### Release version or Commit ID\nmain (genesis-world 1.4.7)\n",
+      "created_at": "2026-11-19T03:29:25Z",
+      "html_url": "https://github.com/Genesis-Embodied-AI/genesis-world/issues/3865",
+      "id": "Genesis-Embodied-AI/genesis-world#3865",
+      "issue_number": 3865,
+      "labels": [],
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "surface_sha256": "0364d05b5fb7b19f8ae4cb194c9e7efb6534a48a6a60e5d5ae2025c714035aee",
+      "title": "[Bug]: gs.utils.geom.inv_T fails on batches of transforms"
+    }
+  ],
+  "post_activation_issue_identities_observed": 694,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-19T03:50:27Z",
+  "schema_version": 1
+}
