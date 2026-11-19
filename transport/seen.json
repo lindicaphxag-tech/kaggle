@@ -10357,6 +10357,28 @@
       "source": "inbox/FIRST_SEEN_20261118T222012Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "42b15380557f00c6d76933860e6cbbed80446eeec7087c1264a66fbd34406778"
+    },
+    {
+      "created_at": "2026-11-19T02:26:12Z",
+      "first_frozen_at": "2026-11-19T03:16:44Z",
+      "id": "huggingface/lerobot#5414",
+      "issue_number": 5414,
+      "prediction_deadline_at": "2026-11-19T09:16:44Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261119T031644Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "eaea45fda53b5fd5e2dfd1860108a023e534b3dfba61a5bd0636d4636eae5765"
+    },
+    {
+      "created_at": "2026-11-19T02:18:49Z",
+      "first_frozen_at": "2026-11-19T03:16:44Z",
+      "id": "isaac-sim/IsaacSim#946",
+      "issue_number": 946,
+      "prediction_deadline_at": "2026-11-19T09:16:44Z",
+      "repository": "isaac-sim/IsaacSim",
+      "source": "inbox/FIRST_SEEN_20261119T031644Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "1cdae78bb7e1d3fbb3da082b9dfbd196be514ac9da36938022bb5dbdbf140249"
     }
   ]
 }
