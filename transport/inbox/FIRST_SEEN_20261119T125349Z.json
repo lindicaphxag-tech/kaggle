@@ -1,0 +1,162 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 11,
+  "new_candidates": [
+    {
+      "author_login": "rOtking",
+      "body": "Hi, I\u2019m a bit confused about the nuPlan Track leaderboard. \n\nWhy are submissions still appearing after the November 18 deadline, and why have the rankings changed since the leaderboard closed? \n\nCould you add an option to view the leaderboard as it stood at the deadline, alongside the results of the original submissions? This would make the final rankings easier to understand. Thank you!",
+      "created_at": "2026-11-19T08:24:32Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/246",
+      "id": "NVlabs/alpasim#246",
+      "issue_number": 246,
+      "labels": [],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "9a3006aa5c7c369e1304cd9ddd99ad20120a3167b62a8c29796c759863bd03b1",
+      "title": "Clarification on nuPlan Track leaderboard changes after the November 18 deadline"
+    },
+    {
+      "author_login": "silvereagle617",
+      "body": "Hi AlpaSim organizers,\n\nCould you make the nuPlan standings from before the organizer-run reevaluations available as a frozen snapshot?\n\nWe understand that averaging multiple runs helps reduce evaluation variance. When the live leaderboard is updated after the regular evaluation phase, teams need a way to look up their original placements and see the standings that preceded the final reruns. AlpaSim Challenge page\n\nWe suggest adding a Show pre-rerun snapshot checkbox next to the existing Show pre-fix snapshot option, as illustrated in the attached mockup. The snapshot would show the standings after all submissions accepted before the deadline had finished evaluation and before the organizer reruns were incorporated into the rankings. It would preserve the ranks, Policy Capability Scores, and rank intervals calculated at that point.\n\nWe hope this approach works for everyone by making the original standings available through the checkbox shown in the mockup, while allowing the official award selection to proceed as planned. The live leaderboard can remain the default view.\n\nThanks for considering this.",
+      "created_at": "2026-11-19T11:08:14Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/247",
+      "id": "NVlabs/alpasim#247",
+      "issue_number": 247,
+      "labels": [
+        "bug"
+      ],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "2825a2b33756293ab3dc7cddacb09745ef69bd90986486b9cf9e886d28e2a351",
+      "title": "[BUG] [AlpaSim Challenge] Please preserve the nuPlan leaderboard before organizer reruns"
+    },
+    {
+      "author_login": "urfeex",
+      "body": "We use some dependency declarations with versions. If those versions are wrong (see e.g. #2096), `colcon` emits a warning only\n\n```\n[-1795084177425705984.000s] WARNING:colcon.colcon_core.package_augmentation.check_dependency_constraint:ur_robot_driver depends on ur_msgs which has version 2.7.0 but expects it to be greater than or equal to 3.1.0\n[-1795084177425705984.000s] WARNING:colcon.colcon_core.package_augmentation.check_dependency_constraint:ur_controllers depends on ur_msgs which has version 2.7.0 but expects it to be greater than or equal to 3.1.0\n```\n\nThis can easily get lost in the CI logs which is why I would like to have that raise an error if something like this happens again.",
+      "created_at": "2026-11-19T10:39:39Z",
+      "html_url": "https://github.com/UniversalRobots/Universal_Robots_ROS2_Driver/issues/2097",
+      "id": "UniversalRobots/Universal_Robots_ROS2_Driver#2097",
+      "issue_number": 2097,
+      "labels": [
+        "CI"
+      ],
+      "repository": "UniversalRobots/Universal_Robots_ROS2_Driver",
+      "surface_sha256": "43b4172c37b848b53384cff2b4b978b8b6d08aa665c317736d4f25af13d39839",
+      "title": "CI: Fail on unsatisfied dependency versions"
+    },
+    {
+      "author_login": "patelshivani2283-lab",
+      "body": "The integration tests for CPU Lidar and Logical Camera still use the deprecated test::Relay mock system. This PR replaces Relay with direct Server::EcmScope() calls, adds missing SensorTopic component include, and verifies sensor topics after server run. Benefits: cleaner tests, future\u2011proof, aligns with PR #4237.\\n\\nAssisted\u2011by: Google DeepMind Antigravity",
+      "created_at": "2026-11-19T05:42:44Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4248",
+      "id": "gazebosim/gz-sim#4248",
+      "issue_number": 4248,
+      "labels": [],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "e1751e2db0dbf62461196150c1ac74771b7f5a76b833415f611cea3f8b68834d",
+      "title": "Refactor CPU Lidar and Logical Camera integration tests to use EcmScope"
+    },
+    {
+      "author_login": "jml-1",
+      "body": "### Intro\n\nHi! I use MuJoCo to benchmark rigid\u2013soft coupling (flex gel pads on a gripper). I found that scripts using the passive viewer crash on Linux when they exit right after the viewer is closed.\n\n### My setup\n\n- MuJoCo 4.0.0 (Python package from PyPI). `python/mujoco/viewer.py` is identical at the 4.0.1 tag.\n- pyGLFW 2.11.0, GLFW library 3.4.0 (X11 GLX)\n- Python 3.12.3, numpy 2.5.4\n- Ubuntu 24.04.4 LTS, Linux 7.0 x86_64, X11 session\n- NVIDIA GeForce RTX 5060 Ti, driver 595.84\n\n### What's happening? What did you expect?\n\nThe process segfaults at exit (exit code 139) after the `with mujoco.viewer.launch_passive(...)` block ends, i.e. after `Handle.close()`. Occasionally it hangs instead and never exits. I expected it to exit cleanly.\n\nWith the script below, 10 of 10 runs segfaulted. In an earlier batch of 3 runs, 2 segfaulted and 1 hung.\n\n`python -X faulthandler repro.py` shows the two threads racing:\n\n```\nFatal Python error: Segmentation fault\n\nCurrent thread (most recent call first):\n  File \".../mujoco/viewer.py\", line 534 in _launch_internal\n  File \"/usr/lib/python3.12/threading.py\", line 1010 in run\n  ...\n\nThread (main, most recent call first):\n  File \".../glfw/__init__.py\", line 832 in terminate\n```\n\nMy reading of `viewer.py`:\n\n- `Handle.close()` (called by `__exit__`) only calls `sim.exit()`, which sets the exit request. It does not wait for the render thread.\n- On Linux, `launch_passive` runs `_launch_internal` in a **daemon** thread. That thread is still leaving `render_loop()` and running `side_thread.join()` / `simulate.destroy()`.\n- Meanwhile the main thread reaches interpreter shutdown. The `atexit.register(glfw.terminate)` handler (registered in `_launch_internal`) then calls `glfwTerminate()` concurrently with the window and context teardown on the render thread.\n\n### Steps for reproduction\n\n1. Save the script below as `repro.py`.\n2. Run `python repro.py; echo $?` a few times.\n3. It prints `139` (segfault), or occasionally hangs.\n\n### Minimal model for reproduction\n\n```xml\n<mujoco><worldbody><body><freejoint/><geom size=\".1\"/></body></worldbody></mujoco>\n```\n\n### Code required for reproduction\n\n```python\nimport mujoco\nimport mujoco.viewer\n\nm = mujoco.MjModel.from_xml_string(\n    '<mujoco><worldbody><body><freejoint/><geom size=\".1\"/></body></worldbody></mujoco>')\nd = mujoco.MjData(m)\nwith mujoco.viewer.launch_passive(m, d) as viewer:\n    for _ in range(100):\n        mujoco.mj_step(m, d)\n        viewer.sync()\n# exits here -> segfault in glfw.terminate (atexit) racing with the viewer thread\n```\n\n### Workaround\n\nWait for the viewer's thread before exiting. With this change, the runs I tried (on a larger flex model) exited with code 0, while the same script without the join segfaulted:\n\n```python\nimport threading\n\nbefore = set(threading.enumerate())\nwith mujoco.viewer.launch_passive(m, d) as viewer:\n    ...\nfor t in set(threading.enumerate()) - before:\n    t.join(timeout=10.0)\n```\n\n### Suggested fix\n\nKeep a reference to the render thread in the `Handle` returned by `launch_passive`, and have `close()` / `__exit__` join it after `sim.exit()` (non-macOS path). Alternatively, `exit_simulate`/`glfw.terminate` at exit could wait for the render loop to finish. Either way, `glfwTerminate` would no longer run while the viewer is still destroying its window.\n\n### Confirmations\n\n- [x] I searched the [latest documentation](https://mujoco.readthedocs.io/en/latest/overview.html) thoroughly before posting.\n- [x] I searched previous [Issues](https://github.com/google-deepmind/mujoco/issues) and [Discussions](https://github.com/google-deepmind/mujoco/discussions), I am certain this has not been raised before. (Older, different passive viewer crashes: #649, #790.)\n",
+      "created_at": "2026-11-19T10:25:55Z",
+      "html_url": "https://github.com/google-deepmind/mujoco/issues/3923",
+      "id": "google-deepmind/mujoco#3923",
+      "issue_number": 3923,
+      "labels": [],
+      "repository": "google-deepmind/mujoco",
+      "surface_sha256": "7fedc6b4ecbea2c0d91316959243c88235ade8184058007ad141c9670d7c4fd4",
+      "title": "viewer.launch_passive: segfault (or hang) at interpreter exit after the `with` block closes the viewer"
+    },
+    {
+      "author_login": "stock-code",
+      "body": "### Description\n\n`eval_policy` records each episode's seed in `per_episode[*].seed`, and since #5279 `eval_one` keeps `per_episode` in `eval_info.json`, but only when a benchmark reports its own `info[\"metrics\"]`. LIBERO doesn't, so a LIBERO run's `eval_info.json` has per-episode successes with no seed next to them. It also has nothing that says which stored initial state each episode started from, and for LIBERO that matters more than the seed: `--seed` doesn't pick the initial state (episode i of a task gets state i mod 50, as noted in #4152).\n\nThat matters for comparing two checkpoints on the same episodes (a paired test, as in #4614):\n- Today the seed has to be rebuilt from `--seed` plus the episode index, which only works while the seeding scheme (`start_seed + batch_ix * num_envs + i`) stays the same.\n- Two runs with different `--seed` values replay the same initial states. Outcomes repeat on an initial state, so treating those episodes as independent makes intervals too narrow. On `lerobot/smolvla_libero` runs I measured it at about 1.6x too narrow. Recording the initial state per episode would let anyone pairing or pooling runs see the repeats.\n\n### Where\n\n`src/lerobot/scripts/lerobot_eval.py`, `eval_one` (on `main` @ 8ec1a47):\n\n```python\nif any(\"metrics\" in episode for episode in per_episode):\n    metrics[\"per_episode\"] = per_episode\n```\n\n### Suggested fix\n\n1. Keep `per_episode` for every benchmark, not only those with `info[\"metrics\"]`. It already carries `seed`, `success`, `sum_reward` and `max_reward`.\n2. For LIBERO, add the initial-state index to each episode's record (for example from `LiberoEnv.init_state_id` before it advances, or `episode_index + r * n_envs` on the local path).\n\nNo change for anyone reading the existing keys. Happy to send a PR with a test for (1), and (2) if you agree with the shape.\n\n### Environment\n\nlerobot `main` @ 7910c20 for the runs, code checked on 8ec1a47; macOS; LIBERO `libero_object` and `libero_spatial` with SmolVLA.\n\n_Written with AI assistance (Claude Code); the runs and measurements are from my machine._\n",
+      "created_at": "2026-11-19T05:15:16Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5418",
+      "id": "huggingface/lerobot#5418",
+      "issue_number": 5418,
+      "labels": [
+        "tests",
+        "examples",
+        "evaluation"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "7f93c4d92376aa08c9e90bed599774847e1e40dd65c0e5db39e066ba5f978055",
+      "title": "eval_info.json drops per-episode seeds and LIBERO initial states, so runs can't be paired reliably"
+    },
+    {
+      "author_login": "zhangyue19921010",
+      "body": "### Ticket Type\n\nBug report\n\n### Environment & System Info\n\nLeRobot main `8ec1a474da5f3f90a670d9343386995ec9f81264`, Python 3.12, CPU.\n\n### Description\n\nWhen recipe rendering drops samples without language supervision or a task fallback, boolean padding masks can be selected from the wrong rows. Actions and rendered messages remain aligned, but `action_is_pad` can describe a different sample.\n\n`_select_value` creates row indices with `value.new_tensor(indices).long()`. For a boolean tensor, index 2 becomes `True` before conversion to integer, so the selected row is 1. Reduced precision and narrow integer tensors can also round or reject valid row indices.\n\n### Context & Reproduction\n\n```python\nimport torch\nfrom lerobot.processor.converters import create_transition\nfrom lerobot.processor.render_messages_processor import _select_batch_indices\n\npadding = torch.tensor([[False, True], [True, True], [False, False]])\ntransition = create_transition(complementary_data={\"action_is_pad\": padding})\nselected = _select_batch_indices(transition, [2], batch_size=3)\nprint(selected[\"complementary_data\"][\"action_is_pad\"])\n# Actual:   tensor([[True, True]])\n# Expected: tensor([[False, False]])\n```\n\nThis is also reproducible through `RenderTrainingMessagesStep` with three samples, only the third carrying a matching subtask annotation, and no task fallbacks. It keeps the third action but the second padding mask.\n\n### Expected behavior\n\nConstruct integer indices directly on the field's device, preserving the selected row numbers independently of the field dtype.\n\n### Checklist\n\n- [x] Searched existing Issues and PRs for this failure.\n- [x] Reproduced on the current main branch.\n",
+      "created_at": "2026-11-19T06:34:19Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5419",
+      "id": "huggingface/lerobot#5419",
+      "issue_number": 5419,
+      "labels": [
+        "bug",
+        "visualization",
+        "processor",
+        "examples"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "12cfcdb4320404e1990d52902dd478350827c9789e0f1679c528dc87b0e73332",
+      "title": "fix(processor): recipe filtering selects padding masks from the wrong rows"
+    },
+    {
+      "author_login": "GLOORSimon",
+      "body": "### Description\n\nUsing the more precise `material:binding:physics` instead of `material:binding` does not display the material assignment in the UI. I expect the material to be shown in `Property Panel > Physics > Physics materials on selected models > Second row`. Instead, the field shows `None`.\n\n<img width=\"757\" height=\"431\" alt=\"image\" src=\"https://github.com/user-attachments/assets/dffb57a1-9fae-49ce-ae35-2808caa82f91\" />\n\nFile to reproduce:\n```\n#usda 1.0\n(\n    defaultPrim = \"World\"\n    metersPerUnit = 1\n    upAxis = \"Z\"\n)\n\ndef Xform \"World\"\n{\n    def Scope \"PhysicsMaterials\"\n    {\n        def Material \"steel\" (\n            prepend apiSchemas = [\"PhysicsMaterialAPI\"]\n        )\n        {\n            float physics:dynamicFriction = 0.9\n            float physics:restitution = 0\n            float physics:staticFriction = 1\n        }\n\n        def Material \"hub_grip\" (\n            prepend apiSchemas = [\"PhysicsMaterialAPI\", \"PhysxMaterialAPI\"]\n        )\n        {\n            float physics:dynamicFriction = 1.8\n            float physics:restitution = 0\n            float physics:staticFriction = 2\n            custom token physxMaterial:frictionCombineMode = \"max\"\n        }\n    }\n\n\n    def Mesh \"Cube\" (\n        prepend apiSchemas = [\"PhysicsCollisionAPI\", \"PhysxCollisionAPI\", \"PhysxConvexHullCollisionAPI\", \"PhysicsMeshCollisionAPI\", \"MaterialBindingAPI\"]\n    )\n    {\n        float3[] extent = [(-0.5, -0.5, -0.5), (0.5, 0.5, 0.5)]\n        int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]\n        int[] faceVertexIndices = [0, 1, 3, 2, 4, 6, 7, 5, 6, 2, 3, 7, 4, 5, 1, 0, 4, 0, 2, 6, 5, 7, 3, 1]\n        rel material:binding:physics = </World/PhysicsMaterials/hub_grip> (\n            bindMaterialAs = \"weakerThanDescendants\"\n        )\n        normal3f[] normals = [(0, 0, 1), (0, 0, 1), (0, 0, 1), (0, 0, 1), (0, 0, -1), (0, 0, -1), (0, 0, -1), (0, 0, -1), (0, 1, 0), (0, 1, 0), (0, 1, 0), (0, 1, 0), (0, -1, 0), (0, -1, 0), (0, -1, 0), (0, -1, 0), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (1, 0, 0), (1, 0, 0), (1, 0, 0), (1, 0, 0)] (\n            interpolation = \"faceVarying\"\n        )\n        uniform token physics:approximation = \"convexHull\"\n        bool physics:collisionEnabled = 1\n        point3f[] points = [(-0.5, -0.5, 0.5), (0.5, -0.5, 0.5), (-0.5, 0.5, 0.5), (0.5, 0.5, 0.5), (-0.5, -0.5, -0.5), (0.5, -0.5, -0.5), (-0.5, 0.5, -0.5), (0.5, 0.5, -0.5)]\n        texCoord2f[] primvars:st = [(0, 0), (1, 0), (1, 1), (0, 1), (1, 0), (1, 1), (0, 1), (0, 0), (0, 1), (0, 0), (1, 0), (1, 1), (0, 0), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (1, 1), (0, 1), (1, 0), (1, 1), (0, 1), (0, 0)] (\n            interpolation = \"faceVarying\"\n        )\n        uniform token subdivisionScheme = \"none\"\n        quatd xformOp:orient = (1, 0, 0, 0)\n        double3 xformOp:scale = (1, 1, 1)\n        double3 xformOp:translate = (0, 0, 0.5)\n        uniform token[] xformOpOrder = [\"xformOp:translate\", \"xformOp:orient\", \"xformOp:scale\"]\n    }\n}\n\n```\n\n### Isaac Sim version\n\n6.2.0\n\n### Operating System (OS)\n\nUbuntu 24.04.4 LTS\n\n### GPU Name\n\nRTX A4500 Laptop\n\n### GPU Driver and CUDA versions\n\nDriver Version: 580.178.04     CUDA Version: 13.0\n\n### Logs\n\n_No response_\n\n### Additional information\n\n_No response_",
+      "created_at": "2026-11-19T09:43:59Z",
+      "html_url": "https://github.com/isaac-sim/IsaacSim/issues/947",
+      "id": "isaac-sim/IsaacSim#947",
+      "issue_number": 947,
+      "labels": [
+        "isaac-sim-physics",
+        "isaac-sim-v6-2-0"
+      ],
+      "repository": "isaac-sim/IsaacSim",
+      "surface_sha256": "b0f44269cb93f72d456f1aa02e2e34dfc761144e840dba4be37e0a28fbee381d",
+      "title": "material:binding:physics not displayed in UI"
+    },
+    {
+      "author_login": "ppranav04",
+      "body": "### Description\n\nWhen working with a SO-101 robot arm, the urdf had joints that did not have 0 in their joint limits.\nWhen I used MSA all the initial positions of joints in initial_positions.yaml were given 0 as the value even if 0 was outside the limits.\n\nThe generated `robot_arm.ros2_control.xacro` uses these values as each joint's initial_value, so the mock hardware starts with joints outside their limits.\n\n### Cause\nIn moveit_setup_controllers/src/control_xacro_config.cpp \n`ControlXacroConfig::setControlInterfaces()`: \nhttps://github.com/moveit/moveit2/blob/900e0e42a80d4d096e60864316a16640b0fe9372/moveit_setup_assistant/moveit_setup_controllers/src/control_xacro_config.cpp#L165-L186\n\n> // TODO: There could be an option to load a group state from the RobotPoses\n> // For now, just assume one DOF, and it is zero\n\nThis applies to every joint that has no `<ros2_control>` tag.\n\nI'm happy to open a PR that fills these values from the robot model's default positions (`getVariableDefaultPositions()`) instead of the hard-coded 0.\n\n### ROS Distro\n\nJazzy\n\n### OS and version\n\nUbuntu 24.04\n\n### Source or binary build?\n\nBinary\n\n### If binary, which release version?\n\nros-jazzy-moveit-setup-assistant 2.12.4\n\n### If source, which branch?\n\n_No response_\n\n### Which RMW are you using?\n\nNone\n\n### Steps to Reproduce\n\n1. test_robot.urdf\n```\n<?xml version=\"1.0\"?>\n<!-- repro: minimal arm. j1 range contains 0 (control case), j2 and j3 do not. -->\n<robot name=\"robot_arm\">\n  <link name=\"base_link\">\n    <visual>\n        <geometry>\n            <box size=\"0.1 0.1 0.05\"/>\n        </geometry>\n    </visual>\n  </link>\n  <link name=\"link1\">\n    <visual>\n        <origin xyz=\"0 0 0.1\"/>\n        <geometry>\n            <box size=\"0.04 0.04 0.2\"/>\n        </geometry>\n    </visual>\n  </link>\n  <link name=\"link2\">\n    <visual>\n        <origin xyz=\"0 0 0.1\"/>\n        <geometry>\n            <box size=\"0.04 0.04 0.2\"/>\n        </geometry>\n    </visual>\n  </link>\n  <link name=\"tool_link\">\n    <visual>\n        <geometry>\n            <box size=\"0.02 0.02 0.02\"/>\n        </geometry>\n    </visual>\n  </link>\n\n<!-- control: 0 is inside the range, expected initial position 0 -->\n  <joint name=\"j1\" type=\"revolute\">\n    <parent link=\"base_link\"/>\n    <child link=\"link1\"/>\n    <origin xyz=\"0 0 0.025\"/>\n    <axis xyz=\"0 0 1\"/>\n    <limit lower=\"-1.57\" upper=\"1.57\" effort=\"1\" velocity=\"1\"/>\n  </joint>\n\n<!-- revolute, 0 outside (same range as SO-101 wrist_roll): expected midpoint -1.64 -->\n  <joint name=\"j2\" type=\"revolute\">\n    <parent link=\"link1\"/>\n    <child link=\"link2\"/>\n    <origin xyz=\"0 0 0.2\"/>\n    <axis xyz=\"0 1 0\"/>\n    <limit lower=\"-2.96\" upper=\"-0.32\" effort=\"1\" velocity=\"1\"/>\n  </joint>\n\n<!-- prismatic, 0 outside: expected midpoint 0.035 -->\n  <joint name=\"j3\" type=\"prismatic\">\n    <parent link=\"link2\"/>\n    <child link=\"tool_link\"/>\n    <origin xyz=\"0 0 0.2\"/>\n    <axis xyz=\"0 0 1\"/>\n    <limit lower=\"0.02\" upper=\"0.05\" effort=\"1\" velocity=\"1\"/>\n  </joint>\n</robot>\n\n```\n2. Run MSA:\n```\nros2 launch moveit_setup_assistant setup_assistant.launch.py\n```\n3. Create new moveit configuration package and load test_robot.urdf\n4. Generate default self-collision matrix.\n5. Skip virtual joints and add planning group (group name = arm, everything else default).\n6. Add kinematic chain group base_link -> tool_link.\n7. Skip robot poses, end effectors and passive joints.\n8. Default ros2_control URDF modifications and skip ROS2 controllers, MoveIt controllers and perception.\n9. Default launch files options.\n10. Save path and generate package.\n\n### Expected behavior\n\nconfig/initial_positions.yaml:\n```\n# Default initial positions for robot_arm's ros2_control fake system\n\ninitial_positions:\n  j1: 0\n  j2: -1.64\n  j3: 0.035\n```\n\n0 if it is within the joint's bounds, otherwise the midpoint, i.e. the same default moveit_core uses in JointModel::getVariableDefaultPositions().\n\n### Actual behavior\n\nconfig/initial_positions.yaml\n```\n# Default initial positions for robot_arm's ros2_control fake system\n\ninitial_positions:\n  j1: 0\n  j2: 0\n  j3: 0\n```\n\n### Backtrace or Console output\n\nNo warning or error is printed about initial positions.",
+      "created_at": "2026-11-19T09:51:57Z",
+      "html_url": "https://github.com/moveit/moveit2/issues/3983",
+      "id": "moveit/moveit2#3983",
+      "issue_number": 3983,
+      "labels": [
+        "bug"
+      ],
+      "repository": "moveit/moveit2",
+      "surface_sha256": "a3c496a86add987b1daa14ac04a9ee649969083351458cc64fc3acd9e3cbacba",
+      "title": "MSA initial_positions.yaml uses 0 even if 0 is outside of joint limits"
+    },
+    {
+      "author_login": "QLL-CCDD",
+      "body": "## Summary\n\nWith the same environment seed, `Counter` can place its interior regions in a different order in two Python processes, so the same seed produces different kitchen scenes. The cause is a `set()` of XML elements, whose iteration order follows object identity (memory addresses), not the seed.\n\n## Location\n\n[`robocasa/models/fixtures/counter.py#L813`](https://github.com/robocasa/robocasa/blob/7bfc60c9d26c02506d4265cbe0e86b35e6e25d42/robocasa/models/fixtures/counter.py#L813) (current `main`; also at v1.0.1 `3443cdf`):\n\n```python\nif len(valid_geoms) > 0:\n    # remove duplicates as needed\n    valid_geoms = list(set(valid_geoms))\n\nfor g in valid_geoms:\n    ...\n```\n\n`valid_geoms` holds `ElementTree` elements, which hash by identity. The loop below creates the counter's regions in this order, and later seeded sampling consumes them in that order, so object placements change between processes even with an identical seed and `PYTHONHASHSEED`.\n\n## Reproduction\n\nBuild a task with `gym.make(\"robocasa/<task>\", split=\"pretrain\", seed=1111111)`, call `reset()` once, and hash `env.unwrapped.env.sim.get_state().flatten()` in several fresh processes (with `PYTHONHASHSEED=42`). On v1.0.1, `WashLettuce` gave two different initial simulator states in three processes. With the fix below (and the fixture-stack fix in the companion issue), all six tasks we checked (PickPlaceCounterToCabinet, WashLettuce, ArrangeTea, StirVegetables, PrepareCoffee, OpenDrawer) start from the same state in every process.\n\n## Suggested fix\n\nDeduplicate while keeping the XML order:\n\n```python\nvalid_geoms = list(dict.fromkeys(valid_geoms))\n```\n\nThis keeps the same set of regions and only makes their order deterministic.\n\nFound while comparing per-episode results of the official multi-task Diffusion Policy evaluator against a re-implementation ([MINT-SJTU/RoboScope-Kit#100](https://github.com/MINT-SJTU/RoboScope-Kit/pull/100)); per-episode comparison needs the same seed to give the same scene.\n",
+      "created_at": "2026-11-19T07:33:58Z",
+      "html_url": "https://github.com/robocasa/robocasa/issues/236",
+      "id": "robocasa/robocasa#236",
+      "issue_number": 236,
+      "labels": [],
+      "repository": "robocasa/robocasa",
+      "surface_sha256": "0c3a4339ba52818cd3ebb1aa285535ebee6b022c43485de0a97f2153e33c1a84",
+      "title": "Counter region order depends on object identity, so the same seed can give different scenes"
+    },
+    {
+      "author_login": "QLL-CCDD",
+      "body": "## Summary\n\n`FixtureStack` builds its base fixture without the environment's seeded generator, so the base is sampled from unseeded randomness and the same environment seed can give different scenes.\n\n## Location\n\n[`robocasa/models/fixtures/fixture_stack.py#L134`](https://github.com/robocasa/robocasa/blob/7bfc60c9d26c02506d4265cbe0e86b35e6e25d42/robocasa/models/fixtures/fixture_stack.py#L134) (current `main`; also at v1.0.1 `3443cdf`):\n\n```python\nbase_config[\"rng\"] = self.rng\nbase = initialize_fixture(base_config, self.scene_fixtures)\n```\n\n[`initialize_fixture(config, cur_fixtures, rng=None)`](https://github.com/robocasa/robocasa/blob/7bfc60c9d26c02506d4265cbe0e86b35e6e25d42/robocasa/models/scenes/scene_utils.py#L33) sets `config[\"rng\"] = rng`, so the `self.rng` assigned on the line before is replaced by `None`, and the base fixture falls back to the global, unseeded random state.\n\n## Suggested fix\n\nPass the generator explicitly:\n\n```python\nbase = initialize_fixture(base_config, self.scene_fixtures, rng=self.rng)\n```\n\n## Context\n\nTogether with the counter-region ordering issue (#236), this made two runs of the official multi-task evaluator with the same constructor seeds start from different scenes. With both fixes, every task we checked starts from the same simulator state across fresh processes. Found during [MINT-SJTU/RoboScope-Kit#100](https://github.com/MINT-SJTU/RoboScope-Kit/pull/100).\n",
+      "created_at": "2026-11-19T07:33:58Z",
+      "html_url": "https://github.com/robocasa/robocasa/issues/237",
+      "id": "robocasa/robocasa#237",
+      "issue_number": 237,
+      "labels": [],
+      "repository": "robocasa/robocasa",
+      "surface_sha256": "1566cf37712e3d9ed51fb363baefb231fbf2188a56bdd81bb326c1190d21ccf4",
+      "title": "FixtureStack base fixture ignores the environment's seeded rng"
+    }
+  ],
+  "post_activation_issue_identities_observed": 705,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-19T12:53:49Z",
+  "schema_version": 1
+}
