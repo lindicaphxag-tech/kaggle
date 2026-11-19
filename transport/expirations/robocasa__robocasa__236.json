@@ -1,0 +1,13 @@
+{
+  "case_id": "robocasa/robocasa#236",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-11-19T21:24:55Z",
+  "expiry_sha256": "831ba4be864a71af43d8e7b047ea6083395cba42de6f5e0e9b004cb709d66efa",
+  "first_frozen_at": "2026-11-19T12:53:49Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-11-19T18:53:49Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "0c3a4339ba52818cd3ebb1aa285535ebee6b022c43485de0a97f2153e33c1a84"
+}
