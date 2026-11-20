@@ -1,0 +1,28 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "zhangyue19921010",
+      "body": "### Ticket Type\n\nBug report\n\n### Description\n\nSaving and reloading a pipeline containing `RewardClassifierProcessorStep(pretrained_path=...)` silently disables reward classification. Its configuration omits `pretrained_path`, so the reloaded step has no classifier and passes rewards and termination flags through unchanged.\n\n### Context & Reproduction\n\nConstruct a `DataProcessorPipeline` containing a reward classifier step, save it with `save_pretrained`, then reload with `from_pretrained` without overrides. The saved step config contains the device, thresholds and reward settings but no classifier checkpoint. The original step calls the classifier; the restored one returns before inference because `reward_classifier is None`.\n\nA CPU regression with a stubbed checkpoint loader gives reward 2 and `done=True` before saving, but reward 0 and `done=False` after reload. Explicitly overriding `pretrained_path` at load time works around it.\n\n### Expected behavior\n\nPreserve the configured classifier checkpoint in the serialized step configuration. Pipelines saved before this correction still need an explicit `pretrained_path` override because they contain no checkpoint reference.\n",
+      "created_at": "2026-11-20T02:36:42Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5430",
+      "id": "huggingface/lerobot#5430",
+      "issue_number": 5430,
+      "labels": [
+        "bug",
+        "configuration",
+        "processor"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "861965dd078bbb6ec81bfd7e4d53cb5790391bf09aa5b413a2a127826037461e",
+      "title": "fix(processor): reloading a reward pipeline loses its classifier checkpoint"
+    }
+  ],
+  "post_activation_issue_identities_observed": 722,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-20T03:03:25Z",
+  "schema_version": 1
+}
