@@ -1,0 +1,13 @@
+{
+  "case_id": "stereolabs/zed-ros2-wrapper#464",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-11-20T03:42:21Z",
+  "expiry_sha256": "9bf1d95476aa164ce860de27ec32ecf909cea82758dac97eabae4c43e854eeaa",
+  "first_frozen_at": "2026-11-19T21:26:08Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-11-20T03:26:08Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "e74e172ecb7a6560aed285c9e249055fd05b50a2cc45c3994dc1dba4cbc74882"
+}

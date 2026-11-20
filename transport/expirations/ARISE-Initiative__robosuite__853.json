@@ -1,0 +1,13 @@
+{
+  "case_id": "ARISE-Initiative/robosuite#853",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-11-20T03:42:21Z",
+  "expiry_sha256": "9f4637e3ff88774b14f303953806f0f3031625adc9e7e08c4df18a3ee7a0038d",
+  "first_frozen_at": "2026-11-19T21:26:08Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-11-20T03:26:08Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "cdda132edcc8a4f5aee2375e8991eee9054e57951e58eff0cbd517a6de99040c"
+}
