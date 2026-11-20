@@ -1,0 +1,38 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "0z5a",
+      "body": "## Summary\n\n`GraspingManager.get_grasp_pose_at_index(index, in_world_frame=True)` raises `AttributeError: 'GraspingManager' object has no attribute 'object_path'` when the object prim is not on the stage. The docstring says it returns `None` in that case.\n\nBoth warning branches in that method build their message with `self.object_path`, which `GraspingManager` never sets (the attribute is `self._object_prim_path`). The \"object prim not found\" branch also uses `{e}`, which is not defined there. The `except` branch in `get_grasp_poses` uses `self.object_path` too.\n\n`get_grasp_poses(in_world_frame=True)` handles the same \"prim not found\" case with a warning and `[]`, so only the per-index getter fails here.\n\nSource: `source/extensions/isaacsim.replicator.grasping/isaacsim/replicator/grasping/grasping_manager.py`, `get_grasp_pose_at_index` and the `except` branch of `get_grasp_poses`.\n\n## Steps to reproduce\n\nIn the Script Editor, on an empty stage:\n\n```python\nimport omni.usd\nfrom isaacsim.replicator.grasping.grasping_manager import GraspingManager\nfrom pxr import Gf, UsdGeom\n\nstage = omni.usd.get_context().get_stage()\nUsdGeom.Xform.Define(stage, \"/World/Object\")\n\nm = GraspingManager()\nm.set_object_prim_path(\"/World/Object\")\nm.grasp_locations = [Gf.Vec3d(0, 0, 0.1)]\nm.grasp_orientations = [Gf.Quatd(1, 0, 0, 0)]\nprint(m.get_grasp_pose_at_index(0, in_world_frame=True))  # pose\n\nstage.RemovePrim(\"/World/Object\")\nprint(m.get_grasp_poses(in_world_frame=True))              # [] with a warning\nprint(m.get_grasp_pose_at_index(0, in_world_frame=True))   # AttributeError\n```\n\nI ran this outside Kit, with `pxr` from `usd-core` and small stand-ins for `carb.log_warn` and `omni.usd.get_context()`, loading `grasping_manager.py` and `transform_utils.py` from `release/6.3` (9160c0e). Output, without the log lines:\n\n```\n(Gf.Vec3d(0.0, 0.0, 0.1), Gf.Quatd(1.0, Gf.Vec3d(0.0, 0.0, 0.0)))\n[]\nAttributeError: 'GraspingManager' object has no attribute 'object_path'\n```\n\n## Expected behavior\n\n`get_grasp_pose_at_index` logs a warning and returns `None`, like `get_grasp_poses` does.\n\n## How I found it\n\nA lint pass flagged `e` as undefined in `get_grasp_pose_at_index`. Reading the method, I saw that `self.object_path` is not an attribute of the class either.\n\n## Where this can show up\n\nThe grasping UI's evaluate step collects poses with `get_grasp_pose_at_index(i, in_world_frame=True)` and skips entries that are `None`. If the object prim was deleted or moved after the poses were generated, the step stops with the `AttributeError` instead of warning that some poses could not be retrieved. My estimate; I have not seen a field report.\n\n## Environment\n\n- `release/6.3` at 9160c0e, extension `isaacsim.replicator.grasping` 1.1.7\n- Checked outside Kit on macOS arm64 with Python 3.11 and `usd-core`; I have not run Isaac Sim itself.\n\nI have a small fix (use `self._object_prim_path` in the messages and drop the stray `{e}`) and can open a PR.\n",
+      "created_at": "2026-11-20T12:55:45Z",
+      "html_url": "https://github.com/isaac-sim/IsaacSim/issues/950",
+      "id": "isaac-sim/IsaacSim#950",
+      "issue_number": 950,
+      "labels": [
+        "isaac-sim-manipulation"
+      ],
+      "repository": "isaac-sim/IsaacSim",
+      "surface_sha256": "75108077463f59c553fc02cbb1bb6894545ae7cc8d14e26feb872a572eed04b4",
+      "title": "GraspingManager.get_grasp_pose_at_index raises AttributeError instead of returning None when the object prim is missing"
+    },
+    {
+      "author_login": "rakhimovv",
+      "body": "I found a position in the RoboCasa365 kitchen where the PandaOmron's `robot0_agentview_right` camera renders the window backdrop through an opaque wall. The robot reached this camera position during a rollout of `RecycleBottlesByType` in layout 44, style 22. I isolated the rendering behavior by resetting the same seeded environment and placing only the camera at the observed world pose.\n\n## Versions\n\n- RoboCasa 1.0.1, commit `a07e365c958c4216cd6bbd5f30b47f09a65c6f00`\n- robosuite 1.5.2, commit `5ce6643f3092639d08f7b0f90ed1c6a84f50552c`\n- MuJoCo 3.3.1, Python 3.11.17, NumPy 2.2.5\n- EGL on NVIDIA H100, driver 580.178.04\n\n## Reproduce\n\nI ran the script below with the RoboCasa365 assets installed and `MUJOCO_GL=egl PYOPENGL_PLATFORM=egl python repro_wall.py`. It uses a fresh environment and then holds the camera pose fixed while changing the near plane. The pose is rounded to four decimal places from the rollout.\n\n```python\nimport random\n\nimport numpy as np\nfrom robocasa.wrappers.gym_wrapper import RoboCasaGymEnv\n\nseed = 3396997499\nrandom.seed(seed)\nnp.random.seed(seed)\ngym = RoboCasaGymEnv(env_name=\"RecycleBottlesByType\", split=\"pretrain\", seed=seed, renderer=\"mujoco\")\ngym.reset()\nenv = gym.env\nassert (env.layout_id, env.style_id) == (44, 22)\nsim = env.sim\nname = \"robot0_agentview_right\"\ncid = sim.model.camera_name2id(name)\nsim.data.cam_xpos[cid] = [5.2149, -4.8736, 1.75]\nsim.data.cam_xmat[cid] = [0.6023, -0.4217, 0.6778, 0.7981, 0.3325, -0.5024, -0.0135, 0.8436, 0.5368]\nfor clip in (sim.model.vis.map.znear, 0.00002):\n    sim.model.vis.map.znear = clip\n    rgb = sim.render(width=256, height=256, camera_name=name)\n    print(clip * sim.model.stat.extent, rgb.mean(), rgb.std(), rgb.min(), rgb.max())\ngym.close()\n```\n\n## Expected\n\nI expect the opaque wall to occlude the background in the agent view when the wall is directly in front of the camera.\n\n## Actual\n\nAt the default effective near plane of 29.91 mm, the camera renders a nearly uniform gray frame. The camera's center ray intersects the wall backing about 3.2 mm from the lens. A shorter near plane of 0.60 mm exposes the wall at the same pose. The untouched reset image showed the kitchen normally.\n\n| 256 \u00d7 256 RGB frame | Mean | Std | Min | Max |\n| --- | ---: | ---: | ---: | ---: |\n| Default near plane at the wall | 163.885 | 0.337 | 162 | 164 |\n| Short near plane at the same pose | 175.063 | 3.485 | 123 | 188 |\n\nCould RoboCasa keep this camera far enough from the wall to preserve occlusion, or choose a smaller near plane for these kitchen scenes?\n",
+      "created_at": "2026-11-20T13:14:34Z",
+      "html_url": "https://github.com/robocasa/robocasa/issues/238",
+      "id": "robocasa/robocasa#238",
+      "issue_number": 238,
+      "labels": [],
+      "repository": "robocasa/robocasa",
+      "surface_sha256": "176e458b5f40ba9e996951b56b9c4fc114c1839b3223c8a42adc7763efd5163f",
+      "title": "PandaOmron right agent-view camera clips through a kitchen wall at close range"
+    }
+  ],
+  "post_activation_issue_identities_observed": 749,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-20T13:34:40Z",
+  "schema_version": 1
+}
