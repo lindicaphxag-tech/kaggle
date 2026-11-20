@@ -11357,6 +11357,17 @@
       "source": "inbox/FIRST_SEEN_20261120T200147Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "4ae983630ecc0c5f33de0c57dc7b85a747b8a89b116e843ea31975c6a4802557"
+    },
+    {
+      "created_at": "2026-11-20T21:18:49Z",
+      "first_frozen_at": "2026-11-20T21:31:32Z",
+      "id": "cyberbotics/webots#7110",
+      "issue_number": 7110,
+      "prediction_deadline_at": "2026-11-21T03:31:32Z",
+      "repository": "cyberbotics/webots",
+      "source": "inbox/FIRST_SEEN_20261120T213132Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "8e89ce3bb81a02c29d89e17ee3d89e930aaab3725cef631d2e35eaedbb0d04fd"
     }
   ]
 }

@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "bensaadsalma8-tech",
+      "body": "**Describe the Bug**\n**Description**\nWebots R2025a crashes without any error message in the console after the simulation has run for a while. The Windows Event Viewer shows an access violation in webots-bin.exe itself (not in a graphics driver):\n\n- Exception code: 0xc0000005\n- Faulting module: webots-bin.exe\n- Fault offset: 0x000000000037e4aa\n- OS: Windows 11\n\nWhen I set the controller of the spawner robot to <none>, the crash disappears. So the crash is caused by this Supervisor controller.\n\n**What the controller does**\nA Python Supervisor creates a new Solid (with Physics and a boundingObject) every 4 seconds using root.getField(\"children\").importMFNodeFromString(-1, ...) and then calls getMFNode(-1). The solids move on a ConveyorBelt and fall into bins. The crash happens after some time of simulation. It happened both without and with node.remove() on the solids.\n\n**Steps to reproduce**\n1. Open the attached world.\n2. Run the simulation.\n3. After some time, Webots closes without any message.\n\n**Expected behavior**\nWebots should not crash.\n\n**Environment**\n- Webots version: R2025a\n- OS: Windows 11\n- Controller language: Python\n- GPU: (write your graphics card here)\n\n**Attachments**\npharma_sim.zip (world + controllers)\n\n**Steps to Reproduce**\n1. Go to '...'\n2. Click on '....'\n3. Scroll down to '....'\n4. See error\n\n**Expected behavior**\nA clear and concise description of what you expected to happen.\n\n**Screenshots**\nIf applicable, add screenshots to help explain your problem.\n\n**System**\n - Operating System: [e.g., Windows 10, Linux Ubuntu 18.04, macOS Mojave]\n - Graphics Card: [e.g., NVIDIA GeForce RTX 2080 11 GB, AMD Radeon RX 580 8GB, etc.]\n\n**Additional context**\nAdd any other context about the problem here.\n",
+      "created_at": "2026-11-20T21:18:49Z",
+      "html_url": "https://github.com/cyberbotics/webots/issues/7110",
+      "id": "cyberbotics/webots#7110",
+      "issue_number": 7110,
+      "labels": [],
+      "repository": "cyberbotics/webots",
+      "surface_sha256": "8e89ce3bb81a02c29d89e17ee3d89e930aaab3725cef631d2e35eaedbb0d04fd",
+      "title": "Crash (0xc0000005) in webots-bin.exe when a Supervisor controller spawns nodes with importMFNodeFromString during the simulation"
+    }
+  ],
+  "post_activation_issue_identities_observed": 760,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-20T21:31:32Z",
+  "schema_version": 1
+}
