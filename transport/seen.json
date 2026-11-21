@@ -11558,6 +11558,28 @@
       "source": "inbox/FIRST_SEEN_20261121T172409Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "ec5b6579fef59fbae978fd61ef96edfcee1a4e01576c098ce04d32ccb03b3f05"
+    },
+    {
+      "created_at": "2026-11-21T21:56:53Z",
+      "first_frozen_at": "2026-11-21T23:07:03Z",
+      "id": "RobotLocomotion/drake#25284",
+      "issue_number": 25284,
+      "prediction_deadline_at": "2026-11-22T05:07:03Z",
+      "repository": "RobotLocomotion/drake",
+      "source": "inbox/FIRST_SEEN_20261121T230703Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "29a09faa5e2891e57870a6fafc2205058d63fff9da609113b58aa37fc8e21ad7"
+    },
+    {
+      "created_at": "2026-11-21T20:41:44Z",
+      "first_frozen_at": "2026-11-21T23:07:03Z",
+      "id": "mani-skill/ManiSkill#1525",
+      "issue_number": 1525,
+      "prediction_deadline_at": "2026-11-22T05:07:03Z",
+      "repository": "mani-skill/ManiSkill",
+      "source": "inbox/FIRST_SEEN_20261121T230703Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "263004626df2963bfbec1fe9e3db51a8e9168a5d5df44a35ab795b4a785bf13a"
     }
   ]
 }
