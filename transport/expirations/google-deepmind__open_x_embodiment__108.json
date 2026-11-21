@@ -1,0 +1,13 @@
+{
+  "case_id": "google-deepmind/open_x_embodiment#108",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-11-21T02:47:39Z",
+  "expiry_sha256": "e4e27ed5c0136cd3e6fbb5615168ced21748e8e7bc8b2daf45eb08c69f5490ec",
+  "first_frozen_at": "2026-11-20T20:01:47Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-11-21T02:01:47Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "2a079a634e6809fc999e724f212437583aed02da6b0d56c634039c6b26160233"
+}
