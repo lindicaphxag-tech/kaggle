@@ -11535,13 +11535,17 @@
     },
     {
       "created_at": "2026-11-21T10:41:22Z",
+      "expiry_recorded_at": "2026-11-21T19:45:08Z",
+      "expiry_sha256": "eb7f4e7d66fbcff24541b099398576982abfeae7ae8d55aaf3862db8f6159ee0",
+      "expiry_source": "expirations/google-deepmind__mujoco__3937.json",
       "first_frozen_at": "2026-11-21T11:44:16Z",
       "id": "google-deepmind/mujoco#3937",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3937,
       "prediction_deadline_at": "2026-11-21T17:44:16Z",
       "repository": "google-deepmind/mujoco",
       "source": "inbox/FIRST_SEEN_20261121T114416Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "9deb93285e91534532ea9888168f60d7da2fe26b5b5fe4f8296a9a86397a02d2"
     },
     {
