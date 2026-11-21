@@ -11505,24 +11505,32 @@
     },
     {
       "created_at": "2026-11-21T04:14:09Z",
+      "expiry_recorded_at": "2026-11-21T17:22:50Z",
+      "expiry_sha256": "87dc5ce466f1353f14b7f24fd57f513310bbeda7753a66f20412f93fe2bfaf6c",
+      "expiry_source": "expirations/gazebosim__gz-sim__4258.json",
       "first_frozen_at": "2026-11-21T09:39:39Z",
       "id": "gazebosim/gz-sim#4258",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 4258,
       "prediction_deadline_at": "2026-11-21T15:39:39Z",
       "repository": "gazebosim/gz-sim",
       "source": "inbox/FIRST_SEEN_20261121T093939Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "62a357466e5f886334e1e4a6f44d235e866525b552afe06dcda98dfd4b6916e2"
     },
     {
       "created_at": "2026-11-21T08:17:29Z",
+      "expiry_recorded_at": "2026-11-21T17:22:50Z",
+      "expiry_sha256": "fbb9e147652f35243ae2ee393e8a7ba223f5ea73fa4efc256e904b776b5688f2",
+      "expiry_source": "expirations/huggingface__lerobot__5455.json",
       "first_frozen_at": "2026-11-21T09:39:39Z",
       "id": "huggingface/lerobot#5455",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 5455,
       "prediction_deadline_at": "2026-11-21T15:39:39Z",
       "repository": "huggingface/lerobot",
       "source": "inbox/FIRST_SEEN_20261121T093939Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "28fdd6a7a5351b8752892f52ebb93ba8e49548582222a27a13d7076541914220"
     },
     {
@@ -11535,6 +11543,17 @@
       "source": "inbox/FIRST_SEEN_20261121T114416Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "9deb93285e91534532ea9888168f60d7da2fe26b5b5fe4f8296a9a86397a02d2"
+    },
+    {
+      "created_at": "2026-11-21T12:08:33Z",
+      "first_frozen_at": "2026-11-21T17:24:09Z",
+      "id": "NVlabs/alpasim#249",
+      "issue_number": 249,
+      "prediction_deadline_at": "2026-11-21T23:24:09Z",
+      "repository": "NVlabs/alpasim",
+      "source": "inbox/FIRST_SEEN_20261121T172409Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "ec5b6579fef59fbae978fd61ef96edfcee1a4e01576c098ce04d32ccb03b3f05"
     }
   ]
 }

@@ -1,0 +1,13 @@
+{
+  "case_id": "gazebosim/gz-sim#4258",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-11-21T17:22:50Z",
+  "expiry_sha256": "87dc5ce466f1353f14b7f24fd57f513310bbeda7753a66f20412f93fe2bfaf6c",
+  "first_frozen_at": "2026-11-21T09:39:39Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-11-21T15:39:39Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "62a357466e5f886334e1e4a6f44d235e866525b552afe06dcda98dfd4b6916e2"
+}
