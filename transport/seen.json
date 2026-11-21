@@ -11368,6 +11368,72 @@
       "source": "inbox/FIRST_SEEN_20261120T213132Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "8e89ce3bb81a02c29d89e17ee3d89e930aaab3725cef631d2e35eaedbb0d04fd"
+    },
+    {
+      "created_at": "2026-11-21T00:30:37Z",
+      "first_frozen_at": "2026-11-21T01:26:05Z",
+      "id": "Genesis-Embodied-AI/genesis-world#3900",
+      "issue_number": 3900,
+      "prediction_deadline_at": "2026-11-21T07:26:05Z",
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "source": "inbox/FIRST_SEEN_20261121T012605Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "fa323a74697f1ddb9b53910752bdd104f924bed0831562a5e401766d2d046f6b"
+    },
+    {
+      "created_at": "2026-11-21T00:59:32Z",
+      "first_frozen_at": "2026-11-21T01:26:05Z",
+      "id": "Genesis-Embodied-AI/genesis-world#3901",
+      "issue_number": 3901,
+      "prediction_deadline_at": "2026-11-21T07:26:05Z",
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "source": "inbox/FIRST_SEEN_20261121T012605Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "85b4e5fc60abdae72b5e527ae1c313885349f3b1da1f339018708bc540470b21"
+    },
+    {
+      "created_at": "2026-11-20T22:43:36Z",
+      "first_frozen_at": "2026-11-21T01:26:05Z",
+      "id": "google-deepmind/mujoco#3933",
+      "issue_number": 3933,
+      "prediction_deadline_at": "2026-11-21T07:26:05Z",
+      "repository": "google-deepmind/mujoco",
+      "source": "inbox/FIRST_SEEN_20261121T012605Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "a8ce2fa41f357dfe46b284173a98afa9d4da4475cb52572b51921b02b9b152e8"
+    },
+    {
+      "created_at": "2026-11-20T23:05:21Z",
+      "first_frozen_at": "2026-11-21T01:26:05Z",
+      "id": "huggingface/lerobot#5449",
+      "issue_number": 5449,
+      "prediction_deadline_at": "2026-11-21T07:26:05Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261121T012605Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "abc917725384a0ecdd71b84fb644a397f19fda5d3c07b0ddb16b8e95b83a8013"
+    },
+    {
+      "created_at": "2026-11-20T23:06:10Z",
+      "first_frozen_at": "2026-11-21T01:26:05Z",
+      "id": "huggingface/lerobot#5451",
+      "issue_number": 5451,
+      "prediction_deadline_at": "2026-11-21T07:26:05Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261121T012605Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "1e943429ad5b1a456a544ec58e29c018592fecf676b4eec5cfdbfc0c0105ced8"
+    },
+    {
+      "created_at": "2026-11-20T23:41:13Z",
+      "first_frozen_at": "2026-11-21T01:26:05Z",
+      "id": "isaac-sim/IsaacLab#9140",
+      "issue_number": 9140,
+      "prediction_deadline_at": "2026-11-21T07:26:05Z",
+      "repository": "isaac-sim/IsaacLab",
+      "source": "inbox/FIRST_SEEN_20261121T012605Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "cac91466e723655927862aaf69615dcf3b2f20fefbca22721ebde8fce965a43e"
     }
   ]
 }
