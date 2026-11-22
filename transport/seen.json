@@ -11674,6 +11674,17 @@
       "source": "inbox/FIRST_SEEN_20261122T154000Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "1d14d44a4e8c87f63a83a40220ee17c3bc6e0295ecfdadb4f396bded93abcc4a"
+    },
+    {
+      "created_at": "2026-11-22T17:47:43Z",
+      "first_frozen_at": "2026-11-22T18:28:36Z",
+      "id": "RobotLocomotion/drake#25286",
+      "issue_number": 25286,
+      "prediction_deadline_at": "2026-11-23T00:28:36Z",
+      "repository": "RobotLocomotion/drake",
+      "source": "inbox/FIRST_SEEN_20261122T182836Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "7d75ee5b4c442dae7215cf14f04d14adf10f4d76f52c852802c907b65ae956af"
     }
   ]
 }
