@@ -11550,13 +11550,17 @@
     },
     {
       "created_at": "2026-11-21T12:08:33Z",
+      "expiry_recorded_at": "2026-11-22T00:39:03Z",
+      "expiry_sha256": "15e61b6b65cb2e96bb5abbe2a7d08361ffe03032c4b0b3f901a994c71d41a86a",
+      "expiry_source": "expirations/NVlabs__alpasim__249.json",
       "first_frozen_at": "2026-11-21T17:24:09Z",
       "id": "NVlabs/alpasim#249",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 249,
       "prediction_deadline_at": "2026-11-21T23:24:09Z",
       "repository": "NVlabs/alpasim",
       "source": "inbox/FIRST_SEEN_20261121T172409Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "ec5b6579fef59fbae978fd61ef96edfcee1a4e01576c098ce04d32ccb03b3f05"
     },
     {
@@ -11580,6 +11584,17 @@
       "source": "inbox/FIRST_SEEN_20261121T230703Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "263004626df2963bfbec1fe9e3db51a8e9168a5d5df44a35ab795b4a785bf13a"
+    },
+    {
+      "created_at": "2026-11-21T23:13:04Z",
+      "first_frozen_at": "2026-11-22T00:40:09Z",
+      "id": "huggingface/lerobot#5459",
+      "issue_number": 5459,
+      "prediction_deadline_at": "2026-11-22T06:40:09Z",
+      "repository": "huggingface/lerobot",
+      "source": "inbox/FIRST_SEEN_20261122T004009Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "392603fdb7f55351d3b4f1f335e1339c5165eb8454cea8ba127ce75e521254ff"
     }
   ]
 }

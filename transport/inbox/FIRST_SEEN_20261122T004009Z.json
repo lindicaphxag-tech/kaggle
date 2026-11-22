@@ -1,0 +1,28 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "zhangyue19921010",
+      "body": "## Description\n\nWhen data-parallel workers report different policy sub-losses, the training log can average unrelated values. For example, an action-supervised batch may report a flow loss while a text-supervised batch on another rank reports a text loss. The tracker packs local meters into a positional tensor at each logging interval.\n\n## Reproduction\n\nAt e5be0c16b, start two CPU Gloo ranks, create a MetricsTracker on each, and call update_metrics with `{\"flow_loss\": 2.0}` on rank 0 and `{\"text_loss\": 8.0}` on rank 1. After both call reduce_across_ranks, rank 0 labels 5 as flow loss and rank 1 labels 5 as text loss. Each reported loss has one observation and should retain its own value on both ranks.\n\nReproduced with Python 3.12 and PyTorch 2.11.0. The same positional mismatch occurs if both workers report the same names in different orders.\n",
+      "created_at": "2026-11-21T23:13:04Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5459",
+      "id": "huggingface/lerobot#5459",
+      "issue_number": 5459,
+      "labels": [
+        "policies",
+        "examples",
+        "training"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "392603fdb7f55351d3b4f1f335e1339c5165eb8454cea8ba127ce75e521254ff",
+      "title": "fix(train): distributed logging mixes losses reported under different names"
+    }
+  ],
+  "post_activation_issue_identities_observed": 773,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-22T00:40:09Z",
+  "schema_version": 1
+}
