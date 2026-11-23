@@ -1,0 +1,38 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "Kashu7100",
+      "body": "### What feature or enhancement are you proposing?\n\nMake the torch path of `gs.utils.geom.transform_by_quat` cheaper on large batches. It builds the rotation matrix by contracting the outer product of the quaternion with the `(10, 4, 4)` coefficient tensor `GeomConstants.quat_to_R`, which allocates a temporary of 160 elements per quaternion. The same rotation can be written with two cross products, `v + 2 * (q_w * t + q_vec x t) / |q|^2` with `t = q_vec x v`, in about as many torch operations and with temporaries of 3 elements.\n\n`inv_transform_by_quat`, `transform_by_trans_quat`, `inv_transform_by_trans_quat` and `transform_pos_quat_by_trans_quat` go through it, so they change with it.\n\n### Motivation\n\nAs a user training policies with thousands of parallel environments\nI want to rotate link-level batches of vectors, such as `(num_envs, num_links, 3)`, at a cost that scales with the data\nBecause reward, observation and kinematics code calls `transform_by_quat` on such batches every step, and at these sizes the temporary dominates the call.\n\n### Potential Benefit\n\nTime per call in microseconds, best of 10 runs, float32, torch 2.11. \"Backward\" is the forward call followed by `torch.autograd.grad` of the summed output with respect to both inputs. The node was shared, so small differences are within noise.\n\nNVIDIA L40S:\n\n| Batch | Forward, current | Forward, proposed | Backward, current | Backward, proposed |\n|---|---|---|---|---|\n| `()` | 43.2 | 44.0 | 281.0 | 312.2 |\n| `(1024,)` | 45.0 | 47.5 | 284.0 | 321.6 |\n| `(4096,)` | 44.7 | 47.3 | 283.5 | 319.6 |\n| `(4096, 14)` | 79.0 | 48.1 | 292.4 | 330.1 |\n| `(65536, 14)` | 2063.4 | 65.6 | 5136.7 | 375.8 |\n\nAMD EPYC 9354, 16 threads:\n\n| Batch | Forward, current | Forward, proposed | Backward, current | Backward, proposed |\n|---|---|---|---|---|\n| `()` | 20.3 | 16.0 | 137.0 | 134.5 |\n| `(1024,)` | 417.9 | 45.1 | 843.2 | 242.3 |\n| `(4096,)` | 777.9 | 126.0 | 1801.9 | 509.0 |\n| `(4096, 14)` | 4275.5 | 2001.6 | 11587.6 | 6629.6 |\n| `(65536, 14)` | 27935.3 | 15231.0 | 58665.6 | 51548.9 |\n\nThe gain is large on the GPU at 917k rotations (31x forward, 14x with the backward pass) and on the CPU from 1,024 rotations up (2x to 9x forward).\n\nThere is a cost. On the GPU the proposed form is 2% to 6% slower forward for batches up to 4,096 rotations, and about 12% slower with the backward pass up to 57k rotations, because the two cross products add autograd nodes. The `GeomConstants` docstring explains that the contraction was chosen to keep the operation count low, so this trade-off is yours to judge.\n\nA matmul contraction of the flattened outer product is as fast as the current form on small batches and 5x faster on large ones, but the docstring already rules it out because of TF32.\n\n### What is the expected outcome of the implementation work?\n\n- [ ] `transform_by_quat` on torch tensors returns the same values and gradients as today, including for non-unit quaternions and for operands of different rank.\n- [ ] The call no longer allocates a temporary of 160 elements per quaternion.\n- [ ] The existing geometry tests pass, including `test_geom_torch_inside_enclosing_torch_compile`.\n\n### Additional information\n\nValues and gradients of the two forms agree to 1e-15 and 7e-15 in float64 on non-unit quaternions with broadcast shapes `(7, 1, 3)` and `(5, 4)`.\n\nI have a patch ready and will open a pull request that links here.\n",
+      "created_at": "2026-11-23T00:06:56Z",
+      "html_url": "https://github.com/Genesis-Embodied-AI/genesis-world/issues/3912",
+      "id": "Genesis-Embodied-AI/genesis-world#3912",
+      "issue_number": 3912,
+      "labels": [
+        "enhancement"
+      ],
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "surface_sha256": "2255da395bf110c956145cf987ec51e653722a46485db461e65e0954c10598bc",
+      "title": "[Feature]: Speed up the torch path of `transform_by_quat` on large batches"
+    },
+    {
+      "author_login": "sudarshan-sridhar",
+      "body": "On main at 708617f, `Gr00tN1d7Processor` assumes every modality config has a `video` entry. The dataset side accepts a config without one, so a state + action + language config gets through data loading and then fails in the processor with `KeyError: 'video'`.\n\nUnguarded accesses in the processor:\nhttps://github.com/NVIDIA/Isaac-GR00T/blob/708617f5716c63fc0a327391492ea2b91977ae90/gr00t/model/gr00t_n1d7/processing_gr00t_n1d7.py#L530 (process_observation)\nhttps://github.com/NVIDIA/Isaac-GR00T/blob/708617f5716c63fc0a327391492ea2b91977ae90/gr00t/model/gr00t_n1d7/processing_gr00t_n1d7.py#L711 (`__call__`)\n\nThe loader explicitly handles it being missing:\nhttps://github.com/NVIDIA/Isaac-GR00T/blob/708617f5716c63fc0a327391492ea2b91977ae90/gr00t/data/dataset/lerobot_episode_loader.py#L417\nhttps://github.com/NVIDIA/Isaac-GR00T/blob/708617f5716c63fc0a327391492ea2b91977ae90/gr00t/data/dataset/fast_sharded_dataset.py#L75\n\nRepro on CPU (skips `__init__` to avoid the HF download):\n\n```python\ncfg = {\"state\": ModalityConfig(delta_indices=[0], modality_keys=[\"s\"]),\n       \"action\": ModalityConfig(delta_indices=list(range(4)), modality_keys=[\"a\"]),\n       \"language\": ModalityConfig(delta_indices=[0], modality_keys=[\"task\"])}\np = Gr00tN1d7Processor.__new__(Gr00tN1d7Processor)\np.modality_configs = {\"new_embodiment\": cfg}\np.training = False; p.exclude_state = True; p.max_state_dim = 8\nobs = {\"state.s\": np.zeros((1, 1, 3), dtype=np.float32), \"task\": [\"pick\"]}\np.process_observation(obs, EmbodimentTag(\"new_embodiment\"))\n```\n\n```\n  File \".../gr00t/model/gr00t_n1d7/processing_gr00t_n1d7.py\", line 530, in process_observation\n    image_keys = modality_config[\"video\"].modality_keys\nKeyError: 'video'\n```\n\nIs video required for N1.7? If it is, I have a small patch that raises a ValueError naming the embodiment and the modalities it did get. If image-free configs are supposed to work, the processor and the policy layer (gr00t_policy.py:256, :549, replay_policy.py:163) would need guards too.",
+      "created_at": "2026-11-22T21:17:29Z",
+      "html_url": "https://github.com/NVIDIA/Isaac-GR00T/issues/821",
+      "id": "NVIDIA/Isaac-GR00T#821",
+      "issue_number": 821,
+      "labels": [],
+      "repository": "NVIDIA/Isaac-GR00T",
+      "surface_sha256": "3acab0c9a81f7051437935e3c8eb83df044075c918a9cf5ae8ab87eb933bf0b7",
+      "title": "N1.7 processor fails with bare KeyError 'video' when the modality config has no video entry"
+    }
+  ],
+  "post_activation_issue_identities_observed": 781,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-23T00:14:02Z",
+  "schema_version": 1
+}

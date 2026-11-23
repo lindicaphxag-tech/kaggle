@@ -11655,24 +11655,32 @@
     },
     {
       "created_at": "2026-11-22T13:14:00Z",
+      "expiry_recorded_at": "2026-11-23T00:12:32Z",
+      "expiry_sha256": "5e3a371136da46cb059b578732f1bff9175e32b8963c737d725e56d533f64aae",
+      "expiry_source": "expirations/Genesis-Embodied-AI__genesis-world__3910.json",
       "first_frozen_at": "2026-11-22T15:40:00Z",
       "id": "Genesis-Embodied-AI/genesis-world#3910",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 3910,
       "prediction_deadline_at": "2026-11-22T21:40:00Z",
       "repository": "Genesis-Embodied-AI/genesis-world",
       "source": "inbox/FIRST_SEEN_20261122T154000Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "4b32e8e2302c5def4866adeca4cf451b4e2d7d44b002f790f9e13e62a7323d1f"
     },
     {
       "created_at": "2026-11-22T13:12:19Z",
+      "expiry_recorded_at": "2026-11-23T00:12:32Z",
+      "expiry_sha256": "8994a4613061b8927012e3c7c64116a937bcecd4bca4c8553ed6c257860c4fb3",
+      "expiry_source": "expirations/huggingface__lerobot__5463.json",
       "first_frozen_at": "2026-11-22T15:40:00Z",
       "id": "huggingface/lerobot#5463",
+      "independence_class": "UNADJUDICATED",
       "issue_number": 5463,
       "prediction_deadline_at": "2026-11-22T21:40:00Z",
       "repository": "huggingface/lerobot",
       "source": "inbox/FIRST_SEEN_20261122T154000Z.json",
-      "status": "candidate-frozen-awaiting-prediction",
+      "status": "deadline_missed_unadjudicated",
       "surface_sha256": "1d14d44a4e8c87f63a83a40220ee17c3bc6e0295ecfdadb4f396bded93abcc4a"
     },
     {
@@ -11685,6 +11693,28 @@
       "source": "inbox/FIRST_SEEN_20261122T182836Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "7d75ee5b4c442dae7215cf14f04d14adf10f4d76f52c852802c907b65ae956af"
+    },
+    {
+      "created_at": "2026-11-23T00:06:56Z",
+      "first_frozen_at": "2026-11-23T00:14:02Z",
+      "id": "Genesis-Embodied-AI/genesis-world#3912",
+      "issue_number": 3912,
+      "prediction_deadline_at": "2026-11-23T06:14:02Z",
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "source": "inbox/FIRST_SEEN_20261123T001402Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "2255da395bf110c956145cf987ec51e653722a46485db461e65e0954c10598bc"
+    },
+    {
+      "created_at": "2026-11-22T21:17:29Z",
+      "first_frozen_at": "2026-11-23T00:14:02Z",
+      "id": "NVIDIA/Isaac-GR00T#821",
+      "issue_number": 821,
+      "prediction_deadline_at": "2026-11-23T06:14:02Z",
+      "repository": "NVIDIA/Isaac-GR00T",
+      "source": "inbox/FIRST_SEEN_20261123T001402Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "3acab0c9a81f7051437935e3c8eb83df044075c918a9cf5ae8ab87eb933bf0b7"
     }
   ]
 }
