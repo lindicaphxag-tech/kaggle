@@ -1,0 +1,61 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 3,
+  "new_candidates": [
+    {
+      "author_login": "alexhegit",
+      "body": "## What happens\n\nResuming an FSDP2 run fails while loading the sharded optimizer state if the policy has trainable parameters that never receive a gradient. With Multi-task DiT:\n\n```\nRuntimeError: Missing key in checkpoint state_dict: optimizer.state.observation_encoder.vision_encoder.model.post_layernorm.weight.step.\n```\n\n## Why\n\n- `CLIPVisionEncoder.forward` uses `last_hidden_state[:, 0]`. `CLIPVisionModel` still computes its pooled output through `post_layernorm`, but that output does not reach the loss, so `post_layernorm` never gets a gradient and AdamW never creates state for it.\n- `save_sharded_optimizer` (accelerate's `save_fsdp_optimizer`) writes the optimizer state that exists, without `post_layernorm`.\n- On resume, `load_sharded_optimizer` (accelerate's `load_fsdp_optimizer`) calls torch's `get_optimizer_state_dict`, whose `_init_optim_state` creates state for every trainable parameter, so `dcp.load` expects `post_layernorm` keys the checkpoint does not have.\n\nDDP resume of the same policy works (non-sharded optimizer path). FSDP resume of ACT, whose parameters all get gradients, works.\n\n## Reproduce\n\nWith LeRobot (2 GPUs; Multi-task DiT declares no `_fsdp_wrap_modules`, hence `wrap_modules`):\n\n```bash\naccelerate launch --num_processes=2 $(which lerobot-train) \\\n  --policy.type=multi_task_dit --policy.horizon=32 --policy.n_action_steps=24 \\\n  --dataset.repo_id=lerobot/aloha_sim_transfer_cube_human --dataset.episodes='[0]' \\\n  --parallelism.dp_shard=2 --accelerator.fsdp.wrap_modules='[\"CLIPEncoderLayer\",\"TransformerBlock\"]' \\\n  --batch_size=1 --steps=2 --save_freq=2 --output_dir=outputs/dit-fsdp\naccelerate launch --num_processes=2 $(which lerobot-train) --resume=true \\\n  --config_path=outputs/dit-fsdp/checkpoints/000002/pretrained_model/train_config.json --steps=4\n```\n\nDevice-independent, with plain torch on CPU (`torchrun --nproc-per-node=2 repro.py /tmp/ckpt`, gloo), following the same save/load calls:\n\n```python\nimport sys, torch, torch.distributed as dist, torch.distributed.checkpoint as dcp\nfrom torch import nn\nfrom torch.distributed.checkpoint.state_dict import get_optimizer_state_dict, set_optimizer_state_dict\nfrom torch.distributed.device_mesh import init_device_mesh\nfrom torch.distributed.fsdp import fully_shard\n\nclass Model(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.used = nn.Linear(8, 8)\n        self.unused = nn.Linear(8, 8)  # trainable, but never reaches the loss\n    def forward(self, x):\n        return self.used(x)\n\ndef build(mesh):\n    model = Model()\n    fully_shard(model.used, mesh=mesh)\n    fully_shard(model, mesh=mesh)\n    return model, torch.optim.AdamW(model.parameters())\n\ndist.init_process_group(\"gloo\")\nmesh = init_device_mesh(\"cpu\", (dist.get_world_size(),))\nmodel, opt = build(mesh)\nmodel(torch.randn(4, 8)).sum().backward(); opt.step(); opt.zero_grad()\ndcp.save({\"optimizer\": get_optimizer_state_dict(model, opt)}, checkpoint_id=sys.argv[1])\n\nmodel2, opt2 = build(mesh)\nstate = {\"optimizer\": get_optimizer_state_dict(model2, opt2)}\ndcp.load(state, checkpoint_id=sys.argv[1])  # Missing key ... optimizer.state.unused.weight.step\nset_optimizer_state_dict(model2, opt2, state[\"optimizer\"])\n```\n\nThe load raises `Missing key in checkpoint state_dict: optimizer.state.unused.weight.step.`; with `unused` included in `forward` it loads.\n\n## Possible fixes\n\n- Initialise the optimizer state for all trainable parameters before the first sharded save (e.g. the same `_init_optim_state` the load path runs), so saved and expected keys match.\n- Or load the optimizer shards non-strictly for parameters without state.\n- For this policy specifically, freezing `post_layernorm` (or not computing the pooled output) avoids it.\n\nThe underlying behaviour is in torch's `get_optimizer_state_dict` + DCP; LeRobot is where FSDP resume breaks for users, so filing here first.\n\n## Environment\n\n- LeRobot `main` (`e5be0c16`), accelerate 1.15, torch 2.12.\n- Seen on 2\u00d7 AMD MI300X (ROCm 7.14); the CPU repro above reproduces it without any GPU. Not run on NVIDIA.\n",
+      "created_at": "2026-11-23T01:43:13Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5474",
+      "id": "huggingface/lerobot#5474",
+      "issue_number": 5474,
+      "labels": [
+        "policies",
+        "training"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "ea4c07eb94e9f87ba2468c3e1abcd9f726005eadaf72e7a0a18935f5d687f676",
+      "title": "FSDP resume fails when a policy has trainable parameters that get no gradient (Missing key ... optimizer.state)"
+    },
+    {
+      "author_login": "alexhegit",
+      "body": "## What happens\n\n`--accelerator.fsdp.min_num_params` (the size-based wrap policy) fails at `accelerator.prepare()` for policies whose layers live in an `nn.ModuleList`, which is most of them:\n\n```\nValueError: fully_shard does not support containers that do not implement forward: ModuleList(\n```\n\n## Why\n\n`FSDPConfig.build_plugin` maps `min_num_params` to accelerate's `size_based_wrap`. accelerate's FSDP2 size policy (`fsdp2_prepare_auto_wrap_policy`) returns `True` for any module whose total parameter count exceeds the threshold, including the `nn.ModuleList` holding the layers, and torch's `fully_shard` rejects modules without a `forward`.\n\nOnly six policies declare `_fsdp_wrap_modules` (ACT, WALL-OSS 0.5, FastWAM, LingBot-VLA v2, LaWAM, Cosmos3). For the others, `set_fsdp_wrap_modules` says to pass `--accelerator.fsdp.wrap_modules` or `--accelerator.fsdp.min_num_params`, but in practice only class names work.\n\n## Reproduce\n\n```bash\naccelerate launch --num_processes=2 $(which lerobot-train) \\\n  --policy.type=multi_task_dit --policy.horizon=32 --policy.n_action_steps=24 \\\n  --dataset.repo_id=lerobot/aloha_sim_transfer_cube_human --dataset.episodes='[0]' \\\n  --parallelism.dp_shard=2 --accelerator.fsdp.min_num_params=100000 \\\n  --batch_size=1 --steps=2\n```\n\nAlso failed for VQ-BeT and SmolVLA (and, with other options set, for DiT with gradient accumulation, HSDP, fp16/bf16 and `reshard_after_forward=false`). The same runs pass with class names, e.g. `--accelerator.fsdp.wrap_modules='[\"CLIPEncoderLayer\",\"TransformerBlock\"]'` for DiT, `'[\"Block\"]'` for VQ-BeT.\n\n## Possible fixes\n\n- Wrap the size policy so it skips containers (`nn.ModuleList`, `nn.ModuleDict`) and modules without their own `forward`, falling through to their children.\n- Or document that `min_num_params` does not work with FSDP2 and point to `wrap_modules`, perhaps with the class names of the policies that declare none.\n\nRelated, separately: FSDP `cpu_offload=true` with the default `init_process_group.backend=\"nccl\"` fails with `No backend type associated with device type cpu`; #5065 addresses it (`cpu:gloo,cuda:nccl` worked for us).\n\n## Environment\n\n- LeRobot `e5be0c16`-era code in the image (accelerate 1.15, torch 2.12).\n- 2\u00d7 AMD MI300X (ROCm 7.14). The failing check is torch's own `fully_shard` validation, so it is device-independent. Not run on NVIDIA.\n",
+      "created_at": "2026-11-23T01:43:15Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5475",
+      "id": "huggingface/lerobot#5475",
+      "issue_number": 5475,
+      "labels": [
+        "policies",
+        "training"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "899378beabd203558d80accee97213c2890676ff9f3204cab20f63561030353f",
+      "title": "--accelerator.fsdp.min_num_params fails under FSDP2: fully_shard rejects the ModuleList it selects"
+    },
+    {
+      "author_login": "alexhegit",
+      "body": "## What happens\n\nThe DROID fine-tune in `docs/source/praxis.mdx` (\"Training\" \u2192 \"Data\") fails at startup with the documented `rename_map`:\n\n```bash\nRENAME='{\"observation.state.cartesian\":\"observation.state\",\"action.cartesian\":\"action\",\n\"observation.images.exterior_1_left\":\"observation.images.exterior\",\"observation.images.wrist_left\":\"observation.images.wrist\"}'\n```\n\n```\nValueError: Both 'observation.state' and 'observation.state.cartesian' are named 'observation.state' after rename_map. Map one of them to another name as well, e.g. add {'observation.state': 'observation.state.original'} to rename a key onto an existing 'observation.state'.\n```\n\nThe docs say \"a renamed key replaces an existing one\", which was the behaviour before #5316 (merged the same day as Praxis, #5321) made collisions an error.\n\n## Following the error message does not work either\n\nMoving the joint-space columns out of the way, as the message suggests:\n\n```bash\nRENAME='{\"observation.state\":\"observation.state.joint_unused\",\"action\":\"action.joint_unused\",\n\"observation.state.cartesian\":\"observation.state\",\"action.cartesian\":\"action\", ...cameras...}'\n```\n\nfails with\n\n```\nValueError: Both 'observation.state.joint_unused' and 'observation.state' are named 'observation.state.joint_unused' after rename_map. ...\n```\n\nAs the doc notes, `lerobot-train` applies the map to the raw batch and once more inside the processor pipeline. On the second pass, the `observation.state` produced by the first pass (formerly `observation.state.cartesian`) is renamed again by the `observation.state \u2192 ...` entry. (`observation.state.joint` cannot be used as the target: DROID already has that column.)\n\nSo there seems to be no `rename_map` that puts the Cartesian columns in place of the joint-space ones under the current collision check.\n\n## Reproduce\n\nThe command in the doc's \"Full fine-tune\" / \"LoRA\" sections, with `--dataset.revision=refs/pr/11`, `--dataset.episodes` from `select_droid_episodes.py`, and `--policy.path=runwayml/praxis-1-droid-lerobot`. It fails before the first step, on any device.\n\n## Possible fixes\n\n- Apply `rename_map` once, or make the second pass a no-op for keys the first pass produced.\n- Or allow an explicit replace, e.g. a key mapped onto a name whose current holder is also mapped away within the same map.\n- Or a DROID revision whose Cartesian columns are already named `observation.state` / `action`.\n\n## Environment\n\nLeRobot `main` (`e5be0c16`), run from source on 1-4\u00d7 AMD MI300X (ROCm 7.14). The failure is in key handling, not device code.\n",
+      "created_at": "2026-11-23T01:43:17Z",
+      "html_url": "https://github.com/huggingface/lerobot/issues/5476",
+      "id": "huggingface/lerobot#5476",
+      "issue_number": 5476,
+      "labels": [
+        "bug",
+        "documentation",
+        "policies",
+        "dataset",
+        "processor",
+        "training"
+      ],
+      "repository": "huggingface/lerobot",
+      "surface_sha256": "c671cdf018ea3d7c721ee677cdaad08cc1993a646aa9ad58f6b73548d095d21b",
+      "title": "Praxis DROID fine-tune: documented rename_map fails since #5316, and no rename_map works with the double application"
+    }
+  ],
+  "post_activation_issue_identities_observed": 784,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-23T01:58:19Z",
+  "schema_version": 1
+}
