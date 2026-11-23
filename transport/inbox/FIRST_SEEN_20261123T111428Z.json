@@ -1,0 +1,36 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "Kashu7100",
+      "body": "## Bug description\n\nIn genesis-world 1.5.0, a surface whose diffuse map is a `gs.textures.DynamicTexture` renders under the rasterizer as a fully metallic material. A quad showing a dynamic texture of the same color as the `Plastic` board it lies on renders much darker than the board: 155 against 208 in the repro below.\n\n`surface_uvs_to_trimesh_visual` (`genesis/utils/mesh.py`) seeds a dynamic texture as a `trimesh.visual.material.PBRMaterial` without `metallicFactor` or `roughnessFactor`. `Mesh._get_trimesh_props` (`genesis/ext/pyrender/mesh.py`) copies those `None`s into a `MetallicRoughnessMaterial`, whose setters turn `None` into 1.0. A plain-colored surface takes the vertex-color path instead, which sets `metallicFactor=0.2, roughnessFactor=0.8`.\n\nGiving the `PBRMaterial` `metallicFactor=0.2, roughnessFactor=0.8` (for instance by subclassing it with those defaults before the scene builds) makes the quad render at 208, matching the board exactly. The `PBRMaterial` built for an image texture with an emission leaves the same two factors unset.\n\n## Minimal reproducible example\n\n```python\nimport genesis as gs\nimport numpy as np\n\ngs.init(backend=gs.gpu, logging_level=\"error\")\nscene = gs.Scene(show_viewer=False, renderer=gs.renderers.Rasterizer())\n# A board in a plain color, and a quad lying on it whose dynamic texture shows the same color\nscene.add_entity(\n    gs.morphs.Box(size=(0.6, 0.4, 0.02), pos=(0, 0, 0.01), fixed=True),\n    surface=gs.surfaces.Plastic(color=(0.9, 0.9, 0.9)),\n)\nscene.add_entity(\n    gs.morphs.Plane(pos=(0, 0, 0.0202), plane_size=(0.4, 0.2), tile_size=(0.4, 0.2), collision=False, fixed=True),\n    surface=gs.surfaces.Plastic(\n        diffuse_texture=gs.textures.DynamicTexture(\n            resolution=(64, 32), variants=(gs.textures.ColorTexture(color=(0.9, 0.9, 0.9)),)\n        )\n    ),\n)\ncam = scene.add_camera(res=(320, 240), pos=(0.0, -0.45, 0.6), lookat=(0.0, 0.05, 0.0), fov=60)\nscene.build()\nrgb = np.asarray(cam.render(rgb=True)[0])\nprint(\"quad (dynamic texture):\", rgb[130, 160].tolist())\nprint(\"board (plain color):   \", rgb[168, 160].tolist())\n```\n\nOutput:\n\n```\nquad (dynamic texture): [155, 155, 155]\nboard (plain color):    [208, 208, 208]\n```\n\n## Expected behavior\n\nA dynamic texture showing a color renders like a surface of that color: both pixels at 208.\n\n## Environment\n\n- genesis-world 1.5.0 (`4a8ee4bb`), rasterizer, CUDA backend\n- Python 3.12, Linux x86_64\n",
+      "created_at": "2026-11-23T09:40:29Z",
+      "html_url": "https://github.com/Genesis-Embodied-AI/genesis-world/issues/3917",
+      "id": "Genesis-Embodied-AI/genesis-world#3917",
+      "issue_number": 3917,
+      "labels": [],
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "surface_sha256": "0e63cff663a12978d28508dd97f2468578fcf70b7c385242f6422fa7021f28a6",
+      "title": "[Bug]: DynamicTexture surfaces render fully metallic under the rasterizer"
+    },
+    {
+      "author_login": "Kashu7100",
+      "body": "## Bug description\n\nUnder the rasterizer, a texel with alpha 0 shows the background color instead of the geometry behind it. A quad lying on a board, whose texture is fully transparent, cuts a hole through the board: the pixels under the quad have the background color, while the board beside the quad renders normally. Static `ImageTexture`s and `DynamicTexture` variants behave the same way.\n\nThis blocks switching an indicator on and off through a `DynamicTexture` with a transparent \"off\" variant, the use its docstring names (an indicator light).\n\n## Minimal reproducible example\n\n```python\nimport genesis as gs\nimport numpy as np\n\ngs.init(backend=gs.gpu, logging_level=\"error\")\nscene = gs.Scene(show_viewer=False, renderer=gs.renderers.Rasterizer())\nscene.add_entity(\n    gs.morphs.Box(size=(0.6, 0.4, 0.02), pos=(0, 0, 0.01), fixed=True),\n    surface=gs.surfaces.Plastic(color=(0.9, 0.9, 0.9)),\n)\n# A quad lying on the board whose texture is fully transparent (alpha 0 everywhere)\ntransparent = np.zeros((4, 4, 4), dtype=np.uint8)\ntransparent[..., 0] = 230\nscene.add_entity(\n    gs.morphs.Plane(pos=(0, 0, 0.0205), plane_size=(0.12, 0.12), tile_size=(0.12, 0.12), collision=False, fixed=True),\n    surface=gs.surfaces.Rough(diffuse_texture=gs.textures.ImageTexture(image_array=transparent)),\n)\ncam = scene.add_camera(res=(320, 240), pos=(0.0, -0.45, 0.6), lookat=(0.0, 0.0, 0.0), fov=50)\nscene.build()\nrgb = np.asarray(cam.render(rgb=True)[0])\nprint(\"under the transparent quad:\", rgb[120, 160].tolist())\nprint(\"board beside the quad:     \", rgb[120, 60].tolist())\nprint(\"background:                \", rgb[5, 5].tolist())\n```\n\nOutput:\n\n```\nunder the transparent quad: [10, 20, 31]\nboard beside the quad:      [203, 203, 203]\nbackground:                 [10, 20, 31]\n```\n\n## Expected behavior\n\nThe board shows through the transparent quad: the pixel under the quad is about 203, like the board beside it.\n\n## Environment\n\n- genesis-world 1.5.0 (`4a8ee4bb`), rasterizer, CUDA backend\n- Python 3.12, Linux x86_64\n",
+      "created_at": "2026-11-23T09:40:30Z",
+      "html_url": "https://github.com/Genesis-Embodied-AI/genesis-world/issues/3918",
+      "id": "Genesis-Embodied-AI/genesis-world#3918",
+      "issue_number": 3918,
+      "labels": [],
+      "repository": "Genesis-Embodied-AI/genesis-world",
+      "surface_sha256": "c74578ad5c7f9aa5c26b65619d84f6b1f6489590519253a3db8a76a8e48e0446",
+      "title": "[Bug]: Rasterizer draws alpha-0 texels as the background color instead of the geometry behind them"
+    }
+  ],
+  "post_activation_issue_identities_observed": 788,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-23T11:14:28Z",
+  "schema_version": 1
+}
