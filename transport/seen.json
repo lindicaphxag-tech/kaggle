@@ -12528,6 +12528,28 @@
       "source": "inbox/FIRST_SEEN_20261125T222737Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "1249bf1a72d40a54ba0c12500c89a6f1dcdb80745be0c939f1acc6eee256648c"
+    },
+    {
+      "created_at": "2026-11-25T22:31:41Z",
+      "first_frozen_at": "2026-11-25T22:44:30Z",
+      "id": "Farama-Foundation/PettingZoo#1560",
+      "issue_number": 1560,
+      "prediction_deadline_at": "2026-11-26T04:44:30Z",
+      "repository": "Farama-Foundation/PettingZoo",
+      "source": "inbox/FIRST_SEEN_20261125T224430Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "e00ce3301680894a1a2e512d5dc408e07d3b1e5a5224479f0eaf4e9adb0b6a3b"
+    },
+    {
+      "created_at": "2026-11-25T22:39:28Z",
+      "first_frozen_at": "2026-11-25T22:44:30Z",
+      "id": "Farama-Foundation/PettingZoo#1562",
+      "issue_number": 1562,
+      "prediction_deadline_at": "2026-11-26T04:44:30Z",
+      "repository": "Farama-Foundation/PettingZoo",
+      "source": "inbox/FIRST_SEEN_20261125T224430Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "7cf2d668f7772721965cf3a79ad9bb94d35dc16b034aedfe362ca9188a6fefbd"
     }
   ]
 }

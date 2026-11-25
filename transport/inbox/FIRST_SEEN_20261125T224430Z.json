@@ -1,0 +1,36 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "pradeep-ramola",
+      "body": "### Describe the bug\n\n`AgentIndicatorV1` and `AgentIndicatorParallelV1` require identical observation spaces, but `_validate_observation_spaces` compares `repr(space)` strings. NumPy truncates large arrays, so two Box spaces with different bounds can have the same representation and pass validation. The wrapper then advertises the first agent's transformed bounds for all agents.\n\nA replacement using only `Box.__eq__` is insufficient: Gymnasium uses `np.allclose` for Box bounds, which also accepts small but real differences.\n\n### Minimal reproduction\n\nThis exercises the shared validation helper used by both public wrapper constructors, without optional environment assets:\n\n```python\nimport numpy as np\nfrom gymnasium.spaces import Box\nfrom pettingzoo.utils.wrappers.agent_indicator import _validate_observation_spaces\n\nlow = np.ones(1024, dtype=np.float32)\nlow[0] = -1\nother_low = low.copy()\nother_low[512] += 1e-6\nhigh = np.full(1024, 3, dtype=np.float32)\nfirst = Box(low, high, dtype=np.float32)\nother = Box(other_low, high, dtype=np.float32)\n\nwith np.printoptions(threshold=1000):\n    assert repr(first) == repr(other)\n    assert first == other  # Gymnasium's tolerant bound comparison.\n    assert not np.array_equal(first.low, other.low)\n    _validate_observation_spaces([first, other])\n    # Currently succeeds; should reject these non-identical bounds.\n```\n\n### Expected behavior and proposed fix\n\nCompare Box dtypes and complete low/high arrays exactly, independent of printing settings, while preserving normal Discrete-space equality and existing wrapper behavior for genuinely identical spaces. No environment dynamics or version changes are needed.\n\nI have a focused patch and tests through both public wrapper constructors. Eight regression cases cover low/high differences, large differences and differences within allclose's tolerance; all fail on unchanged main eec83ee0. Six positive controls cover distinct identical Box objects and equivalent Discrete spaces. All 22 agent-indicator tests and 787 tests across 19 wrapper modules pass with the fix.\n\nEnvironment: Windows, Python 3.14.5, Gymnasium 1.4.0, CPU/headless tests. The broader run reports 65 existing environment/deprecation warnings, not warnings from the new agent-indicator cases. No new runtime dependencies. AI assistance was used for investigation, implementation, and testing.\n\n### Checklist\n\n- [x] I have checked that there is no similar issue or competing PR in the repo.\n- [x] I have included a minimal reproduction.",
+      "created_at": "2026-11-25T22:31:41Z",
+      "html_url": "https://github.com/Farama-Foundation/PettingZoo/issues/1560",
+      "id": "Farama-Foundation/PettingZoo#1560",
+      "issue_number": 1560,
+      "labels": [],
+      "repository": "Farama-Foundation/PettingZoo",
+      "surface_sha256": "e00ce3301680894a1a2e512d5dc408e07d3b1e5a5224479f0eaf4e9adb0b6a3b",
+      "title": "AgentIndicator accepts different Box bounds when their printed representations match"
+    },
+    {
+      "author_login": "pradeep-ramola",
+      "body": "### Describe the bug\n\nBoth `DelayObservationV1` and `DelayObservationParallelV1` append observations directly to their history queues. When an environment reuses a NumPy observation buffer, later updates overwrite the queued frame, so a positive delay returns current data instead of historical data. Dictionaries with observation/action-mask arrays are affected too.\n\n### Minimal reproduction\n\n```python\nimport numpy as np\nfrom gymnasium.spaces import Box, Discrete\nfrom pettingzoo import ParallelEnv\nfrom pettingzoo.utils.wrappers import DelayObservationParallelV1\n\nclass BufferEnv(ParallelEnv):\n    metadata = {'name': 'buffer_reuse'}\n    render_mode = None\n    possible_agents = ['agent_0']\n\n    def __init__(self):\n        self.buffer = np.array([10], dtype=np.int64)\n\n    def observation_space(self, agent):\n        return Box(0, 100, shape=(1,), dtype=np.int64)\n\n    def action_space(self, agent):\n        return Discrete(2)\n\n    def reset(self, seed=None, options=None):\n        self.agents = self.possible_agents[:]\n        self.buffer[0] = 10\n        return {'agent_0': self.buffer}, {'agent_0': {}}\n\n    def step(self, actions):\n        self.buffer += 1\n        return ({'agent_0': self.buffer}, {'agent_0': 0.0},\n                {'agent_0': False}, {'agent_0': False}, {'agent_0': {}})\n\nenv = DelayObservationParallelV1(BufferEnv(), delay=1)\nenv.reset()\nobservations, *_ = env.step({'agent_0': 0})\nprint(observations['agent_0'])  # Actual: [11]; expected: [10].\n```\n\n### Expected behavior and proposed fix\n\nSnapshot observations when retaining them for a positive delay, including nested mutable arrays. Preserve zero-delay pass-through without an unnecessary copy. The queue should retain a frame's value at capture time, and a returned historical frame should not change when the environment writes to its next buffer.\n\nI have a focused patch with eight failing-before cases across AEC/Parallel APIs, array/dictionary observations, and delays of one/two. They return 11 or 12 instead of the expected 10 on unchanged main eec83ee0. Four additional controls preserve object identity with delay=0. All 31 delay-wrapper tests and 785 tests across 19 wrapper modules pass with the fix. The full Atari/environment/tutorial matrix was not run; the broader run emits existing environment/deprecation warnings.\n\nEnvironment: Windows, Python 3.14.5, Gymnasium 1.4.0, CPU/headless tests. No new dependencies or environment-dynamics changes. This is independent of #1560/#1561. AI assistance was used for investigation, implementation, and testing.\n\n### Checklist\n\n- [x] I have checked that there is no similar issue or competing PR in the repo.\n- [x] I have included a minimal reproduction.",
+      "created_at": "2026-11-25T22:39:28Z",
+      "html_url": "https://github.com/Farama-Foundation/PettingZoo/issues/1562",
+      "id": "Farama-Foundation/PettingZoo#1562",
+      "issue_number": 1562,
+      "labels": [],
+      "repository": "Farama-Foundation/PettingZoo",
+      "surface_sha256": "7cf2d668f7772721965cf3a79ad9bb94d35dc16b034aedfe362ca9188a6fefbd",
+      "title": "Delayed observations are overwritten when an environment reuses its buffers"
+    }
+  ],
+  "post_activation_issue_identities_observed": 836,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-25T22:44:30Z",
+  "schema_version": 1
+}
