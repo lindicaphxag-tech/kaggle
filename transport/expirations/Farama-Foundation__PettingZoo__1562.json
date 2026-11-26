@@ -1,0 +1,13 @@
+{
+  "case_id": "Farama-Foundation/PettingZoo#1562",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-11-26T04:56:48Z",
+  "expiry_sha256": "7eb12ea002dbb73719f341d89fd12c8fd4608f09d38ca25499d81a36aa50d85c",
+  "first_frozen_at": "2026-11-25T22:44:30Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-11-26T04:44:30Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "7cf2d668f7772721965cf3a79ad9bb94d35dc16b034aedfe362ca9188a6fefbd"
+}
