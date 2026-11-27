@@ -1,0 +1,26 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 1,
+  "new_candidates": [
+    {
+      "author_login": "RBT22",
+      "body": "### Motivation\n\nSome industrial robots run at a fixed hardware period, such as 4 ms, with blocking `read()` and/or `write()` methods. In synchronous `read() -> update() -> write()` loop, a blocking `read()` waits until a robot message arrives.\n\nCurrently, controller manager reads the clock when triggering each controller's `update()` method. Network jitter therefore affects the timestamp and period passed to it, which can introduce uneven trajectory sampling and variations in commanded velocity despite the robot's fixed cycle.\n\n### Proposed approach\n\nWould it make sense to introduce an optional mode that advances controller timestamps on a nominal hardware timeline, rather than using the actual execution time?\n\nAfter the first blocking `read()` returns, store the initial timestamp immediately before the controller update.\n\nSubsequent timestamps would follow the nearest nominal hardware cycle, estimated from the time elapsed since the first read completed. If a message is lost, the timestamp could advance by multiple hardware periods to account for the gap.\n\n### Limitations\n\nThis approach relies on host-side arrival times, so it cannot reliably distinguish packet loss from a sufficiently long delay. For example, with a 4 ms period, a 6 ms interval between the first two packets would be rounded to two cycles, even if no packet was lost. A delay in the first packet can also bias later estimates because its arrival establishes the timing reference.\n\nAsynchronous operation is another option, but keeping the controller and hardware loops aligned introduces its own timing and synchronization challenges.\n\nWould this approach be useful, or is there a better way to address this? I would appreciate your opinions. Thank you! ",
+      "created_at": "2026-11-27T09:24:07Z",
+      "html_url": "https://github.com/ros-controls/ros2_control/issues/3830",
+      "id": "ros-controls/ros2_control#3830",
+      "issue_number": 3830,
+      "labels": [
+        "enhancement"
+      ],
+      "repository": "ros-controls/ros2_control",
+      "surface_sha256": "fcae23ea30d1bfd45305c726813e3154c103480187b569974a573bf77f840345",
+      "title": "Fixed controller timestamps for hardware-synchronized loops"
+    }
+  ],
+  "post_activation_issue_identities_observed": 892,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-27T10:07:45Z",
+  "schema_version": 1
+}
