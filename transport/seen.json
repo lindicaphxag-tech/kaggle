@@ -13602,6 +13602,28 @@
       "source": "inbox/FIRST_SEEN_20261127T185338Z.json",
       "status": "deadline_missed_unadjudicated",
       "surface_sha256": "2d05d85e227a2bcdc7617f43aa3d018efa7986653b3cb3e10fe9e9a35d4a60ec"
+    },
+    {
+      "created_at": "2026-11-27T21:49:41Z",
+      "first_frozen_at": "2026-11-28T02:10:32Z",
+      "id": "ros2/rclpy#1789",
+      "issue_number": 1789,
+      "prediction_deadline_at": "2026-11-28T08:10:32Z",
+      "repository": "ros2/rclpy",
+      "source": "inbox/FIRST_SEEN_20261128T021032Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "d131e2c6e2f4c015fbefadca83ad0fd17acef4e2c5337201849b8a1c49de8323"
+    },
+    {
+      "created_at": "2026-11-27T23:17:42Z",
+      "first_frozen_at": "2026-11-28T02:10:32Z",
+      "id": "ros2/rosidl#1035",
+      "issue_number": 1035,
+      "prediction_deadline_at": "2026-11-28T08:10:32Z",
+      "repository": "ros2/rosidl",
+      "source": "inbox/FIRST_SEEN_20261128T021032Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "c0a1acba311413708da45fa7926f800efdbe4a2a70250448ee01a890764932de"
     }
   ]
 }
