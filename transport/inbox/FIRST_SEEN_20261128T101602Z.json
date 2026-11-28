@@ -1,0 +1,60 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 4,
+  "new_candidates": [
+    {
+      "author_login": "jeckyuans",
+      "body": "Hi organizers,\n\nRegarding the 2026 AlpaSim E2E Closed Loop Challenge, the announcements state that valid final submissions accompanied by a technical report are \"eligible for prizes and certificates, including both leaderboard and innovation awards.\"\n\nCould you please clarify two points?\n\n1. Eligibility: Are certificates issued only to the 1st-place and Innovation Prize winners, or do 2nd-place teams (or top-3 finalists) with a valid technical report also receive certificates?\n2. Timeline: When and through what channel will the certificates be distributed?\n\nThank you.",
+      "created_at": "2026-11-28T09:14:14Z",
+      "html_url": "https://github.com/NVlabs/alpasim/issues/250",
+      "id": "NVlabs/alpasim#250",
+      "issue_number": 250,
+      "labels": [],
+      "repository": "NVlabs/alpasim",
+      "surface_sha256": "1bc81342a292ab63a505e8251746e20e066372f78eea6d2687c84cc69d3d5c29",
+      "title": "Clarification on Certificate Eligibility (2nd Place) and Distribution Timeline"
+    },
+    {
+      "author_login": "patelshivani2283-lab",
+      "body": "### Description\n\nAs part of #4178, integration tests using mock systems solely to query the ECM after simulation steps are being refactored to use `Server::EcmScope()`.\n\nIn `test/integration/load_system_static_registry.cc`, the `LoadWorks` test adds a `MockSystem` with a `postUpdateCallback` solely to inspect the ECM and check that `ModelPluginComponent` exists and is attached to `test_model1` and `test_model2` after `server.RunOnce()`.\n\nSince the ECM can be inspected directly via `server.EcmScope()` with `ASSERT_TRUE(ecm.Valid())` immediately after `server.RunOnce()`, creating and registering a `MockSystem` is unnecessary. Replacing this with `server.EcmScope()` eliminates the need for `MockSystem`, removes the `#include \"plugins/MockSystem.hh\"` header, and simplifies the test.\n\n### Tasks\n\n- [ ] Refactor `test/integration/load_system_static_registry.cc` to use `server.EcmScope()`.\n- [ ] Remove `#include \"plugins/MockSystem.hh\"`.",
+      "created_at": "2026-11-28T03:07:12Z",
+      "html_url": "https://github.com/gazebosim/gz-sim/issues/4315",
+      "id": "gazebosim/gz-sim#4315",
+      "issue_number": 4315,
+      "labels": [],
+      "repository": "gazebosim/gz-sim",
+      "surface_sha256": "908988656401e2ffabccd7433d7b458ee861a5f94f3f580ec727dea1ac460ff8",
+      "title": "Refactor load_system_static_registry integration test to use EcmScope"
+    },
+    {
+      "author_login": "Quchaosheng",
+      "body": "#3809 is a deadlock between `load_and_initialize_components()` (`resources_lock_` -> `joint_limiters_lock_` -> `resource_interfaces_lock_`) and `shutdown_components()` (the reverse order), hit when SIGINT/SIGTERM arrives during startup. #3811 fixes the order; this is the test that keeps it fixed.\n\nWhat the test has to do:\n\n- start `load_and_initialize_components()` in a `std::async`, with a test component whose `on_init()` blocks until the test releases it (a `sleep_on_init` parameter, as suggested in #3811);\n- once the load thread is inside `on_init()`, call `shutdown_components()` from the test thread;\n- wait with a bounded `std::future::wait_for()` and assert that both calls return and the components end up `FINALIZED`.\n\nThe failure mode on the old code is a real deadlock, so the \"bounded\" part needs care: a plain `wait_for()` that times out leaves two threads stuck and the gtest process hangs at exit instead of failing. Options: run the case in a forked child or a separate test executable with a hard timeout, or make the test component's `on_init()` release after a fixed delay so the window is a race rather than a guaranteed deadlock. The first gives a deterministic failure, the second is cheap but flaky by nature.\n\nNot urgent for #3811, which is a two-line order fix; tracked here so it does not get lost.",
+      "created_at": "2026-11-28T05:29:23Z",
+      "html_url": "https://github.com/ros-controls/ros2_control/issues/3832",
+      "id": "ros-controls/ros2_control#3832",
+      "issue_number": 3832,
+      "labels": [],
+      "repository": "ros-controls/ros2_control",
+      "surface_sha256": "2b1be6a6eb5cfb3e42b639b9446cd74609135135ece6223ad41421a6c487e092",
+      "title": "Add a regression test for the ResourceManager load/shutdown lock order"
+    },
+    {
+      "author_login": "Quchaosheng",
+      "body": "#3630 stops the controllers that command a hardware component when it is asked to leave the `ACTIVE` state, so a controller cannot keep writing to hardware that no longer accepts commands (#3444). Three gaps are left in that path:\n\n1. **Readers are kept for every target.** The stop request only includes controllers that command the component, which is right for `inactive` (the state interfaces stay available, and `ros2_control_demo_example_13` relies on its joint state broadcasters surviving the transition). For `unconfigured` and `finalized`, `cleanup_hardware()`/`shutdown_hardware()` remove the interfaces from the available list, so a state-only reader is left running against interfaces that no longer exist.\n2. **An inactive component is not covered.** The block only runs when the component is currently `ACTIVE`, so `inactive -> unconfigured/finalized` removes the interfaces without stopping anything. With `allow_controller_activation_with_inactive_hardware` (or a component that self-deactivated) those controllers can be active.\n3. **`BEST_EFFORT` can drop a controller and still transition.** With the list already filtered down to active controllers, there is no \"already inactive\" case left to tolerate; using `STRICT` would make a rejected stop leave the component untouched, which is what the callback intends.\n\nAll three are behaviour changes for users who rely on readers surviving a hardware transition, so they want their own PR with tests: a state-only reader kept for `inactive` and stopped for `unconfigured`/`finalized`, the inactive -> unconfigured case, and a chained controller that `BEST_EFFORT` would silently drop.\n\nSplit out of #3630, which stays a two-line lock-order fix.",
+      "created_at": "2026-11-28T05:29:49Z",
+      "html_url": "https://github.com/ros-controls/ros2_control/issues/3833",
+      "id": "ros-controls/ros2_control#3833",
+      "issue_number": 3833,
+      "labels": [],
+      "repository": "ros-controls/ros2_control",
+      "surface_sha256": "e2767c31851cbdf1903523b609008139f8350a3932267df318618c33143c0cf2",
+      "title": "set_hardware_component_state: stop state-interface readers for unconfigured/finalized, and use STRICT"
+    }
+  ],
+  "post_activation_issue_identities_observed": 910,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-28T10:16:02Z",
+  "schema_version": 1
+}
