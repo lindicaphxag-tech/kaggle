@@ -1,0 +1,13 @@
+{
+  "case_id": "Farama-Foundation/Gymnasium#1881",
+  "claim_boundary": "Administrative missed-SLA evidence only. No retrospective mechanism prediction, I0 exclusion, independent hit, or external-adoption credit.",
+  "expiry_recorded_at": "2026-11-28T01:53:43Z",
+  "expiry_sha256": "695f7cada290dd0f9bfe04d3e5d98fb69ba697851c7a34a3f164724d7c271859",
+  "first_frozen_at": "2026-11-27T18:53:38Z",
+  "independence_class": "UNADJUDICATED",
+  "prediction_deadline_at": "2026-11-28T00:53:38Z",
+  "primary_prospective_I2_eligible": false,
+  "reason": "No prediction or original-surface disposition frozen before six-hour deadline.",
+  "schema_version": 1,
+  "source_surface_sha256": "944a9280335cbb25d363797f9cbf32d2feee88b5f83396ad4e6fb375aff5a07c"
+}
