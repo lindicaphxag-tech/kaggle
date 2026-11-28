@@ -13676,6 +13676,28 @@
       "source": "inbox/FIRST_SEEN_20261128T101602Z.json",
       "status": "candidate-frozen-awaiting-prediction",
       "surface_sha256": "e2767c31851cbdf1903523b609008139f8350a3932267df318618c33143c0cf2"
+    },
+    {
+      "created_at": "2026-11-28T10:27:19Z",
+      "first_frozen_at": "2026-11-28T10:51:26Z",
+      "id": "NVIDIA/Isaac-GR00T#824",
+      "issue_number": 824,
+      "prediction_deadline_at": "2026-11-28T16:51:26Z",
+      "repository": "NVIDIA/Isaac-GR00T",
+      "source": "inbox/FIRST_SEEN_20261128T105126Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "12b455c7eae9599d362b990fc65e5eed20b85e103d7ef7457c90024e61ac88a1"
+    },
+    {
+      "created_at": "2026-11-28T10:17:53Z",
+      "first_frozen_at": "2026-11-28T10:51:26Z",
+      "id": "RobotLocomotion/drake#25305",
+      "issue_number": 25305,
+      "prediction_deadline_at": "2026-11-28T16:51:26Z",
+      "repository": "RobotLocomotion/drake",
+      "source": "inbox/FIRST_SEEN_20261128T105126Z.json",
+      "status": "candidate-frozen-awaiting-prediction",
+      "surface_sha256": "d8b1101eb0007c72524f98272f7ed9096a50386b8fbf1e3cc6e5da04116c1c99"
     }
   ]
 }

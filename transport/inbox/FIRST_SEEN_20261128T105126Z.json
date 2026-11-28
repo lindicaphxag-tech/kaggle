@@ -1,0 +1,36 @@
+{
+  "claim_boundary": "Capture is not I2 admission, mechanism correctness, external adoption, or L8/L9 credit.",
+  "information_barrier": "Before prediction freeze, transport may read only the GitHub issues endpoint original issue fields. Comments, linked PR diffs, later commits, maintainer diagnoses, and fixes are forbidden.",
+  "new_candidate_count": 2,
+  "new_candidates": [
+    {
+      "author_login": "hly000",
+      "body": "`DiT`, `AlternateVLDiT` and `SelfAttentionTransformer` (`gr00t/model/modules/dit.py`) set `_supports_gradient_checkpointing = True` and `self.gradient_checkpointing = False`, but no `forward` ever reads the flag. Blocks are always called directly (lines 338, 418, 536).\n\nSo `TrainingConfig.gradient_checkpointing=True` (passed through at `experiment.py:290`) flips the flag and saves no memory in the action head. With a frozen backbone, the DiT is the only place it could.\n\nThe flag gets suggested for low-VRAM fine-tuning in #162, #536 and #724, so people are likely relying on it.\n\n### Repro\n\nCPU only, no weights:\n\n```python\n# python repro.py path/to/gr00t/model/modules/dit.py\nimport importlib.util, sys, torch, torch.utils.checkpoint as cp\n\nspec = importlib.util.spec_from_file_location(\"dit\", sys.argv[1])\ndit = importlib.util.module_from_spec(spec); spec.loader.exec_module(dit)\n\ncalls = 0\norig = cp.checkpoint\ndef counting(*a, **k):\n    global calls; calls += 1; return orig(*a, **k)\ncp.checkpoint = counting\n\nm = dit.AlternateVLDiT(num_attention_heads=4, attention_head_dim=16, output_dim=8, num_layers=4,\n                       interleave_self_attention=True, cross_attention_dim=64).train()\nm.enable_gradient_checkpointing()\nB, T, S = 2, 6, 10\nout = m(torch.randn(B, T, 64, requires_grad=True), torch.randn(B, S, 64),\n        timestep=torch.randint(0, 1000, (B,)),\n        image_mask=torch.arange(S)[None].expand(B, -1) < 5,\n        backbone_attention_mask=torch.ones(B, S, dtype=torch.bool))\nout.sum().backward()\nprint(m.gradient_checkpointing, calls)   # True 0\n```\n\nPrints `True 0`. Expected `True 4`.\n\n### Fix\n\nA few lines in each block loop:\n\n```python\nif self.training and self.gradient_checkpointing and torch.is_grad_enabled():\n    hidden_states = torch.utils.checkpoint.checkpoint(block, hidden_states, ..., use_reentrant=False)\nelse:\n    hidden_states = block(hidden_states, ...)\n```\n\nI can open a PR.\n\n### Versions\n\nIsaac-GR00T `main` at `708617f`, torch 2.14.1, diffusers 0.35.1, transformers 4.57.3, Python 3.10.\n",
+      "created_at": "2026-11-28T10:27:19Z",
+      "html_url": "https://github.com/NVIDIA/Isaac-GR00T/issues/824",
+      "id": "NVIDIA/Isaac-GR00T#824",
+      "issue_number": 824,
+      "labels": [],
+      "repository": "NVIDIA/Isaac-GR00T",
+      "surface_sha256": "12b455c7eae9599d362b990fc65e5eed20b85e103d7ef7457c90024e61ac88a1",
+      "title": "`gradient_checkpointing` does nothing on the DiT action head"
+    },
+    {
+      "author_login": "ucsurf",
+      "body": "Our code review of RobotLocomotion/drake at 5186757f28d541f90428158c123fd84585e8eaee (current master HEAD) found two issues in Drake's own parsers and LCM image unpacking. This is source review only, nothing was run or compiled; the suggested patch and its three tests are unrun and untested.\n\nWe did not find a private security channel (private vulnerability reporting is disabled, and the repository has no SECURITY.md or documented security contact), so we are reporting these publicly.\n\n1. A model file that includes itself can make Parser hang or overflow the stack (CWE-835, CWE-674). This is a local-file path: the victim parses an attacker-supplied model. MJCF ExpandIncludeTags in multibody/parsing/detail_mujoco_parser.cc:1973-2054 has no depth counter and no visited set (entered from Parse at :2073 via AddOrMergeModelFromMujocoXml / MujocoParserWrapper::AddModel). An include whose file attribute resolves to the same file either loops at :2042-2053 (include directly under mujoco) or recurses at :2044 (include inside worldbody). DMD ParseModelDirectivesImpl in multibody/parsing/detail_dmd_parser.cc, add_directives branch :279-307, recursively loads a URI that names the same file (ResolveUri at :295, LoadModelDirectives at :302, self-call at :306) with no path-depth check. We are not claiming an out-of-bounds access or code execution here, only a hang or stack overflow.\n\n2. LcmImageArrayToImages copies width \u00d7 height \u00d7 channels bytes from an uncompressed lcmt_image without checking data.size() (CWE-125). UnpackLcmImage in systems/sensors/lcm_image_array_to_images.cc:94-126 resizes at :101 and memcpy's image->size() at :105; Image::size() is width * height * kNumChannels (systems/sensors/image.h:122). The zlib and VTK branches at :68-92 already check lengths; this branch does not. The write stays inside the resized buffer; the read can run past data. The attacker must be able to publish on the victim's LCM channel.\n\nAn untested fix, drake-include-lcm-bounds.patch, is in the first comment below (apply with `git apply`, not `git am`). It records the include / add_directives chain and rejects a lexically normal path already in that chain, and it compares the needed uncompressed byte count with data.size() before copying. A lexical-path check alone can still cycle through a symlink alias, so we recommend also adding a depth bound on include expansion. The three tests in the patch have not been compiled or run.\n\nCredit: Ugur Celik (ucsurf), @ucsurf\n\u2014 Ugur Celik (ucsurf) \u00b7 https://uc.surf\nWe find and report security issues in open source before attackers do. If our work helped you, a small contribution keeps it going and makes the internet a little safer for everyone:\nhttps://buymeacoffee.com/ucsurf\n",
+      "created_at": "2026-11-28T10:17:53Z",
+      "html_url": "https://github.com/RobotLocomotion/drake/issues/25305",
+      "id": "RobotLocomotion/drake#25305",
+      "issue_number": 25305,
+      "labels": [],
+      "repository": "RobotLocomotion/drake",
+      "surface_sha256": "d8b1101eb0007c72524f98272f7ed9096a50386b8fbf1e3cc6e5da04116c1c99",
+      "title": "Self-including model files hang or overflow the stack; uncompressed LCM images read past data"
+    }
+  ],
+  "post_activation_issue_identities_observed": 912,
+  "public_activation_cutoff": "2026-10-06T01:58:55Z",
+  "repositories_scanned": 89,
+  "scanned_at": "2026-11-28T10:51:26Z",
+  "schema_version": 1
+}
